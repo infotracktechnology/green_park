@@ -28,7 +28,15 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 #admin routes
 Route::group(['middleware' => ['auth'], 'prefix' => 'admin'],function(){
     Route::resource('branch', 'App\Http\Controllers\BranchController');
-    Route::get('studentdashboard', function () {
-    return view('dashboards.studentdashboard');
+    
+Route::get('studentdashboard', function () {
+return view('dashboards.studentdashboard');
 })->name('studentdashboard');
+
+Route::get('teacherdashboard', function () {
+return view('dashboards.teacherdashboard');
+})->name('teacherdashboard');
 });
+
+
+
