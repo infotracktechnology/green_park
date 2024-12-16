@@ -5,6 +5,7 @@
 <section class="section">
     <div class="row">
         <div class="col-12">
+            <marquee behavior="scroll" direction="left" style="background-color: #e61515cb; padding: 10px; color: white; font-weight: bold;">******* Today is {{ date('l, F jS') }} and Please Complete Today Unit Test Within Given Time Period ******</marquee>
             <h3><strong>Home</strong></h3>
             <div class="row text-center">
                 <!-- Profile Icon -->
