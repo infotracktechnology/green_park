@@ -38,8 +38,6 @@ class StudentController extends Controller
             'ph_no2' => ['unique:student,ph_no2', 'numeric', 'min:10'],
             'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'min:10'],
             'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'min:10'],
-
-            // 'email' => ['unique:student,email', 'email'],
         ]);
         $students = student::create($request->all());
         return to_route('student.index');
@@ -60,7 +58,7 @@ class StudentController extends Controller
     {
         $data=$request->all();
         $student->update($data);
-        return to_route('student.index');
+        return $request->ajax() ? response()->json(['success' => true]) : to_route('student.index');
 
     }
 
