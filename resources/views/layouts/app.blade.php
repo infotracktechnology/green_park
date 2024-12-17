@@ -114,6 +114,12 @@
               <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
             </li>
 
+            <li class="dropdown">
+              <a href="{{ route('student.index') }}" class="nav-link"><i data-feather="grid"></i><span>Students</span></a>
+            </li>
+
+
+
 
           <li class="dropdown">
 

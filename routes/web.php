@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
@@ -26,9 +27,10 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 #admin routes
-Route::group(['middleware' => ['auth'], 'prefix' => 'admin'],function(){
+Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
     Route::resource('branch', 'App\Http\Controllers\BranchController');
     Route::get('studentdashboard', function () {
-    return view('dashboards.studentdashboard');
-})->name('studentdashboard');
+        return view('dashboards.studentdashboard');
+    })->name('studentdashboard');
+    Route::resource('student', 'App\Http\Controllers\StudentController');
 });
