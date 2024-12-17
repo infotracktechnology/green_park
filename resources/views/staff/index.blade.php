@@ -26,22 +26,23 @@
                     <h6 class="col-deep-purple">Staff Details</h6>
                     </div>
                     <div class="col-md-2 col-sm-12 mb-3">
-                      <a href="{{route('staff.create')}}" class="btn btn-primary btn-block">Add staff</a>
+                      <a href="{{route('staff.create')}}" class="btn btn-primary btn-block">Add Staff</a>
                     </div>
                     </div>
                     <div class="col-12">
                     <div class="table-responsive">
-      <table class="table table-striped table-sm" id="myTable">
+      <table class="table table-striped table-sm " id="myTable">
   
       <thead>
   
         <tr role="row">
-        <th>Branch ID</th>
+        <th >Branch ID</th>
         <th>Full Name</th>
         <th>Designation</th>
         <th>Department</th>
         <th>Email</th>
         <th>Mobile No</th>
+        <th>Gender</th>
         <th>Branch</th>
         <th>City</th>
         <th>State</th>
@@ -52,30 +53,34 @@
   
         </thead>
   
-        {{-- <tbody>
-          @foreach ($staff as $staff)
+        <tbody>
+          @foreach ($staff as $member)
           <tr>
-            <td>{{$staff->id}}</td>
-            <td>{{$staff->name}}</td>
-           <td>{{$staff->city}}</td>
-            <td>{{$staff->state}}</td>
-            <td>{{$staff->pincode}}</td>
-            <td>{{$staff->mob_no}}</td>
-            <td>{{$staff->email}}</td>
-            <td>{{$staff->manager_name}}</td>
+            <td>{{ $member->id }}</td>
+            <td>{{ $member->name }}</td>
+            <td>{{ $member->designation }}</td>
+            <td>{{ $member->department }}</td>
+            <td>{{ $member->email }}</td>
+            <td>{{ $member->mob_no }}</td>
+            <td>{{ $member->gender }}</td>
+            <td>{{ $member->branch }}</td>
+            <td>{{ $member->city }}</td>
+            <td>{{ $member->state }}</td>
+            <td>{{ $member->pincode }}</td>
+           
+          
             <td>
-              <a href="{{route('staff.edit', $staff->id)}}" class="btn btn-warning text-white"><i class="fas fa-edit"></i></a>
+              <a href="{{ route('staff.edit', $member->id) }}" class="btn btn-warning text-white"><i class="fas fa-edit"></i></a>
             </td>
-        
             <td>
-              <form action="{{route('staff.destroy', $staff->id)}}" method="post" onsubmit="return confirm('Are you sure you want to Delete This staff?')">
+              <form action="{{ route('staff.destroy', $member->id) }}" method="post" onsubmit="return confirm('Are you sure you want to Delete This staff?')">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
               </form>
             </td>
           </tr>
-          @endforeach --}}
+          @endforeach
           
         </tbody>
       </table>
