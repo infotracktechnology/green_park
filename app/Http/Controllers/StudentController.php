@@ -47,25 +47,24 @@ class StudentController extends Controller
 
 
 
-    public function edit(Request $request, student $student) {
+    public function edit(Request $request, student $student)
+    {
         $branches = DB::table('branch')->select('id', 'name')->get();
-
-        return view('student.edit', compact('student', 'branches'));
+        $districts = DB::table('district_list')->get();
+        $states = DB::table('district_list')->select('State')->distinct()->get();
+        return view('student.edit', compact('student', 'branches' , 'districts', 'states'));
     }
 
-   
-    public function update(Request $request, student $student) {
 
-        // $data=$request->all();
-        // $student->update($data);
-
-        $student->update($request->all());
+    public function update(Request $request, student $student)
+    {
+        $data=$request->all();
+        $student->update($data);
         return to_route('student.index');
 
     }
-  
-    public function destroy($id)
-    {
-       
-    }
+
+    
+
+    public function destroy($id) {}
 }
