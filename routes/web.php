@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImportController;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -36,7 +37,8 @@ return view('dashboards.studentdashboard');
 Route::get('teacherdashboard', function () {
 return view('dashboards.teacherdashboard');
 })->name('teacherdashboard');
+
+Route::get('student/import', [ImportController::class, 'index'])->name('import');
+Route::post('student/import/upload', [ImportController::class, 'upload'])->name('import.upload');
 });
-
-
 
