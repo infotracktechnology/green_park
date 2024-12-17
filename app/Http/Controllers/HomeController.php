@@ -30,5 +30,9 @@ function studentdashboard(){
     return view('dashboards.studentdashboard');
 }
 
+function teacherdashboard(){
+    return view('dashboards.teacherdashboard');
+}
+
 }
 

@@ -1,0 +1,61 @@
+@extends('layouts.app')
+@section('title', 'Admission')
+@section('main')
+<div class="main-content">
+    <section class="section">
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-primary" x-data="app">
+                        <form action="{{ route('import.upload') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <h6 class="col-deep-purple">Student Import</h6>
+                                    </div>
+                                    <div class="form-group col-lg-3">
+                                        <label for="branch">Select Branch:</label>
+                                        <select name="branch" id="branch" class="form-control form-control-sm" required>
+                                            <option value="" disabled selected>-- Choose Branch --</option>
+                                            @foreach ($branches as $branch)
+                                                <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group col-lg-3">
+                                        <label for="csv_file">Upload CSV File (Max: 2MB):</label>
+                                        <input type="file" name="csv_file" id="csv_file" class="form-control form-control-sm" accept=".csv" required>
+                                    </div>
+
+                                    <div class="form-group col-lg-3">
+                                        <button style="margin-top: 25px;" type="submit" class="btn btn-primary">Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        @if(session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
+
+                        <script>
+                            document.querySelector('input[type="file"]').addEventListener('change', function (e) {
+                                const file = e.target.files[0];
+                                if (file.size > 2 * 1024 * 1024) { // 2MB in bytes
+                                    alert("File size must not exceed 2MB!");
+                                    e.target.value = ""; // Clear the file input
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+@endsection
