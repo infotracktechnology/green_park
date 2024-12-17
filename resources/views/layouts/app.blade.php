@@ -115,7 +115,7 @@
             </li>
 
             <li class="dropdown">
-              <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="grid"></i><span>Staff Profile</span></a>
+              <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="users"></i><span>Staff Profile</span></a>
             </li>
           <li class="dropdown">
 

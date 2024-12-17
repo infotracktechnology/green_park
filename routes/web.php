@@ -31,7 +31,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin'],function(){
     Route::get('studentdashboard', function () {
     return view('dashboards.studentdashboard');
 })->name('studentdashboard');
-Route::resource('staff', 'App\Http\Controllers\StaffProfileController');
+Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
+
 
 
 
