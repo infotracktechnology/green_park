@@ -109,6 +109,8 @@
                         <button x-cloak x-show="formStep === 6" type="submit" class="btn btn-success">Submit</button>
                      </div>
                   </div>
+
+                  
                     </div>
 
                     
