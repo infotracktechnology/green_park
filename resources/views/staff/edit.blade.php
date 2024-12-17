@@ -86,9 +86,6 @@
                     <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" value= "{{$staff->address_line_2}}" required>
                  </div>
 
-
-
-
                  <div class="form-group col-lg-3">
                     <label>City</label>
                      <select name="city" id="city" class="form-control form-control-sm" required >
