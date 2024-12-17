@@ -7,7 +7,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card card-primary" x-data="app">
-                        <form action="{{ route('import.upload') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('student.import.upload') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
