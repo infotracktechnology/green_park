@@ -38,7 +38,7 @@ Route::get('teacherdashboard', function () {
 return view('dashboards.teacherdashboard');
 })->name('teacherdashboard');
 
-Route::get('student/import', [ImportController::class, 'index'])->name('import');
-Route::post('student/import/upload', [ImportController::class, 'upload'])->name('import.upload');
+Route::get('student/import', [ImportController::class, 'index'])->name('student.import');
+Route::post('student/import/upload', [ImportController::class, 'upload'])->name('student.import.upload');
 });
 
