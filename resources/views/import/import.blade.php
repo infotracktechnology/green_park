@@ -1,11 +1,18 @@
 @extends('layouts.app')
 @section('title', 'Student Import')
 @section('main')
+
 <div class="main-content">
     <section class="section">
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
+                    @if(session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
                     <div class="card card-primary" x-data="app">
                         <form action="{{ route('student.import.upload') }}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -36,12 +43,7 @@
                             </div>
                         </form>
 
-                        @if(session('success'))
-                            <div class="alert alert-success">{{ session('success') }}</div>
-                        @endif
-                        @if(session('error'))
-                            <div class="alert alert-danger">{{ session('error') }}</div>
-                        @endif
+                        
 
                         <script>
                             document.querySelector('input[type="file"]').addEventListener('change', function (e) {
