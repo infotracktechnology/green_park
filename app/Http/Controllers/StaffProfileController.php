@@ -80,11 +80,12 @@ class StaffProfileController extends Controller
             $data['id_proof'] = $request->file('id_proof')->storeAs('id_proofs', $filename, 'public');
         }
         if ($request->hasFile('experience_certificates')) {
-          $data['experience_certificates'] = $request->file('experience_certificates')->store('certificates', 'public');
+            $filename= rand().'.pdf';
+          $data['experience_certificates'] = $request->file('experience_certificates')->storeAs('certificates',$filename, 'public');
         }
         $staff->update($data);
 
-        return redirect()->route('staff.index')->with('success', 'Staff updated successfully')->withImageName($data['photo']);
+        return redirect()->route('staff.index')->with('success', 'Staff updated successfully');
 
     }
     public function destroy(Request $request, Staff $staff)
