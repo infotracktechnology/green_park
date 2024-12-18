@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Enquiry')
+@section('title', 'Student')
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
@@ -20,15 +20,24 @@
                 <div class="card card-primary">
   
                     <div class="card-body">
-  
-                    <div class="row">
-                    <div class="col-md-10 col-sm-12 mb-3">
-                    <h6 class="col-deep-purple">Students Details</h6>
+                      <div class="row ">
+                       
+                        <div class="col-md-8 col-sm-12">
+                            <h6 class="col-deep-purple">Students Details</h6>
+                        </div>
+                   
+                              <div class="col-md-2 col-sm-12 mb-3">
+                           <a href="{{ route('student.create') }}" class="btn btn-primary btn-block">Add Students</a>
+                                </div>
+                              <div class="col-md-2 col-sm-12 mb-3">
+                                <a href="{{ route('import.student') }}" class="btn btn-primary btn-block ">Import Students</a>
+                                 </div>
+
+                    
+                     
                     </div>
-                    <div class="col-md-2 col-sm-12 mb-3">
-                      <a href="{{route('student.create')}}" class="btn btn-primary btn-block">Add Students</a>
-                    </div>
-                    </div>
+                    
+                   
                     <div class="col-12">
                     <div class="table-responsive">
       <table class="table table-striped table-sm" id="myTable">
