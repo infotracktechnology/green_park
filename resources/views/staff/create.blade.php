@@ -155,6 +155,7 @@
                        <option value="Married">Married</option>
                     </select>
                  </div>
+                 
                  <div class="form-group col-lg-12"><h6> Banking Details</h6> <hr style="border-bottom: 1px solid #ccc;"></div>
                  <!-- Banking Details -->
                  <div class="form-group col-lg-3">
