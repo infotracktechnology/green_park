@@ -69,12 +69,12 @@
             <td>{{$branch->email}}</td>
             <td>{{$branch->manager_name}}</td>
             <td>
-              <a href="{{ route('student.edit', $student->id) }}" class="btn btn-warning text-white">
+              <a href="{{ route('branch.edit', $branch->id) }}" class="btn btn-warning text-white">
                  <i class="fas fa-edit"></i>
               </a>
            </td>
            <td>
-              <form action="{{ route('student.destroy', $student->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this student?')">
+              <form action="{{ route('branch.destroy', $branch->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
                  @csrf
                  @method('DELETE')
                  <button type="submit" class="btn btn-danger">

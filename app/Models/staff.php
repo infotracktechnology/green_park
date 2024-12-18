@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 
-class staff extends Model
+class Staff extends Model
 {
  
 
