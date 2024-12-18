@@ -25,6 +25,7 @@ class Staff extends Model
 		static::updating(function($model)
 		{
 			$user = Auth::user();
+			
 			$model->updated_by = $user->id;
 		});
 	}
