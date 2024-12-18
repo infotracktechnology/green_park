@@ -54,15 +54,23 @@ class StudentController extends Controller
     }
 
 
-    public function update(Request $request, student $student)
+    public function update(Request $request, Student $student)
     {
-        $data=$request->all();
+        $data = $request->all();
         $student->update($data);
-        return $request->ajax() ? response()->json(['success' => true]) : to_route('student.index');
-
+    
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+    
+        session()->flash('success', 'Student details successfully updated.');
+        return redirect()->route('student.index');
     }
+    
 
     
 
-    public function destroy($id) {}
+    public function destroy($id) {
+
+    }
 }

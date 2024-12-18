@@ -134,7 +134,8 @@ $(function () {
 
 
     form.validate({
-
+        errorElement: 'div',
+        
         highlight: function (input) {
             $(input).parents('.form-line').addClass('text-danger');
         },
