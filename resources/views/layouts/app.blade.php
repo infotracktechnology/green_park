@@ -12,12 +12,16 @@
   <link rel="stylesheet" href="{{asset('css/components.css')}}">
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
-  <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.ico')}}' />
+  <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
     .select2{
       width: 100% !important;
+    }
+    .error{
+      color: red;
+      font-weight: bold;
     }
   </style>
   @yield('css')
@@ -97,7 +101,7 @@
 
 
 
-            <a href="#"> <img alt="image" src="{{asset('img/logo.png')}}" class="header-logo" /> <span
+            <a href="#"> <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" /> <span
                 class="logo-name">Green Park</span>
             </a>
           </div>
@@ -115,8 +119,13 @@
             </li>
 
             <li class="dropdown">
+              <a href="{{ route('student.index') }}" class="nav-link"><i data-feather="users"></i><span>Students</span></a>
+            </li>
+
+        <li class="dropdown">
               <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="users"></i><span>Staff Profile</span></a>
             </li>
+            
           <li class="dropdown">
 
               <a href="http://www.infotrackin.com/its/" target="_blank" class="nav-link"><i data-feather="headphones"></i><span>Support </span></a>
