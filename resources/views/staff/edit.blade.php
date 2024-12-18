@@ -178,17 +178,38 @@
                  <!-- Upload Fields -->
                  <div class="form-group col-lg-3">
                     <label>Photo</label>
+                    @if($staff->photo)
+                    <img src="{{ Storage::url($staff->photo) }}" height="200px" width="200px" alt="Photo" class="img-thumbnail">
+                    @else
                     <input type="file" name="photo" class="form-control form-control-sm" value="{{$staff->photo}}">
+                    @error('photo')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
+                    @endif
                  </div>
                 
                  <div class="form-group col-lg-3">
                     <label> Certificates</label>
-                    <input type="file" name="experience_certificates[]" class="form-control form-control-sm" value="{{$staff->experience_certificates}}" multiple>
-                 </div>
+                     @if($staff->experience_certificates)
+                     <a href="{{ Storage::url($staff->experience_certificates) }}" target="_blank">View Certificates</a>   
+                    @else
+                    <input type="file" name="experience_certificates" class="form-control form-control-sm" value="{{$staff->experience_certificates}}">
+                    @error('experience_certificates')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
+                    @endif
+                   </div>
 
                  <div class="form-group col-lg-3">
                     <label>ID Proof</label>
-                    <input type="file" name="id_proof" class="form-control form-control-sm" value="{{$staff->id_proof}}" >
+                    @if($staff->id_proof) 
+                    <img src="{{ Storage::url($staff->id_proof) }}" height="200px" width="200px" alt="ID Proof" class="img-thumbnail">
+                    @else
+                    <input type="file" name="id_proof" class="form-control form-control-sm" value="{{$staff->id_proof}}">
+                    @error('id_proof')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
+                    @endif
                  </div>
 
       
