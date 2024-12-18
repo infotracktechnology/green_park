@@ -27,19 +27,12 @@
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
       <div class="navbar-bg"></div>
-      <nav style="left:0;" class="navbar navbar-expand-lg bg-grey main-navbar sticky">
-        <div class="form-inline mr-auto">
-          <ul class="navbar-nav mr-3">
-            <li><a href="#" class="nav-link nav-link-lg fullscreen-btn"><i data-feather="maximize"></i></a></li>
-            <li><form class="form-inline mr-auto">
-                <div class="search-element">
-                  <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="200">
-                  <button class="btn" type="submit">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-              </form>
-            </li>
+      <nav style="left:0;" class="navbar navbar-expand-lg e main-navbar sticky">
+        <div class="mr-auto">
+         <ul class="navbar-nav">
+            <li>
+              <a href="#"><img style="height: 55px;width:90%;" alt="image" src="{{asset('img/image.png')}}" class="header-logo" /></a>
+          </li>
           </ul>
         </div>
 
@@ -48,44 +41,48 @@
         <ul class="navbar-nav navbar-right">
 
 
-          <li class="dropdown dropdown-list-toggle"><a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i>
-          </a>
-          <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
-            <div class="dropdown-header">Notifications</div>
-            <div class="dropdown-list-content dropdown-list-icons">
+          <ul class="navbar-nav navbar-right">
 
-              <a href="#" class="dropdown-item dropdown-item-unread"> <span
-                  class="dropdown-item-icon bg-primary text-white"> <i class="fas
-                      fa-code"></i>
-                </span> <span class="dropdown-item-desc"> Template update is
-                  available now! <span class="time">2 Min
-                    Ago</span>
-                </span>
-              </a>
-           
+
+            <li class="dropdown dropdown-list-toggle"><a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i>
+            </a>
+            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
+              <div class="dropdown-header">Notifications</div>
+              <div class="dropdown-list-content dropdown-list-icons">
+  
+                <a href="#" class="dropdown-item dropdown-item-unread"> <span
+                    class="dropdown-item-icon bg-primary text-white"> <i class="fas
+                        fa-code"></i>
+                  </span> <span class="dropdown-item-desc"> Template update is
+                    available now! <span class="time">2 Min
+                      Ago</span>
+                  </span>
+                </a>
+             
+              </div>
+              <div class="dropdown-footer text-center">
+                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+              </div>
             </div>
-            <div class="dropdown-footer text-center">
-              <a href="#">View All <i class="fas fa-chevron-right"></i></a>
-            </div>
-          </div>
-        </li>
-
-
-             <li class="dropdown"><a href="#" data-toggle="dropdown"class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image" src="{{asset('img/user.png')}}"class="user-img-radious-style"> <span class="d-sm-none d-lg-inline-block"></span></a>
-
-
-
-            <div class="dropdown-menu dropdown-menu-right pullDown">
-            <div class="dropdown-title">Hi, {{ auth()->user()->name }}</div>
-              <div class="dropdown-divider"></div>
-              <a onclick="event.preventDefault();document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
-            </div>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                @csrf
-            </form>
           </li>
+  
+  
+               <li class="dropdown"><a href="#" data-toggle="dropdown"class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image" src="{{asset('img/user.png')}}"class="user-img-radious-style"> <span class="d-sm-none d-lg-inline-block"></span></a>
+  
+  
+  
+              <div class="dropdown-menu dropdown-menu-right pullDown">
+              <div class="dropdown-title">Hi, {{ auth()->user()->name }}</div>
+                <div class="dropdown-divider"></div>
+                <a onclick="event.preventDefault();document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
+              </div>
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                  @csrf
+              </form>
+            </li>
+  
+          </ul>
 
-        </ul>
       </nav>
 
 
