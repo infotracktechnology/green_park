@@ -12,9 +12,12 @@
     <div class="section-body"> 
         <div class="row">
             <div class="col-md-12 col-sm-12">
-            @if(session()->has('success'))
-                <div class="alert alert-success alert-dismissible show fade"> {{ session('success') }} </div>
-            @endif
+              @if(session()->has('success'))
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  {{ session('success') }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+           @endif
                  
         
                 <div class="card card-primary">
@@ -66,18 +69,21 @@
             <td>{{$branch->email}}</td>
             <td>{{$branch->manager_name}}</td>
             <td>
-              <a href="{{route('branch.edit', $branch->id)}}" class="btn btn-warning text-white"><i class="fas fa-edit"></i></a>
-            </td>
-        
-            <td>
-              <form action="{{route('branch.destroy', $branch->id)}}" method="post" onsubmit="return confirm('Are you sure you want to Delete This branch?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+              <a href="{{ route('student.edit', $student->id) }}" class="btn btn-warning text-white">
+                 <i class="fas fa-edit"></i>
+              </a>
+           </td>
+           <td>
+              <form action="{{ route('student.destroy', $student->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this student?')">
+                 @csrf
+                 @method('DELETE')
+                 <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i>
+                 </button>
               </form>
-            </td>
-          </tr>
-          @endforeach
+           </td>
+        </tr>
+        @endforeach
           
         </tbody>
       </table>

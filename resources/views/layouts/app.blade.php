@@ -19,6 +19,10 @@
     .select2{
       width: 100% !important;
     }
+    .error{
+      color: red;
+      font-weight: bold;
+    }
   </style>
   @yield('css')
 </head>
@@ -115,8 +119,13 @@
             </li>
 
             <li class="dropdown">
+              <a href="{{ route('student.index') }}" class="nav-link"><i data-feather="users"></i><span>Students</span></a>
+            </li>
+
+        <li class="dropdown">
               <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="users"></i><span>Staff Profile</span></a>
             </li>
+            
           <li class="dropdown">
 
               <a href="http://www.infotrackin.com/its/" target="_blank" class="nav-link"><i data-feather="headphones"></i><span>Support </span></a>
