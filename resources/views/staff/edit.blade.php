@@ -179,16 +179,25 @@
                  <div class="form-group col-lg-3">
                     <label>Photo</label>
                     <input type="file" name="photo" class="form-control form-control-sm" value="{{$staff->photo}}">
+                    @error('photo')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
                  </div>
                 
                  <div class="form-group col-lg-3">
                     <label> Certificates</label>
-                    <input type="file" name="experience_certificates[]" class="form-control form-control-sm" value="{{$staff->experience_certificates}}" multiple>
-                 </div>
+                    <input type="file" name="experience_certificates" class="form-control form-control-sm">
+                    @error('experience_certificates')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
+                   </div>
 
                  <div class="form-group col-lg-3">
                     <label>ID Proof</label>
-                    <input type="file" name="id_proof" class="form-control form-control-sm" value="{{$staff->id_proof}}" >
+                    <input type="file" name="id_proof" class="form-control form-control-sm">
+                    @error('id_proof')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
                  </div>
 
       
