@@ -37,7 +37,7 @@ class ImportController extends Controller
             if (!empty($data)) {
                 foreach ($data as $row) {
                     DB::table('admissions')->insert([
-                        'id' => $request->input('id'),  // Assign branch ID
+                        'branch_id' => $request->input('branch'),  // Assign branch ID
                         'name' => $row['name'] ?? null,
                         'email' => $row['email'] ?? null,
                         'phone' => $row['phone'] ?? null,
