@@ -40,7 +40,7 @@ return view('dashboards.teacherdashboard');
   
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
-Route::get('student/import', [ImportController::class, 'index'])->name('student.import');
-Route::post('student/import/upload', [ImportController::class, 'upload'])->name('student.import.upload');
+Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
+Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
 });
 
