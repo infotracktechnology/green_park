@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImportController;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -26,14 +27,19 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 #admin routes
-Route::group(['middleware' => ['auth'], 'prefix' => 'admin'],function(){
+Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
     Route::resource('branch', 'App\Http\Controllers\BranchController');
-    Route::get('studentdashboard', function () {
-    return view('dashboards.studentdashboard');
+    
+Route::get('studentdashboard', function () {
+return view('dashboards.studentdashboard');
 })->name('studentdashboard');
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
+Route::get('teacherdashboard', function () {
+return view('dashboards.teacherdashboard');
+})->name('teacherdashboard');
 
-
-
+Route::get('student/import', [ImportController::class, 'index'])->name('student.import');
+Route::post('student/import/upload', [ImportController::class, 'upload'])->name('student.import.upload');
 
 });
+
