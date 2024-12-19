@@ -44,9 +44,9 @@ class StudentController extends Controller
     public function edit(Request $request, Student $student)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
-        $districts = DB::table('district_list')->get();
+        $districts = DB::table('district_list')->where('State', $student->state)->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('student.edit', compact('student', 'branches' , 'districts', 'states'));
+        return view('student.edit', compact('student', 'branches',  'districts','states'));
     }
 
 
