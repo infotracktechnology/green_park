@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\HostelController;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -42,5 +43,8 @@ Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
 Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
 Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
+Route::resource('hostel', App\Http\Controllers\HostelController::class);
+Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
+
 });
 
