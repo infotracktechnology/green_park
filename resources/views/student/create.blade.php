@@ -36,22 +36,23 @@
 
                         <div class="form-group col-lg-3">
                             <label>Coaching Type</label>
-                            <select name="coaching_type" class="form-control form-control-sm" required>
+                            <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
                                 <option value="">Select Coaching Type</option>
-                                <option value="Online">Online</option>
                                 <option value="Offline">Offline</option>
+                                <option value="Online Recorded">Online Recorded</option>
+                                <option value="Online Live">Online Live</option>
                             </select>
                         </div>
                         
-     
                         <div class="form-group col-lg-3">
                             <label>Hostel/Day Scholar</label>
-                            <select name="hostel_dayscholar" class="form-control form-control-sm" required>
+                            <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" required>
                                 <option value="">Select Option</option>
                                 <option value="Hostel">Hostel</option>
                                 <option value="Day Scholar">Day Scholar</option>
                             </select>
                         </div>
+                        
                         
 
                         <div class="form-group col-lg-3">
@@ -158,6 +159,29 @@
 @endsection
 
 @section('js')
+<script>
+    document.getElementById('coaching_type').addEventListener('change', function() {
+        var selectedCoachingType = this.value;
+        var hostelSelect = document.getElementById('hostel_dayscholar');
+
+        if (selectedCoachingType === 'Offline') {
+            hostelSelect.disabled = false;  
+        } else {
+            hostelSelect.value = '';
+            hostelSelect.disabled = true;   
+        }
+    });
+
+    // Initial check if the page loads with a predefined value
+    window.onload = function() {
+        var selectedCoachingType = document.getElementById('coaching_type').value;
+        var hostelSelect = document.getElementById('hostel_dayscholar');
+        
+        if (selectedCoachingType !== 'Offline') {
+            hostelSelect.disabled = true;  // Disable if the value is not "Offline"
+        }
+    };
+</script>
 
 
 @endsection
