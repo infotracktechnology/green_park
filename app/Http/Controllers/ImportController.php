@@ -14,7 +14,7 @@ class ImportController extends Controller
         // Fetch branches from the 'green-park' database
         $branches = Branch::all();
 
-        return view('import.import', ['branches' => $branches]);
+        return view('import.student', ['branches' => $branches]);
     }
 
     public function upload(Request $request)

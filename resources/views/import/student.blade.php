@@ -14,7 +14,7 @@
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
                     <div class="card card-primary" x-data="app">
-                        <form action="{{ route('student.import.upload') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('import.student.upload') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="row">

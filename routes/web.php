@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\HostelController;
+use App\Http\Controllers\StaffProfileController;
+
+
 
 /*
 |-------------------------------------------------------------------------- 
@@ -30,7 +34,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 #admin routes
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
 Route::resource('branch', 'App\Http\Controllers\BranchController');
-    
+
 Route::get('studentdashboard', function () {
 return view('dashboards.studentdashboard');
 })->name('studentdashboard');
@@ -40,7 +44,12 @@ return view('dashboards.teacherdashboard');
   
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
-Route::get('student/import', [ImportController::class, 'index'])->name('student.import');
-Route::post('student/import/upload', [ImportController::class, 'upload'])->name('student.import.upload');
+  
+Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
+Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
+  
+Route::resource('hostel', App\Http\Controllers\HostelController::class);
+Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
+
 });
 
