@@ -15,26 +15,15 @@ class StaffProfileController extends Controller
         $staff = Staff::all();
         return view('staff.index', compact('staff'));
     }
-   
-   public function create(Request $request)
-{
-    $states = DB::table('district_list')->select('State')->distinct()->orderBy('State', 'asc')->get();
-    $districts = DB::table('district_list')->get();
-
-    $filteredDistricts = $request->input('state') ? DB::table('district_list')->where('State', $request->input('state'))->get() : $districts;
-
-    return view('staff.create', compact('districts', 'states', 'filteredDistricts'));
-}
-    
-
-public function getDistricts($state)
-{
-    $districts = DB::table('district_list')
-                    ->where('State', $state)
-                    ->get();
-
-    return response()->json(['districts' => $districts]);
-}
+    public function create(Request $request)
+    {
+        $states = DB::table('district_list')->select('State')->distinct()->get();
+        if($request->has('state')){
+            $districts = DB::table('district_list')->where('State', $request->state)->select('District')->get();
+            return response()->json($districts);
+        }
+        return view('staff.create', compact('states'));
+    }
     public function store(Request $request)
     {
 
@@ -70,11 +59,9 @@ public function getDistricts($state)
     public function edit(Request $request, Staff $staff)
     {
 
-        $states = DB::table('district_list')->select('State')->distinct()->orderBy('State', 'asc')->get();
-
-        $districts = DB::table('district_list')->orderBy('District', 'asc')->get();
-    
-        return view('staff.edit', compact('districts', 'states'));
+        $districts = DB::table('district_list')->where('State', $staff->state)->get();
+        $states = DB::table('district_list')->select('State')->distinct()->get();
+        return view('staff.edit', compact('staff', 'districts', 'states'));
     }
     public function update(Request $request, Staff $staff)
     {
