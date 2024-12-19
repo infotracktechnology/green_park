@@ -17,10 +17,12 @@ class StaffProfileController extends Controller
     }
     public function create(Request $request)
     {
-
-        $districts = DB::table('district_list')->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('staff.create', compact('districts', 'states'));
+        if($request->has('state')){
+            $districts = DB::table('district_list')->where('State', $request->state)->select('District')->get();
+            return response()->json($districts);
+        }
+        return view('staff.create', compact('states'));
     }
     public function store(Request $request)
     {
@@ -55,7 +57,7 @@ class StaffProfileController extends Controller
     public function edit(Request $request, Staff $staff)
     {
 
-        $districts = DB::table('district_list')->get();
+        $districts = DB::table('district_list')->where('State', $staff->state)->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
         return view('staff.edit', compact('staff', 'districts', 'states'));
     }

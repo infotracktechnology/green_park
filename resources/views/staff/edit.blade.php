@@ -88,7 +88,7 @@
 
                  <div class="form-group col-lg-3">
                     <label>City</label>
-                     <select name="city" id="city" class="form-control form-control-sm" required >
+                     <select name="city" id="city" onchange="City(this.value);" class="form-control form-control-sm" required >
                        <option value="">Select City</option>
                        @foreach ($districts as $district)
                        <option value="{{$district->District}}" @if($staff->city == $district->District) selected @endif>{{$district->District}}</option>
@@ -232,6 +232,17 @@
 @endsection
 
 @section('js')
-
+<script>
+   function City(state) {
+      if(!state) return;
+      $.get("{{ route('staff.create') }}", {state: state}, function(data) {
+          var html = '<option value="">Select City</option>';
+          $.each(data, function(key, value) {
+              html += '<option value="' + value.District + '">' + value.District + '</option>';
+          });
+          $('#city').html(html);
+      });
+   }
+</script>
 
 @endsection
