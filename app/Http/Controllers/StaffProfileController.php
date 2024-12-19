@@ -15,13 +15,26 @@ class StaffProfileController extends Controller
         $staff = Staff::all();
         return view('staff.index', compact('staff'));
     }
-    public function create(Request $request)
-    {
+   
+   public function create(Request $request)
+{
+    $states = DB::table('district_list')->select('State')->distinct()->orderBy('State', 'asc')->get();
+    $districts = DB::table('district_list')->get();
 
-        $districts = DB::table('district_list')->get();
-        $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('staff.create', compact('districts', 'states'));
-    }
+    $filteredDistricts = $request->input('state') ? DB::table('district_list')->where('State', $request->input('state'))->get() : $districts;
+
+    return view('staff.create', compact('districts', 'states', 'filteredDistricts'));
+}
+    
+
+public function getDistricts($state)
+{
+    $districts = DB::table('district_list')
+                    ->where('State', $state)
+                    ->get();
+
+    return response()->json(['districts' => $districts]);
+}
     public function store(Request $request)
     {
 
@@ -52,12 +65,16 @@ class StaffProfileController extends Controller
 
         return redirect()->route('staff.index')->with('success', 'Staff created successfully');
     }
+
+    
     public function edit(Request $request, Staff $staff)
     {
 
-        $districts = DB::table('district_list')->get();
-        $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('staff.edit', compact('staff', 'districts', 'states'));
+        $states = DB::table('district_list')->select('State')->distinct()->orderBy('State', 'asc')->get();
+
+        $districts = DB::table('district_list')->orderBy('District', 'asc')->get();
+    
+        return view('staff.edit', compact('districts', 'states'));
     }
     public function update(Request $request, Staff $staff)
     {
@@ -114,4 +131,9 @@ class StaffProfileController extends Controller
         $staff->delete();
         return redirect()->route('staff.index')->with('success', 'Staff deleted successfully');
     }
+
+  
+
+
+
 }

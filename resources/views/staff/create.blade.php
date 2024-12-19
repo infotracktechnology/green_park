@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Admission')
+@section('title', 'Staff Details')
 @section('main')
 <div class="main-content">
    <section class="section">
@@ -85,25 +85,31 @@
                   <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" required>
                </div>
 
-                 <div class="form-group col-lg-3">
-                    <label>City</label>
-                    <select name="city" id="city" class="form-control form-control-sm" required>
-                     <option value="">Select City</option>
-                     @foreach ($districts as $district)
-                     <option value="{{$district->District}}">{{$district->District}}</option>
-                     @endforeach
-                   </select>
-                 </div>
 
-                 <div class="form-group col-lg-3">
-                    <label>State</label>
-                   <select name="state" id="state" class="form-control form-control-sm" required>
-                 <option value="">Select State</option>
-                 @foreach ($states as $state)
-                 <option value="{{$state->State}}">{{$state->State}}</option>
-                 @endforeach
-               </select>
-                 </div>
+               <div class="form-group col-lg-3">
+                  <label>State</label>
+                  <select name="state" onchange="getDistrict(this.value)" id="state" class="form-control form-control-sm" required>
+                      <option value="">Select State</option>
+                      @foreach ($states as $state)
+                          <option value="{{ $state->State }}" {{ old('state') == $state->State ? 'selected' : '' }}>
+                              {{ $state->State }}
+                          </option>
+                      @endforeach
+                  </select>
+              </div>
+
+              <div class="form-group col-lg-3">
+                  <label>City</label>
+                  <select name="city" id="city" class="form-control form-control-sm" required>
+                      <option value="">Select City</option>
+                      @foreach ($districts as $district)
+                          <option value="{{ $district->District }}">
+                              {{ $district->District }}
+                          </option>
+                      @endforeach
+                  </select>
+              </div>
+              
 
                  <div class="form-group col-lg-3">
                     <label>Pincode</label>
@@ -262,6 +268,8 @@ function showFileNamesAndPreviews(input, previewId) {
        }
        previewDiv.style.display = "block";
    }
+
+
 </script>
 
 
