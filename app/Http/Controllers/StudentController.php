@@ -44,15 +44,16 @@ class StudentController extends Controller
     public function edit(Request $request, Student $student)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
-        $districts = DB::table('district_list')->get();
+        $districts = DB::table('district_list')->where('State', $student->state)->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('student.edit', compact('student', 'branches' , 'districts', 'states'));
+        return view('student.edit', compact('student', 'branches',  'districts','states'));
     }
 
 
     public function update(Request $request, Student $student)
     {
         $data = $request->all();
+        $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
         $student->update($data);
     
         if ($request->ajax()) {
@@ -62,8 +63,6 @@ class StudentController extends Controller
         session()->flash('success', 'Student details successfully updated.');
         return redirect()->route('student.index');
     }
-    
-
     
 
     public function destroy($id) {
