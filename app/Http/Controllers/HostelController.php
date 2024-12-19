@@ -19,9 +19,12 @@ class HostelController extends Controller
 
     public function create(Request $request)
     {
-        $districts = DB::table('district_list')->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('hostel.create', compact('districts', 'states'));
+        if($request->has('state')){
+            $districts = DB::table('district_list')->where('State', $request->state)->select('District')->get();
+            return response()->json($districts);
+        }
+        return view('hostel.create', compact('states'));
     }
 
     public function store(Request $request)
@@ -62,7 +65,7 @@ class HostelController extends Controller
     public function edit(Request $request, $id)
     {
         $hostel = Hostel::with('rooms')->findOrFail($id); 
-        $districts = DB::table('district_list')->get();
+        $districts = DB::table('district_list')->where('State', $hostel->state)->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
         return view('hostel.edit', compact('hostel', 'states', 'districts'));
 
