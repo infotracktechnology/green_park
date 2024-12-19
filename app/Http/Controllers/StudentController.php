@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\student;
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
 
@@ -45,7 +45,7 @@ class StudentController extends Controller
 
 
 
-    public function edit(Request $request, student $student)
+    public function edit(Request $request, Student $student)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
         $districts = DB::table('district_list')->get();
@@ -57,6 +57,7 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         $data = $request->all();
+        $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
         $student->update($data);
     
         if ($request->ajax()) {
@@ -66,8 +67,6 @@ class StudentController extends Controller
         session()->flash('success', 'Student details successfully updated.');
         return redirect()->route('student.index');
     }
-    
-
     
 
     public function destroy($id) {

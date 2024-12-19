@@ -35,16 +35,18 @@
         
                            <div class="form-group col-lg-3">
                                <label>Coaching Type</label>
-                                <select name="coaching_type" class="form-control form-control-sm" required >
+                                <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" onchange="hostel(this.value)" required >
                                     <option value="">Select Coaching Type</option>
-                                    <option value="Online" @if($student->coaching_type == 'Online') selected @endif>Online</option>
                                     <option value="Offline" @if($student->coaching_type == 'Offline') selected @endif>Offline</option>
+                                    <option value="Online Recorded" @if($student->coaching_type == 'Online Recorded') selected @endif>Online Recorded</option>
+                                    <option value="Online Live" @if($student->coaching_type == 'Online Live') selected @endif>Online Live</option>
+                             
                                 </select>
                             </div>
         
                             <div class="form-group col-lg-3">
                                <label>Hostel/Day Scholar</label>
-                                <select name="hostel_dayscholar" class="form-control form-control-sm" required >
+                                <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm"  >
                                     <option value="">Select Option</option>
                                     <option value="Hostel" @if($student->hostel_dayscholar == 'Hostel') selected @endif>Hostel</option>
                                     <option value="Day Scholar" @if($student->hostel_dayscholar == 'Day Scholar') selected @endif>Day Scholar</option>
@@ -189,6 +191,19 @@
                                 <label>Street Name</label>
                                  <input type="text" name="street_name" value="{{$student->street_name}}" class="form-control form-control-sm" required>
                             </div>
+
+
+                            <div class="form-group col-lg-3">
+                                <label>State</label>
+                                <select name="state" class="form-control form-control-sm" required>
+                                  <option value="">Select State</option>
+                                  @foreach ($states as $state)
+                                  <option value="{{$state->State}}" @if($student->state == $state->State) selected @endif>{{$state->State}}</option>
+                                  @endforeach
+                                </select>
+                           </div>
+        
+
         
                             <div class="form-group col-lg-3">
                                 <label>City</label>
@@ -200,16 +215,7 @@
                                  </select>
                             </div>
                 
-                            <div class="form-group col-lg-3">
-                                <label>State</label>
-                                <select name="state" class="form-control form-control-sm" required>
-                                  <option value="">Select State</option>
-                                  @foreach ($states as $state)
-                                  <option value="{{$state->State}}" @if($student->state == $state->State) selected @endif>{{$state->State}}</option>
-                                  @endforeach
-                                </select>
-                           </div>
-        
+                    
         
                             <div class="form-group col-lg-3">
                                 <label>Pincode</label>
@@ -462,7 +468,39 @@
 <script src="{{asset('bundles/jquery-validation/dist/jquery.validate.min.js')}}"></script>
 <script src="{{asset('bundles/jquery-steps/jquery.steps.min.js')}}"></script>
 <script src="{{ asset('js/page/form-wizard.js') }}"></script>
+<script>
+    
+    function hostel(type){
+        document.getElementById('hostel_dayscholar').value = '';
+        if(type == 'Offline'){
+            document.getElementById('hostel_dayscholar').disabled = false;
+        }else{
+            document.getElementById('hostel_dayscholar').disabled = true;
+        }
+    }
+    // Initial check if the page loads with a predefined value
+    window.onload = function() {
+        var selectedCoachingType = document.getElementById('coaching_type').value;
+        var hostelSelect = document.getElementById('hostel_dayscholar');
+        
+        if (selectedCoachingType !== 'Offline') {
+            hostelSelect.disabled = true;  // Disable if the value is not "Offline"
+        }
+    };
 
+    function City(state) {
+      if(!state) return;
+      $.get("{{ route('staff.create') }}", {state: state}, function(data) {
+          var html = '<option value="">Select City</option>';
+          $.each(data, function(key, value) {
+              html += '<option value="' + value.District + '">' + value.District + '</option>';
+          });
+          $('#city').html(html);
+      });
+   }
+
+
+</script>
 {{-- <script>
      document.addEventListener('alpine:init', () => {
         Alpine.data('app', () => ({
