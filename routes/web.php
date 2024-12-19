@@ -42,9 +42,6 @@ return view('dashboards.teacherdashboard');
   
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 
-
-
-
 Route::get('/get-districts/{state}', [StaffProfileController::class, 'getDistricts']);
 
 Route::resource('student', 'App\Http\Controllers\StudentController');
