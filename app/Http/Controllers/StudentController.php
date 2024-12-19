@@ -16,10 +16,6 @@ class StudentController extends Controller
             ->select('student.*', 'branch.name as campus')
             ->get();
 
-        $students = $students->filter(function ($student) {
-            return isset($student->id);
-        });
-
         return view('student.index', compact('students'));
     }
 
