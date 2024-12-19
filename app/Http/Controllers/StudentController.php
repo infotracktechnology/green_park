@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\student;
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
 
@@ -15,10 +15,6 @@ class StudentController extends Controller
             ->join('branch', 'student.campus', '=', 'branch.id')
             ->select('student.*', 'branch.name as campus')
             ->get();
-
-        $students = $students->filter(function ($student) {
-            return isset($student->id);
-        });
 
         return view('student.index', compact('students'));
     }
@@ -39,24 +35,25 @@ class StudentController extends Controller
             'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'min:10'],
             'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'min:10'],
         ]);
-        $students = student::create($request->all());
-        return to_route('student.index');
+        $students = Student::create($request->all());
+        return redirect()->route('student.index');
     }
 
 
 
-    public function edit(Request $request, student $student)
+    public function edit(Request $request, Student $student)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
-        $districts = DB::table('district_list')->get();
+        $districts = DB::table('district_list')->where('State', $student->state)->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('student.edit', compact('student', 'branches' , 'districts', 'states'));
+        return view('student.edit', compact('student', 'branches',  'districts','states'));
     }
 
 
     public function update(Request $request, Student $student)
     {
         $data = $request->all();
+        $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
         $student->update($data);
     
         if ($request->ajax()) {
@@ -66,8 +63,6 @@ class StudentController extends Controller
         session()->flash('success', 'Student details successfully updated.');
         return redirect()->route('student.index');
     }
-    
-
     
 
     public function destroy($id) {

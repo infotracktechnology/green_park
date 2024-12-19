@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 
-class staff extends Model
+class Staff extends Model
 {
  
 
@@ -25,6 +25,7 @@ class staff extends Model
 		static::updating(function($model)
 		{
 			$user = Auth::user();
+			
 			$model->updated_by = $user->id;
 		});
 	}
