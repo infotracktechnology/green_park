@@ -90,7 +90,7 @@
 
                  <div class="form-group col-lg-3">
                   <label>State</label>
-                  <select name="state" class="form-control form-control-sm" required>
+                  <select name="state" onchange="City(this.value);" class="form-control form-control-sm" required>
                     <option value="">Select State</option>
                     @foreach ($states as $state)
                     <option value="{{$state->State}}" @if($staff->state == $state->State) selected @endif>{{$state->State}}</option>
@@ -101,7 +101,7 @@
 
                  <div class="form-group col-lg-3">
                     <label>City</label>
-                     <select name="city" id="city" onchange="City(this.value);" class="form-control form-control-sm" required >
+                     <select name="city" id="city"  class="form-control form-control-sm" required >
                        <option value="">Select City</option>
                        @foreach ($districts as $district) 
                        <option value="{{$district->District}}" @if($staff->city == $district->District) selected @endif>{{$district->District}}</option>
@@ -110,6 +110,12 @@
                 </div> 
 
               
+
+
+               
+
+
+
                  <div class="form-group col-lg-3">
                     <label>Pincode</label>
                     <input type="number" name="pincode" class="form-control form-control-sm" value ="{{$staff->pincode}}" required>
