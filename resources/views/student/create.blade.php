@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Admission')
+@section('title', 'Students')
 @section('main')
 <div class="main-content">
    <section class="section">
@@ -13,7 +13,7 @@
                       <div class="row">
 
                         <div class="col-md-12 col-sm-12 mb-3">
-                            <h6 class="col-deep-purple">Add Branch</h6>
+                            <h6 class="col-deep-purple">Add Students</h6>
                         </div>
 
 
