@@ -16,10 +16,6 @@ class StudentController extends Controller
             ->select('student.*', 'branch.name as campus')
             ->get();
 
-        $students = $students->filter(function ($student) {
-            return isset($student->id);
-        });
-
         return view('student.index', compact('students'));
     }
 
@@ -39,8 +35,8 @@ class StudentController extends Controller
             'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'min:10'],
             'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'min:10'],
         ]);
-        $students = student::create($request->all());
-        return to_route('student.index');
+        $students = Student::create($request->all());
+        return redirect()->route('student.index');
     }
 
 
