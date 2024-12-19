@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\student;
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
 
@@ -35,13 +35,13 @@ class StudentController extends Controller
             'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'min:10'],
             'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'min:10'],
         ]);
-        $students = student::create($request->all());
-        return to_route('student.index');
+        $students = Student::create($request->all());
+        return redirect()->route('student.index');
     }
 
 
 
-    public function edit(Request $request, student $student)
+    public function edit(Request $request, Student $student)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
         $districts = DB::table('district_list')->get();
