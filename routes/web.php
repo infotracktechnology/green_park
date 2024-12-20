@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\HostelController;
-use App\Http\Controllers\StaffProfileController;
+
 
 
 
@@ -50,6 +50,9 @@ Route::post('import/upload/student', [ImportController::class, 'upload'])->name(
   
 Route::resource('hostel', App\Http\Controllers\HostelController::class);
 Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
+
+Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
+Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
 
 });
 

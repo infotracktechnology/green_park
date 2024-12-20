@@ -68,4 +68,28 @@ class StudentController extends Controller
     public function destroy($id) {
 
     }
+
+    public function section()
+    {
+          $students = DB::table('student')
+            ->join('branch', 'student.campus', '=', 'branch.id')
+            ->select('student.*', 'branch.name as campus')
+            ->get();
+            return view('student.section')->with('students', $students);
+        
+    }
+
+    public function update_section(Request $request)
+    {
+      if ($request->student_ids) {
+        foreach ($request->student_ids as $student_id) {
+          $student = Student::find($student_id);
+          $student->section = $request->section;
+          $student->save();
+        }
+      }
+      session()->flash('success', 'Student details successfully updated.');
+      return redirect()->route('section.student');
+
+    }
 }
