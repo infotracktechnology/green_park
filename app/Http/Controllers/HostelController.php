@@ -9,6 +9,7 @@ use App\Models\HostelRoom;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Branch;
+use Illuminate\Support\Facades\Log;
 
 class HostelController extends Controller
 {
@@ -140,13 +141,13 @@ class HostelController extends Controller
         $room = HostelRoom::findOrFail($id);
         
         // Log the room being deleted for debugging purposes
-        \Log::info('Deleting room:', ['room' => $room]);
+        Log::info('Deleting room:', ['room' => $room]);
         
         // Delete the room only
         $room->delete();
         
         // Log the success for debugging purposes
-        \Log::info('Room deleted successfully.', ['room_id' => $id]);
+        Log::info('Room deleted successfully.', ['room_id' => $id]);
         
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Room deleted successfully.');
