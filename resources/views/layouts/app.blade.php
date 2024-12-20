@@ -124,7 +124,7 @@
                   <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
                   <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></a></li>
                   <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
-                  <li><a href="#" class="nav-link">Section Shuffleing</a></li>
+                  <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffleing</a></li>
               </ul>
           </li>
 
