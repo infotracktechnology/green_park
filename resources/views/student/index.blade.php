@@ -22,19 +22,14 @@
                     <div class="card-body">
                       <div class="row ">
                        
-                        <div class="col-md-8 col-sm-12">
+                        <div class="col-md-10 col-sm-12">
                             <h6 class="col-deep-purple">Students Details</h6>
                         </div>
                    
                               <div class="col-md-2 col-sm-12 mb-3">
                            <a href="{{ route('student.create') }}" class="btn btn-primary btn-block">Add Students</a>
                                 </div>
-                              <div class="col-md-2 col-sm-12 mb-3">
-                                <a href="{{ route('import.student') }}" class="btn btn-primary btn-block ">Import Students</a>
-                                 </div>
-
-                    
-                     
+                           
                     </div>
                     
                    
