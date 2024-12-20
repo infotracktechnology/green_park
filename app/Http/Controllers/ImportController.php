@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
+use App\Models\Student;
 use Illuminate\Support\Facades\Storage;
+
 class ImportController extends Controller
 {
     public function index()
@@ -36,14 +38,9 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
-                    DB::table('admissions')->insert([
-                        'branch_id' => $request->input('branch'),  // Assign branch ID
-                        'name' => $row['name'] ?? null,
-                        'email' => $row['email'] ?? null,
-                        'phone' => $row['phone'] ?? null,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                   $student = Student::find($row['id']);
+                   unset($row['id']);
+                   $student->update($row);
                 }
                 return back()->with('success', 'CSV file uploaded and data saved successfully!');
             }
@@ -52,11 +49,8 @@ class ImportController extends Controller
         return back()->with('error', 'No data found in the file or file upload failed.');
     }
 
-    /**
-     * Parse CSV File into an Associative Array
-     */
-    private function parseCSV($filePath)
-{
+
+    private function parseCSV($filePath){
     $csvData = [];
     if (($handle = fopen($filePath, 'r')) !== false) {
         $header = null;
@@ -69,18 +63,15 @@ class ImportController extends Controller
 
             // Capture header from the first row
             if (!$header) {
-                $header = array_map('strtolower', $row); // Normalize to lowercase
+                $header = array_map('strtolower', $row);
                 continue;
             }
 
-            // Validate that the row matches header column count
+           
             if (count($header) !== count($row)) {
-                // Log or skip the invalid row
                 \Log::warning('Skipping invalid row: ' . implode(',', $row));
                 continue;
             }
-
-            // Combine header and row
             $csvData[] = array_combine($header, $row);
         }
         fclose($handle);

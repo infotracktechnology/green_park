@@ -119,21 +119,22 @@
             </li>
 
             <li class="dropdown">
-              <a href="{{ route('student.index') }}" class="nav-link"><i data-feather="users"></i><span>Students</span></a>
-            </li>
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
+                  <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></a></li>
+                  <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
+                  <li><a href="#" class="nav-link">Section Shuffleing</a></li>
+              </ul>
+          </li>
 
-        <li class="dropdown">
+
+            <li class="dropdown">
               <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
             </li>
             
             <li class="dropdown">
               <a href="{{ route('hostel.index') }}" class="nav-link"><i data-feather="home"></i><span>Hostel</span></a>
-            </li>
-
-          <li class="dropdown">
-
-              <a href="http://www.infotrackin.com/its/" target="_blank" class="nav-link"><i data-feather="headphones"></i><span>Support </span></a>
-
             </li>
 
           </ul>
@@ -147,8 +148,8 @@
         </div>
         <div class="footer-center">
         	<a href="http://www.infotrackin.com/its/" target="_blank">
-            <span>copyright &copy; {{ date('Y') }} Version 0.10 - developed by <b style="color: #27a9e0">Infotrack Technology Solution</b>
-              </a>
+            <span>copyright &copy; {{ date('Y') }} Version 1.0 - Developed By <b style="color: #27a9e0">Infotrack Technologies</b>
+          </a>
         </div>
       </footer>
 
