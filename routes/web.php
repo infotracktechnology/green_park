@@ -53,4 +53,3 @@ Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name
 Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
 });
-
