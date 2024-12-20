@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Branch;
 use Illuminate\Support\Facades\Log;
+use App\Models\Staff;
 
 class HostelController extends Controller
 {
@@ -17,21 +18,23 @@ class HostelController extends Controller
 {
     $hostels = Hostel::all();
     $branches = Branch::all(); 
-    return view('hostel.index', compact('hostels', 'branches'));
+    $staffs = Staff::all();
+    return view('hostel.index', compact('hostels', 'branches','staffs'));
 }
+
 
 
     public function create(Request $request)
 {
     $branches = DB::table('branch')->select('id', 'name')->get(); // Fetch branch details
+    $staffs =DB::table('staff')->select('id', 'name')->get();
     $states = DB::table('district_list')->select('State')->distinct()->get(); // Fetch state list
-
     if ($request->has('state')) {
         $districts = DB::table('district_list')->where('State', $request->state)->select('District')->get();
         return response()->json($districts); // Return districts as JSON for dynamic city selection
     }
 
-    return view('hostel.create', compact('branches', 'states')); // Pass $branches to the view
+    return view('hostel.create', compact('branches', 'states', 'staffs')); // Pass $branches to the view
 }
 
     public function store(Request $request)
@@ -75,9 +78,10 @@ class HostelController extends Controller
     {
         $hostel = Hostel::with('rooms')->findOrFail($id); 
         $branches = Branch::all();
+        $staffs = Staff::all();
         $districts = DB::table('district_list')->where('State', $hostel->state)->get();
         $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('hostel.edit', compact('hostel', 'states', 'districts', 'branches'));
+        return view('hostel.edit', compact('hostel', 'states', 'districts', 'branches', 'staffs'));
 
     }
 
