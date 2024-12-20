@@ -210,7 +210,7 @@
                     @endif
                    </div>
 
-                 <div class="form-group col-lg-3">
+                 {{-- <div class="form-group col-lg-3">
                     <label>ID Proof</label>
                     @if($staff->id_proof) 
                     <img src="{{ Storage::url($staff->id_proof) }}" height="200px" width="200px" alt="ID Proof" class="img-thumbnail">
@@ -220,7 +220,7 @@
                     <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                     @enderror
                     @endif
-                 </div>
+                 </div> --}}
 
       
         <div class="form-group col-lg-12">
