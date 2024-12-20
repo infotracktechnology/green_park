@@ -50,6 +50,7 @@ Route::post('import/upload/student', [ImportController::class, 'upload'])->name(
   
 Route::resource('hostel', App\Http\Controllers\HostelController::class);
 Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
+Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
 });
 
