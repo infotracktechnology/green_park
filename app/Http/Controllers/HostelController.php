@@ -134,23 +134,23 @@ class HostelController extends Controller
         session()->flash('success', 'Hostel deleted successfully');
         return to_route('hostel.index');
     }
-    // public function deleteRoom($id)
-    // {
-    //     // Find the room by its ID
-    //     $room = HostelRoom::findOrFail($id);
+    public function deleteRoom($id)
+    {
+        // Find the room by its ID
+        $room = HostelRoom::findOrFail($id);
         
-    //     // Log the room being deleted for debugging purposes
-    //     \Log::info('Deleting room:', ['room' => $room]);
+        // Log the room being deleted for debugging purposes
+        \Log::info('Deleting room:', ['room' => $room]);
         
-    //     // Delete the room only
-    //     $room->delete();
+        // Delete the room only
+        $room->delete();
         
-    //     // Log the success for debugging purposes
-    //     \Log::info('Room deleted successfully.', ['room_id' => $id]);
+        // Log the success for debugging purposes
+        \Log::info('Room deleted successfully.', ['room_id' => $id]);
         
-    //     // Redirect back with a success message
-    //     return redirect()->back()->with('success', 'Room deleted successfully.');
-    // }
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Room deleted successfully.');
+    }
     
        
 }
