@@ -18,6 +18,15 @@
                                 </div>
                                 <!-- Hostel Fields -->
                                 <div class="form-group col-lg-3">
+                                    <label>Branch</label>
+                                    <select name="branch_id" id="branch" class="form-control form-control-sm" required>
+                                        <option value="" disabled selected>-- Choose Branch --</option>
+                                        @foreach ($branches as $branch)
+                                            <option value="{{ $branch->id }}" @if($hostel->branch_id == $branch->id) selected @endif>{{ $branch->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-3">
                                     <label>Name</label>
                                     <input type="text" name="name" value="{{ $hostel->name }}" class="form-control form-control-sm" required>
                                 </div>
@@ -89,20 +98,24 @@
                                 <div id="roomDetails">
                                     @foreach ($hostel->rooms as $index => $room)
                                     <div style="margin-left: 10px;" class="row mb-4 room-row">
+                                        <div class="form-group col-lg-2">
+                                            <label>Block No</label>
+                                            <input type="text" name="rooms[{{ $index }}][block_no]" value="{{ $room->block_no }}" class="form-control form-control-sm" required>
+                                        </div>
                                         <!-- Floor No -->
-                                        <div class="form-group col-lg-3">
+                                        <div class="form-group col-lg-2">
                                             <label>Floor No</label>
                                             <input type="text" name="rooms[{{ $index }}][floor_no]" value="{{ $room->floor_no }}" class="form-control form-control-sm" required>
                                         </div>
 
                                         <!-- Room No -->
-                                        <div class="form-group col-lg-3">
+                                        <div class="form-group col-lg-2">
                                             <label>Room No</label>
                                             <input type="text" name="rooms[{{ $index }}][room_no]" value="{{ $room->room_no }}" class="form-control form-control-sm" required>
                                         </div>
 
                                         <!-- Room Type -->
-                                        <div class="form-group col-lg-3">
+                                        <div class="form-group col-lg-2">
                                             <label>Room Type</label>
                                             <select name="rooms[{{ $index }}][room_type]" class="form-control form-control-sm" required>
                                                 <option value="">Select</option>
@@ -112,11 +125,11 @@
                                         </div>
 
                                         <!-- No of Beds -->
-                                        <div class="form-group col-lg-3">
+                                        <div class="form-group col-lg-2">
                                             <label>No of Beds</label>
                                             <div class="d-flex align-items-center">
                                             <input type="number" name="rooms[{{ $index }}][no_of_beds]" value="{{ $room->no_of_beds }}" class="form-control form-control-sm" required>
-                                            <button style="margin-left: 10px;" type="button" class="btn btn-danger btn-sm" onclick="deleteRoom(event);"><i class="fa fa-trash"></i></button>
+                                            {{-- <button style="margin-left: 10px;" type="button" class="btn btn-danger btn-sm" onclick="deleteRoom(event);"><i class="fa fa-trash"></i></button> --}}
                                         </div>
                                         </div>
 
@@ -161,15 +174,19 @@
     const roomIndex = roomDetailsContainer.querySelectorAll('.room-row').length;
     const newRoomRow = `
       <div style="margin-left: 10px;" class="row mb-4 room-row" id="room-row-${roomIndex}">
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-2">
+          <label>Block No</label>
+          <input type="text" name="rooms[${roomIndex}][block_no]" class="form-control form-control-sm" required>
+        </div>
+        <div class="form-group col-lg-2">
           <label>Floor No</label>
           <input type="text" name="rooms[${roomIndex}][floor_no]" class="form-control form-control-sm" required>
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-2">
           <label>Room No</label>
           <input type="text" name="rooms[${roomIndex}][room_no]" class="form-control form-control-sm" required>
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-2">
           <label>Room Type</label>
           <select name="rooms[${roomIndex}][room_type]" class="form-control form-control-sm">
             <option value="">Select</option>
@@ -177,7 +194,7 @@
             <option value="Non AC">Non AC</option>
           </select>
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-2">
           <label>No of Beds</label>
           <div class="d-flex align-items-center">
           <input type="number" name="rooms[${roomIndex}][no_of_beds]" class="form-control form-control-sm" required>
