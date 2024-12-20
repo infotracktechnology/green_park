@@ -30,25 +30,22 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 #admin routes
-Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
-Route::resource('branch', 'App\Http\Controllers\BranchController');
-    
-Route::get('studentdashboard', function () {
-return view('dashboards.studentdashboard');
-})->name('studentdashboard');
-Route::get('teacherdashboard', function () {
-return view('dashboards.teacherdashboard');
-})->name('teacherdashboard');
-  
-Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
+Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
+    Route::resource('branch', 'App\Http\Controllers\BranchController');
+
+    Route::get('studentdashboard', function () {
+        return view('dashboards.studentdashboard');
+    })->name('studentdashboard');
+    Route::get('teacherdashboard', function () {
+        return view('dashboards.teacherdashboard');
+    })->name('teacherdashboard');
+
+    Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 
 
+    Route::get('/get-districts/{state}', [StaffProfileController::class, 'getDistricts']);
 
-
-Route::get('/get-districts/{state}', [StaffProfileController::class, 'getDistricts']);
-
-Route::resource('student', 'App\Http\Controllers\StudentController');
-Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
-Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
+    Route::resource('student', 'App\Http\Controllers\StudentController');
+    Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
+    Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
 });
-
