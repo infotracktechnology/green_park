@@ -67,10 +67,8 @@
   
         <tbody>
           @foreach ($students as $student)
-          @if(is_object($student))
           <tr>
             <td>{{$student->id}}</td>
-            
             <td>{{$student->campus}}</td>
             <td>{{$student->coaching_type}}</td>
             <td>{{$student->user_name}}</td>
@@ -94,7 +92,6 @@
               </form>
             </td>
           </tr>
-          @endif
           @endforeach
           
         </tbody>

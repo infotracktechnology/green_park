@@ -126,6 +126,10 @@
               <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
             </li>
             
+            <li class="dropdown">
+              <a href="{{ route('hostel.index') }}" class="nav-link"><i data-feather="home"></i><span>Hostel</span></a>
+            </li>
+
           <li class="dropdown">
 
               <a href="http://www.infotrackin.com/its/" target="_blank" class="nav-link"><i data-feather="headphones"></i><span>Support </span></a>
