@@ -83,9 +83,28 @@
         
                             <div class="form-group col-lg-3">
                                 <label>Date of Birth</label>
-                                 <input type="date" name="dob" value="{{$student->dob}}" class="form-control form-control-sm" required >
+                                <input 
+                                    type="date" 
+                                    name="dob" 
+                                    value="{{ $student->dob }}" 
+                                    class="form-control form-control-sm" 
+                                    required 
+                                    id="dobInput"
+                                    onchange="calculateAge()">
                             </div>
-        
+                            
+                            <div class="form-group col-lg-3">
+                                <label>Age</label>
+                                <input 
+                                    type="number" 
+                                    name="age" 
+                                    value="{{ \Carbon\Carbon::parse($student->dob)->age }}" 
+                                    class="form-control form-control-sm" 
+                                    required 
+                                    id="ageInput" 
+                                    readonly>
+                            </div>
+
         
                             <div class="form-group col-lg-3">
                                 <label>Father Name</label>
@@ -140,12 +159,15 @@
                                      <option value="O-" @if($student->blood_group == 'O-') selected @endif>O-</option>
                                  </select>
                              </div>
+
+
+
                          
-         
+{{--          
                              <div class="form-group col-lg-3">
                                 <label>Age</label>
                                  <input type="number" name="age" value="{{$student->age}}" class="form-control form-control-sm" required>
-                            </div>
+                            </div> --}}
         
         
         
@@ -495,12 +517,30 @@
           $('#city').html(html);
       });
    }
-   
- 
-
-
 
 </script>
+
+<script>
+    function calculateAge() {
+        const dobInput = document.getElementById('dobInput');
+        const ageInput = document.getElementById('ageInput');
+
+        const dob = new Date(dobInput.value);
+        const today = new Date();
+
+        if (!isNaN(dob.getTime())) { // Check if valid date
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            ageInput.value = age; // Update age input
+        } else {
+            ageInput.value = ''; // Clear age if invalid DOB
+        }
+    }
+</script>
+
 {{-- <script>
      document.addEventListener('alpine:init', () => {
         Alpine.data('app', () => ({
