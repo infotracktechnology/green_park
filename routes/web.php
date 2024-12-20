@@ -41,13 +41,13 @@ return view('dashboards.studentdashboard');
 Route::get('teacherdashboard', function () {
 return view('dashboards.teacherdashboard');
 })->name('teacherdashboard');
-  
+
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
   
 Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
 Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
-  
+ 
 Route::resource('hostel', App\Http\Controllers\HostelController::class);
 Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
 Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
