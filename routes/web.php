@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\HostelController;
 use App\Http\Controllers\StaffProfileController;
+
 
 
 /*
@@ -30,22 +32,24 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 #admin routes
-Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
-    Route::resource('branch', 'App\Http\Controllers\BranchController');
+Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
+Route::resource('branch', 'App\Http\Controllers\BranchController');
 
-    Route::get('studentdashboard', function () {
-        return view('dashboards.studentdashboard');
-    })->name('studentdashboard');
-    Route::get('teacherdashboard', function () {
-        return view('dashboards.teacherdashboard');
-    })->name('teacherdashboard');
+Route::get('studentdashboard', function () {
+return view('dashboards.studentdashboard');
+})->name('studentdashboard');
+Route::get('teacherdashboard', function () {
+return view('dashboards.teacherdashboard');
+})->name('teacherdashboard');
+  
+Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
+Route::resource('student', 'App\Http\Controllers\StudentController');
+  
+Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
+Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
+  
+Route::resource('hostel', App\Http\Controllers\HostelController::class);
+Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
+Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
-    Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
-
-
-    Route::get('/get-districts/{state}', [StaffProfileController::class, 'getDistricts']);
-
-    Route::resource('student', 'App\Http\Controllers\StudentController');
-    Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
-    Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
 });
