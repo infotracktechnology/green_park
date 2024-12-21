@@ -15,6 +15,16 @@
                                  <h6 class="col-deep-purple">Hostel Details</h6>
                               </div>
                               <div class="form-group col-lg-3">
+                                 <label>Branch</label>
+                                 <select name="branch_id" id="branch" class="form-control form-control-sm" required>
+                                     <option value="" disabled selected>-- Choose Branch --</option>
+                                     @foreach ($branches as $branch)
+                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                     @endforeach
+                                 </select>
+                             </div>
+                             
+                              <div class="form-group col-lg-3">
                                  <label>Name</label>
                                  <input type="text" name="name" class="form-control form-control-sm" required>
                               </div>
@@ -28,30 +38,36 @@
                               </div>
                               <div class="form-group col-lg-3">
                                  <label>Warden Name</label>
-                                 <input type="text" name="warden_name" class="form-control form-control-sm" required>
-                              </div>
+                                 <select name="warden_name" id="staff" class="form-control form-control-sm" required>
+                                     <option value="" disabled selected>-- Choose Warden --</option>
+                                     @foreach ($staffs as $staff)
+                                         <option value="{{ $staff->name }}" @if(old('warden_name') == $staff->name) selected @endif>{{ $staff->name }}</option>
+                                     @endforeach
+                                 </select>
+                             </div>
+                             
+                             
+                             
                               <div class="form-group col-lg-3">
                                  <label>Address</label>
                                  <input type="text" name="address" class="form-control form-control-sm" required>
                               </div>
                               <div class="form-group col-lg-3">
-                                 <label>City</label>
-                                 <select name="city" id="city" class="form-control form-control-sm" required>
-                                    <option value="">Select City</option>
-                                    @foreach ($districts as $district)
-                                    <option value="{{ $district->District }}">{{ $district->District }}</option>
-                                    @endforeach
-                                 </select>
+                                 <label>State</label>
+                                <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" required>
+                              <option value="">Select State</option>
+                              @foreach ($states as $state)
+                              <option value="{{$state->State}}">{{$state->State}}</option>
+                              @endforeach
+                            </select>
                               </div>
                               <div class="form-group col-lg-3">
-                                 <label>State</label>
-                                 <select name="state" id="state" class="form-control form-control-sm" required>
-                                    <option value="">Select State</option>
-                                    @foreach ($states as $state)
-                                    <option value="{{ $state->State }}">{{ $state->State }}</option>
-                                    @endforeach
-                                 </select>
+                                 <label>City</label>
+                                 <select name="city" id="city" class="form-control form-control-sm" required>
+                                  <option value="">Select City</option>
+                                </select>
                               </div>
+                              
                               <div class="form-group col-lg-3">
                                  <label>Pincode</label>
                                  <input type="number" name="pincode" class="form-control form-control-sm">
@@ -68,15 +84,19 @@
                               </div>
                               <div id="roomDetails">
                                  <div style="margin-left: 10px;" class="row mb-4 room-row">
-                                    <div class="form-group col-lg-3">
+                                    <div class="form-group col-lg-2">
+                                       <label>Block No</label>
+                                       <input type="text" name="rooms[0][block_no]" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="form-group col-lg-2">
                                        <label>Floor No</label>
                                        <input type="text" name="rooms[0][floor_no]" class="form-control form-control-sm" required>
                                     </div>
-                                    <div class="form-group col-lg-3">
+                                    <div class="form-group col-lg-2">
                                        <label>Room No</label>
                                        <input type="text" name="rooms[0][room_no]" class="form-control form-control-sm" required>
                                     </div>
-                                    <div class="form-group col-lg-3">
+                                    <div class="form-group col-lg-2">
                                        <label>Room Type</label>
                                        <select name="rooms[0][room_type]" class="form-control form-control-sm" >
                                           <option value="">Select</option>
@@ -84,7 +104,7 @@
                                           <option value="Non AC">Non AC</option>
                                        </select>
                                     </div>
-                                    <div class="form-group col-lg-3">
+                                    <div class="form-group col-lg-2">
                                        <label for="no_of_beds">No of Beds</label>
                                        <div class="d-flex align-items-center">
                                           <input type="text" name="rooms[0][no_of_beds]" class="form-control form-control-sm me-2" required>
@@ -143,5 +163,17 @@
       }
     });
   });
+</script>
+<script>
+   function City(state) {
+      if(!state) return;
+      $.get("{{ route('hostel.create') }}", {state: state}, function(data) {
+          var html = '<option value="">Select City</option>';
+          $.each(data, function(key, value) {
+              html += '<option value="' + value.District + '">' + value.District + '</option>';
+          });
+          $('#city').html(html);
+      });
+   }
 </script>
 @endsection

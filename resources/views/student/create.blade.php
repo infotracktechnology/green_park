@@ -89,10 +89,14 @@
                         </select>
                     </div>
                     
-
                     <div class="form-group col-lg-3">
                         <label>Date of Birth</label>
-                         <input type="date" name="dob"  class="form-control form-control-sm" >
+                        <input type="date" name="dob" id="dob" class="form-control form-control-sm" required>   
+                    </div>
+                    
+                    <div class="form-group col-lg-3">
+                        <label>Age</label>
+                        <input type="text" name="age" id="age" class="form-control form-control-sm" required>
                     </div>
           
          
@@ -181,6 +185,26 @@
             hostelSelect.disabled = true;  // Disable if the value is not "Offline"
         }
     };
+</script>
+
+
+<script>
+    document.getElementById('dob').addEventListener('change', function () {
+        const dob = new Date(this.value); // Get the selected date of birth
+        const today = new Date(); // Get the current date
+        
+        let age = today.getFullYear() - dob.getFullYear(); // Calculate the year difference
+        const monthDiff = today.getMonth() - dob.getMonth(); 
+        const dayDiff = today.getDate() - dob.getDate();
+
+        // Adjust the age if the birth date hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            age--;
+        }
+
+        // Display the calculated age in the "Age" field
+        document.getElementById('age').value = age > 0 ? age : 0; // Ensure age is non-negative
+    });
 </script>
 
 
