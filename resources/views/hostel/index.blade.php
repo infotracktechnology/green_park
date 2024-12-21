@@ -38,6 +38,7 @@
       <thead>
   
         <tr role="row">
+          <th>Branch</th>
         <th>Hostel ID</th>
           <th>Name</th>
           <th>Type</th>
@@ -53,6 +54,7 @@
         <tbody>
           @foreach ($hostels as $hostel)
           <tr>
+            <td >{{$hostel->branch->name}}</td>
             <td>{{$hostel->id}}</td>
             <td>{{$hostel->name}}</td>
             <td>{{$hostel->type}}</td>
