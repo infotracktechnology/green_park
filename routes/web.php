@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\HostelController;
-
+use App\Http\Controllers\StaffProfileController;
 
 
 
@@ -22,7 +22,7 @@ use App\Http\Controllers\HostelController;
 */
 
 Route::get('/', function () {
-    return view('auth.login');
+    return auth('web')->check() ? redirect()->route('home') : view('auth.login');
 });
 
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
@@ -34,25 +34,19 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 #admin routes
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
 Route::resource('branch', 'App\Http\Controllers\BranchController');
-
-Route::get('studentdashboard', function () {
-return view('dashboards.studentdashboard');
-})->name('studentdashboard');
-Route::get('teacherdashboard', function () {
-return view('dashboards.teacherdashboard');
-})->name('teacherdashboard');
-
+  
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
   
 Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
 Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
- 
+  
 Route::resource('hostel', App\Http\Controllers\HostelController::class);
 Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
 Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
-Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
-Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
-Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
 });
+#students routes
+Route::view('/student/login', 'auth.studentlogin')->name('studentlogin');
+Route::view('/student/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
+Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
