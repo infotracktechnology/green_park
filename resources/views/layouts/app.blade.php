@@ -117,7 +117,10 @@
               <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
             </li>
             <li class="dropdown">
-              <a href="{{ route('hostel.index') }}" class="nav-link"><i data-feather="home"></i><span>Hostel</span></a>
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
+                <li><a  href="#" class="nav-link">Hostel Allocation</a></li>
             </li>
           </ul>
         </aside>

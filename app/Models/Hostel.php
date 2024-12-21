@@ -30,4 +30,8 @@ class Hostel extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+    public function staff()
+{
+    return $this->belongsTo(Staff::class);
+}
 }
