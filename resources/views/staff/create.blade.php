@@ -192,7 +192,7 @@
        <ul id="certificatesList"></ul>
    </div>
 </div>
-
+{{-- 
 <div class="form-group col-lg-3">
    <label>ID Proof</label>
    <input type="file" name="id_proof" class="form-control form-control-sm" id="id_proof" onchange="showFileNameAndPreview(this, 'idProofPreview')">
@@ -202,7 +202,7 @@
        <br>
        <a id="idProofLink" href="#" target="_blank" style="display:none;">View ID Proof</a>
    </div>
-</div>
+</div> --}}
 
 <script>
    
