@@ -38,8 +38,16 @@
                               </div>
                               <div class="form-group col-lg-3">
                                  <label>Warden Name</label>
-                                 <input type="text" name="warden_name" class="form-control form-control-sm" required>
-                              </div>
+                                 <select name="warden_name" id="staff" class="form-control form-control-sm" required>
+                                     <option value="" disabled selected>-- Choose Warden --</option>
+                                     @foreach ($staffs as $staff)
+                                         <option value="{{ $staff->name }}" @if(old('warden_name') == $staff->name) selected @endif>{{ $staff->name }}</option>
+                                     @endforeach
+                                 </select>
+                             </div>
+                             
+                             
+                             
                               <div class="form-group col-lg-3">
                                  <label>Address</label>
                                  <input type="text" name="address" class="form-control form-control-sm" required>
