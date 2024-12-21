@@ -54,5 +54,5 @@ Route::get('export/student', 'App\Http\Controllers\ExportController@student_expo
 
 Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
 Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
-
+Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
 });
