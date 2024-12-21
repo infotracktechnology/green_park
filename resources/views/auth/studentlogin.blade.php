@@ -29,7 +29,7 @@
                         <div class="form-section-innner">
                             <div class="logo clearfix">
                                 
-                                <img alt="image" src="http://www.greenparkacademy.com/gpa.jpg" style="height:80px;"  /> 
+                                <img alt="image" src="{{asset('img/logo.png')}}" style="height:80px;"  /> 
                                 
                                
                             </div>
