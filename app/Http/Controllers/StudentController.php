@@ -20,9 +20,13 @@ class StudentController extends Controller
     }
 
 
-    public function create()
+    public function create(Request $request)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
+        if($request->has('city')) {
+            $pincodes = DB::table('district_list')->where('District', $request->city)->select('Pincode')->get();
+            return response()->json($pincodes);
+        }
         return view('student.create', compact('branches'));
     }
 
@@ -30,6 +34,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            // 'student_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
             'ph_no1' => ['unique:student,ph_no1', 'numeric', 'min:10'],
             'ph_no2' => ['unique:student,ph_no2', 'numeric', 'min:10'],
             'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'min:10'],
@@ -44,9 +49,10 @@ class StudentController extends Controller
     public function edit(Request $request, Student $student)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
-        $districts = DB::table('district_list')->where('State', $student->state)->get();
-        $states = DB::table('district_list')->select('State')->distinct()->get();
-        return view('student.edit', compact('student', 'branches',  'districts','states'));
+        $districts = DB::table('district_list')->where('State', $student->state)->distinct()->orderBy('District')->get();
+        $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
+        $pincodes = DB::table('district_list')->where('District', $student->district)->select('Pincode')->get();
+        return view('student.edit', compact('student', 'branches',  'districts','states','pincodes'));
     }
 
 

@@ -14,7 +14,7 @@
                     <form id="wizard_with_validation" method="POST" novalidate="novalidate" action="{{ route('student.update', $student->id) }}" class="my-4" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        <h3>Pesronal Details</h3>
+                        <h3>Personal Details</h3>
                         <fieldset class="row">
                             <div class="form-group col-lg-3">
                                 <label>Admission Date</label>
@@ -126,7 +126,7 @@
                                  <input type="text" name="mother_ph_no" value="{{$student->mother_ph_no}}" class="form-control form-control-sm" required>
                             </div>
         
-                            <div class="form-group col-lg-3">
+                            {{-- <div class="form-group col-lg-3">
                                 <label>Admission Opted For</label>
                                  <select name="admission_opted_for" class="form-control form-control-sm" required >
                                      <option value="">Select Coaching Type</option>
@@ -134,7 +134,7 @@
                                      <option value="Offline" @if($student->admission_opted_for == 'Offline') selected @endif>Offline</option>
                                  </select>
                              </div>
-        
+         --}}
                             <div class="form-group col-lg-3" >
                                 <label>AC/Non AC</label>
                                  <select name="ac_nonac" class="form-control form-control-sm" required >
@@ -176,19 +176,42 @@
                                  <input type="number" name="aadhar_card_no" value="{{$student->aadhar_card_no}}" class="form-control form-control-sm" required>
                             </div>
         
-                            <div class="form-group col-lg-3">
+                          
+                                <div class="form-group col-lg-3">
                                 <label>Nationality</label>
-                                 <input type="text" name="nationality" value="{{$student->nationality}}" class="form-control form-control-sm" required>
+                                <select name="nationality" class="form-control form-control-sm" required>
+                                    <option value="">Select Nationality</option>
+                                    <option value="Indian" @if($student->nationality == 'Indian') selected @endif>Indian</option>
+                                    <option value="Foreign" @if($student->nationality == 'Foreign') selected @endif>Foreign</option>
+                                    <option value="NRI" @if($student->nationality == 'NRI') selected @endif>NRI</option>
+                                </select>
                             </div>
+                               
         
+                     
                             <div class="form-group col-lg-3">
                                 <label>Religion</label>
-                                 <input type="text" name="religion" value="{{$student->religion}}" class="form-control form-control-sm" required>
+                                <select name="religion" class="form-control form-control-sm" required>
+                                    <option value="">Select Religion</option>
+                                    <option value="Hindu" @if($student->religion == 'Hindu') selected @endif>Hindu</option>
+                                    <option value="Christian" @if($student->religion == 'Christian') selected @endif>Christian</option>
+                                    <option value="Muslim" @if($student->religion == 'Muslim') selected @endif>Muslim</option>
+                                </select>
                             </div>
         
+                
                             <div class="form-group col-lg-3">
                                 <label>Community</label>
-                                 <input type="text" name="community" value="{{$student->community}}" class="form-control form-control-sm" required>
+                                <select name="community" class="form-control form-control-sm" required>
+                                    <option value="">Select Community</option>
+                                    <option value="OC" @if($student->community == 'OC') selected @endif>OC</option>
+                                    <option value="BC" @if($student->community == 'BC') selected @endif>BC</option>
+                                    <option value="BCM" @if($student->community == 'BCM') selected @endif>BCM</option>
+                                    <option value="MBC / DNC" @if($student->community == 'MBC / DNC') selected @endif>MBC / DNC</option>
+                                    <option value="SC" @if($student->community == 'SC') selected @endif>SC</option>
+                                    <option value="SCA" @if($student->community == 'SCA') selected @endif>SCA</option>
+                                    <option value="ST" @if($student->community == 'ST') selected @endif>ST</option>
+                                </select>
                             </div>
         
                             <div class="form-group col-lg-3">
@@ -227,18 +250,23 @@
 
                              <div class="form-group col-lg-3">
                                 <label>City</label>
-                                <select name="city" id="city" class="form-control form-control-sm" required>
+                                <select name="city" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm" required>
                                  <option value="">Select City</option>
                                  @foreach ($districts as $city)
                                  <option value="{{$city->District}}" @if($student->city == $city->District) selected @endif>{{$city->District}}</option>
                                  @endforeach
                                </select>
                              </div>
-                    
+
+                    <datalist id="pincode_list">
+                        @foreach ($pincodes as $pin)
+                        <option value="{{$pin->Pincode}}">{{$pin->Pincode}}</option>
+                        @endforeach
+                    </datalist>
         
                             <div class="form-group col-lg-3">
                                 <label>Pincode</label>
-                                 <input type="number" name="pincode" value="{{$student->pincode}}" class="form-control form-control-sm" required>
+                                 <input type="text" id="pincode" list="pincode_list" name="pincode" value="{{$student->pincode}}" class="form-control form-control-sm" required>
                             </div>
         
                             <div class="form-group col-lg-3">
@@ -309,10 +337,19 @@
 
                         <h3>Academic Details</h3>
                         <fieldset class="row">
-                            <div class="form-group col-lg-3">
-                                <label>Board of Study (X std)</label>
-                                <input type="text" name="board_of_study_X_std" value="{{$student->board_of_study_X_std}}" class="form-control form-control-sm" required>
-                            </div>
+                        
+                                <div class="form-group col-lg-3">
+                                    <label>Board of Study (X std)</label>
+                                    <select name="board_of_study_X_std" class="form-control form-control-sm" required>
+                                        <option value="">Select Board</option>
+                                        <option value="STATEBOARD" {{ $student->board_of_study_X_std == 'STATEBOARD' ? 'selected' : '' }}>STATEBOARD</option>
+                                        <option value="CBSE" {{ $student->board_of_study_X_std == 'CBSE' ? 'selected' : '' }}>CBSE</option>
+                                        <option value="ICSE" {{ $student->board_of_study_X_std == 'ICSE' ? 'selected' : '' }}>ICSE</option>
+                                        <option value="IGCSE" {{ $student->board_of_study_X_std == 'IGCSE' ? 'selected' : '' }}>IGCSE</option>
+                                    </select>
+                                </div>
+                           
+                            
     
                             <div class="form-group col-lg-3">
                                 <label>Name of School (X std)</label>
@@ -331,8 +368,15 @@
     
                             <div class="form-group col-lg-3">
                                 <label>Board of Study (XII std)</label>
-                                <input type="text" name="board_of_study_XII_std" value="{{$student->board_of_study_XII_std}}" class="form-control form-control-sm" required>
+                                <select name="board_of_study_XII_std" class="form-control form-control-sm" required>
+                                    <option value="">Select Board</option>
+                                    <option value="STATEBOARD" {{ $student->board_of_study_XII_std == 'STATEBOARD' ? 'selected' : '' }}>STATEBOARD</option>
+                                    <option value="CBSE" {{ $student->board_of_study_XII_std == 'CBSE' ? 'selected' : '' }}>CBSE</option>
+                                    <option value="ICSE" {{ $student->board_of_study_XII_std == 'ICSE' ? 'selected' : '' }}>ICSE</option>
+                                    <option value="IGCSE" {{ $student->board_of_study_XII_std == 'IGCSE' ? 'selected' : '' }}>IGCSE</option>
+                                </select>
                             </div>
+                            
     
                             <div class="form-group col-lg-3">
                                 <label>Name of School (XII std)</label>
@@ -355,71 +399,102 @@
                         <h3>Mark Details</h3>
                         <fieldset class="row">
                             
-                           <div class="form-group col-lg-4">
-                            <label>Subject 1</label>
-                            <input type="text" name="S1" value="{{$student->S1}}" class="form-control form-control-sm" required>
-                        </div>
+                            <div class="form-group col-lg-4">
+                                <label>Subject 1</label>
+                                <select name="S1" class="form-control form-control-sm" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="ENGLISH" {{ $student->S1 == 'ENGLISH' ? 'selected' : '' }}>English</option>
+                                    <option value="PHYSICS" {{ $student->S1 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
+                                    <option value="CHEMISTRY" {{ $student->S1 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
+                                    <option value="BIOLOGY" {{ $student->S1 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
+                                </select>
+                            </div>
+                            
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S1</label>
-                            <input type="number" name="S1_max_marks" value="{{$student->S1_max_marks}}" class="form-control form-control-sm" required>
+                            <input type="number" name="S1_max_marks" value="{{$student->S1_max_marks}}"  max="100" class="form-control form-control-sm" required>
                         </div>
 
-                        <div class="form-group col-lg-4">
-                            <label>Marks Obtained in S1</label>
-                            <input type="number" name="S1_obtained_mark" value="{{$student->S1_obtained_mark}}" class="form-control form-control-sm" required>
-                        </div>
+                        {{-- <div class="form-group col-lg-4">
+                            <label>Maximum Marks of S1</label>
+                            <input type="number" name="S1_max_marks" value="{{$student->S1_max_marks}}" class="form-control form-control-sm" required>
+                        </div> --}}
+
+      <div class="form-group col-lg-4">
+    <label>Marks Obtained in S1</label>
+    <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$student->S1_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+</div>
 
                         <div class="form-group col-lg-4">
                             <label>Subject 2</label>
-                            <input type="text" name="S2" value="{{$student->S2}}" class="form-control form-control-sm" required>
+                            <select name="S2" class="form-control form-control-sm" required>
+                                <option value="">Select Subject</option>
+                                <option value="ENGLISH" {{ $student->S2 == 'ENGLISH' ? 'selected' : '' }}>English</option>
+                                <option value="PHYSICS" {{ $student->S2 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
+                                <option value="CHEMISTRY" {{ $student->S2 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
+                                <option value="BIOLOGY" {{ $student->S2 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
+                            </select>
                         </div>
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S2</label>
-                            <input type="number" name="S2_max_marks" value="{{$student->S2_max_marks}}" class="form-control form-control-sm" required>
+                            <input type="number" name="S2_max_marks" value="{{$student->S2_max_marks}}" max="100" class="form-control form-control-sm" required>
                         </div>
 
-                        <div class="form-group col-lg-4">
-                            <label>Marks Obtained in S2</label>
-                            <input type="number" name="S2_obtained_mark" value="{{$student->S2_obtained_mark}}" class="form-control form-control-sm" required>
-                        </div>
+             <div class="form-group col-lg-4">
+    <label>Marks Obtained in S2</label>
+    <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$student->S2_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+</div>
 
                         <div class="form-group col-lg-4">
                             <label>Subject 3</label>
-                            <input type="text" name="S3" value="{{$student->S3}}" class="form-control form-control-sm" required>
+                            <select name="S3" class="form-control form-control-sm" required>
+                                <option value="">Select Subject</option>
+                                <option value="ENGLISH" {{ $student->S3 == 'ENGLISH' ? 'selected' : '' }}>English</option>
+                                <option value="PHYSICS" {{ $student->S3 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
+                                <option value="CHEMISTRY" {{ $student->S3 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
+                                <option value="BIOLOGY" {{ $student->S3 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
+                            </select>
                         </div>
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S3</label>
-                            <input type="number" name="S3_max_marks" value="{{$student->S3_max_marks}}" class="form-control form-control-sm" required>
+                            <input type="number" name="S3_max_marks" value="{{$student->S3_max_marks}}"  max="100" class="form-control form-control-sm" required>
                         </div>
 
-                        <div class="form-group col-lg-4">
-                            <label>Marks Obtained in S3</label>
-                            <input type="number" name="S3_obtained_mark" value="{{$student->S3_obtained_mark}}" class="form-control form-control-sm" required>
-                        </div>
+            <div class="form-group col-lg-4">
+    <label>Marks Obtained in S3</label>
+    <input type="number" id="S3_obtained_mark" name="S3_obtained_mark" value="{{$student->S3_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+</div>
+
 
                         <div class="form-group col-lg-4">
                             <label>Subject 4</label>
-                            <input type="text" name="S4" value="{{$student->S4}}" class="form-control form-control-sm" required>
+                            <select name="S4" class="form-control form-control-sm" required>
+                                <option value="">Select Subject</option>
+                                <option value="ENGLISH" {{ $student->S4 == 'ENGLISH' ? 'selected' : '' }}>English</option>
+                                <option value="PHYSICS" {{ $student->S4 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
+                                <option value="CHEMISTRY" {{ $student->S4 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
+                                <option value="BIOLOGY" {{ $student->S4 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
+                            </select>
                         </div>
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S4</label>
-                            <input type="number" name="S4_max_marks" value="{{$student->S4_max_marks}}" class="form-control form-control-sm" required>
+                            <input type="number" name="S4_max_marks" value="{{$student->S4_max_marks}}" max="100" class="form-control form-control-sm" required>
                         </div>
 
-                        <div class="form-group col-lg-4">
-                            <label>Marks Obtained in S4</label>
-                            <input type="number" name="S4_obtained_mark" value="{{$student->S4_obtained_mark}}" class="form-control form-control-sm" required>
-                        </div>
+                    <div class="form-group col-lg-4">
+    <label>Marks Obtained in S4</label>
+    <input type="number" id="S4_obtained_mark" name="S4_obtained_mark" value="{{$student->S4_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+</div>
 
 
-                        <div class="form-group col-lg-4">
-                            <label>Total Marks</label>
-                            <input type="number" name="total_marks" value="{{$student->total_marks}}" class="form-control form-control-sm" required>
-                        </div>
+                  <div class="form-group col-lg-4">
+    <label>Total Marks</label>
+    <input type="number" id="total_marks" name="total_marks" value="{{$student->total_marks}}" class="form-control form-control-sm" readonly>
+</div>
                         
 
 
@@ -433,13 +508,13 @@
                             </div>
                             
                             <div class="form-group col-lg-3">
-                                <label>NEET Score - 2023</label>
-                                <input type="number" name="neet_score_2023" value="{{$student->neet_score_2023}}" class="form-control form-control-sm" required>
+                                <label>NEET Score - 2024</label>
+                                <input type="number" name="neet_score_2024" value="{{$student->neet_score_2024}}" class="form-control form-control-sm" required>
                             </div>
                             
                             <div class="form-group col-lg-3">
-                                <label>NEET Score - 2024</label>
-                                <input type="number" name="neet_score_2024" value="{{$student->neet_score_2024}}" class="form-control form-control-sm" required>
+                                <label>NEET Score - 2025</label>
+                                <input type="number" name="neet_score_2025" value="{{$student->neet_score_2025}}" class="form-control form-control-sm" required>
                             </div>
                             
                             <div class="form-group col-lg-3">
@@ -448,14 +523,22 @@
                                     <option value="" disabled selected>Select an option</option>
                                     <option value="repeater" {{ $student->repeater_re_repeater == 'repeater' ? 'selected' : '' }}>Repeater</option>
                                     <option value="re-repeater" {{ $student->repeater_re_repeater == 're-repeater' ? 'selected' : '' }}>Re-repeater</option>
+                                    <option value="Regular" {{ $student->repeater_re_repeater == 'Regular' ? 'selected' : '' }}>Regular</option>
+
                                 </select>
                             </div>
                             
                             
                             <div class="form-group col-lg-3">
                                 <label>Previous Course Studied for NEET</label>
-                                <input type="text" name="previous_course_studied_neet" value="{{$student->previous_course_studied_neet}}" class="form-control form-control-sm" required>
+                                <select name="previous_course_studied_neet" class="form-control form-control-sm" required>
+                                    <option value="">Select Course</option>
+                                    <option value="Integrated" {{ $student->previous_course_studied_neet == 'Integrated' ? 'selected' : '' }}>Integrated</option>
+                                    <option value="Crash course" {{ $student->previous_course_studied_neet == 'Crash course' ? 'selected' : '' }}>Crash course</option>
+                                    <option value="Long term" {{ $student->previous_course_studied_neet == 'Long term' ? 'selected' : '' }}>Long term</option>
+                                </select>
                             </div>
+                            
         
         <div class="form-group col-lg-3">
             <label>Name of the Institution Studied</label>
@@ -465,7 +548,16 @@
         
         <div class="form-group col-lg-3">
             <label>Institution Bill Type</label>
-            <input type="text" name="institution_bill_type" value="{{$student->institution_bill_type}}" class="form-control form-control-sm" required>
+            <select name="institution_bill_type" class="form-control form-control-sm" required>
+                <option value="">Select Bill Type</option>
+                <option value="GPCC, Namakkal" {{ $student->institution_bill_type == 'GPCC, Namakkal' ? 'selected' : '' }}>GPCC, Namakkal</option>
+                <option value="GPI, Namakkal" {{ $student->institution_bill_type == 'GPI, Namakkal' ? 'selected' : '' }}>GPI, Namakkal</option>
+                <option value="GPCI, Erode" {{ $student->institution_bill_type == 'GPCI, Erode' ? 'selected' : '' }}>GPCI, Erode</option>
+                <option value="GPCI, Karur" {{ $student->institution_bill_type == 'GPCI, Karur' ? 'selected' : '' }}>GPCI, Karur</option>
+                <option value="GPCA, Coimbatore" {{ $student->institution_bill_type == 'GPCA, Coimbatore' ? 'selected' : '' }}>GPCA, Coimbatore</option>
+                <option value="GPA, Chennai" {{ $student->institution_bill_type == 'GPA, Chennai' ? 'selected' : '' }}>GPA, Chennai</option>
+                <option value="Others" {{ $student->institution_bill_type == 'Others' ? 'selected' : '' }}>Others</option>
+            </select>
         </div>
         
                         </fieldset>
@@ -518,9 +610,19 @@
       });
    }
 
-</script>
 
-<script>
+   function Pincode(city){
+    $.get("{{ route('student.create') }}", {city: city}, function(data) {
+            var html = '';
+            $('#pincode').val('');
+          $.each(data, function(key, value) {
+              html += '<option value="' + value.Pincode + '">' + value.Pincode + '</option>';
+          });
+          $('#pincode_list').html(html);
+      });
+   }
+
+
     function calculateAge() {
         const dobInput = document.getElementById('dobInput');
         const ageInput = document.getElementById('ageInput');
@@ -528,18 +630,36 @@
         const dob = new Date(dobInput.value);
         const today = new Date();
 
-        if (!isNaN(dob.getTime())) { // Check if valid date
+        if (!isNaN(dob.getTime())) { 
             let age = today.getFullYear() - dob.getFullYear();
             const monthDiff = today.getMonth() - dob.getMonth();
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
                 age--;
             }
-            ageInput.value = age; // Update age input
+            ageInput.value = age; 
         } else {
-            ageInput.value = ''; // Clear age if invalid DOB
+            ageInput.value = ''; 
         }
     }
+
+    function calculateTotal() {
+        const s1 = parseInt(document.getElementById('S1_obtained_mark').value) || 0;
+        const s2 = parseInt(document.getElementById('S2_obtained_mark').value) || 0;
+        const s3 = parseInt(document.getElementById('S3_obtained_mark').value) || 0;
+        const s4 = parseInt(document.getElementById('S4_obtained_mark').value) || 0;
+
+        const total = s1 + s2 + s3 + s4;
+        document.getElementById('total_marks').value = total;
+    }
+
+
+
+
+
 </script>
+
+
+
 
 {{-- <script>
      document.addEventListener('alpine:init', () => {
