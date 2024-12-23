@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Branch;
 use Illuminate\Support\Facades\Log;
 use App\Models\Staff;
-
+use App\Models\Student;
 class HostelController extends Controller
 {
     public function index(Request $request)
@@ -28,9 +28,9 @@ class HostelController extends Controller
 {
     $branches = DB::table('branch')->select('id', 'name')->get(); // Fetch branch details
     $staffs =DB::table('staff')->select('id', 'name')->get();
-    $states = DB::table('district_list')->select('State')->distinct()->get(); // Fetch state list
+    $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get(); // Fetch state list
     if ($request->has('state')) {
-        $districts = DB::table('district_list')->where('State', $request->state)->select('District')->get();
+        $districts = DB::table('district_list')->where('State', $request->state)->select('District')->distinct()->orderby('District')->get();
         return response()->json($districts); // Return districts as JSON for dynamic city selection
     }
 
@@ -79,8 +79,8 @@ class HostelController extends Controller
         $hostel = Hostel::with('rooms')->findOrFail($id); 
         $branches = Branch::all();
         $staffs = Staff::all();
-        $districts = DB::table('district_list')->where('State', $hostel->state)->get();
-        $states = DB::table('district_list')->select('State')->distinct()->get();
+        $districts = DB::table('district_list')->where('State', $hostel->state)->select('District')->distinct()->orderby('District')->get();
+        $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get();
         return view('hostel.edit', compact('hostel', 'states', 'districts', 'branches', 'staffs'));
 
     }
@@ -157,5 +157,18 @@ class HostelController extends Controller
         return redirect()->back()->with('success', 'Room deleted successfully.');
     }
     
-       
+    public function allocation(Request $request)
+    {
+        $branches = Branch::all();
+        $branch  = NULL;
+        $hostels= [];
+        $students=[];
+        if($request->has('branch')){
+            $branch = $request->branch;
+            $hostels = Hostel::where('branch_id', $branch)->get();
+            $students = Student::where('campus', $branch)->where('hostel_dayscholar', 'Hostel')->get();
+        }
+        return view('hostel.allocation' , compact('branches', 'branch', 'hostels', 'students') );
+    }
+
 }

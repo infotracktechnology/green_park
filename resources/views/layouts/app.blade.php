@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- auth-login.html  21 Nov 2019 03:49:32 GMT -->
+
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
@@ -16,16 +16,18 @@
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
-    .select2{
+    .select2 {
       width: 100% !important;
     }
-    .error{
+
+    .error {
       color: red;
       font-weight: bold;
     }
   </style>
   @yield('css')
 </head>
+
 <body>
   <div class="loader"></div>
   <div id="app">
@@ -34,9 +36,10 @@
       <nav class="navbar navbar-expand-lg bg-blue main-navbar sticky">
         <div class="form-inline mr-auto">
           <ul class="navbar-nav mr-3">
-            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg	collapse-btn"> <i data-feather="align-justify"></i></a></li>
+            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i data-feather="align-justify"></i></a></li>
             <li><a href="#" class="nav-link nav-link-lg fullscreen-btn"><i data-feather="maximize"></i></a></li>
-            <li><form class="form-inline mr-auto">
+            <li>
+              <form class="form-inline mr-auto">
                 <div class="search-element">
                   <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="200">
                   <button class="btn" type="submit">
@@ -47,137 +50,110 @@
             </li>
           </ul>
         </div>
-
-
-
         <ul class="navbar-nav navbar-right">
-
-
-          <li class="dropdown dropdown-list-toggle"><a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i>
-          </a>
-          <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
-            <div class="dropdown-header">Notifications</div>
-            <div class="dropdown-list-content dropdown-list-icons">
-
-              <a href="#" class="dropdown-item dropdown-item-unread"> <span
-                  class="dropdown-item-icon bg-primary text-white"> <i class="fas
-                      fa-code"></i>
-                </span> <span class="dropdown-item-desc"> Template update is
-                  available now! <span class="time">2 Min
-                    Ago</span>
-                </span>
-              </a>
-           
+          <li class="dropdown dropdown-list-toggle">
+            <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
+            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
+              <div class="dropdown-header">Notifications</div>
+              <div class="dropdown-list-content dropdown-list-icons">
+                <a href="#" class="dropdown-item dropdown-item-unread">
+                  <span class="dropdown-item-icon bg-primary text-white"><i class="fas fa-code"></i></span>
+                  <span class="dropdown-item-desc">
+                    Template update is available now! 
+                    <span class="time">2 Min Ago</span>
+                  </span>
+                </a>
+              </div>
+              <div class="dropdown-footer text-center">
+                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+              </div>
             </div>
-            <div class="dropdown-footer text-center">
-              <a href="#">View All <i class="fas fa-chevron-right"></i></a>
-            </div>
-          </div>
-        </li>
-
-
-             <li class="dropdown"><a href="#" data-toggle="dropdown"class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image" src="{{asset('img/user.png')}}"class="user-img-radious-style"> <span class="d-sm-none d-lg-inline-block"></span></a>
-
-
-
+          </li>
+          <li class="dropdown">
+            <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+              <img alt="image" src="{{asset('img/user.png')}}" class="user-img-radious-style"> 
+              <span class="d-sm-none d-lg-inline-block"></span>
+            </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
-            <div class="dropdown-title">Hi, {{ auth()->user()->name }}</div>
+              <div class="dropdown-title">Hi, {{ auth()->user()->name }}</div>
               <div class="dropdown-divider"></div>
-              <a onclick="event.preventDefault();document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
+              <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout">
+                <i class="fas fa-sign-out-alt"></i>Logout
+              </a>
             </div>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                @csrf
+              @csrf
             </form>
           </li>
-
         </ul>
       </nav>
-
-
 
       <div class="main-sidebar sidebar-style-2">
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
-
-
-
-            <a href="#"> <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" /> <span
-                class="logo-name">Green Park</span>
+            <a href="#">
+              <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" /> 
+              <span class="logo-name">Green Park</span>
             </a>
           </div>
-
-
-
           <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
             <li class="dropdown">
               <a href="{{ route('home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
             </li>
-
             <li class="dropdown">
               <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
             </li>
-
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
-                  <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
-                  <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></a></li>
-                  <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
-                  <li><a href="#" class="nav-link">Section Shuffleing</a></li>
+                <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
+                <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
+                <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
+                <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a></li>
               </ul>
-          </li>
-
-
+            </li>
             <li class="dropdown">
               <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
             </li>
-            
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
-                <li><a  href="#" class="nav-link">Hostel Allocation</a></li>
+                <li><a  href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
             </li>
-
           </ul>
         </aside>
       </div>
 
-    @yield('main')
+      @yield('main')
 
-    <footer class="main-footer">
-      <div class="footer-center">
-        </div>
+      <footer class="main-footer">
         <div class="footer-center">
-        	<a href="http://www.infotrackin.com/its/" target="_blank">
-            <span>copyright &copy; {{ date('Y') }} Version 1.0 - Developed By <b style="color: #27a9e0">Infotrack Technologies</b>
+          <a href="http://www.infotrackin.com/its/" target="_blank">
+            <span>Copyright &copy; {{ date('Y') }} Version 1.0 - Developed By <b style="color: #27a9e0">Infotrack Technologies</b></span>
           </a>
         </div>
       </footer>
-
+    </div>
   </div>
-</div>
+
   <!-- General JS Scripts -->
-  
-  
-<script src="{{asset('js/app.min.js')}}"></script>
-<script src="{{asset('js/scripts.js')}}"></script>
-<script src="{{asset('js/custom.js')}}"></script>
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-<script>
-$(document).ready(function() {
-  $('.select').each(function() {
-    new TomSelect(this, {
-      create: true,
-      sortField: {
-        field: "text",
-        direction: "asc"
-      }
+  <script src="{{asset('js/app.min.js')}}"></script>
+  <script src="{{asset('js/scripts.js')}}"></script>
+  <script src="{{asset('js/custom.js')}}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('.select').each(function () {
+        new TomSelect(this, {
+          create: true,
+          sortField: { field: "text", direction: "asc" }
+        });
+      });
     });
-})
-});
-</script>
-@yield('js')
+  </script>
+  @yield('js')
 </body>
+
 </html>

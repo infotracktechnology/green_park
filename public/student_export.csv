@@ -1,0 +1,10 @@
+<<<<<<< HEAD
+id,total_attempts_neet,neet_score_2023,neet_score_2024,repeater_re_repeater,previous_course_studied_neet,institution_studied_name,institution_bill_type
+1009,6,6,6,repeater,6,6,6
+1010,,,,,,,
+=======
+id,door_no,street_name,city,state,pincode,parent_whatsapp_no,email
+1000,23,"annai sathiya street",Coimbatore,"Tamil Nadu (TN)",642001,9150893428,nandhini.rajendran0412@gmail.com
+1001,,,,,,,
+1002,,,,,,,
+>>>>>>> bdc83595b2132ebc274970f646547d5aa0689f6b

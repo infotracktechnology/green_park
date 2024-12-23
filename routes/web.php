@@ -22,7 +22,7 @@ use App\Http\Controllers\StaffProfileController;
 */
 
 Route::get('/', function () {
-    return view('auth.login');
+    return auth('web')->check() ? redirect()->route('home') : view('auth.login');
 });
 
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
@@ -34,13 +34,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 #admin routes
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
 Route::resource('branch', 'App\Http\Controllers\BranchController');
-
-Route::get('studentdashboard', function () {
-return view('dashboards.studentdashboard');
-})->name('studentdashboard');
-Route::get('teacherdashboard', function () {
-return view('dashboards.teacherdashboard');
-})->name('teacherdashboard');
   
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
@@ -53,4 +46,7 @@ Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name
 Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
 });
-
+#students routes
+Route::view('/student/login', 'auth.studentlogin')->name('studentlogin');
+Route::view('/student/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
+Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
