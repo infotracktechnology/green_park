@@ -72,7 +72,7 @@
   
   
               <div class="dropdown-menu dropdown-menu-right pullDown">
-              <div class="dropdown-title">Hi, {{ auth()->user()->name }}</div>
+              <div class="dropdown-title">Hi, {{ auth('student')->user()->user_name }}</div>
                 <div class="dropdown-divider"></div>
                 <a onclick="event.preventDefault();document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
               </div>

@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\HostelController;
 use App\Http\Controllers\StaffProfileController;
+use App\Http\Controllers\Auth\LoginController;
 
 
 
@@ -22,19 +23,17 @@ use App\Http\Controllers\StaffProfileController;
 */
 
 Route::get('/', function () {
-    return auth('web')->check() ? redirect()->route('home') : view('auth.login');
+    return redirect()->route('login');
 });
-
-Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
 Auth::routes();
-
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 #admin routes
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
 Route::resource('branch', 'App\Http\Controllers\BranchController');
-  
+
+
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
   
@@ -52,6 +51,11 @@ Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocatio
 Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
 });
 #students routes
-Route::view('/student/login', 'auth.studentlogin')->name('studentlogin');
-Route::view('/student/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
-Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
+
+
+Route::view('/student/login', 'auth.studentlogin')->name('student.login');
+Route::post('/student/login', [LoginController::class, 'studentLogin'])->name('student.login.submit');
+Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'],function(){
+Route::view('/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
+#Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
+});

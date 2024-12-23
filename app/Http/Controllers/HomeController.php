@@ -13,7 +13,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth:web');
     }
 
     /**
@@ -23,16 +23,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-    return view('home');
+        return auth('student')->check() ? redirect()->route('studentdashboard') : view('home');
     }
-
-function studentdashboard(){
-    return view('dashboards.studentdashboard');
-}
-
-function teacherdashboard(){
-    return view('dashboards.teacherdashboard');
-}
 
 }
 
