@@ -19,7 +19,7 @@
                @endif
 
                <div class="card card-primary">
-                  <form method="post" id="myForm" action="{{ route('allocation.hostel') }}" enctype="multipart/form-data">
+                  <form method="post" id="myForm" action="{{ route('allocation.store') }}" enctype="multipart/form-data">
                      @csrf
                      <div class="card-body">
                         <div class="row">
@@ -47,16 +47,21 @@
                                     </div>
                                     <div class="form-group col-3">
                                         <label>Block</label>
-                                        <select name="block" id="block" class="form-control form-control-sm" required>
-                                            <option value="">Select </option>
-                                            
+                                        <select name="block_no" id="block_no" class="form-control form-control-sm" required>
+                                            <option value="">Select Block</option>
+                                            @foreach ($blocks as $block)
+                                                <option value="{{ $block->block_no }}">{{ $block->block_no }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
+                                    
                                     <div class="form-group col-3">
                                         <label>Floor</label>
-                                        <select name="floor" id="floor" class="form-control form-control-sm" required>
-                                            <option value="">Select </option>
-                                            
+                                        <select name="floor_no" id="floor_no" class="form-control form-control-sm" required>
+                                            <option value="">Select Floor</option>
+                                            @foreach ($floors as $floor)
+                                                <option value="{{ $floor->floor_no }}">{{ $floor->floor_no }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group col-3">
@@ -70,9 +75,11 @@
                                     </div>
                                     <div class="form-group col-3">
                                         <label>Room No</label>
-                                        <select name="section6" id="section6" class="form-control form-control-sm" required>
-                                            <option value="">Select </option>
-                                           
+                                        <select name="room_no" id="room_no" class="form-control form-control-sm" required>
+                                            <option value="">Select Room No</option>
+                                            @foreach ($rooms as $room)
+                                                <option value="{{ $room->room_no }}">{{ $room->room_no }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -140,12 +147,12 @@
       "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
    });
 
-   // Select All Checkbox Functionality
-//    document.getElementById('selectAll').addEventListener('change', function () {
-//       const checkboxes = document.querySelectorAll('input[name="student_ids[]"]');
-//       checkboxes.forEach((checkbox) => {
-//          checkbox.checked = this.checked;
-//       });
-//    });
+   Select All Checkbox Functionality
+   document.getElementById('selectAll').addEventListener('change', function () {
+      const checkboxes = document.querySelectorAll('input[name="student_ids[]"]');
+      checkboxes.forEach((checkbox) => {
+         checkbox.checked = this.checked;
+      });
+   });
 </script>
 @endsection
