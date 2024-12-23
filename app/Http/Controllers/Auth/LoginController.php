@@ -41,15 +41,13 @@ class LoginController extends Controller
 
      public function studentLogin(Request $request)
      {
-         // Validate the incoming request
-       
-         // Attempt to log the student in using hashed password
+         
          if (Auth::guard('student')->attempt(['user_name' => $request->username, 'password' => $request->password])) {
-             // Redirect to the student dashboard
+            
              return redirect()->route('studentdashboard')->with('success', 'Welcome back!');
          }
      
-         // Authentication failed
+      
          return redirect()->back()->with('error', 'Invalid username or password.');
      }
      

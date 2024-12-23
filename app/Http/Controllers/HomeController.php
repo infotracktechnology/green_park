@@ -23,7 +23,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return auth('student')->check() ? redirect()->route('studentdashboard') : view('home');
+        return view('home');
     }
 
 }
