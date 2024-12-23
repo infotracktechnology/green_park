@@ -63,10 +63,11 @@
                                   
                                     <div class="form-group col-3">
                                         <label>Room No</label>
-                                        <select name="room_no" id="room_no" class="form-control form-control-sm" required>
+                                        <select name="room_id" id="room_no" class="form-control form-control-sm" required>
                                             <option value="">Select Room No</option>
                                         </select>
                                     </div>
+                                   
                                 </div>
                             </div>
                             
@@ -150,14 +151,25 @@
        $.get("{{ route('allocation.hostel') }}", {floor_no:floor_no, type:type,hostel:hostel}, function(data) {
           var html = '<option value="">Select Room No</option>';
           $.each(data, function(key, value) {
-              html += '<option value="' + value.room_no + '">' + value.room_no + '</option>';
+              html += '<option value="' + value.id + '" data-rooms="' + value.no_of_beds + '">' + value.room_no + '</option>';
           });
           $('#room_no').html(html);
+
+          $('#myForm').on('submit', function(e) {
+    var selectedRoom = $('#room_no').find(':selected');
+    var availableBeds = selectedRoom.data('rooms');
+    var selectedStudents = $('input[name="student_ids[]"]:checked').length;
+
+    if (selectedStudents > availableBeds) {
+        e.preventDefault();
+        alert('Not enough beds available. Only ' + availableBeds + ' beds left in this room.');
+    }   
+});
+
       });
    }
 
-
-
+  
 
 </script>
 @endsection

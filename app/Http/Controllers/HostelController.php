@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Hostel;
+use App\Models\HostelAllocation;
 use App\Models\HostelRoom;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,7 @@ use App\Models\Branch;
 use Illuminate\Support\Facades\Log;
 use App\Models\Staff;
 use App\Models\Student;
+
 
 class HostelController extends Controller
 {
@@ -179,7 +181,7 @@ class HostelController extends Controller
         $branch = null;
         $hostels = [];
         $students = [];
-    
+
         if ($request->has('branch')) {
             $branch = $request->branch;
             $hostels = Hostel::where('branch_id', $branch)->get();
@@ -187,26 +189,41 @@ class HostelController extends Controller
                 ->where('hostel_dayscholar', 'Hostel')
                 ->get();
         }
-    
+
         if ($request->has('hostel_id')) {
             $floors = HostelRoom::where('hostel_id', $request->hostel_id)
                 ->select('floor_no')
                 ->distinct()
                 ->get();
-    
+
             return response()->json($floors);
         }
 
-    
-        if ($request->has('type')) {    
+
+        if ($request->has('type')) {
             $rooms = HostelRoom::where('hostel_id', $request->hostel)
                 ->where('floor_no', $request->floor_no)
                 ->where('room_type', $request->type)
                 ->get();
-     return response()->json($rooms);
+            return response()->json($rooms);
         }
-    
+
         return view('hostel.allocation', compact('branches', 'branch', 'hostels', 'students'));
     }
-    
+
+   public function  storeAllocation(Request $request){
+
+    if ($request->student_ids) {
+        foreach ($request->student_ids as $student_id) {
+            $student = Student::find($student_id);
+            $student->hostel_id = $request->hostel;
+            $student->room_id = $request->room_id;
+                $student->save();
+            
+        }
+    }
+
+    return redirect()->route('allocation.hostel')->with('success', 'Student details successfully updated');
+
+   }
 }
