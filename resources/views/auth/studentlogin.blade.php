@@ -26,6 +26,7 @@
                 </div>
                 <div class="col-lg-6 col-md-12 form-info">
                     <div class="form-section">
+                       
                         <div class="form-section-innner">
                             <div class="logo clearfix">
                                 
@@ -33,10 +34,15 @@
                                 
                                
                             </div>
+                            @if ($message = Session::get('error'))
+                            <div class="alert alert-danger fade show" role="alert">
+                                 {{ $message }}
+                            </div>
+                        @endif
                             <h3>Student Login</h3>
                         
                             <div class="login-inner-form">
-                                <form action="#" method="post" enctype="multipart/form-data">
+                                <form method="POST" action="{{ route('student.login.submit') }}" enctype="multipart/form-data">
                                     @csrf
                                     <div class="form-group form-box clearfix">
                                         <input name="username" type="text" class="form-control" placeholder="Enter UserID" aria-label="Username" required>
