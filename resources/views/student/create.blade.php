@@ -91,12 +91,12 @@
                     
                     <div class="form-group col-lg-3">
                         <label>Date of Birth</label>
-                        <input type="date" name="dob" id="dob" class="form-control form-control-sm">
+                        <input type="date" name="dob" id="dob" class="form-control form-control-sm" required>   
                     </div>
                     
                     <div class="form-group col-lg-3">
                         <label>Age</label>
-                        <input type="text" name="age" id="age" class="form-control form-control-sm">
+                        <input type="text" name="age" id="age" class="form-control form-control-sm" required>
                     </div>
           
          
