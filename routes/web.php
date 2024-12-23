@@ -50,6 +50,7 @@ Route::post('section/student', 'App\Http\Controllers\StudentController@update_se
 Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
 
 Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
+
 });
 #students routes
 Route::view('/student/login', 'auth.studentlogin')->name('studentlogin');
