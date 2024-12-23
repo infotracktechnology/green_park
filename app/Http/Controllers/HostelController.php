@@ -160,15 +160,41 @@ class HostelController extends Controller
     public function allocation(Request $request)
     {
         $branches = Branch::all();
-        $branch  = NULL;
-        $hostels= [];
-        $students=[];
-        if($request->has('branch')){
+        $branch = null;
+        $hostels = [];
+        $students = [];
+        $blocks = [];
+        $floors = [];
+        $rooms = [];
+    
+        if ($request->has('branch')) {
             $branch = $request->branch;
             $hostels = Hostel::where('branch_id', $branch)->get();
             $students = Student::where('campus', $branch)->where('hostel_dayscholar', 'Hostel')->get();
+            $blocks = HostelRoom::select('block_no')->distinct()->get();
+            $floors = HostelRoom::select('floor_no')->distinct()->get();
+            $rooms = HostelRoom::select('room_no')->distinct()->get();
         }
-        return view('hostel.allocation' , compact('branches', 'branch', 'hostels', 'students') );
+    
+        return view('hostel.allocation', compact('branches', 'branch', 'hostels', 'students', 'blocks', 'floors', 'rooms'));
+    }
+    
+    public function storeAllocation(Request $request)
+    {
+        $studentId = $request->input('student_id');
+        $block = $request->input('block');
+        $floor = $request->input('floor');
+        $room = $request->input('room');
+    
+        $student = Student::find($studentId);
+        $hostelRoom = HostelRoom::where('block_no', $block)->where('floor_no', $floor)->where('room_no', $room)->first();
+    
+        if ($student && $hostelRoom) {
+            $student->hostel_room_id = $hostelRoom->id;
+            $student->save();
+        }
+    
+        return redirect()->back()->with('success', 'Student allocated to hostel successfully.');
     }
 
 }
