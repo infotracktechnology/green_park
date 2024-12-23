@@ -23,19 +23,17 @@ use App\Http\Controllers\Auth\LoginController;
 */
 
 Route::get('/', function () {
-    return auth('web')->check() ? redirect()->route('home') : view('auth.login');
+    return redirect()->route('login');
 });
-
-Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
 Auth::routes();
-
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 #admin routes
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
 Route::resource('branch', 'App\Http\Controllers\BranchController');
-  
+
+
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
   
