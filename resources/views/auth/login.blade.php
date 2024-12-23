@@ -1,112 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
-<!-- auth-login.html  21 Nov 2019 03:49:32 GMT -->
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-  <title>ERP System </title>
+  <title>Login</title>
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{{asset('css/app.min.css')}}">
-  <link rel="stylesheet" href="{{asset('bundles/bootstrap-social/bootstrap-social.css')}}">
-  <!-- Template CSS -->
-  <link rel="stylesheet" href="{{asset('css/style.css')}}">
-  <link rel="stylesheet" href="{{asset('css/components.css')}}">
-  <!-- Custom style CSS -->
-  <link rel="stylesheet" href="{{asset('css/custom.css')}}">
+  <link rel="stylesheet" href="{{asset('css/login.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
 </head>
 <body>
-  <div class="loader"></div>
-  <div id="app">
-    <section class="section">
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-12 col-lg-8 offset-lg-2">
-            <div class="card card-primary">
-              <div class="card-header">
-                  
-                <h4>Login</h4>
-                
-              </div>
-              <div class="card-body">
-                  
-                                                
-                <form method="POST" action="{{ route('login') }}">
-                @csrf
-                    
-                    
-                 <div class="row">    
-                 
-                    <div class="col-12 col-lg-6">   
-                  <div class="form-group col-12 mb-4">
-                    <label for="email">Email</label>
-                    <input id="email" type="email" class="form-control form-control-sm @error('email') is-invalid @enderror" name="email"  required autocomplete="email" autofocus>
 
-                    @error('email')
-                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                    @enderror
-
-                  </div>
-                  <div class="form-group col-12 mb-4">
-                    <div class="d-block">
-                      <label for="password" class="control-label">Password</label>
-                     
+    <div class="login-13">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 bg-img">
+                    <div class="bg-img-inner">
+                        <div class="info">
+                            <div class="center">
+                                <h1>Welcome To GPCC</h1>
+                            </div>
+                            <p>Green Park Group of Educational Institutions are always known for their Academic Accomplishments in securing admissions into Professional courses. With the Central government making NEET mandatory for MBBS admissions, we have started Green Park Coaching Centre in 2017 to provide the students with extensive, exceptional, and efficacious coaching to crack NEET with effortless ease.</p>
+                        </div>
                     </div>
-                    <input id="password" type="password" class="form-control form-control-sm @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
-                    @error('password')
-                    <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                    @enderror
-                  </div>
-                  <div class="form-group col-12 mb-4">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" name="remember" class="custom-control-input" tabindex="3" id="remember-me">
-                      <label class="custom-control-label" for="remember-me">Remember Me</label>
-                    </div>
-                  </div>
-
-
-                  <div class="form-group col-12 mb-4">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
-                      Login
-                    </button>
-                  </div>
-                  {{-- <div class="form-group col-12 mb-4">
-                    @if (Route::has('password.request'))
-                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                        {{ __('Forgot Your Password?') }}
-                    </a>
-                @endif
-                  </div> --}}
-                  </div>
-                
-                  
-                  <div class="col-lg-6 col-12 d-md-block d-none text-center align-self-center p-3">
-                                     
-                                        <img class="img-fluid" src="https://www.linelogictech.com/icode/app-assets/images/pages/login.png" alt="branding logo">
-                                    
-                                </div>
+                </div>
+                <div class="col-lg-6 col-md-12 form-info">
+                    <div class="form-section">
+                       
+                        <div class="form-section-innner">
+                            <div class="logo clearfix">
                                 
-                  </div>
-                </form>
-                
-              </div>
+                                <img alt="image" src="{{asset('img/logo.png')}}" style="height:80px;"  /> 
+                                
+                               
+                            </div>
+                            @if ($message = Session::get('error'))
+                            <div class="alert alert-danger fade show" role="alert">
+                                 {{ $message }}
+                            </div>
+                        @endif
+                            <h3>Login</h3>
+                        
+                            <div class="login-inner-form">
+                                <form method="POST" action="{{ route('auth.login') }}" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="form-group form-box clearfix">
+                                        <input name="username" type="text" class="form-control" placeholder="Enter Username" aria-label="Username" required>
+                                        <i class="fa fa-user"></i>
+                                    </div>
+                                    <div class="form-group form-box clearfix">
+                                        <input name="password" type="password" class="form-control" autocomplete="off" placeholder="Enter Password" aria-label="Password" required>
+                                        <i class="fa fa-lock"></i>
+                                    </div>
+                                   
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary btn-lg btn-theme">Login</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {{-- <ul class="social-list">
+                                <li><a href="#" class="facebook-color"><i class="fa fa-facebook facebook-i"></i><span>Facebook</span></a></li>
+                                <li><a href="#" class="twitter-color"><i class="fa fa-twitter twitter-i"></i><span>Twitter</span></a></li>
+                                <li><a href="#" class="google-color"><i class="fa fa-google google-i"></i><span>Google</span></a></li>
+                            </ul> --}}
+                            
+                        </div>
+                    </div>
+                </div>
             </div>
-      
-          </div>
         </div>
-      </div>
-    </section>
-    
-  </div>
-  <!-- General JS Scripts -->
+    </div>
+
   <script src="{{asset('js/app.min.js')}}"></script>
-  <!-- JS Libraies -->
-  <!-- Page Specific JS File -->
-  <!-- Template JS File -->
-  <script src="{{asset('js/scripts.js')}}"></script>
-  <!-- Custom JS File -->
-  <script src="{{asset('js/custom.js')}}"></script>
 </body>
 </html>

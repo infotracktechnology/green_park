@@ -75,7 +75,7 @@
               <span class="d-sm-none d-lg-inline-block"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
-              <div class="dropdown-title">Hi, {{ auth()->user()->name }}</div>
+              <div class="dropdown-title">Hi, {{ auth()->user()->username }}</div>
               <div class="dropdown-divider"></div>
               <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout">
                 <i class="fas fa-sign-out-alt"></i>Logout
@@ -99,7 +99,7 @@
           <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
             <li class="dropdown">
-              <a href="{{ route('home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
+              <a href="{{ route('admin.home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
             </li>
             <li class="dropdown">
               <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
