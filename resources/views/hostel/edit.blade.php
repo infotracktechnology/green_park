@@ -46,6 +46,7 @@
                                         <option value="" disabled selected>-- Choose Warden --</option>
                                         @foreach ($staffs as $staff)
                                             <option value="{{ $staff->name }}" @if($hostel->warden_name == $staff->name) selected @endif>{{ $staff->name }}</option>
+                                            <option value="{{ $staff->id }}" @if($hostel->warden_name == $staff->id) selected @endif>{{ $staff->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
