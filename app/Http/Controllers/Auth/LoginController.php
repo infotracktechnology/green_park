@@ -3,38 +3,37 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
+    
+     public function login(Request $request)
+     {
+         
+         if (Auth::guard('web')->attempt(['username' => $request->username, 'password' => $request->password])) {
+            
+             return redirect()->route('admin.home')->with('success', 'Welcome back!');
+         }
+         elseif(Auth::guard('student')->attempt(['user_name' => $request->username, 'password' => $request->password])) {
+            
+            return redirect()->route('studentdashboard')->with('success', 'Welcome back!');
+        }
+    
+         return redirect()->back()->with('error', 'Invalid username or password.');
+     }
 
-    use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-        // $this->middleware('auth')->only('logout');
-    }
+     function showLoginForm(){
+        if (Auth::guard('web')->check()) {
+            return redirect()->route('admin.home');
+        }
+        elseif(Auth::guard('student')->check()) {
+            return redirect()->route('studentdashboard');
+       }
+   
+        return view('auth.login');
+     }
+     
+    
 }
