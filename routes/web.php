@@ -22,17 +22,14 @@ use App\Http\Controllers\Auth\LoginController;
 | 
 */
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
-Auth::routes();
+Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
+Route::post('/login', [LoginController::class, 'login'])->name('auth.login');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 #admin routes
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
 Route::resource('branch', 'App\Http\Controllers\BranchController');
-
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
 
 Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
 Route::resource('student', 'App\Http\Controllers\StudentController');
@@ -53,8 +50,6 @@ Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAll
 #students routes
 
 
-Route::view('/student/login', 'auth.studentlogin')->name('student.login');
-Route::post('/student/login', [LoginController::class, 'studentLogin'])->name('student.login.submit');
 Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'],function(){
 Route::view('/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
