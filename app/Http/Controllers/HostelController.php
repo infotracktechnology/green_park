@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Hostel;
+use App\Models\HostelAllocation;
 use App\Models\HostelRoom;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -12,30 +13,32 @@ use App\Models\Branch;
 use Illuminate\Support\Facades\Log;
 use App\Models\Staff;
 use App\Models\Student;
+
+
 class HostelController extends Controller
 {
     public function index(Request $request)
-{
-    $hostels = Hostel::all();
-    $branches = Branch::all(); 
-    $staffs = Staff::all();
-    return view('hostel.index', compact('hostels', 'branches','staffs'));
-}
+    {
+        $hostels = Hostel::all();
+        $branches = Branch::all();
+        $staffs = Staff::all();
+        return view('hostel.index', compact('hostels', 'branches', 'staffs'));
+    }
 
 
 
     public function create(Request $request)
-{
-    $branches = DB::table('branch')->select('id', 'name')->get(); // Fetch branch details
-    $staffs =DB::table('staff')->select('id', 'name')->get();
-    $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get(); // Fetch state list
-    if ($request->has('state')) {
-        $districts = DB::table('district_list')->where('State', $request->state)->select('District')->distinct()->orderby('District')->get();
-        return response()->json($districts); // Return districts as JSON for dynamic city selection
-    }
+    {
+        $branches = DB::table('branch')->select('id', 'name')->get(); // Fetch branch details
+        $staffs = DB::table('staff')->select('id', 'name')->get();
+        $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get(); // Fetch state list
+        if ($request->has('state')) {
+            $districts = DB::table('district_list')->where('State', $request->state)->select('District')->distinct()->orderby('District')->get();
+            return response()->json($districts); // Return districts as JSON for dynamic city selection
+        }
 
-    return view('hostel.create', compact('branches', 'states', 'staffs')); // Pass $branches to the view
-}
+        return view('hostel.create', compact('branches', 'states', 'staffs')); // Pass $branches to the view
+    }
 
     public function store(Request $request)
     {
@@ -51,12 +54,20 @@ class HostelController extends Controller
             'pincode' => 'nullable|numeric',
             'phone_no' => 'required|numeric|digits:10|unique:hostel,phone_no',
         ]);
-    
+
         // Save hostel details
         $hostel = Hostel::create($request->only([
-           'branch_id', 'name', 'type', 'warden_name', 'address', 'city', 'state', 'pincode', 'phone_no'
+            'branch_id',
+            'name',
+            'type',
+            'warden_name',
+            'address',
+            'city',
+            'state',
+            'pincode',
+            'phone_no'
         ]));
-    
+
         // Save room details
         if ($request->has('rooms')) {
             foreach ($request->rooms as $room) {
@@ -69,59 +80,66 @@ class HostelController extends Controller
                 ]);
             }
         }
-    
+
         return redirect()->route('hostel.index')->with('success', 'Hostel and Room details saved successfully.');
     }
-    
+
 
     public function edit(Request $request, $id)
     {
-        $hostel = Hostel::with('rooms')->findOrFail($id); 
+        $hostel = Hostel::with('rooms')->findOrFail($id);
         $branches = Branch::all();
         $staffs = Staff::all();
         $districts = DB::table('district_list')->where('State', $hostel->state)->select('District')->distinct()->orderby('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get();
         return view('hostel.edit', compact('hostel', 'states', 'districts', 'branches', 'staffs'));
-
     }
 
     public function update(Request $request, $id)
-{
-    // Validate the hostel details
-    $request->validate([
-        'branch_id' => 'required|exists:branch,id',
-        'name' => 'required|string|max:255',
-        'type' => 'required|string',
-        'warden_name' => 'required|string',
-        'address' => 'required|string',
-        'city' => 'required|string',
-        'state' => 'required|string',
-        'pincode' => 'nullable|numeric',
-        'phone_no' => 'required|numeric|digits:10',
-    ]);
+    {
+        // Validate the hostel details
+        $request->validate([
+            'branch_id' => 'required|exists:branch,id',
+            'name' => 'required|string|max:255',
+            'type' => 'required|string',
+            'warden_name' => 'required|string',
+            'address' => 'required|string',
+            'city' => 'required|string',
+            'state' => 'required|string',
+            'pincode' => 'nullable|numeric',
+            'phone_no' => 'required|numeric|digits:10',
+        ]);
 
-    // Update hostel details
-    $hostel = Hostel::findOrFail($id);
-    $hostel->update($request->only([
-        'branch_id', 'name', 'type', 'warden_name', 'address', 'city', 'state', 'pincode', 'phone_no'
-    ]));
+        // Update hostel details
+        $hostel = Hostel::findOrFail($id);
+        $hostel->update($request->only([
+            'branch_id',
+            'name',
+            'type',
+            'warden_name',
+            'address',
+            'city',
+            'state',
+            'pincode',
+            'phone_no'
+        ]));
 
-    $hostel->rooms()->delete();
-    // Update room details
-    if ($request->has('rooms')) {
-        foreach ($request->rooms as $room) {
-            $hostel->rooms()->create([
-                'block_no' => $room['block_no'],
-                'floor_no' => $room['floor_no'],
-                'room_no' => $room['room_no'],
-                'room_type' => $room['room_type'],
-                'no_of_beds' => $room['no_of_beds'],
-            ]);
+        $hostel->rooms()->delete();
+        // Update room details
+        if ($request->has('rooms')) {
+            foreach ($request->rooms as $room) {
+                $hostel->rooms()->create([
+                    'block_no' => $room['block_no'],
+                    'floor_no' => $room['floor_no'],
+                    'room_no' => $room['room_no'],
+                    'room_type' => $room['room_type'],
+                    'no_of_beds' => $room['no_of_beds'],
+                ]);
+            }
         }
-    }
 
-    return redirect()->route('hostel.index')->with('success', 'Hostel and Room details updated successfully.');
-}
+        return redirect()->route('hostel.index')->with('success', 'Hostel and Room details updated successfully.');
+    }
 
 
     public function destroy(Request $request, Hostel $hostel)
@@ -143,58 +161,69 @@ class HostelController extends Controller
     {
         // Find the room by its ID
         $room = HostelRoom::findOrFail($id);
-        
+
         // Log the room being deleted for debugging purposes
         Log::info('Deleting room:', ['room' => $room]);
-        
+
         // Delete the room only
         $room->delete();
-        
+
         // Log the success for debugging purposes
         Log::info('Room deleted successfully.', ['room_id' => $id]);
-        
+
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Room deleted successfully.');
     }
-    
+
     public function allocation(Request $request)
     {
         $branches = Branch::all();
         $branch = null;
         $hostels = [];
         $students = [];
-        $blocks = [];
-        $floors = [];
-        $rooms = [];
-    
+
         if ($request->has('branch')) {
             $branch = $request->branch;
             $hostels = Hostel::where('branch_id', $branch)->get();
-            $students = Student::where('campus', $branch)->where('hostel_dayscholar', 'Hostel')->get();
-            $blocks = HostelRoom::select('block_no')->distinct()->get();
-            $floors = HostelRoom::select('floor_no')->distinct()->get();
-            $rooms = HostelRoom::select('room_no')->distinct()->get();
+            $students = Student::where('campus', $branch)
+                ->where('hostel_dayscholar', 'Hostel')
+                ->get();
         }
-    
-        return view('hostel.allocation', compact('branches', 'branch', 'hostels', 'students', 'blocks', 'floors', 'rooms'));
-    }
-    
-    public function storeAllocation(Request $request)
-    {
-        $studentId = $request->input('student_id');
-        $block = $request->input('block');
-        $floor = $request->input('floor');
-        $room = $request->input('room');
-    
-        $student = Student::find($studentId);
-        $hostelRoom = HostelRoom::where('block_no', $block)->where('floor_no', $floor)->where('room_no', $room)->first();
-    
-        if ($student && $hostelRoom) {
-            $student->hostel_room_id = $hostelRoom->id;
-            $student->save();
+
+        if ($request->has('hostel_id')) {
+            $floors = HostelRoom::where('hostel_id', $request->hostel_id)
+                ->select('floor_no')
+                ->distinct()
+                ->get();
+
+            return response()->json($floors);
         }
-    
-        return redirect()->back()->with('success', 'Student allocated to hostel successfully.');
+
+
+        if ($request->has('type')) {
+            $rooms = HostelRoom::where('hostel_id', $request->hostel)
+                ->where('floor_no', $request->floor_no)
+                ->where('room_type', $request->type)
+                ->get();
+            return response()->json($rooms);
+        }
+
+        return view('hostel.allocation', compact('branches', 'branch', 'hostels', 'students'));
     }
 
+   public function  storeAllocation(Request $request){
+
+    if ($request->student_ids) {
+        foreach ($request->student_ids as $student_id) {
+            $student = Student::find($student_id);
+            $student->hostel_id = $request->hostel;
+            $student->room_id = $request->room_id;
+                $student->save();
+            
+        }
+    }
+
+    return redirect()->route('allocation.hostel')->with('success', 'Student details successfully updated');
+
+   }
 }
