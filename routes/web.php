@@ -6,10 +6,10 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\HostelController;
+
 use App\Http\Controllers\StaffProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
-
 
 
 /*
@@ -48,6 +48,7 @@ Route::post('section/student', 'App\Http\Controllers\StudentController@update_se
 Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
 
 Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
+
 });
 #students routes
 
