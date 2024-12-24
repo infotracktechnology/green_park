@@ -138,11 +138,6 @@ $(function () {
 
             }
 
-
-
-
-
-
             // Add additional rules for other fields here if needed
         },
 

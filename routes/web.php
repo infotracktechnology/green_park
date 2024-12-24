@@ -10,7 +10,6 @@ use App\Http\Controllers\StaffProfileController;
 use App\Http\Controllers\Auth\LoginController;
 
 
-
 /*
 |-------------------------------------------------------------------------- 
 | Web Routes
