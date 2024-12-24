@@ -64,6 +64,7 @@ class StudentController extends Controller
     {
         $data = $request->all();
         $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
+        $data['ac_nonac'] = $data['ac_nonac'] ?? null;
 
         $student->update($data);
 
@@ -106,4 +107,16 @@ class StudentController extends Controller
 
         return redirect()->route('section.student')->with('success', 'Student details successfully updated.');
     }
+    public function profile()
+{
+    
+
+    return view('student.profile');
+}
+
+    
+    
+
+    
+
 }

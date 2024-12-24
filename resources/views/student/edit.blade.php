@@ -21,17 +21,29 @@
                                  <input type="date" name="admission_date" value="{{$student->admission_date}}" class="form-control form-control-sm" required>
                             
                              </div>
-        
                              <div class="form-group col-lg-3">
                                 <label for="branch_id">Campus</label>
-                                <select name="campus" class="form-control form-control-sm" required >
+                                <select name="campus" class="form-control form-control-sm" id="campus-select" required>
                                     <option value="" disabled selected>Select Campus</option>
                                     @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}" @if($branch->id == $student->campus) selected @endif>{{ $branch->name }}</option>
+                                        <option value="{{ $branch->id }}" @if($branch->id == $student->campus) selected @endif>
+                                            {{ $branch->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
-        
+                            
+                            <div class="form-group col-lg-3">
+                                <label>AC/Non AC</label>
+                                <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" required>
+                                    <option value="">Select AC/Non AC</option>
+                                    <option value="AC" @if($student->ac_nonac == 'AC') selected @endif>AC</option>
+                                    <option value="Non AC" @if($student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
+                                </select>
+                            </div>
+                            
+                            
+
         
                            <div class="form-group col-lg-3">
                                <label>Coaching Type</label>
@@ -55,27 +67,21 @@
         
                             <div class="form-group col-lg-3">
                                 <label for="student_name">Student Name</label>
-                                <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $student->student_name) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only alphabets and spaces are allowed.
-                                </div>
+                                <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $student->student_name) }}" class="form-control form-control-sm alphabetsOnly" required>
+                               
                             </div>
                             
         
                             <div class="form-group col-lg-3">
                                 <label for="ph_no1">Mobile No 1</label>
-                                <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $student->ph_no1) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only numbers are allowed.
-                                </div>
+                                <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $student->ph_no1) }}" class="form-control form-control-sm digits" required>
+                              
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label for="ph_no2">Mobile No 2</label>
-                                <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $student->ph_no2) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only numbers are allowed.
-                                </div>
+                                <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $student->ph_no2) }}" class="form-control form-control-sm digits" required>
+                               
                             </div>
         
                             <div class="form-group col-lg-3">
@@ -117,34 +123,26 @@
         
                             <div class="form-group col-lg-3">
                                 <label for="father_name">Father Name</label>
-                                <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $student->father_name) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only alphabets and spaces are allowed.
-                                </div>
+                                <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $student->father_name) }}" class="form-control form-control-sm alphabetsOnly" required>
+                               
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label for="father_ph_no">Father Mobile No</label>
-                                <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $student->father_ph_no) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only numbers are allowed.
-                                </div>
+                                <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $student->father_ph_no) }}" class="form-control form-control-sm digits" required>
+                              
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label for="mother_name">Mother Name</label>
-                                <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $student->mother_name) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only alphabets and spaces are allowed.
-                                </div>
+                                <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $student->mother_name) }}" class="form-control form-control-sm alphabetsOnly" required>
+                             
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label for="mother_ph_no">Mother Mobile No</label>
-                                <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $student->mother_ph_no) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only numbers are allowed.
-                                </div>
+                                <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $student->mother_ph_no) }}" class="form-control form-control-sm digits" required>
+                              
                             </div>
                             
 
@@ -158,14 +156,7 @@
                                  </select>
                              </div>
          --}}
-                            <div class="form-group col-lg-3" >
-                                <label>AC/Non AC</label>
-                                 <select name="ac_nonac" class="form-control form-control-sm" required >
-                                     <option value="">Select AC/Non AC</option>
-                                     <option value="AC" @if($student->ac_nonac == 'AC') selected @endif>AC</option>
-                                     <option value="Non AC" @if($student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
-                                 </select>
-                             </div>
+                          
         
         
                              <div class="form-group col-lg-3">
@@ -252,10 +243,8 @@
         
                             <div class="form-group col-lg-3">
                                 <label for="student_whatsapp_no">Student WhatsApp No</label>
-                                <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $student->student_whatsapp_no) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only numbers are allowed.
-                                </div>
+                                <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $student->student_whatsapp_no) }}" class="form-control form-control-sm digits" required>
+                               
                             </div>     
                         </fieldset>
 
@@ -271,6 +260,10 @@
                                  <input type="text" name="street_name" value="{{$student->street_name}}" class="form-control form-control-sm" required>
                             </div>
 
+                            <div class="form-group col-lg-3">
+                                <label>City</label>
+                                 <input type="text" name="city" value="{{$student->city}}" class="form-control form-control-sm" required>
+                            </div>
 
                             <div class="form-group col-lg-3">
                                 <label>State</label>
@@ -283,14 +276,15 @@
                              </div>
 
                              <div class="form-group col-lg-3">
-                                <label>City</label>
-                                <select name="city" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm" required>
-                                 <option value="">Select City</option>
-                                 @foreach ($districts as $city)
-                                 <option value="{{$city->District}}" @if($student->city == $city->District) selected @endif>{{$city->District}}</option>
-                                 @endforeach
-                               </select>
-                             </div>
+                                <label>District</label>
+                                <select name="district" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm" required>
+                                    <option value="">Select City</option>
+                                    @foreach ($districts as $city)
+                                        <option value="{{ $city->District }}" @if($student->district == $city->District) selected @endif>{{ $city->District }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
 
                     <datalist id="pincode_list">
                         @foreach ($pincodes as $pin)
@@ -305,10 +299,8 @@
         
                             <div class="form-group col-lg-3">
                                 <label for="parent_whatsapp_no">Parent WhatsApp No</label>
-                                <input type="number" name="parent_whatsapp_no" id="parent_whatsapp_no" value="{{ old('parent_whatsapp_no', $student->parent_whatsapp_no) }}" class="form-control form-control-sm" required>
-                                <div class="invalid-feedback">
-                                    Only numbers are allowed.
-                                </div>
+                                <input type="number" name="parent_whatsapp_no" id="parent_whatsapp_no" value="{{ old('parent_whatsapp_no', $student->parent_whatsapp_no) }}" class="form-control form-control-sm digits" required>
+                               
                             </div>
         
                             <div class="form-group col-lg-3">
@@ -522,8 +514,6 @@
                             </div>
                   
 
-
-
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S3</label>
                             <input type="number" name="S3_max_marks" value="{{$student->S3_max_marks}}"  max="100" class="form-control form-control-sm" required>
@@ -729,59 +719,91 @@
     }
 
     $(document).ready(function () {
-    $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').on('input', function () {
-        let input = $(this).val();
-        let nameRegex = /^[a-zA-Z .]*$/;  // Allow alphabets, spaces, and dots
-        let phoneRegex = /^[0-9]{10}$/;  // Only 10 digits allowed for phone numbers
-        let aadharRegex = /^[0-9]{12}$/;  // 12 digits for Aadhar card
+    const acNonAcSelect = $('#ac-nonac-select');
 
-        if ($(this).attr('id') == 'student_name' || $(this).attr('id') == 'father_name' || $(this).attr('id') == 'mother_name') {
-            if (!nameRegex.test(input)) {
-                $(this).addClass('is-invalid');
-                $(this).next('.invalid-feedback').text('Only alphabets, spaces, and dots are allowed');
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        }
+    $('#campus-select').on('change', function () {
+        const selectedCampusName = $(this).find('option:selected').text().trim();
 
-        // For phone numbers: only 10 digits allowed
-        if ($(this).attr('id') == 'ph_no1' || $(this).attr('id') == 'ph_no2' || $(this).attr('id') == 'father_ph_no' || $(this).attr('id') == 'mother_ph_no' || $(this).attr('id') == 'student_whatsapp_no' || $(this).attr('id') == 'parent_whatsapp_no') {
-            if (!phoneRegex.test(input)) {
-                $(this).addClass('is-invalid');
-                $(this).next('.invalid-feedback').text('Phone numbers must be exactly 10 digits');
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        }
-
-        if ($(this).attr('id') == 'aadhar_card_no') {
-            if (!aadharRegex.test(input)) {
-                $(this).addClass('is-invalid');
-                $(this).next('.invalid-feedback').text('Aadhar card number should be exactly 12 digits');
-            } else {
-                $(this).removeClass('is-invalid');
-            }
+        if (selectedCampusName.startsWith('GPCC')) {
+            acNonAcSelect.prop('disabled', false); // Enable AC/Non AC field
+        } else {
+            acNonAcSelect.prop('disabled', true); // Disable AC/Non AC field
+            acNonAcSelect.val(''); // Reset value to null when campus is not GPCC
         }
     });
+
+    // Initialize AC/Non AC field state on page load
+    const initialCampusName = $('#campus-select').find('option:selected').text().trim();
+    if (!initialCampusName.startsWith('GPCC')) {
+        acNonAcSelect.prop('disabled', true);
+        acNonAcSelect.val(''); // Reset value to null when campus is not GPCC on page load
+    }
 });
 
+
+
+    'use strict';
+
+    // Real-time input validation
+    // $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').on('input', function () {
+    //     let input = $(this).val();
+    //     let nameRegex = /^[a-zA-Z .]*$/;  // Allow alphabets, spaces, and dots
+    //     let phoneRegex = /^[0-9]{10}$/;  // Only 10 digits allowed for phone numbers
+    //     let aadharRegex = /^[0-9]{12}$/;  // 12 digits for Aadhar card
+
+    //     if ($(this).attr('id') == 'student_name' || $(this).attr('id') == 'father_name' || $(this).attr('id') == 'mother_name') {
+    //         if (!nameRegex.test(input)) {
+    //             $(this).addClass('is-invalid');
+    //             $(this).next('.invalid-feedback').text('Only alphabets, spaces, and dots are allowed');
+    //         } else {
+    //             $(this).removeClass('is-invalid');
+    //             $(this).next('.invalid-feedback').text('');
+    //         }
+    //     }
+
+        // For phone numbers: only 10 digits allowed
+    //     if ($(this).attr('id') == 'ph_no1' || $(this).attr('id') == 'ph_no2' || $(this).attr('id') == 'father_ph_no' || $(this).attr('id') == 'mother_ph_no' || $(this).attr('id') == 'student_whatsapp_no' || $(this).attr('id') == 'parent_whatsapp_no') {
+    //         if (!phoneRegex.test(input)) {
+    //             $(this).addClass('is-invalid');
+    //             $(this).next('.invalid-feedback').text('Phone numbers must be exactly 10 digits');
+    //         } else {
+    //             $(this).removeClass('is-invalid');
+    //             $(this).next('.invalid-feedback').text('');
+    //         }
+    //     }
+
+    //     if ($(this).attr('id') == 'aadhar_card_no') {
+    //         if (!aadharRegex.test(input)) {
+    //             $(this).addClass('is-invalid');
+    //             $(this).next('.invalid-feedback').text('Aadhar card number should be exactly 12 digits');
+    //         } else {
+    //             $(this).removeClass('is-invalid');
+    //             $(this).next('.invalid-feedback').text('');
+    //         }
+    //     }
+    // });
+
+    // Prevent form submission if invalid
+//     $('#wizard_with_validation').on('submit', function (e) {
+//         let isFormValid = true;
+
+//         // Validate all inputs again before submitting
+//         $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').each(function () {
+//             $(this).trigger('input'); // Trigger input event to revalidate the field
+//             if ($(this).hasClass('is-invalid')) {
+//                 isFormValid = false;
+//             }
+//         });
+
+//         if (!isFormValid) {
+//             e.preventDefault();
+//             alert('Please correct the errors before submitting the form.');
+//         }
+//     });
+// });
+
+
+  
 </script>
-
-
-
-
-{{-- <script>
-     document.addEventListener('alpine:init', () => {
-        Alpine.data('app', () => ({
-            formStep: 1,
-            errors: {},
-            updateFormStep() {
-            },
-            init() {
-                
-            }
-        }));
-    });
-</script> --}}
 
 @endsection
