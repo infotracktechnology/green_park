@@ -151,7 +151,7 @@
 
       @yield('main')
 
-      {{-- <footer class="main-footer">
+      <footer class="main-footer">
         <div class="footer-center">
           <a href="http://www.infotrackin.com/its/" target="_blank">
             <span>Copyright &copy; {{ date('Y') }} Version 1.0 - Developed By <b style="color: #27a9e0">Infotrack Technologies</b></span>
@@ -159,7 +159,7 @@
         </div>
       </footer>
     </div>
-  </div> --}}
+  </div>
 
   <!-- General JS Scripts -->
   <script src="{{asset('js/app.min.js')}}"></script>

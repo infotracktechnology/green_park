@@ -53,7 +53,7 @@
                                 <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="home-tab2">
                                   <div class="row">
                                     
-                                    <div style="color: #2196f3;" class="col-md-3 col-6 b-r">
+                                    <div style="color: #2196f3;" class="col-md-4 col-6 b-r">
                                       <strong>Mobile</strong>
                                       <br>
                                       <p class="text-muted"> {{ auth()->user()->ph_no1 }}</p>
@@ -63,7 +63,7 @@
                                       <br>
                                       <p class="text-muted">johndeo@example.com</p>
                                     </div>
-                                    <div style="color: #2196f3;" class="col-md-3 col-6">
+                                    <div style="color: #2196f3;" class="col-md-4 col-6">
                                       <strong>Address</strong>
                                       <br>
                                       <p class="text-muted"> {{ auth()->user()->city }}</p>
