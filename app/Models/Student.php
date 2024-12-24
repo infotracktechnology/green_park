@@ -32,6 +32,11 @@ class Student extends Authenticatable
             $model->save();
         });
     }
+    public function getRouteKeyName()
+{
+    return 'id'; 
+}
 
+    
     
 }
