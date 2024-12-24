@@ -4,7 +4,6 @@ namespace App\Models;
 
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Student extends Authenticatable
@@ -12,6 +11,14 @@ class Student extends Authenticatable
     public $table = 'student';
 
     protected $guarded = [];
+    function branch()
+    {
+        return $this->belongsTo(Branch::class,'campus','id');
+    }
+    function room()
+    {
+        return $this->belongsTo(HostelRoom::class,'room_id','id');
+    }
     public static function boot()
 	{
 		parent::boot();
