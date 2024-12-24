@@ -13,11 +13,11 @@ class Student extends Authenticatable
     protected $guarded = [];
     function branch()
     {
-        return $this->hasOne(Branch::class,'campus','id');
+        return $this->belongsTo(Branch::class,'campus','id');
     }
     function room()
     {
-        return $this->hasOne(HostelRoom::class,'room_id','id');
+        return $this->belongsTo(HostelRoom::class,'room_id','id');
     }
     public static function boot()
 	{
