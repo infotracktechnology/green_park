@@ -54,19 +54,28 @@
                             </div>
         
                             <div class="form-group col-lg-3">
-                               <label>Student Name</label>
-                                <input type="text" name="student_name" value="{{$student->student_name}}" class="form-control form-control-sm" required>
-                           </div>
-        
-                            <div class="form-group col-lg-3">
-                                <label>Mobile No 1</label>
-                                 <input type="text" name="ph_no1" value="{{$student->ph_no1}}" class="form-control form-control-sm" required>
-                                
+                                <label for="student_name">Student Name</label>
+                                <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $student->student_name) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only alphabets and spaces are allowed.
+                                </div>
                             </div>
+                            
         
                             <div class="form-group col-lg-3">
-                                <label>Mobile No 2</label>
-                                 <input type="text" name="ph_no2" value="{{$student->ph_no2}}" class="form-control form-control-sm" required>
+                                <label for="ph_no1">Mobile No 1</label>
+                                <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $student->ph_no1) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only numbers are allowed.
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-lg-3">
+                                <label for="ph_no2">Mobile No 2</label>
+                                <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $student->ph_no2) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only numbers are allowed.
+                                </div>
                             </div>
         
                             <div class="form-group col-lg-3">
@@ -107,25 +116,39 @@
 
         
                             <div class="form-group col-lg-3">
-                                <label>Father Name</label>
-                                 <input type="text" name="father_name" value="{{$student->father_name}}" class="form-control form-control-sm" required>
+                                <label for="father_name">Father Name</label>
+                                <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $student->father_name) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only alphabets and spaces are allowed.
+                                </div>
                             </div>
-        
+                            
                             <div class="form-group col-lg-3">
-                                <label>Father Mobile No</label>
-                                 <input type="text" name="father_ph_no" value="{{$student->father_ph_no}}" class="form-control form-control-sm" required>
+                                <label for="father_ph_no">Father Mobile No</label>
+                                <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $student->father_ph_no) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only numbers are allowed.
+                                </div>
                             </div>
-        
+                            
                             <div class="form-group col-lg-3">
-                                <label>Mother Name</label>
-                                 <input type="text" name="mother_name" value="{{$student->mother_name}}" class="form-control form-control-sm" required>
+                                <label for="mother_name">Mother Name</label>
+                                <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $student->mother_name) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only alphabets and spaces are allowed.
+                                </div>
                             </div>
-        
+                            
                             <div class="form-group col-lg-3">
-                                <label>Mother Mobile No</label>
-                                 <input type="text" name="mother_ph_no" value="{{$student->mother_ph_no}}" class="form-control form-control-sm" required>
+                                <label for="mother_ph_no">Mother Mobile No</label>
+                                <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $student->mother_ph_no) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only numbers are allowed.
+                                </div>
                             </div>
-        
+                            
+
+                
                             {{-- <div class="form-group col-lg-3">
                                 <label>Admission Opted For</label>
                                  <select name="admission_opted_for" class="form-control form-control-sm" required >
@@ -170,11 +193,19 @@
                             </div> --}}
         
         
-        
-                            <div class="form-group col-lg-3">
-                                <label>Aadhar Card No</label>
-                                 <input type="number" name="aadhar_card_no" value="{{$student->aadhar_card_no}}" class="form-control form-control-sm" required>
-                            </div>
+                          
+<div class="form-group col-lg-3">
+    <label for="aadhar_card_no">Aadhar Card No</label>
+    <input type="number" name="aadhar_card_no" id="aadhar_card_no" value="{{ old('aadhar_card_no', $student->aadhar_card_no) }}" class="form-control form-control-sm" required pattern="^[0-9]{12}$">
+    <div class="invalid-feedback">
+        Aadhar card number should be exactly 12 digits.
+    </div>
+</div>
+
+                             {{-- @error('aadhar_card_no')
+                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                             @enderror --}}
+
         
                           
                                 <div class="form-group col-lg-3">
@@ -220,9 +251,12 @@
                             </div>
         
                             <div class="form-group col-lg-3">
-                                <label>Student WhatsApp No</label>
-                                 <input type="number" name="student_whatsapp_no" value="{{$student->student_whatsapp_no}}" class="form-control form-control-sm" required>
-                            </div>        
+                                <label for="student_whatsapp_no">Student WhatsApp No</label>
+                                <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $student->student_whatsapp_no) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only numbers are allowed.
+                                </div>
+                            </div>     
                         </fieldset>
 
                         <h3> Address</h3>
@@ -270,8 +304,11 @@
                             </div>
         
                             <div class="form-group col-lg-3">
-                                <label>Parent WhatsApp No</label>
-                                 <input type="number" name="parent_whatsapp_no" value="{{$student->parent_whatsapp_no}}" class="form-control form-control-sm" required>
+                                <label for="parent_whatsapp_no">Parent WhatsApp No</label>
+                                <input type="number" name="parent_whatsapp_no" id="parent_whatsapp_no" value="{{ old('parent_whatsapp_no', $student->parent_whatsapp_no) }}" class="form-control form-control-sm" required>
+                                <div class="invalid-feedback">
+                                    Only numbers are allowed.
+                                </div>
                             </div>
         
                             <div class="form-group col-lg-3">
@@ -399,7 +436,7 @@
                         <h3>Mark Details</h3>
                         <fieldset class="row">
                             
-                            <div class="form-group col-lg-4">
+                            {{-- <div class="form-group col-lg-4">
                                 <label>Subject 1</label>
                                 <select name="S1" class="form-control form-control-sm" required>
                                     <option value="">Select Subject</option>
@@ -408,7 +445,19 @@
                                     <option value="CHEMISTRY" {{ $student->S1 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
                                     <option value="BIOLOGY" {{ $student->S1 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
                                 </select>
+                            
+                            </div> --}}
+
+
+                            <div class="form-group col-lg-4">
+                                <label>Subject 1</label>
+                                <input type="text" name="S1" 
+                                       value="{{ $student->S1 ?? 'English' }}" 
+                                       class="form-control form-control-sm" 
+                                       required readonly>
                             </div>
+                            
+                            
                             
 
                         <div class="form-group col-lg-4">
@@ -426,7 +475,7 @@
     <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$student->S1_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
 </div>
 
-                        <div class="form-group col-lg-4">
+                        {{-- <div class="form-group col-lg-4">
                             <label>Subject 2</label>
                             <select name="S2" class="form-control form-control-sm" required>
                                 <option value="">Select Subject</option>
@@ -435,7 +484,14 @@
                                 <option value="CHEMISTRY" {{ $student->S2 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
                                 <option value="BIOLOGY" {{ $student->S2 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
                             </select>
-                        </div>
+                        </div> --}}
+
+
+
+                        <div class="form-group col-lg-4">
+                            <label>Subject 2</label>
+                            <input type="text" name="S2" value="{{ $student->S2 ?? 'Physics' }}" class="form-control form-control-sm" required readonly>
+                            </div>
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S2</label>
@@ -447,7 +503,7 @@
     <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$student->S2_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
 </div>
 
-                        <div class="form-group col-lg-4">
+                        {{-- <div class="form-group col-lg-4">
                             <label>Subject 3</label>
                             <select name="S3" class="form-control form-control-sm" required>
                                 <option value="">Select Subject</option>
@@ -456,7 +512,17 @@
                                 <option value="CHEMISTRY" {{ $student->S3 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
                                 <option value="BIOLOGY" {{ $student->S3 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
                             </select>
-                        </div>
+                        </div> --}}
+
+
+
+                        <div class="form-group col-lg-4">
+                            <label>Subject 3</label>
+                            <input type="text" name="S3" value="{{ $student->S3 ?? 'Chemistry' }}" class="form-control form-control-sm" required readonly>
+                            </div>
+                  
+
+
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S3</label>
@@ -469,7 +535,7 @@
 </div>
 
 
-                        <div class="form-group col-lg-4">
+                        {{-- <div class="form-group col-lg-4">
                             <label>Subject 4</label>
                             <select name="S4" class="form-control form-control-sm" required>
                                 <option value="">Select Subject</option>
@@ -478,7 +544,14 @@
                                 <option value="CHEMISTRY" {{ $student->S4 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
                                 <option value="BIOLOGY" {{ $student->S4 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
                             </select>
-                        </div>
+                        </div> --}}
+
+
+                        <div class="form-group col-lg-4">
+                            <label>Subject 4</label>
+                            <input type="text" name="S4" value="{{ $student->S4
+                             ?? 'Biology' }}" class="form-control form-control-sm" required readonly>
+                            </div>
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S4</label>
@@ -578,9 +651,12 @@
 
 <script src="{{asset('bundles/jquery-validation/dist/jquery.validate.min.js')}}"></script>
 <script src="{{asset('bundles/jquery-steps/jquery.steps.min.js')}}"></script>
-<script src="{{ asset('js/page/form-wizard.js') }}"></script>
+<script src="{{asset('js/page/form-wizard.js') }}"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/8H2L9eO5g5y5V3K5Hg5T5XH3KZ9r5X5K5Z9r5T" crossorigin="anonymous"></script> --}}
+
 <script>
-    
+
+
     function hostel(type){
         document.getElementById('hostel_dayscholar').value = '';
         if(type == 'Offline'){
@@ -652,9 +728,42 @@
         document.getElementById('total_marks').value = total;
     }
 
+    $(document).ready(function () {
+    $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').on('input', function () {
+        let input = $(this).val();
+        let nameRegex = /^[a-zA-Z .]*$/;  // Allow alphabets, spaces, and dots
+        let phoneRegex = /^[0-9]{10}$/;  // Only 10 digits allowed for phone numbers
+        let aadharRegex = /^[0-9]{12}$/;  // 12 digits for Aadhar card
 
+        if ($(this).attr('id') == 'student_name' || $(this).attr('id') == 'father_name' || $(this).attr('id') == 'mother_name') {
+            if (!nameRegex.test(input)) {
+                $(this).addClass('is-invalid');
+                $(this).next('.invalid-feedback').text('Only alphabets, spaces, and dots are allowed');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        }
 
+        // For phone numbers: only 10 digits allowed
+        if ($(this).attr('id') == 'ph_no1' || $(this).attr('id') == 'ph_no2' || $(this).attr('id') == 'father_ph_no' || $(this).attr('id') == 'mother_ph_no' || $(this).attr('id') == 'student_whatsapp_no' || $(this).attr('id') == 'parent_whatsapp_no') {
+            if (!phoneRegex.test(input)) {
+                $(this).addClass('is-invalid');
+                $(this).next('.invalid-feedback').text('Phone numbers must be exactly 10 digits');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        }
 
+        if ($(this).attr('id') == 'aadhar_card_no') {
+            if (!aadharRegex.test(input)) {
+                $(this).addClass('is-invalid');
+                $(this).next('.invalid-feedback').text('Aadhar card number should be exactly 12 digits');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        }
+    });
+});
 
 </script>
 
@@ -676,4 +785,3 @@
 </script> --}}
 
 @endsection
-
