@@ -64,6 +64,7 @@ class StudentController extends Controller
     {
         $data = $request->all();
         $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
+        $data['ac_nonac'] = $data['ac_nonac'] ?? null;
 
         $student->update($data);
 

@@ -21,17 +21,29 @@
                                  <input type="date" name="admission_date" value="{{$student->admission_date}}" class="form-control form-control-sm" required>
                             
                              </div>
-        
                              <div class="form-group col-lg-3">
                                 <label for="branch_id">Campus</label>
-                                <select name="campus" class="form-control form-control-sm" required >
+                                <select name="campus" class="form-control form-control-sm" id="campus-select" required>
                                     <option value="" disabled selected>Select Campus</option>
                                     @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}" @if($branch->id == $student->campus) selected @endif>{{ $branch->name }}</option>
+                                        <option value="{{ $branch->id }}" @if($branch->id == $student->campus) selected @endif>
+                                            {{ $branch->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
-        
+                            
+                            <div class="form-group col-lg-3">
+                                <label>AC/Non AC</label>
+                                <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" required>
+                                    <option value="">Select AC/Non AC</option>
+                                    <option value="AC" @if($student->ac_nonac == 'AC') selected @endif>AC</option>
+                                    <option value="Non AC" @if($student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
+                                </select>
+                            </div>
+                            
+                            
+
         
                            <div class="form-group col-lg-3">
                                <label>Coaching Type</label>
@@ -144,14 +156,7 @@
                                  </select>
                              </div>
          --}}
-                            <div class="form-group col-lg-3" >
-                                <label>AC/Non AC</label>
-                                 <select name="ac_nonac" class="form-control form-control-sm" required >
-                                     <option value="">Select AC/Non AC</option>
-                                     <option value="AC" @if($student->ac_nonac == 'AC') selected @endif>AC</option>
-                                     <option value="Non AC" @if($student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
-                                 </select>
-                             </div>
+                          
         
         
                              <div class="form-group col-lg-3">
@@ -255,6 +260,10 @@
                                  <input type="text" name="street_name" value="{{$student->street_name}}" class="form-control form-control-sm" required>
                             </div>
 
+                            <div class="form-group col-lg-3">
+                                <label>City</label>
+                                 <input type="text" name="city" value="{{$student->city}}" class="form-control form-control-sm" required>
+                            </div>
 
                             <div class="form-group col-lg-3">
                                 <label>State</label>
@@ -267,14 +276,15 @@
                              </div>
 
                              <div class="form-group col-lg-3">
-                                <label>City</label>
-                                <select name="city" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm" required>
-                                 <option value="">Select City</option>
-                                 @foreach ($districts as $city)
-                                 <option value="{{$city->District}}" @if($student->city == $city->District) selected @endif>{{$city->District}}</option>
-                                 @endforeach
-                               </select>
-                             </div>
+                                <label>District</label>
+                                <select name="district" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm" required>
+                                    <option value="">Select City</option>
+                                    @foreach ($districts as $city)
+                                        <option value="{{ $city->District }}" @if($student->district == $city->District) selected @endif>{{ $city->District }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
 
                     <datalist id="pincode_list">
                         @foreach ($pincodes as $pin)
@@ -708,6 +718,29 @@
         document.getElementById('total_marks').value = total;
     }
 
+    $(document).ready(function () {
+    const acNonAcSelect = $('#ac-nonac-select');
+
+    $('#campus-select').on('change', function () {
+        const selectedCampusName = $(this).find('option:selected').text().trim();
+
+        if (selectedCampusName.startsWith('GPCC')) {
+            acNonAcSelect.prop('disabled', false); // Enable AC/Non AC field
+        } else {
+            acNonAcSelect.prop('disabled', true); // Disable AC/Non AC field
+            acNonAcSelect.val(''); // Reset value to null when campus is not GPCC
+        }
+    });
+
+    // Initialize AC/Non AC field state on page load
+    const initialCampusName = $('#campus-select').find('option:selected').text().trim();
+    if (!initialCampusName.startsWith('GPCC')) {
+        acNonAcSelect.prop('disabled', true);
+        acNonAcSelect.val(''); // Reset value to null when campus is not GPCC on page load
+    }
+});
+
+
 
     'use strict';
 
@@ -769,23 +802,8 @@
 //     });
 // });
 
+
+  
 </script>
-
-
-
-
-{{-- <script>
-     document.addEventListener('alpine:init', () => {
-        Alpine.data('app', () => ({
-            formStep: 1,
-            errors: {},
-            updateFormStep() {
-            },
-            init() {
-                
-            }
-        }));
-    });
-</script> --}}
 
 @endsection
