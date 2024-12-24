@@ -71,18 +71,18 @@
                                   </div>
                                   <div class="section-title"><h5 style="color: #2196f3;">Personal Details</h5></div>
                                   <ul>
-                                    <li>Father Name : {{ auth()->user()->father_name }}</li>
-                                    <li>Father Phone : {{ auth()->user()->father_ph_no }}</li>
-                                    <li>Mother Name : {{ auth()->user()->mother_name }}</li>
-                                    <li>Mother Phone : {{ auth()->user()->mother_ph_no }}</li>
+                                    <li>Father Name : &nbsp; &nbsp;{{ auth()->user()->father_name }}</li>
+                                    <li>Father Phone : &nbsp; &nbsp;{{ auth()->user()->father_ph_no }}</li>
+                                    <li>Mother Name :  &nbsp; &nbsp;{{ auth()->user()->mother_name }}</li>
+                                    <li>Mother Phone : &nbsp; &nbsp;{{ auth()->user()->mother_ph_no }}</li>
                                   </ul>
                                   <div class="section-title"><h5 style="color: #2196f3;">Academic Details</h5></div>
                                   <ul>
-                                    <li>Coaching Type : {{ auth()->user()->coaching_type }}</li>
-                                    <li>Board of Study in XII : {{ auth()->user()->board_of_study_XII_std }}</li>
-                                    <li>XII - Physics Marks : {{ auth()->user()->S2_obtained_mark }}</li>
-                                    <li>XII - Chemistry Mark : {{ auth()->user()->S1_obtained_mark }}</li>
-                                    <li>XII - Biology Mark : {{ auth()->user()->S3_obtained_mark }}</li>
+                                    <li>Coaching Type : &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; {{ auth()->user()->coaching_type }}</li>
+                                    <li>Board of Study in XII :&nbsp; &nbsp; {{ auth()->user()->board_of_study_XII_std }}</li>
+                                    <li>XII - Physics Marks : &nbsp; &nbsp;&nbsp; &nbsp; {{ auth()->user()->S2_obtained_mark }}</li>
+                                    <li>XII - Chemistry Mark : &nbsp; &nbsp; {{ auth()->user()->S1_obtained_mark }}</li>
+                                    <li>XII - Biology Mark : &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {{ auth()->user()->S3_obtained_mark }}</li>
                                   </ul>
                                 </div>
                                 
