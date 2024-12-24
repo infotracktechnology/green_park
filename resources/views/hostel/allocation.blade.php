@@ -19,7 +19,7 @@
                @endif
 
                <div class="card card-primary">
-                  <form method="post" id="myForm" action="{{ route('allocation.hostel') }}" enctype="multipart/form-data">
+                  <form method="post" id="myForm" action="{{ route('allocation.store') }}" enctype="multipart/form-data">
                      @csrf
                      <div class="card-body">
                         <div class="row">
@@ -38,83 +38,74 @@
                                     </div>
                                     <div class="form-group  col-3">
                                         <label>Hostel</label>
-                                        <select name="hostel" id="hostel" class="form-control form-control-sm" required>
+                                        <select name="hostel" id="hostel" class="form-control form-control-sm" onchange="floors(this.value)" required>
                                             <option value="">Select </option>
                                             @foreach ($hostels as $row)
                                                 <option value="{{ $row->id }}">{{ $row->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group col-3">
-                                        <label>Block</label>
-                                        <select name="block" id="block" class="form-control form-control-sm" required>
-                                            <option value="">Select </option>
-                                            
-                                        </select>
-                                    </div>
+                                  
                                     <div class="form-group col-3">
                                         <label>Floor</label>
-                                        <select name="floor" id="floor" class="form-control form-control-sm" required>
-                                            <option value="">Select </option>
-                                            
+                                        <select name="floor_no" id="floor_no" class="form-control form-control-sm" required>
+                                            <option value="">Select Floor</option>
                                         </select>
                                     </div>
                                     <div class="form-group col-3">
-                                        <label> Room Type</label>
-                                        <select name="type" id="type5" class="form-control form-control-sm" required>
-                                            <option value="">Select </option>
+                                        <label>Room Type</label>
+                                        <select name="type" id="type" class="form-control form-control-sm" onchange="rooms()" required>
+                                            <option value="">Select</option>
                                             <option value="AC">AC</option>
                                             <option value="Non_AC">Non AC</option>
-                                           
                                         </select>
                                     </div>
+                                  
                                     <div class="form-group col-3">
                                         <label>Room No</label>
-                                        <select name="section6" id="section6" class="form-control form-control-sm" required>
-                                            <option value="">Select </option>
-                                           
+                                        <select name="room_id" id="room_no" class="form-control form-control-sm" required>
+                                            <option value="">Select Room No</option>
                                         </select>
                                     </div>
+                                   
                                 </div>
                             </div>
                             
-                            
+
                            </div>
                         </div>
                         <div class="col-12">
                            <div class="table-responsive">
                               <table class="table table-sm table-hover" id="myTable">
                                  <thead>
-                                    
-                                            <tr role="row">
-                                                <th>#</th>
-                                                <th>Student ID</th>
-                                                <th>Coaching Type</th>
-                                                <th>Student Name</th>
-                                                <th>Section</th>
-                                                <th>Gender</th>
-                                                <th>Father Name</th>
-                                                <th>Mobile No</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($students as $student)
-                                                <tr>
-                                                    <td>
-                                                        <input type="checkbox" name="student_ids[]" value="{{ $student->id }}"/>
-                                                    </td>
-                                                    <td>{{ $student->id }}</td>
-                                                    <td>{{ $student->coaching_type }}</td>
-                                                    <td>{{ $student->student_name }}</td>
-                                                    <td>{{ $student->section }}</td>
-                                                    <td>{{ $student->gender }}</td>
-                                                    <td>{{ $student->father_name }}</td>
-                                                    <td>{{ $student->ph_no1 }}</td>
-                                                </tr>
-                                          @endforeach
-                                        </tbody>
-                                    </table>
-                                    
+                                    <tr role="row">
+                                        <th>#</th>
+                                        <th>Student ID</th>
+                                        <th>Coaching Type</th>
+                                        <th>Student Name</th>
+                                        <th>Section</th>
+                                        <th>Gender</th>
+                                        <th>Father Name</th>
+                                        <th>Mobile No</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                     @foreach ($students as $student)
+                                         <tr>
+                                             <td>
+                                                 <input type="checkbox" name="student_ids[]" value="{{ $student->id }}"/>
+                                             </td>
+                                             <td>{{ $student->id }}</td>
+                                             <td>{{ $student->coaching_type }}</td>
+                                             <td>{{ $student->student_name }}</td>
+                                             <td>{{ $student->section }}</td>
+                                             <td>{{ $student->gender }}</td>
+                                             <td>{{ $student->father_name }}</td>
+                                             <td>{{ $student->ph_no1 }}</td>
+                                         </tr>
+                                     @endforeach
+                                 </tbody>
+                              </table>
                            </div>
                         </div>
                         <div class="form-group col-lg-12">
@@ -133,19 +124,52 @@
 @section('js')
 <script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script>
    // Initialize DataTables
    const table = $('#myTable').DataTable({
       "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
    });
 
-   // Select All Checkbox Functionality
-//    document.getElementById('selectAll').addEventListener('change', function () {
-//       const checkboxes = document.querySelectorAll('input[name="student_ids[]"]');
-//       checkboxes.forEach((checkbox) => {
-//          checkbox.checked = this.checked;
-//       });
-//    });
+   function floors(hostel_id)  {
+       if(!hostel_id){
+        alert("Please Select Hostel");
+        return false;
+       }
+       $.get("{{ route('allocation.hostel') }}", {hostel_id: hostel_id}, function(data) {
+          var html = '<option value="">Select floor</option>';
+          $.each(data, function(key, value) {
+              html += '<option value="' + value.floor_no + '">' + value.floor_no + '</option>';
+          });
+          $('#floor_no').html(html);
+      });
+   }
+
+   function rooms() {
+       var floor_no = $('#floor_no').val();
+       var type = $('#type').val();
+       var hostel = $('#hostel').val();
+       $.get("{{ route('allocation.hostel') }}", {floor_no:floor_no, type:type,hostel:hostel}, function(data) {
+          var html = '<option value="">Select Room No</option>';
+          $.each(data, function(key, value) {
+              html += '<option value="' + value.id + '" data-rooms="' + value.no_of_beds + '">' + value.room_no + '</option>';
+          });
+          $('#room_no').html(html);
+
+          $('#myForm').on('submit', function(e) {
+    var selectedRoom = $('#room_no').find(':selected');
+    var availableBeds = selectedRoom.data('rooms');
+    var selectedStudents = $('input[name="student_ids[]"]:checked').length;
+
+    if (selectedStudents > availableBeds) {
+        e.preventDefault();
+        alert('Not enough beds available. Only ' + availableBeds + ' beds left in this room.');
+    }   
+});
+
+      });
+   }
+
+  
+
 </script>
 @endsection
