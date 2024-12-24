@@ -8,6 +8,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\HostelController;
 use App\Http\Controllers\StaffProfileController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\StudentController;
 
 
 
@@ -41,6 +42,7 @@ Route::resource('hostel', App\Http\Controllers\HostelController::class);
 Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
 Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
+
 Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
 Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
 Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
@@ -50,7 +52,12 @@ Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAll
 #students routes
 
 
+
+
+
 Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'],function(){
 Route::view('/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
+
+Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });
