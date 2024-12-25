@@ -74,7 +74,7 @@
                                       <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Mobile :</strong> {{ auth()->user()->ph_no1 }}</p>
                                       <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Email :</strong> {{ auth()->user()->email }}</p>
                                       <p style="color: #2196f3;padding-top: 0px;margin-bottom: 0px;"><strong>Address :</strong></p>
-                                      <ul style="list-style: none; padding-left: 0;">
+                                      <ul style="list-style: none; padding-left: 0;margin-bottom: 0px;">
                                           <li>{{ auth()->user()->door_no }}, {{ auth()->user()->street_name }}, {{ auth()->user()->city }}, {{ auth()->user()->state }} - {{ auth()->user()->pincode }}</li>
                                       </ul>
                                       <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Hostel Type :</strong> {{ auth()->user()->hostel_dayscholar }} - {{ auth()->user()->ac_nonac }}</p>
