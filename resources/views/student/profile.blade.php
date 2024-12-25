@@ -3,6 +3,29 @@
 @section('title', 'Student')
 
 @section('css')
+<style>
+  .details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+  }
+  .details-table td {
+    padding: 0px 0px;
+    vertical-align: top;
+  }
+  .details-label {
+    font-weight: bold;
+    color: #333;
+    width: 30%;
+  }
+  .details-value {
+    color: #555;
+  }
+  .section-title {
+    margin: 20px 0 10px;
+    font-size: 1.2em;
+  }
+</style>
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
 @endsection
@@ -39,8 +62,31 @@
                         <i class="fab fa-instagram"></i>
                       </a>
                     </div>
+                   
                 </div>
+                
                         </div>
+                        <div class="card author-box">
+                          <div class="card-body">
+                              <div class="author-box-center">
+                                  <div class="clearfix"></div>
+                                  <div style="font-size: 13px" class="author-box-job">
+                                      <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Mobile :</strong> {{ auth()->user()->ph_no1 }}</p>
+                                      <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Email :</strong> {{ auth()->user()->email }}</p>
+                                      <p style="color: #2196f3;padding-top: 0px;margin-bottom: 0px;"><strong>Address :</strong></p>
+                                      <ul style="list-style: none; padding-left: 0;margin-bottom: 0px;">
+                                          <li>{{ auth()->user()->door_no }}, {{ auth()->user()->street_name }}, {{ auth()->user()->city }}, {{ auth()->user()->state }} - {{ auth()->user()->pincode }}</li>
+                                      </ul>
+                                      <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Hostel Type :</strong> {{ auth()->user()->hostel_dayscholar }} - {{ auth()->user()->ac_nonac }}</p>
+                                  </div>
+                                 
+                          </div>
+                          
+                         
+                      </div>
+                      
+                              </div>
+
                     </div>
                     <div class="col-12 col-md-12 col-lg-8">
                         <div class="card">
@@ -51,39 +97,51 @@
                               </ul>
                               <div class="tab-content tab-bordered" id="myTab3Content">
                                 <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="home-tab2">
-                                  <div class="row">
-                                    
-                                    <div style="color: #2196f3;" class="col-md-4 col-6 b-r">
-                                      <strong>Mobile</strong>
-                                      <br>
-                                      <p class="text-muted"> {{ auth()->user()->ph_no1 }}</p>
-                                    </div>
-                                    <div style="color: #2196f3;" class="col-md-4 col-6 b-r">
-                                      <strong>Email</strong>
-                                      <br>
-                                      <p class="text-muted">johndeo@example.com</p>
-                                    </div>
-                                    <div style="color: #2196f3;" class="col-md-4 col-6">
-                                      <strong>Address</strong>
-                                      <br>
-                                      <p class="text-muted"> {{ auth()->user()->city }}</p>
-                                    </div>
-                                  </div>
-                                  <div class="section-title"><h5 style="color: #2196f3;">Personal Details</h5></div>
-                                  <ul>
-                                    <li>Father Name : &nbsp; &nbsp;{{ auth()->user()->father_name }}</li>
-                                    <li>Father Phone : &nbsp; &nbsp;{{ auth()->user()->father_ph_no }}</li>
-                                    <li>Mother Name :  &nbsp; &nbsp;{{ auth()->user()->mother_name }}</li>
-                                    <li>Mother Phone : &nbsp; &nbsp;{{ auth()->user()->mother_ph_no }}</li>
-                                  </ul>
-                                  <div class="section-title"><h5 style="color: #2196f3;">Academic Details</h5></div>
-                                  <ul>
-                                    <li>Coaching Type : &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; {{ auth()->user()->coaching_type }}</li>
-                                    <li>Board of Study in XII :&nbsp; &nbsp; {{ auth()->user()->board_of_study_XII_std }}</li>
-                                    <li>XII - Physics Marks : &nbsp; &nbsp;&nbsp; &nbsp; {{ auth()->user()->S2_obtained_mark }}</li>
-                                    <li>XII - Chemistry Mark : &nbsp; &nbsp; {{ auth()->user()->S1_obtained_mark }}</li>
-                                    <li>XII - Biology Mark : &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {{ auth()->user()->S3_obtained_mark }}</li>
-                                  </ul>
+                                  
+                                  
+                                  <div  class="section-title" style="color: #2196f3;">Personal Details</div>
+                                  <table class="details-table">
+                                       <tr>
+                                     <td class="details-label">Father Name</td>
+                                     <td class="details-value">: {{ auth()->user()->father_name }}</td>
+                                   </tr>
+                                 <tr>
+                                   <td class="details-label">Father Phone</td>
+                                   <td class="details-value">: {{ auth()->user()->father_ph_no }}</td>
+                                 </tr>                               
+                                 <tr>
+                                   <td class="details-label">Mother Name</td>
+                                   <td class="details-value">: {{ auth()->user()->mother_name }}</td>
+                                   </tr>
+                                   <tr>
+                                     <td class="details-label">Mother Phone</td>
+                                     <td class="details-value">: {{ auth()->user()->mother_ph_no }}</td>
+                                   </tr>
+                                 </table>
+
+                                 <div class="section-title" style="color: #2196f3;">Academic Details</div>
+                                 <table  class="details-table">
+                                   <tr>
+                                     <td class="details-label">Coaching Type</td>
+                                     <td class="details-value">: {{ auth()->user()->coaching_type }}</td>
+                                   </tr>
+                                   <tr>
+                                     <td class="details-label">Board of Study in XII</td>
+                                     <td class="details-value">: {{ auth()->user()->board_of_study_XII_std }}</td>
+                                   </tr>
+                                   <tr>
+                                     <td class="details-label">XII - Physics Marks</td>
+                                     <td class="details-value">: {{ auth()->user()->S2_obtained_mark }}</td>
+                                   </tr>
+                                   <tr>
+                                     <td class="details-label">XII - Chemistry Mark</td>
+                                     <td class="details-value">: {{ auth()->user()->S1_obtained_mark }}</td>
+                                   </tr>
+                                   <tr>
+                                     <td class="details-label">XII - Biology Mark</td>
+                                     <td class="details-value">: {{ auth()->user()->S3_obtained_mark }}</td>
+                                   </tr>
+                                 </table>
                                 </div>
                                 
                               </div>
