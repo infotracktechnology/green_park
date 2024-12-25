@@ -60,5 +60,7 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'],function(
 Route::view('/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
 
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
+Route::get('home',[StudentController::class, 'home'])->name('student.home');
+Route::get('notification',[StudentController::class, 'notification'])->name('student.notification');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });

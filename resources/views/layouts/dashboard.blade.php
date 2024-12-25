@@ -98,20 +98,34 @@
           </div>
           <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
+            <li class="dropdown">
+              <a href="{{ route('student.home') }}" class="nav-link">
+                <i data-feather="home"></i><span>Home</span>
+            </a>
+            
+        </li>
            
     <li class="dropdown">
      
         <a href="{{ route('student.profile') }}" class="nav-link">
-            <i data-feather="user"></i><span>Home</span>
+            <i data-feather="user"></i><span>Profile</span>
         </a>
         
     </li>
+
+           <li class="dropdown">
+            <a href="{{ route('student.notification') }}" class="nav-link">
+            <i data-feather="bell"></i><span>Notifications <span style="font-size:15px;font-weight:bold;color:red;">9+</span> </span>
+             </a> 
+            </li>
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
             </li>
+            @if (auth()->user()->coaching_type != 'Offline')
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="pause-circle"></i><span>Class Videos</span></a>
             </li>
+            @endif
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
             </li>
