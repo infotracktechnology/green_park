@@ -57,7 +57,6 @@
                         </div>
 
 
-
                         <div class="form-group col-lg-4">
                             <label>Category</label>
                             <select name="category" class="form-control form-control-sm">
