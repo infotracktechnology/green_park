@@ -728,7 +728,8 @@ $(function () {
 
         ["font", ["strikethrough"]],
 
-        ["para", ["paragraph"]]
+        ["para", ["paragraph"]],
+        ["insert", ["link"]],
 
       ]
 
