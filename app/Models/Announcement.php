@@ -14,4 +14,5 @@ class Announcement extends Model
     {
         return $this->belongsTo(Branch::class, 'campus', 'id');
     }
+    
 }

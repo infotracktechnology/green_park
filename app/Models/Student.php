@@ -5,7 +5,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
-
+use App\Models\Announcement;
 class Student extends Authenticatable
 {
     public $table = 'student';
@@ -32,11 +32,9 @@ class Student extends Authenticatable
             $model->save();
         });
     }
-    public function getRouteKeyName()
-{
-    return 'id'; 
-}
-
+    public function announcement(){
+        return Announcement::where('branch', $this->campus)->where('gender', $this->gender)->where('coaching_type', $this->coaching_type);
+    }
     
     
 }

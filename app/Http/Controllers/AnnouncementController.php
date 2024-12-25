@@ -50,4 +50,12 @@ class AnnouncementController extends Controller
         session()->flash('success', 'Announcement deleted successfully');
         return to_route('announcement.index');
     }
+    
+    public function notification()
+{
+    return view('student.notification');
+
+}
+  
+
 }

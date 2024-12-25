@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
+
 class StudentController extends Controller
 {
     /**
@@ -119,12 +120,7 @@ public function home()
 
     return view('student.home');
 }
-public function notification()
-{
-    return view('student.notification');
-
-}
-    
+  
 
     
 

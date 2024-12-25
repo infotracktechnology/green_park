@@ -115,7 +115,7 @@
 
            <li class="dropdown">
             <a href="{{ route('student.notification') }}" class="nav-link">
-            <i data-feather="bell"></i><span>Notifications <span style="font-size:15px;font-weight:bold;color:red;">9+</span> </span>
+            <i data-feather="bell"></i><span>Notifications <span style="font-size:15px;font-weight:bold;color:red;">{{ auth()->user()->announcement()->count() }}</span> </span>
              </a> 
             </li>
             <li class="dropdown">

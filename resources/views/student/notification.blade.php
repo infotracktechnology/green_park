@@ -19,46 +19,25 @@
                     </form>
                   </div>
                   <div class="card-body">
+                    @forelse(auth()->user()->announcement()->get() as $announcement)
                     <div class="support-ticket media pb-1 mb-3 d-flex">
                      
                       <div class="flex-1 ms-3">
                         
-                        <span class="fw-bold">#89754</span>
-                        <a href="javascript:void(0)">Please add advance table</a>
-                        <p class="my-1">Hi, can you please add new table for advan...</p>
+                        <span class="fw-bold">#{{ $announcement->id }} </span>
+                        <span>{{ $announcement->title }}</span>
+                        {!! $announcement->content !!}
                         
                       </div>
                     </div>
+                    @empty
                     <div class="support-ticket media pb-1 mb-3 d-flex">
-                     
                       <div class="flex-1 ms-3">
-                      
-                        <span class="fw-bold">#57854</span>
-                        <a href="javascript:void(0)">Select item not working</a>
-                        <p class="my-1">please check select item in advance form not work...</p>
-                       
+                        <span class="fw-bold">No Announcements</span>
                       </div>
                     </div>
-                    <div class="support-ticket media pb-1 mb-3 d-flex">
-                     
-                      <div class="flex-1 ms-3">
-                      
-                        <span class="fw-bold">#85784</span>
-                        <a href="javascript:void(0)">Are you provide template in Angular?</a>
-                        <p class="my-1">can you provide template in latest angular 8.</p>
-                        
-                      </div>
-                    </div>
-                    <div class="support-ticket media pb-1 mb-3 d-flex">
-                      
-                      <div class="flex-1 ms-3">
-                        
-                        <span class="fw-bold">#25874</span>
-                        <a href="javascript:void(0)">About template page load speed</a>
-                        <p class="my-1">Hi, John, can you work on increase page speed of template...</p>
-                       
-                      </div>
-                    </div>
+                    @endforelse
+                    
                   </div>
                 </div>
                 <!-- Support tickets -->
