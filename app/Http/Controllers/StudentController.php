@@ -113,8 +113,17 @@ class StudentController extends Controller
 
     return view('student.profile');
 }
-
+public function home()
+{
     
+
+    return view('student.home');
+}
+public function notification()
+{
+    return view('student.notification');
+
+}
     
 
     

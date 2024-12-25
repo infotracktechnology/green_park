@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Student')
+@section('title', 'Profile')
 
 @section('css')
 <style>
@@ -33,7 +33,7 @@
 @section('main')
 <div class="main-content">
     <div class="section-body">
-        <marquee behavior="scroll" direction="left" style="background-color: #e61515cb; padding: 10px; color: white; font-weight: bold;">****** Today is {{ date('l, F jS') }} and your upcoming class is :CHEMISTRY *****</marquee>
+        {{-- <marquee behavior="scroll" direction="left" style="background-color: #e61515cb; padding: 10px; color: white; font-weight: bold;">****** Today is {{ date('l, F jS') }} and your upcoming class is :CHEMISTRY *****</marquee> --}}
         <div class="row mt-sm-4">
             <div class="col-12 col-md-12 col-lg-4">
                 <div class="card author-box">
