@@ -41,7 +41,7 @@ class AnnouncementController extends Controller
     public function update(Request $request, Announcement $announcement)
     {
         $announcement->update($request->all());
-        return to_route('announcement.index');
+        return to_route('announcement.index')->with('success', 'Announcement details successfully updated.');
     }
  
     public function destroy(Request $request, Announcement $announcement)
