@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
@@ -10,7 +11,7 @@ use App\Http\Controllers\HostelController;
 use App\Http\Controllers\StaffProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
-
+use App\Models\Announcement;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -57,7 +58,7 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function
 Route::view('/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
-Route::get('notification',[StudentController::class, 'notification'])->name('student.notification');
+Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });
 

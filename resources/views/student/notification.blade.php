@@ -11,7 +11,7 @@
     <div class="section-body">
         <div class="row">
             <div class="col-md-6 col-lg-12 col-xl-12">
-                <!-- Support tickets -->
+                <!-- Announcement -->
                 <div class="card">
                   <div class="card-header">
                     <h4>Announcements</h4>
@@ -19,49 +19,23 @@
                     </form>
                   </div>
                   <div class="card-body">
-                    <div class="support-ticket media pb-1 mb-3 d-flex">
-                     
-                      <div class="flex-1 ms-3">
-                        
-                        <span class="fw-bold">#89754</span>
-                        <a href="javascript:void(0)">Please add advance table</a>
-                        <p class="my-1">Hi, can you please add new table for advan...</p>
-                        
+                    <div class="notice-board">
+                      @forelse(auth()->user()->announcement()->get() as $announcement)
+                      <div class="notice-board-item">
+                        <div class ="notice-board-id"> <strong>#</strong> {{ $announcement->id }}</div>
+                        <div class="notice-board-item-date float-right"> <strong>Time:</strong> {{ $announcement->created_at }}</div>
+                        <div class="notice-board-item-title"><strong>Title :</strong> {{ $announcement->title }}</div>
+                        <div class="notice-board-item-content"><strong>Content :</strong> {!! $announcement->content !!}</div>
                       </div>
-                    </div>
-                    <div class="support-ticket media pb-1 mb-3 d-flex">
-                     
-                      <div class="flex-1 ms-3">
-                      
-                        <span class="fw-bold">#57854</span>
-                        <a href="javascript:void(0)">Select item not working</a>
-                        <p class="my-1">please check select item in advance form not work...</p>
-                       
+                      @empty
+                      <div class="notice-board-item">
+                        <div class="notice-board-item-date">No announcement found</div>
                       </div>
-                    </div>
-                    <div class="support-ticket media pb-1 mb-3 d-flex">
-                     
-                      <div class="flex-1 ms-3">
-                      
-                        <span class="fw-bold">#85784</span>
-                        <a href="javascript:void(0)">Are you provide template in Angular?</a>
-                        <p class="my-1">can you provide template in latest angular 8.</p>
-                        
-                      </div>
-                    </div>
-                    <div class="support-ticket media pb-1 mb-3 d-flex">
-                      
-                      <div class="flex-1 ms-3">
-                        
-                        <span class="fw-bold">#25874</span>
-                        <a href="javascript:void(0)">About template page load speed</a>
-                        <p class="my-1">Hi, John, can you work on increase page speed of template...</p>
-                       
-                      </div>
+                      @endforelse
                     </div>
                   </div>
                 </div>
-                <!-- Support tickets -->
+                <!-- Notice board -->
               </div>
             </div>
         </div>

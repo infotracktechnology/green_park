@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\DB;
+use App\Models\Branch;
 
 class AnnouncementController extends Controller
 {
@@ -50,4 +51,13 @@ class AnnouncementController extends Controller
         session()->flash('success', 'Announcement deleted successfully');
         return to_route('announcement.index');
     }
+    
+    public function notification()
+{
+   
+    return view('student.notification');
+
+}
+  
+
 }
