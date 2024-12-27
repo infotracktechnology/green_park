@@ -371,7 +371,7 @@
                                     <label>Board of Study (X std)</label>
                                     <select name="board_of_study_X_std" class="form-control form-control-sm" required>
                                         <option value="">Select Board</option>
-                                        <option value="STATEBOARD" {{ $student->board_of_study_X_std == 'STATEBOARD' ? 'selected' : '' }}>STATEBOARD</option>
+                                        <option value="STATE BOARD" {{ $student->board_of_study_X_std == 'STATE BOARD' ? 'selected' : '' }}>STATE BOARD</option>
                                         <option value="CBSE" {{ $student->board_of_study_X_std == 'CBSE' ? 'selected' : '' }}>CBSE</option>
                                         <option value="ICSE" {{ $student->board_of_study_X_std == 'ICSE' ? 'selected' : '' }}>ICSE</option>
                                         <option value="IGCSE" {{ $student->board_of_study_X_std == 'IGCSE' ? 'selected' : '' }}>IGCSE</option>
