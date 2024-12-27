@@ -23,7 +23,7 @@
 
                               <div class="form-group col-lg-3">
                                 <label>Branch</label>
-                                <select name="branch" class="form-control form-control-sm"  required>
+                                <select name="branch_id" class="form-control form-control-sm"  required>
                                     <option value="" disabled selected>Select Branch</option>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -66,7 +66,7 @@
                            </div>
 
                             <template x-for="(question, index) in questions" :key="index">
-                             <div class="row">
+                             <div class="row question" :key="index">
                             
                                 <div class="form-group col-lg-2">
                                     <label>Question Code</label>
@@ -79,7 +79,7 @@
                                    
                                 </div>
                                 <div class="col-lg-1">
-                                    <button type="button" x-on:click="questions.splice(index, 1)" class="btn btn-danger mt-4"><i class="fa fa-trash"></i></button>
+                                    <button type="button"  x-on:click="questions.splice(index, 1)" class="btn btn-danger mt-4"><i class="fa fa-trash"></i></button>
                                 </div>
                              </div>
                             </template>
@@ -114,5 +114,13 @@ function filesize(input) {
         input.value = "";
     }
 }
+$("#myForm").submit(function(e) {
+    e.preventDefault();
+    if($(".question").length == 0){
+        alert("Please add at least one question");
+        return;
+    }
+    this.submit();
+})
 </script>
 @endsection

@@ -53,7 +53,7 @@
             <td>{{ $test->total_questions }}</td>
             <td>{{ $test->duration }}</td>
             <td>
-             <form action="{{ route('announcement.destroy', $test->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">
+             <form action="{{ route('exam.destroy', $test->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">
               @csrf 
               @method('DELETE')
               <button type="submit" class="btn btn-danger">
