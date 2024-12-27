@@ -122,6 +122,16 @@
             </li>
 
             <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
+    
+              </ul>
+            </li>
+
+
+
+            <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
@@ -129,13 +139,7 @@
               </ul>
             </li>
          
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
-    
-              </ul>
-            </li>
+ 
             
           </ul>
 
@@ -169,6 +173,7 @@
       $('.select').each(function () {
         new TomSelect(this, {
           create: true,
+          plugins: ['remove_button'],
           sortField: { field: "text", direction: "asc" }
         });
       });

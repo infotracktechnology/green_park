@@ -51,7 +51,7 @@
         <tbody>
           @foreach ($announcements as $announcement)
           <tr>
-            <td>{{$announcement->branch}}</td>
+            <td>{{ $announcement->branch }}</td>
             <td>{{$announcement->coaching_type}}</td>
             <td>{{$announcement->gender}}</td>
             <td>{{$announcement->title}}</td>
