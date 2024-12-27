@@ -129,6 +129,13 @@
               </ul>
             </li>
 
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Examination</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('exam.index') }}" class="nav-link"> Add Test</a></li>
+              </ul>
+            </li>
+
 
 
             <li class="dropdown">
