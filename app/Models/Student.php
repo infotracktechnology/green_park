@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
 use App\Models\Announcement;
+use App\Models\Branch;
 class Student extends Authenticatable
 {
     public $table = 'student';
@@ -37,4 +38,6 @@ class Student extends Authenticatable
     }
     
     
+
+   
 }

@@ -115,7 +115,11 @@
 
            <li class="dropdown">
             <a href="{{ route('student.notification') }}" class="nav-link">
-            <i data-feather="bell"></i><span>Notifications <span style="font-size:15px;font-weight:bold;color:red;">{{ auth()->user()->announcement()->count() }}</span> </span>
+            <i data-feather="bell"></i><span>Notifications 
+            @if (session('{{ auth()->user()->announcement->count() }}_new_announcement_count') > 0)
+              <span style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: red; color: white; font-weight: bold; line-height: 20px; text-align: center;">{{ session('new_announcement_count') }}</span>
+            @endif
+            </span>
              </a> 
             </li>
             <li class="dropdown">
