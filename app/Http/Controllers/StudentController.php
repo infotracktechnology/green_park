@@ -51,27 +51,26 @@ class StudentController extends Controller
     }
 
 
-    public function edit(Request $request, Student $student)
-    {
+    public function edit(Request $request, $id)
+    { 
+        $students = Student::findOrFail($id);
         $branches = DB::table('branch')->select('id', 'name')->get();
-        $districts = DB::table('district_list')->where('State', $student->state)->distinct()->orderBy('District')->get();
+        $districts = DB::table('district_list')->where('State', $students->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
-        $pincodes = DB::table('district_list')->where('District', $student->district)->select('Pincode')->get();
-        return view('student.edit', compact('student', 'branches',  'districts', 'states', 'pincodes'));
+        $pincodes = DB::table('district_list')->where('District', $students->district)->select('Pincode')->get();
+    
+        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes','students'));
     }
 
 
-    public function update(Request $request, Student $student)
+    public function update(Request $request, $id)
     {
         $data = $request->all();
         $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
         $data['ac_nonac'] = $data['ac_nonac'] ?? null;
 
+        $student = Student::findOrFail($id);
         $student->update($data);
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
-        }
 
         return redirect()->route('student.index')->with('success', 'Student details successfully updated.');
     }
