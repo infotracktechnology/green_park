@@ -49,6 +49,7 @@ Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocatio
 Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
 
 });
+
 #students routes
 
 
