@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- auth-login.html  21 Nov 2019 03:49:32 GMT -->
+
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
@@ -12,107 +12,197 @@
   <link rel="stylesheet" href="{{asset('css/components.css')}}">
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
-  <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.ico')}}' />
+  <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
-    .select2{
+    .select2 {
       width: 100% !important;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
     }
   </style>
   @yield('css')
 </head>
+
 <body>
   <div class="loader"></div>
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
       <div class="navbar-bg"></div>
-      <nav style="left:0;" class="navbar navbar-expand-lg e main-navbar sticky">
-        <div class="mr-auto">
-         <ul class="navbar-nav">
+      <nav class="navbar navbar-expand-lg bg-blue main-navbar sticky">
+        <div class="form-inline mr-auto">
+          <ul class="navbar-nav mr-3">
+            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i data-feather="align-justify"></i></a></li>
+            <li><a href="#" class="nav-link nav-link-lg fullscreen-btn"><i data-feather="maximize"></i></a></li>
             <li>
-              <a href="#"><img style="height: 55px;width:90%;" alt="image" src="{{asset('img/image.png')}}" class="header-logo" /></a>
-          </li>
+              <form class="form-inline mr-auto">
+                <div class="search-element">
+                  <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="200">
+                  <button class="btn" type="submit">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </form>
+            </li>
           </ul>
         </div>
-
-
-
         <ul class="navbar-nav navbar-right">
-
-
-          <ul class="navbar-nav navbar-right">
-
-
-            <li class="dropdown dropdown-list-toggle"><a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i>
-            </a>
+          <li class="dropdown dropdown-list-toggle">
+            <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
             <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
               <div class="dropdown-header">Notifications</div>
               <div class="dropdown-list-content dropdown-list-icons">
-  
-                <a href="#" class="dropdown-item dropdown-item-unread"> <span
-                    class="dropdown-item-icon bg-primary text-white"> <i class="fas
-                        fa-code"></i>
-                  </span> <span class="dropdown-item-desc"> Template update is
-                    available now! <span class="time">2 Min
-                      Ago</span>
+                <a href="#" class="dropdown-item dropdown-item-unread">
+                  <span class="dropdown-item-icon bg-primary text-white"><i class="fas fa-code"></i></span>
+                  <span class="dropdown-item-desc">
+                    Template update is available now! 
+                    <span class="time">2 Min Ago</span>
                   </span>
                 </a>
-             
               </div>
               <div class="dropdown-footer text-center">
                 <a href="#">View All <i class="fas fa-chevron-right"></i></a>
               </div>
             </div>
           </li>
-  
-  
-               <li class="dropdown"><a href="#" data-toggle="dropdown"class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image" src="{{asset('img/user.png')}}"class="user-img-radious-style"> <span class="d-sm-none d-lg-inline-block"></span></a>
-  
-  
-  
-              <div class="dropdown-menu dropdown-menu-right pullDown">
-              <div class="dropdown-title">Hi, {{ auth('student')->user()->user_name }}</div>
-                <div class="dropdown-divider"></div>
-                <a onclick="event.preventDefault();document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
-              </div>
-              <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                  @csrf
-              </form>
-            </li>
-  
-          </ul>
-
+          <li class="dropdown">
+            <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+              <img alt="image" src="{{asset('img/user.png')}}" class="user-img-radious-style"> 
+              <span class="d-sm-none d-lg-inline-block"></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right pullDown">
+              <div class="dropdown-title">Hi, {{ auth()->user()->user_name }}</div>
+              <div class="dropdown-divider"></div>
+              <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout">
+                <i class="fas fa-sign-out-alt"></i>Logout
+              </a>
+            </div>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+            </form>
+          </li>
+        </ul>
       </nav>
 
+      <div class="main-sidebar sidebar-style-2">
+        <aside id="sidebar-wrapper">
+          <div class="sidebar-brand">
+            <a href="#">
+              <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" /> 
+              <span class="logo-name">Green Park</span>
+            </a>
+          </div>
+          <ul class="sidebar-menu">
+            <li class="menu-header">Main</li>
+            <li class="dropdown">
+              <a href="{{ route('student.home') }}" class="nav-link">
+                <i data-feather="home"></i><span>Home</span>
+            </a>
+            
+        </li>
+           
+    <li class="dropdown">
+     
+        <a href="{{ route('student.profile') }}" class="nav-link">
+            <i data-feather="user"></i><span>Profile</span>
+        </a>
+        
+    </li>
 
-
-      <div style="padding-left:15px;" class="main-content">
-    @yield('main')
+           <li class="dropdown">
+            <a href="{{ route('student.notification') }}" class="nav-link">
+            <i data-feather="bell"></i><span>Notifications 
+            @if (session('{{ auth()->user()->announcement->count() }}_new_announcement_count') > 0)
+              <span style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: red; color: white; font-weight: bold; line-height: 20px; text-align: center;">{{ session('new_announcement_count') }}</span>
+            @endif
+            </span>
+             </a> 
+            </li>
+            <li class="dropdown">
+              <a href="#" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
+            </li>
+            @if (auth()->user()->coaching_type != 'Offline')
+            <li class="dropdown">
+              <a href="#" class="nav-link"><i data-feather="pause-circle"></i><span>Class Videos</span></a>
+            </li>
+            @endif
+            <li class="dropdown">
+              <a href="#" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="nav-link"><i data-feather="bar-chart"></i><span>Mark Details</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="nav-link"><i data-feather="edit"></i><span>Question Papers</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="nav-link"><i data-feather="unlock"></i><span>Answer Key</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="nav-link"><i data-feather="download-cloud"></i><span>Downloads</span></a>
+            </li>
+            {{-- <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
+                <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
+                <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
+                <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
+                <li><a  href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
+            </li> --}}
+          </ul>
+        </aside>
       </div>
 
+      @yield('main')
+
+      <footer class="main-footer">
+        <div class="footer-center">
+          <a href="http://www.infotrackin.com/its/" target="_blank">
+            <span>Copyright &copy; {{ date('Y') }} Version 1.0 - Developed By <b style="color: #27a9e0">Infotrack Technologies</b></span>
+          </a>
+        </div>
+      </footer>
+    </div>
   </div>
-</div>
+
   <!-- General JS Scripts -->
-  
-  
-<script src="{{asset('js/app.min.js')}}"></script>
-<script src="{{asset('js/scripts.js')}}"></script>
-<script src="{{asset('js/custom.js')}}"></script>
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-<script>
-$(document).ready(function() {
-  $('.select').each(function() {
-    new TomSelect(this, {
-      create: true,
-      sortField: {
-        field: "text",
-        direction: "asc"
-      }
+  <script src="{{asset('js/app.min.js')}}"></script>
+  <script src="{{asset('js/scripts.js')}}"></script>
+  <script src="{{asset('js/custom.js')}}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('.select').each(function () {
+        new TomSelect(this, {
+          create: true,
+          sortField: { field: "text", direction: "asc" }
+        });
+      });
     });
-})
-});
+  </script>
+  <script>
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+            window.location.reload(); 
+        }
+    });
 </script>
-@yield('js')
+
+  @yield('js')
 </body>
+
 </html>

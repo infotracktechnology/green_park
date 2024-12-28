@@ -57,7 +57,10 @@
 
                         <div class="form-group col-lg-3">
                            <label>Student Name</label>
-                            <input type="text" name="student_name"  class="form-control form-control-sm" required>
+                            <input type="text" name="student_name"  class="form-control form-control-sm  @error('student_name') is-invalid @enderror" required>
+                            @error('student_name')
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
                        </div>
 
                        <div class="form-group col-lg-3">
@@ -102,7 +105,10 @@
          
                     <div class="form-group col-lg-3">
                         <label>Father Name</label>
-                         <input type="text" name="father_name"  class="form-control form-control-sm" >
+                         <input type="text" name="father_name"  class="form-control form-control-sm @error('father_name') is-invalid @enderror" required>
+                         @error('father_name')
+                         <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                         @enderror
                     </div>
 
 
@@ -117,7 +123,10 @@
 
                     <div class="form-group col-lg-3">
                         <label>Mother Name</label>
-                         <input type="text" name="mother_name"  class="form-control form-control-sm" >
+                         <input type="text" name="mother_name"  class="form-control form-control-sm @error('mother_name') is-invalid @enderror" required>
+                         @error('mother_name')
+                         <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                         @enderror
                     </div>
 
 
