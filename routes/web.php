@@ -34,8 +34,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
 
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
-    Route::resource('student', 'App\Http\Controllers\StudentController');
-
+    Route::resource('student', 'App\Http\Controllers\StudentController')->except(['show','update']);
+    Route::put('student/{id}', 'App\Http\Controllers\StudentController@update')->name('student.update');
     Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
 
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
