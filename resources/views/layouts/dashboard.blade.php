@@ -98,20 +98,38 @@
           </div>
           <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
+            <li class="dropdown">
+              <a href="{{ route('student.home') }}" class="nav-link">
+                <i data-feather="home"></i><span>Home</span>
+            </a>
+            
+        </li>
            
     <li class="dropdown">
      
         <a href="{{ route('student.profile') }}" class="nav-link">
-            <i data-feather="user"></i><span>Home</span>
+            <i data-feather="user"></i><span>Profile</span>
         </a>
         
     </li>
+
+           <li class="dropdown">
+            <a href="{{ route('student.notification') }}" class="nav-link">
+            <i data-feather="bell"></i><span>Notifications 
+            @if (session('{{ auth()->user()->announcement->count() }}_new_announcement_count') > 0)
+              <span style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: red; color: white; font-weight: bold; line-height: 20px; text-align: center;">{{ session('new_announcement_count') }}</span>
+            @endif
+            </span>
+             </a> 
+            </li>
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
             </li>
+            @if (auth()->user()->coaching_type != 'Offline')
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="pause-circle"></i><span>Class Videos</span></a>
             </li>
+            @endif
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
             </li>

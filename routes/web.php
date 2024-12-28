@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
@@ -10,7 +11,7 @@ use App\Http\Controllers\HostelController;
 use App\Http\Controllers\StaffProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
-
+use App\Models\Announcement;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -28,37 +29,38 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->mid
 Route::post('/login', [LoginController::class, 'login'])->name('auth.login');
 
 #admin routes
-Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'],function(){
-Route::resource('branch', 'App\Http\Controllers\BranchController');
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
+Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
+    Route::resource('branch', 'App\Http\Controllers\BranchController');
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
 
-Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
-Route::resource('student', 'App\Http\Controllers\StudentController');
-  
-Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
-Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
-  
-Route::resource('hostel', App\Http\Controllers\HostelController::class);
-Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
-Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
+    Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
+    Route::resource('student', 'App\Http\Controllers\StudentController');
+
+    Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
+
+    Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
+    Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
+
+    Route::resource('hostel', App\Http\Controllers\HostelController::class);
+    Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
+    Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
 
-Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
-Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
-Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
+    Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
+    Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
+    Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
 
-Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
+    Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
 
+    Route::resource('exam', 'App\Http\Controllers\ExamController');
 });
 #students routes
 
-
-
-
-
-Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'],function(){
+Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function () {
 Route::view('/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
-
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
+Route::get('home',[StudentController::class, 'home'])->name('student.home');
+Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });
+

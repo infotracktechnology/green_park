@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
+
 class StudentController extends Controller
 {
     /**
@@ -113,9 +114,13 @@ class StudentController extends Controller
 
     return view('student.profile');
 }
+public function home()
+{
+    
 
-    
-    
+    return view('student.home');
+}
+  
 
     
 
