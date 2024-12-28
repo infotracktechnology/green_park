@@ -43,11 +43,8 @@
                           <div class="card-statistic-3">
                             <div class="card-icon card-icon-large"><i class="fa fa-building"></i></div>
                             <div class="card-content">
-                              <h4 class="card-title">Branch : {{ auth()->user()->branch ? auth()->user()->branch->name : 'No Branch Assigned' }}</h4>
-                              <span>Manager Name : {{ auth()->user()->branch ? auth()->user()->branch->manager_name : 'No Manager Assigned' }}</span>
-                              <p class="mb-0 text-sm">
-                                <span class="text-nowrap"><strong >Manager Mobile:</strong> {{ auth()->user()->branch ? auth()->user()->branch->mob_no : 'No Manager Assigned' }}</span>
-                              </p>
+                              <h2 class="card-title">Branch : {{ auth()->user()->branch ? auth()->user()->branch->name : 'No Branch Assigned' }}</h2>
+                              
                             </div>
                           </div>
                         </div>
