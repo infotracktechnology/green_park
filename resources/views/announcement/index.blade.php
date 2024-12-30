@@ -39,10 +39,7 @@
           <th>Coaching Type</th>
           <th>Gender</th>
           <th>Title</th>
-          <th>Type</th>
-          {{-- <th>Content</th> --}}
-          <th>Category</th>
-          <th>Edit </th>
+         <th>Category</th>
           <th>Action</th>
         </tr>
   
@@ -51,18 +48,17 @@
         <tbody>
           @foreach ($announcements as $announcement)
           <tr>
-            <td>{{ $announcement->branch }}</td>
+           <td>{{ $announcement->branch_id == 'All' ? 'All' : $announcement->branch->name }}</td>
             <td>{{$announcement->coaching_type}}</td>
             <td>{{$announcement->gender}}</td>
             <td>{{$announcement->title}}</td>
-            <td>{{$announcement->type}}</td>
-            <td>{{$announcement->category}}</td>
+           <td>{{$announcement->category}}</td>
            
-            <td>
+            {{-- <td>
               <a href="{{ route('announcement.edit', $announcement->id) }}" class="btn btn-warning text-white">
                  <i class="fas fa-edit"></i>
               </a>
-           </td>
+           </td> --}}
            <td>
               <form action="{{ route('announcement.destroy', $announcement->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
                  @csrf
