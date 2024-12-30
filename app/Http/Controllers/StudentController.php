@@ -51,13 +51,14 @@ class StudentController extends Controller
     }
 
 
-    public function edit(Request $request, Student $student)
+    public function edit(Request $request, Student $Student)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
-        $districts = DB::table('district_list')->where('State', $student->state)->distinct()->orderBy('District')->get();
+        $districts = DB::table('district_list')->where('State', $Student->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
-        $pincodes = DB::table('district_list')->where('District', $student->district)->select('Pincode')->get();
-        return view('student.edit', compact('student', 'branches',  'districts', 'states', 'pincodes'));
+        $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
+        
+        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes','Student'));
     }
 
 
