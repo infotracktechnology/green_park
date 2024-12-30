@@ -55,6 +55,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::resource('exam', 'App\Http\Controllers\ExamController');
 });
+
 #students routes
 
 Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function () {
