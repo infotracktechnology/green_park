@@ -13,7 +13,7 @@ class Announcement extends Model
     protected $guarded = [];
     function branch()
     {
-        return $this->belongsTo(Branch::class, 'branch_id', 'id');
+        return $this->belongsTo(Branch::class, 'branch', 'id');
     }
     
 }
