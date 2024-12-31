@@ -75,29 +75,33 @@
                               </form>
                             </div>
                             <div class="card-body">
-                              <div class="notice-board">
-                                  @forelse(auth()->user()->announcement()->where('branch', auth()->user()->campus)->orWhere('branch', 'All')->where('coaching_type', auth()->user()->coaching_type)->orWhere('coaching_type', 'All')->where('gender', auth()->user()->gender)->orWhere('gender', 'All')->latest()->get() as $announcement)
-                                      @if(
-                                          ($announcement->branch === auth()->user()->campus || $announcement->branch === 'All') &&
-                                          ($announcement->coaching_type === auth()->user()->coaching_type || $announcement->coaching_type === 'All') &&
-                                          ($announcement->gender === auth()->user()->gender || $announcement->gender === 'All')
-                                      )
-                                          <div class="notice-board-item border p-3 mb-3 rounded">
-                                              <div class="notice-board-id"> <strong>#</strong> {{ $announcement->id }}</div>
-                                              <div class="notice-board-item-date float-right"> 
-                                                  <strong>Time:</strong> {{ $announcement->created_at }}
-                                              </div>
-                                              <div class="notice-board-item-title"><strong>Title :</strong> {{ $announcement->title }}</div>
-                                              <div class="notice-board-item-content"><strong>Content :</strong> {!! $announcement->content !!}</div>
-                                          </div>
-                                      @endif
-                                  @empty
-                                      <div class="notice-board-item border p-3 mb-3 rounded">
-                                          <div class="notice-board-item-date">No announcement found</div>
-                                      </div>
-                                  @endforelse
+                              @forelse(auth()->user()->announcement()->where('branch', auth()->user()->campus)->orWhere('branch', 'All')->where('coaching_type', auth()->user()->coaching_type)->orWhere('coaching_type', 'All')->where('gender', auth()->user()->gender)->orWhere('gender', 'All')->latest()->get() as $announcement)
+                            @if(
+                                ($announcement->branch === auth()->user()->campus || $announcement->branch === 'All') &&
+                                ($announcement->coaching_type === auth()->user()->coaching_type || $announcement->coaching_type === 'All') &&
+                                ($announcement->gender === auth()->user()->gender || $announcement->gender === 'All')
+                            )
+                              <div class="announcement-item media mb-4 p-3 border rounded">
+                                <div class="me-3">
+                                  <img src="{{ asset('img/announcement.jpg') }}" alt="Announcement Image" class="img-fluid rounded-circle border" width="60">
+                                </div>
+                                <div class="media-body">
+                                  <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                      <span class="text-muted small">Announcement #{{ $announcement->id }}</span>
+                                      <h5 class="mt-1 mb-2 text-primary" style="font-weight: bold; ">{{ $announcement->title }}</h5>
+                                    </div>
+                                    <span class="badge rounded-pill" style="background-color: {{ $announcement->category == 'Important' ? '#dc3545' : '#28a745' }}; color: #ffffff; font-weight: bold;">{{ $announcement->category }}</span>
+                                  </div>
+                                </div>
                               </div>
-                          </div>
+                              @endif
+                              @empty
+                              <div class="alert alert-info text-center">
+                                <strong>No Announcements</strong>
+                              </div>
+                              @endforelse
+                            </div>
                             <div class="card-footer text-center bg-light">
                               <a href="{{ route('student.notification') }}" class="btn btn-primary btn-sm">View All Announcements</a>
                             </div>

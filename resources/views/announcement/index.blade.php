@@ -48,7 +48,7 @@
         <tbody>
           @foreach ($announcements as $announcement)
           <tr>
-           <td>{{ $announcement->branch == 'All' ? 'All' : $announcement->branch }}</td>
+           <td>{{ $announcement->branch_id == 'All' ? 'All' : $announcement->branch }}</td>
             <td>{{$announcement->coaching_type}}</td>
             <td>{{$announcement->gender}}</td>
             <td>{{$announcement->title}}</td>
