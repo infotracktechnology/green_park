@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Exam;
-
+use Illuminate\Support\Facades\Storage;
 
 class ExamController extends Controller
 {
@@ -25,10 +25,18 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->except('question');
+        $data = $request->except('questions');
+        foreach ($request->questions as $key => $question) {
+            $filename = $data['name'].$question->getClientOriginalName();
+            $file = $question->storeAs('questions', $filename, 'public');
+            $data['questions'][$key] = ['question' => $key, 'image' => $file];
+        }
         $exam = Exam::create($data);
         session()->flash('success', 'Test created successfully');
         return to_route('exam.index');
+    }
+    function show(Request $request, Exam $exam){
+        
     }
 
     public function destroy(Request $request, Exam $exam)
