@@ -12,6 +12,7 @@ use App\Http\Controllers\StaffProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Models\Announcement;
+use App\Models\Student;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -58,7 +59,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 #students routes
 
 Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function () {
-Route::view('/dashboard', 'dashboards.studentdashboard')->name('studentdashboard');
+Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentdashboard');
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
 Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');

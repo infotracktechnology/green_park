@@ -109,20 +109,16 @@ class StudentController extends Controller
 
         return redirect()->route('section.student')->with('success', 'Student details successfully updated.');
     }
-    public function profile()
-{
-    
-
-    return view('student.profile');
-}
-public function home()
-{
-    
-
-    return view('student.home');
-}
-  
-
-    
-
+        public function profile()
+    {
+             return view('student.profile');
+    }
+        public function home()
+    {
+            return view('student.home');
+    }
+        public function dashboard()
+    {
+            return view('dashboards.studentdashboard');
+    }
 }
