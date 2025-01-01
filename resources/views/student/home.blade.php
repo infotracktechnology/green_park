@@ -110,11 +110,21 @@
                         Latest Announcements
                     </div>
                     <div class="card-body">
-                        @forelse(auth()->user()->announcement()->where('branch', auth()->user()->campus)->orWhere('branch', 'All')->where('coaching_type', auth()->user()->coaching_type)->orWhere('coaching_type', 'All')->where('gender', auth()->user()->gender)->orWhere('gender', 'All')->latest()->take(5)->get() as $announcement)
+                        @forelse(auth()->user()->announcement()
+                        ->where('branch', auth()->user()->campus)
+                        ->orWhere('branch', 'All')
+                        ->where('coaching_type', auth()->user()->coaching_type)
+                        ->orWhere('coaching_type', 'All')
+                        ->where('gender', auth()->user()->gender)
+                        ->orWhere('gender', 'All')
+                        ->latest()->take(5)
+                        ->get() as $announcement)
+                        
                         @if(
                             ($announcement->branch === auth()->user()->campus || $announcement->branch === 'All') &&
                             ($announcement->coaching_type === auth()->user()->coaching_type || $announcement->coaching_type === 'All') &&
-                            ($announcement->gender === auth()->user()->gender || $announcement->gender === 'All')
+                            ($announcement->gender === auth()->user()->gender || $announcement->gender === 'All') &&
+                            ($announcement->coaching_type !== 'Offline' || ($announcement->coaching_type === 'Offline' && ($announcement->category === 'All'|| $announcement->category === null || $announcement->category === auth()->user()->hostel_dayscholar)))
                         )
                         <div class="announcement-item media mb-4">
                             <div class="me-3">

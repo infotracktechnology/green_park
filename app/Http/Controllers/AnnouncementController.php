@@ -25,8 +25,18 @@ class AnnouncementController extends Controller
 
     public function store(Request $request)
     {
-        Announcement::create($request->all());
-
+        
+        $announcement = new Announcement();
+        $announcement->branch = $request->branch;
+        $announcement->coaching_type = $request->coaching_type;
+        $announcement->gender = $request->gender;
+        $announcement->title = $request->title;
+        $announcement->content = $request->content;
+    
+        // Set category only if coaching_type is 'Offline'
+        $announcement->category = $request->coaching_type === 'Offline' ? $request->category : null;
+    
+        $announcement->save();
         return to_route('announcement.index');
     }
 
