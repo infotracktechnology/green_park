@@ -25,6 +25,7 @@
                                 <label>Branch</label>
                                 <select name="branch_id" class="form-control form-control-sm"  required>
                                     <option value="" disabled selected>Select Branch</option>
+                                    <option value="">All</option>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
@@ -36,6 +37,7 @@
                                  <label>Coaching Type</label>
                                  <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
                                     <option value="">Select Coaching Type</option>
+                                    <option value="All">All</option>
                                     <option value="Offline">Offline</option>
                                     <option value="Online Recorded">Online Recorded</option>
                                     <option value="Online Live">Online Live</option>
@@ -46,20 +48,82 @@
                                 <label>Test Name</label>
                                 <input type="text" name="name" id="name" class="form-control form-control-sm" required>
                             </div>
-
+                            <div class="form-group col-lg-3">
+                                <label>Subject Name</label>
+                                <select name="subject_name" id="subject_name" class="form-control form-control-sm" required>
+                                    <option value="">Select Subject Name</option>
+                                    <option value="All">All</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                 </select>
+                              
+                            </div>
+                            <div class="form-group col-lg-3">
+                                <label>Physics Questions</label>
+                                <input type="number" min="1" name="phy_questions" class="form-control form-control-sm" required>
+                            </div>
+                            
+                            <div class="form-group col-lg-3">
+                                <label>Chemistry Questions</label>
+                                <input type="number" min="1" name="chem_questions" class="form-control form-control-sm" required>
+                            </div>
+                            
+                            <div class="form-group col-lg-3">
+                                <label>Biology Questions</label>
+                                <input type="number" min="1" name="bio_questions" class="form-control form-control-sm" required>
+                            </div>
+                            
                             <div class="form-group col-lg-3">
                                 <label>Total Questions</label>
-                                <input type="number" min="1" name="total_questions" class="form-control form-control-sm" required>
+                                <input type="number" min="1" name="total_questions" id="total_questions" class="form-control form-control-sm" required>
                             </div>
+                            
+                           
+
+
 
                             <div class="form-group col-lg-3">
+                                <label>Physics Start NO</label>
+                                <input type="number" min="1" name="phy_start" class="form-control form-control-sm" required>
+                            </div>
+
+
+
+                            <div class="form-group col-lg-3">
+                                <label>Chemistry Start No</label>
+                                <input type="number" min="1" name="chem_start" class="form-control form-control-sm" required>
+                            </div>
+
+
+
+                            <div class="form-group col-lg-3">
+                                <label>Biology Start No</label>
+                                <input type="number" min="1" name="bio_start" class="form-control form-control-sm" required>
+                            </div>
+
+                          
+
+
+                            <div class="form-group col-lg-3">
+                                <label>Questions Files</label>
+                                <input type="file" name="questions[]" class="form-control form-control-sm" multiple required accept="image/*">
+                            </div>
+                            
+
+                            
+                                <div class="form-group col-lg-12">
+                                   <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+
+                            {{-- <div class="form-group col-lg-3">
                                 <label>Total Duration (in hours)</label>
                                 <input type="number" min="1" step="0.5" name="duration" class="form-control form-control-sm" required>
-                            </div>
+                            </div> --}}
 
                     
 
-                             <div class="form-group col-lg-12">
+                             {{-- <div class="form-group col-lg-12">
                                 <button type="button" x-on:click="questions.push({})" class="btn btn-warning">Add Question</button>
                              </div>
 
@@ -82,12 +146,8 @@
                                     <button type="button"  x-on:click="questions.splice(index, 1)" class="btn btn-danger mt-4"><i class="fa fa-trash"></i></button>
                                 </div>
                              </div>
-                            </template>
+                            </template> --}}
 
-                            <div class="row">
-                              <div class="form-group col-lg-12">
-                                 <button type="submit" class="btn btn-primary">Submit</button>
-                              </div>
 
                            </div>
                         </div>
@@ -123,4 +183,26 @@ $("#myForm").submit(function(e) {
     this.submit();
 })
 </script>
+
+<script>
+    const phyQuestionsInput = document.querySelector('input[name="phy_questions"]');
+    const chemQuestionsInput = document.querySelector('input[name="chem_questions"]');
+    const bioQuestionsInput = document.querySelector('input[name="bio_questions"]');
+    const totalQuestionsInput = document.querySelector('input[name="total_questions"]');
+
+    phyQuestionsInput.addEventListener('input', calculateTotalQuestions);
+    chemQuestionsInput.addEventListener('input', calculateTotalQuestions);
+    bioQuestionsInput.addEventListener('input', calculateTotalQuestions);
+
+    function calculateTotalQuestions() {
+        const phyQuestions = parseInt(phyQuestionsInput.value) || 0;
+        const chemQuestions = parseInt(chemQuestionsInput.value) || 0;
+        const bioQuestions = parseInt(bioQuestionsInput.value) || 0;
+
+        const totalQuestions = phyQuestions + chemQuestions + bioQuestions;
+
+        totalQuestionsInput.value = totalQuestions;
+    }
+</script>
+
 @endsection
