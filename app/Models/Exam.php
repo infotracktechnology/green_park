@@ -13,6 +13,8 @@ class Exam extends Model
     protected $guarded = [];
     protected $casts = [
         'questions' => 'json',
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
     ];
 
     function branch()
