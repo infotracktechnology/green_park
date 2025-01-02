@@ -71,7 +71,10 @@
                                 <label for="content">Content</label>
                                 <textarea name="content" id="content" class="summernote-simple"></textarea>
                             </div>
-                            
+                            <div class="form-group col-lg-4">
+                                <label for="attachment">Attachment</label>
+                                <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" onchange="saveAs('assets/attachments', this)">
+                            </div>
                              
 
                               <div class="form-group col-lg-12">

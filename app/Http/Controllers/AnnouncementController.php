@@ -32,6 +32,13 @@ class AnnouncementController extends Controller
         $announcement->gender = $request->gender;
         $announcement->title = $request->title;
         $announcement->content = $request->content;
+        if ($request->hasFile('attachment')) {
+            $fileName = time() . '.' . $request->attachment->extension();
+            $request->attachment->move(public_path('assets/attachments'), $fileName);
+            $announcement->attachment = 'assets/attachments/' . $fileName;
+        } else {
+            $announcement->attachment = null;
+        }
     
         // Set category only if coaching_type is 'Offline'
         $announcement->category = $request->coaching_type === 'Offline' ? $request->category : null;

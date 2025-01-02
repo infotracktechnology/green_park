@@ -84,6 +84,11 @@
                                     <div class="notice-board-item-content">
                                         <i class="fas fa-align-left"></i> <strong>Content :</strong> {!! $announcement->content !!}
                                     </div>
+                                    <div class="notice-board-item-date mt-2">
+                                        @if($announcement->attachment)
+                                            <a href="/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-paperclip"></i> Attachment</a>
+                                        @endif
+                                    </div>
                                 </div>
                             @endif
                         @empty
