@@ -123,7 +123,7 @@
              </a> 
             </li>
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
+              <a href="{{ route('student.chairmanvideo') }}" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
             </li>
             @if (auth()->user()->coaching_type != 'Offline')
             <li class="dropdown">

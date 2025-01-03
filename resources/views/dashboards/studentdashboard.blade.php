@@ -4,6 +4,7 @@
 @include('student.home')
     @include('student.profile')
     @include('student.notification')
+    @include('student.chairmanvideo')
 @endsection
 
 

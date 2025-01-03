@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Models\Announcement;
 use App\Models\Student;
+use App\Http\Controllers\ChairmanVideoController;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -52,9 +53,10 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
 
     Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
-
     Route::resource('exam', 'App\Http\Controllers\ExamController');
+    Route::resource('chairmanvideo', 'App\Http\Controllers\ChairmanVideoController');
     Route::get('exam/instruction/{test_id}', 'App\Http\Controllers\ExamController@instruction')->name('exam.instruction');
+
 });
 
 #students routes
@@ -64,6 +66,7 @@ Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentd
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
 Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
+Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });
 

@@ -125,7 +125,7 @@
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
-    
+                <li><a href="{{route('chairmanvideo.index')}}"  class="nav-link"> Chairman Video</a></li>
               </ul>
             </li>
 
