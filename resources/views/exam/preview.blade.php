@@ -17,13 +17,13 @@
 
     .pagination li {
         display: inline !important;
-        padding: 0px 5px !important;
+        padding: 0px 0px !important;
     }
 
     .pagination>li>a,
     .pagination>li>span {
-        padding: 6px 12px;
-        line-height: 2.8;
+        padding: 7px 12px;
+        line-height: 2.9;
         text-decoration: none;
         border: none;
         background-size: 100% 100% !important;
@@ -95,42 +95,59 @@
                 </div>
                 <div class="col-md-8">
                     <!-- Question Display -->
-                    <div class="question-container">
+                    <div class="question-container p-t-30 p-b-10">
                         @foreach ($exam->questions as $index => $question)
                         <div id="question-{{ $index }}" class="question" style="display: {{ $index === 0 ? 'block' : 'none' }};">
-                            <img src="{{ Storage::disk('public')->url($question['image']) }}" alt="Question Image" style="max-width: 100%;">
-                            <p>Question {{ $index + 1 }}</p>
-                            <div>
-                                <input type="radio" name="question-{{ $index }}" value="A"> A
-                                <input type="radio" name="question-{{ $index }}" value="B"> B
-                                <input type="radio" name="question-{{ $index }}" value="C"> C
-                                <input type="radio" name="question-{{ $index }}" value="D"> D
+                            <div class="question-panel" style="overflow-y: scroll;max-height: 400px;overflow-x: hidden;">
+                            <h4>Question {{ $index + 1 }}</h4>
+                            <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
+                        
+                            <table class="table table-borderless mb0">
+                                <tbody>
+                                    <tr>
+                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="A"> 1 ) </td>
+                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="B"> 2 ) </td>
+                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="C"> 3 ) </td>
+                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="D"> 4 ) </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                             </div>
-                            <button class="btn-save" data-index="{{ $index }}">Save</button>
-                            <button class="btn-mark" data-index="{{ $index }}">Mark for Review</button>
-                            <button class="btn-reset" data-index="{{ $index }}">Reset</button>
+                            
+                        
+                            <button class="btn-save btn btn-success" data-index="{{ $index }}">Save & Next</button>
+                            <button class="btn-reset btn btn-light" data-index="{{ $index }}">Clear</button>
+                            <button class="btn btn-warning btn-save-mark-answer" data-index="{{ $index }}">Save &amp; Mark For Review</button>
+                            <button class="btn-mark btn btn-primary" data-index="{{ $index }}">Mark for Review & Next</button>
+                            
                         </div>
                         @endforeach
                     </div>
+
+                    <div class="row m-t-20">
+                        <button class="btn btn-link float-left" id="btnPrevQue"> << Back </button> &nbsp;&nbsp; 
+                        <button  class="btn btn-link float-left" id="btnNextQue">Next >></button>
+                        <button class="btn btn-success btn-submit-all-answers ml-auto">Submit</button>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; 
+                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="table-responsive" style="border:dotted;">
+                    <div style="border:dotted;margin:10px 0px;">
                         <table class="table table-borderless mb-0 test-questions">
                             <thead>
                                 <tr>
-                                    <td class="full-width"> <a class="not-attempted">1</a></td>
+                                    <td> <a class="not-attempted countNotVisited">1</a></td>
                                     <td>Not Visited</td>
-                                    <td class="full-width"> <a class="not-answered">1</a></td>
+                                    <td> <a class="not-answered countNotAnswered">1</a></td>
                                     <td>Not Answered</td>
                                 </tr>
                                 <tr>
-                                    <td class="full-width"> <a class="que-save">1</a></td>
+                                    <td> <a class="que-save countAnswered">1</a></td>
                                     <td>Answered</td>
-                                    <td class="full-width"> <a class="que-mark">1</a></td>
+                                    <td> <a class="que-mark countMarked">1</a></td>
                                     <td>Marked for Review</td>
                                 </tr>
                                 <tr>
-                                    <td> <a class="que-save-mark">1</a></td>
+                                    <td><a class="que-save-mark countAnsweredAndMarked">1</a></td>
                                     <td colspan="3">Answered &amp; Marked for Review (will be considered for evaluation)</td>
                                 </tr>
                             </thead>
@@ -155,11 +172,11 @@
 
 @section('js')
 <script>
-    var timer = 7200; // 2 hours in seconds
+    var timer = 7200;
     var activeQuestion = 0;
     const questions = @json($exam->questions);
 
-    // Timer
+
     function startTimer() {
         const interval = setInterval(function () {
             if (timer > 0) {
@@ -172,21 +189,27 @@
                 );
             } else {
                 clearInterval(interval);
-                submitAllAnswers();
+                timefinish();
             }
         }, 1000);
     }
 
-    // Open Question
+
     function openQuestion(index) {
         $('.question').hide();
         $(`#question-${index}`).show();
         $('.pagination li').removeClass('active');
         $(`.pagination li[data-seq="${index}"]`).addClass('active');
+        const a = $(`.pagination li[data-seq="${index}"] a`);
+        if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) 
+        {
+            $(a).addClass("not-answered").removeClass("not-attempted");
+        }
         activeQuestion = index;
+        updateCounts();
     }
 
-    // Update Counts
+
     function updateCounts() {
         let notVisited = 0;
         let notAnswered = 0;
@@ -196,67 +219,101 @@
 
         $('.pagination a').each(function () {
             const className = $(this).attr('class');
-            if (className.includes('not-answered')) notAnswered++;
-            if (className.includes('que-save')) answered++;
-            if (className.includes('que-mark')) marked++;
-            if (className.includes('que-save-mark')) answeredAndMarked++;
+            if (className === 'not-answered') notAnswered++;
+            if (className === 'que-save') answered++;
+            if (className === 'que-mark') marked++;
+            if (className === 'que-save-mark') answeredAndMarked++;
         });
 
         notVisited = questions.length - (notAnswered + answered + marked + answeredAndMarked);
 
-        $('#countNotVisited').text(notVisited);
-        $('#countNotAnswered').text(notAnswered);
-        $('#countAnswered').text(answered);
-        $('#countMarked').text(marked);
-        $('#countAnsweredAndMarked').text(answeredAndMarked);
+        $('.countNotVisited').text(notVisited);
+        $('.countNotAnswered').text(notAnswered);
+        $('.countAnswered').text(answered);
+        $('.countMarked').text(marked);
+        $('.countAnsweredAndMarked').text(answeredAndMarked);
     }
 
-    // Save Answer
+ 
     $('.btn-save').click(function () {
         const index = $(this).data('index');
+        const radio = $(`#question-${index} input[type="radio"]`);
+        if(!radio.is(':checked')) {
+            alert('Please select an answer first.');
+            return;
+        }
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save-mark')
             .addClass('que-save');
-        updateCounts();
+            NextQuestion(index);
     });
 
-    // Mark for Review
+
+    $('.btn-save-mark-answer').click(function () {
+        const index = $(this).data('index');
+        const radio = $(`#question-${index} input[type="radio"]`);
+        if(!radio.is(':checked')) {
+            alert('Please select an answer first.');
+            return;
+        }
+        $(`.pagination li[data-seq="${index}"] a`)
+            .removeClass('not-answered que-mark que-save')
+            .addClass('que-save-mark');
+            NextQuestion(index);
+    });
+
+   
     $('.btn-mark').click(function () {
         const index = $(this).data('index');
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-save que-save-mark')
             .addClass('que-mark');
-        updateCounts();
+        NextQuestion(index);
     });
 
-    // Reset Answer
+   
     $('.btn-reset').click(function () {
         const index = $(this).data('index');
         $(`#question-${index} input[type="radio"]`).prop('checked', false);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('que-save que-mark que-save-mark')
             .addClass('not-answered');
-        updateCounts();
+            updateCounts();
     });
 
-    // Pagination Click
     $('.pagination a').click(function (e) {
         const index = $(this).data('index');
-        if (!$(e.target).hasClass("que-save") &&
-                !$(e.target).hasClass("que-save-mark") &&
-                !$(e.target).hasClass("que-mark")) {
-                $(e.target).addClass("not-answered").removeClass("not-attempted");
-            }
         openQuestion(index);
     });
 
-    // Submit All Answers
-    function submitAllAnswers() {
+    $('#btnPrevQue').click(function () {
+        PreviousQuestion(activeQuestion);
+    });
+
+    $('#btnNextQue').click(function () {
+        NextQuestion(activeQuestion);
+    });
+
+
+    function timefinish() {
         alert('Time is up! Submitting all answers.');
-        // Add logic to submit answers
     }
 
-    // Initialize
+    function NextQuestion(index) {
+        if (index < questions.length - 1) {
+            openQuestion(index + 1);
+        }
+        return;
+    }
+
+    function PreviousQuestion(index) {
+        if (index > 0) {
+            openQuestion(index - 1);
+        }
+        return;
+    }
+
+
     startTimer();
     openQuestion(0);
     updateCounts();
