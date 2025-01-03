@@ -41,18 +41,25 @@ class ExamController extends Controller
         foreach ($request->questions as $key => $question) {
             $filename = $data['name'].$question->getClientOriginalName();
             $file = $question->storeAs('questions', $filename, 'public');
-            $data['questions'][$key] = ['question' => $key, 'image' => Storage::disk('public')->url($file)];
+            $data['questions'][$key] = ['question' => $key, 'image' => $file];
         }
         $exam = Exam::create($data);
         session()->flash('success', 'Test created successfully');
         return to_route('exam.index');
     }
     function show(Request $request, Exam $exam){
-        
+       
+       return view('exam.preview',compact('exam'));
+    }
+    function instruction(Request $request,$test_id){
+        return view('exam.instruction',compact('test_id'));
     }
 
     public function destroy(Request $request, Exam $exam)
     {
+        foreach($exam->questions as $key => $question){
+            Storage::disk('public')->delete($question['image']);
+        }
         $exam->delete();
         session()->flash('success', 'Test deleted successfully');
         return to_route('exam.index');
