@@ -56,7 +56,7 @@
             <td>{{ $test->name }}</td>
             <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>
-            <td><a href="{{ route('exam.show', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a></td>
+            <td><a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a></td>
             <td>
              <form action="{{ route('exam.destroy', $test->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">
               @csrf 
@@ -88,7 +88,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="formModal">Test Shechedule</h5>
+          <h5 class="modal-title">Test Schedule</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
