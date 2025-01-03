@@ -46,7 +46,7 @@ class ChairmanVideoController extends Controller
     }
     public function chairmanvideo(Request $request)
     {
-        $chairmanvideos = Chairmanvideo::all();
-        return view('student.chairmanvideo', compact('chairmanvideos'));
+        $chairmanvideo = Chairmanvideo::latest()->first();
+        return view('student.chairmanvideo', compact('chairmanvideo'));
     }
 }
