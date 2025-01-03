@@ -39,10 +39,9 @@
                              <div class="form-group col-lg-3">
                                 <label>Gender</label>
                                 <select name="gender" id="gender" class="form-control form-control-sm" required>
-                                   <option value="Male,Female,Other">All</option>
+                                   <option value="Male,Female">All</option>
                                    <option value="Male">Male</option>
                                    <option value="Female">Female</option>
-                                   <option value="Other">Other</option>
                                 </select>
                              </div>
                              <div class="form-group col-lg-3">
