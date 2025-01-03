@@ -19,7 +19,7 @@ class ChairmanVideoController extends Controller
         $branches = Branch::all();
         return view('chairmanvideo.create', compact('branches'));
     }
-    public function store(Request $request, Chairmanvideo $chairmanvideos)
+    public function store(Request $request)
     {
         $chairmanvideos = new Chairmanvideo();
         $chairmanvideos->branch_id = $request->branch_id;
