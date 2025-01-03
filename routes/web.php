@@ -54,6 +54,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
 
     Route::resource('exam', 'App\Http\Controllers\ExamController');
+    Route::get('exam/instruction/{test_id}', 'App\Http\Controllers\ExamController@instruction')->name('exam.instruction');
 });
 
 #students routes
