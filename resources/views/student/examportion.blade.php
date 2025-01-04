@@ -18,7 +18,7 @@
                   <div class="card-body">
                     <span class="font-weight-bold">Title : {{ $examportion->title }}</span>
                     @if($examportion->attachment)
-                    <a href="/public/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
+                    <a href="/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
                   <i class="fas fa-paperclip"></i> Attachment
                     </a>
                   @endif
