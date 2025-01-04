@@ -126,6 +126,7 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
                 <li><a href="{{route('chairmanvideo.index')}}"  class="nav-link"> Chairman Video</a></li>
+                <li><a href="{{route('examportion.index')}}"  class="nav-link"> Exam Portion</a></li>
               </ul>
             </li>
 
