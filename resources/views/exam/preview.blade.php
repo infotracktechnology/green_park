@@ -37,7 +37,8 @@
 <div class="main-content">
     <section class="section">
         <div class="section-body">
-            <div class="row">
+            <form method="post" id="myForm" action="#" enctype="multipart/form-data">
+            <div class="row exam-paper">
                 <div class="col-md-9">
                     <table>
                         <tbody>
@@ -105,29 +106,29 @@
                             <table class="table table-borderless mb0">
                                 <tbody>
                                     <tr>
-                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="A"> 1 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="B"> 2 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="C"> 3 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index+1 }}]" value="D"> 4 ) </td>
+                                        <td> <input type="radio" name="question[]" value="1"> 1 ) </td>
+                                        <td> <input type="radio" name="question[]" value="2"> 2 ) </td>
+                                        <td> <input type="radio" name="question[]" value="3"> 3 ) </td>
+                                        <td> <input type="radio" name="question[]" value="4"> 4 ) </td>
                                     </tr>
                                 </tbody>
                             </table>
                             </div>
                             
                         
-                            <button class="btn-save btn btn-success" data-index="{{ $index }}">Save & Next</button>
-                            <button class="btn-reset btn btn-light" data-index="{{ $index }}">Clear</button>
-                            <button class="btn btn-warning btn-save-mark-answer" data-index="{{ $index }}">Save &amp; Mark For Review</button>
-                            <button class="btn-mark btn btn-primary" data-index="{{ $index }}">Mark for Review & Next</button>
+                            <button type="button" class="btn-save btn btn-success" data-index="{{ $index }}">Save & Next</button>
+                            <button type="button" class="btn-reset btn btn-light" data-index="{{ $index }}">Clear</button>
+                            <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $index }}">Save &amp; Mark For Review</button>
+                            <button type="button" class="btn-mark btn btn-primary" data-index="{{ $index }}">Mark for Review & Next</button>
                             
                         </div>
                         @endforeach
                     </div>
 
                     <div class="row m-t-20">
-                        <button class="btn btn-link float-left" id="btnPrevQue"> << Back </button> &nbsp;&nbsp; 
-                        <button  class="btn btn-link float-left" id="btnNextQue">Next >></button>
-                        <button class="btn btn-success btn-submit-all-answers ml-auto">Submit</button>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; 
+                        <button type="button" class="btn btn-link float-left" id="btnPrevQue"> << Back </button> &nbsp;&nbsp; 
+                        <button type="button" class="btn btn-link float-left" id="btnNextQue">Next >></button>
+                        <button type="button" class="btn btn-success btn-submit-answer ml-auto">Submit</button>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; 
                      </div>
                 </div>
                 <div class="col-md-4">
@@ -165,6 +166,43 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row exam-summery justify-content-center" style="display: none;">
+                <h3>Exam Summary</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No of Questions</th>
+                            <th>Answered</th>
+                            <th>Not Answered</th>
+                            <th>Marked for Review</th>
+                            <th>Answered &amp; Marked for Review</th>
+                            <th>Not Visited</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ $exam->total_questions }}</td>
+                            <td class="countAnswered">0</td>
+                            <td class="countNotAnswered">0</td>
+                            <td class="countMarked">0</td>
+                            <td class="countAnsweredAndMarked">0</td>
+                            <td class="countNotVisited">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+                
+                <div class="col-md-12 text-center">
+                    <h4> Are you sure you want to submit for final marking?<br>No changes will be allowed after submission.</h4>
+                    <button type="button" class="btn btn-light btn-lg mx-auto" id="btnYesSubmitConfirm">Yes</button>
+                    <button type="button" class="btn btn-light btn-lg mx-auto" id="btnNoSubmitConfirm">No</button>
+                </div>
+            </div>
+
+            </form>
+
+
         </div>
     </section>
 </div>
@@ -175,7 +213,7 @@
     var timer = 7200;
     var activeQuestion = 0;
     const questions = @json($exam->questions);
-
+    const form = $('#myForm');
 
     function startTimer() {
         const interval = setInterval(function () {
@@ -297,6 +335,7 @@
 
     function timefinish() {
         alert('Time is up! Submitting all answers.');
+        form.submit();
     }
 
     function NextQuestion(index) {
@@ -313,6 +352,21 @@
         return;
     }
 
+    $(".btn-submit-answer").click(function () {
+        $('.exam-paper').hide();
+        $('.exam-summery').show();
+    });
+
+    $('#btnYesSubmitConfirm').click(function () {
+        form.submit();
+    });
+    $('#btnNoSubmitConfirm').click(function () {
+        if(timer === 0) {
+            form.submit();
+        }
+        $('.exam-paper').show();
+        $('.exam-summery').hide();
+    });
 
     startTimer();
     openQuestion(0);
