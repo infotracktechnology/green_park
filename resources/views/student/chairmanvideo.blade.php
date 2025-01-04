@@ -16,8 +16,22 @@
                     <h4><i class="fas fa-video"></i> Chairman Video</h4>
                   </div>
                   <div class="card-body">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/oBkgL2iQygA?si=zj6MWHAiX8oOkSEq" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                  </div>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        @if($chairmanvideo->link)
+                        <iframe class="embed-responsive-item" 
+                                src="{{ str_replace('youtu.be/', 'www.youtube.com/embed/', explode('?', $chairmanvideo->link)[0]) }}" 
+                                allowfullscreen 
+                                title="YouTube video player" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin">
+                        </iframe>
+                        @else
+                        <p>No Video Found</p>
+                        @endif
+                    </div>
+                </div>
+                                
                   <div class="card-footer text-right">
                   
                     @if($chairmanvideo->attachment)
