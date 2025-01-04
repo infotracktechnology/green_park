@@ -35,7 +35,7 @@
                   <div class="card-footer text-right">
                   
                     @if($chairmanvideo->attachment)
-                    <a href="/{{ $chairmanvideo->attachment }}" target="_blank" rel="noopener noreferrer">
+                    <a href="/public/{{ $chairmanvideo->attachment }}" target="_blank" rel="noopener noreferrer">
                   <i class="fas fa-paperclip"></i> Attachment
                     </a>
                   @endif
