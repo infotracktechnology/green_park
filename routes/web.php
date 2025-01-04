@@ -14,6 +14,7 @@ use App\Http\Controllers\StudentController;
 use App\Models\Announcement;
 use App\Models\Student;
 use App\Http\Controllers\ChairmanVideoController;
+use App\Http\Controllers\ExamPortionController;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -56,6 +57,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('exam', 'App\Http\Controllers\ExamController');
     Route::resource('chairmanvideo', 'App\Http\Controllers\ChairmanVideoController');
     Route::get('exam/instruction/{test_id}', 'App\Http\Controllers\ExamController@instruction')->name('exam.instruction');
+    Route::resource('examportion', 'App\Http\Controllers\ExamPortionController');
 
 });
 
@@ -67,6 +69,7 @@ Route::get('profile', [StudentController::class, 'profile'])->name('student.prof
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
 Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
 Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
+Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });
 

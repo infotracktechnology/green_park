@@ -131,7 +131,7 @@
             </li>
             @endif
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
+              <a href="{{ route('student.examportion') }}" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
             </li>
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="bar-chart"></i><span>Mark Details</span></a>
