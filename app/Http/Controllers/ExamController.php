@@ -39,7 +39,7 @@ class ExamController extends Controller
         $data = $request->except('questions');
         $data['status'] = 'perview';
         foreach ($request->questions as $key => $question) {
-            $filename = $data['name'].'-'.$key.'.'.$question->getClientOriginalExtension();
+            $filename = time().'-'.$key.'.'.$question->getClientOriginalExtension();
             $file = $question->move('questions', $filename);
             $data['questions'][$key] = ['question' => $key, 'image' => "questions/".$filename];
         }
@@ -48,7 +48,6 @@ class ExamController extends Controller
         return to_route('exam.index');
     }
     function show(Request $request, Exam $exam){
-       
        return view('exam.preview',compact('exam'));
     }
     function instruction(Request $request,$test_id){
@@ -58,7 +57,7 @@ class ExamController extends Controller
     function destroy(Request $request, Exam $exam)
     {
         foreach($exam->questions as $key => $question){
-            Storage::delete($question->image);
+            unlink($question['image']);
         }
         $exam->delete();
         session()->flash('success', 'Test deleted successfully');
