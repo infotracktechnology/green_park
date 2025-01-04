@@ -1,7 +1,5 @@
 @extends('layouts.dashboard')
-
 @section('title', 'Chairman Video')
-
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
@@ -18,22 +16,26 @@
                   <div class="card-body">
                     <div class="embed-responsive embed-responsive-16by9">
                         @if($chairmanvideo->link)
-                        <iframe class="embed-responsive-item" 
-                                src="{{ str_replace('youtu.be/', 'www.youtube.com/embed/', explode('?', $chairmanvideo->link)[0]) }}" 
-                                allowfullscreen 
-                                title="YouTube video player" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                referrerpolicy="strict-origin-when-cross-origin">
-                        </iframe>
+                            @php
+                                preg_match('/vimeo\.com\/(\d+)/', $chairmanvideo->link, $matches);
+                                $videoId = $matches[1] ?? null;
+                            @endphp
+                            @if($videoId)
+                                <iframe src="https://player.vimeo.com/video/{{ $videoId }}" 
+                                        frameborder="0" 
+                                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; gyroscope; accelerometer" 
+                                        style="position:absolute;top:0;left:0;width:100%;height:100%;" 
+                                        title="video_20240822_142621"></iframe>
+                                <script src="https://player.vimeo.com/api/player.js"></script>
+                            @else
+                                <p>Invalid Video Link</p>
+                            @endif
                         @else
-                        <p>No Video Found</p>
+                            <p>No Video Found</p>
                         @endif
                     </div>
-                </div>
-                                
+                </div>         
                   <div class="card-footer text-right">
-                  
                     @if($chairmanvideo->attachment)
                     <a href="/public/{{ $chairmanvideo->attachment }}" target="_blank" rel="noopener noreferrer">
                   <i class="fas fa-paperclip"></i> Attachment
@@ -45,4 +47,5 @@
         </div>
     </div>
 </div>
+
 @endsection 
