@@ -19,7 +19,7 @@
                     <div class="embed-responsive embed-responsive-16by9">
                         @if($chairmanvideo->link)
                         <iframe class="embed-responsive-item" 
-                                src="{{ $chairmanvideo->link }}" 
+                                src="{{ str_replace('youtu.be/', 'www.youtube.com/embed/', explode('?', $chairmanvideo->link)[0]) }}" 
                                 allowfullscreen 
                                 title="YouTube video player" 
                                 frameborder="0" 
@@ -30,7 +30,8 @@
                         <p>No Video Found</p>
                         @endif
                     </div>
-                </div>                
+                </div>
+                                
                   <div class="card-footer text-right">
                   
                     @if($chairmanvideo->attachment)
