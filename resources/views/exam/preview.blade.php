@@ -37,7 +37,9 @@
 <div class="main-content">
     <section class="section">
         <div class="section-body">
-            <form method="post" id="myForm" action="#" enctype="multipart/form-data">
+            <form method="post" id="myForm" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
+                @csrf
+            <input type="hidden" name="test_id" value="{{ $exam->id }}">
             <div class="row exam-paper">
                 <div class="col-md-9">
                     <table>
@@ -97,6 +99,7 @@
                 <div class="col-md-8">
                     <!-- Question Display -->
                     <div class="question-container p-t-30 p-b-10">
+                        <input type="hidden" name="total_question" value="{{ count($exam->questions) }}">
                         @foreach ($exam->questions as $index => $question)
                         <div id="question-{{ $index }}" class="question" style="display: {{ $index === 0 ? 'block' : 'none' }};">
                             <div class="question-panel" style="overflow-y: scroll;max-height: 400px;overflow-x: hidden;">
@@ -106,10 +109,10 @@
                             <table class="table table-borderless mb0">
                                 <tbody>
                                     <tr>
-                                        <td> <input type="radio" name="question[]" value="1"> 1 ) </td>
-                                        <td> <input type="radio" name="question[]" value="2"> 2 ) </td>
-                                        <td> <input type="radio" name="question[]" value="3"> 3 ) </td>
-                                        <td> <input type="radio" name="question[]" value="4"> 4 ) </td>
+                                        <td> <input type="radio" name="question[{{ $index }}]" value="1"> 1 ) </td>
+                                        <td> <input type="radio" name="question[{{ $index }}]" value="2"> 2 ) </td>
+                                        <td> <input type="radio" name="question[{{ $index }}]" value="3"> 3 ) </td>
+                                        <td> <input type="radio" name="question[{{ $index }}]" value="4"> 4 ) </td>
                                     </tr>
                                 </tbody>
                             </table>
