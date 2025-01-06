@@ -11,7 +11,7 @@
             <div class="col-md-6 col-lg-12 col-xl-8">
                 <div class="card">
                   <div class="card-header">
-                    <h4><i class="fas fa-video"></i> Chairman Video</h4>
+                    <h4><i style="font-size: 25px;" class="fas fa-video"></i> Chairman Video</h4>
                   </div>
                   <div class="card-body">
                     <div class="embed-responsive embed-responsive-16by9">
