@@ -39,8 +39,6 @@ class AnnouncementController extends Controller
         } else {
             $announcement->attachment = null;
         }
-    
-        // Set category only if coaching_type is 'Offline'
         $announcement->category = $request->coaching_type === 'Offline' ? $request->category : null;
     
         $announcement->save();

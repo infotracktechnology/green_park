@@ -87,7 +87,6 @@
           </li>
         </ul>
       </nav>
-
       <div class="main-sidebar sidebar-style-2">
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
@@ -101,18 +100,16 @@
             <li class="dropdown">
               <a href="{{ route('student.home') }}" class="nav-link">
                 <i data-feather="home"></i><span>Home</span>
-            </a>
-            
-        </li>
-           
+            </a> 
+        </li>  
     <li class="dropdown">
-     
         <a href="{{ route('student.profile') }}" class="nav-link">
             <i data-feather="user"></i><span>Profile</span>
         </a>
-        
     </li>
-
+    <li class="dropdown">
+      <a href="#" class="nav-link"><i data-feather="clipboard"></i><span>Online Exam</span></a>
+    </li>
            <li class="dropdown">
             <a href="{{ route('student.notification') }}" class="nav-link">
             <i data-feather="bell"></i><span>Notifications 
@@ -123,7 +120,7 @@
              </a> 
             </li>
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
+              <a href="{{ route('student.chairmanvideo') }}" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
             </li>
             @if (auth()->user()->coaching_type != 'Offline')
             <li class="dropdown">
@@ -131,11 +128,12 @@
             </li>
             @endif
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
+              <a href="{{ route('student.examportion') }}" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
             </li>
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="bar-chart"></i><span>Mark Details</span></a>
             </li>
+            
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="edit"></i><span>Question Papers</span></a>
             </li>
