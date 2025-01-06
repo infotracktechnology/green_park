@@ -57,7 +57,7 @@
             <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>
             <td>
-              {{-- <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a> --}}
+              <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>
             </td>
             <td>
              <form action="{{ route('exam.destroy', $test->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">

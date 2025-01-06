@@ -1,20 +1,18 @@
 <?php
-
-use App\Http\Controllers\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\HostelController;
-
 use App\Http\Controllers\StaffProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
-use App\Models\Announcement;
-use App\Models\Student;
-use App\Http\Controllers\ChairmanVideoController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ExamPortionController;
+
+
+
 
 /*
 |-------------------------------------------------------------------------- 
@@ -38,7 +36,6 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
     Route::resource('student', 'App\Http\Controllers\StudentController');
-
     Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
 
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
@@ -52,13 +49,12 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
     Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
     Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
-
     Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
+  
     Route::resource('exam', 'App\Http\Controllers\ExamController');
     Route::resource('chairmanvideo', 'App\Http\Controllers\ChairmanVideoController');
     Route::get('exam/instruction/{test_id}', 'App\Http\Controllers\ExamController@instruction')->name('exam.instruction');
     Route::resource('examportion', 'App\Http\Controllers\ExamPortionController');
-
 });
 
 #students routes
@@ -68,8 +64,12 @@ Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentd
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
 Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
+Route::get('examinstruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.examinstruction');
+Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
 Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
 Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
+
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });
 
+Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
