@@ -13,7 +13,7 @@
             <div class="col-md-6 col-lg-12 col-xl-8">
                 <div class="card">
                   <div class="card-header">
-                    <h4><i class="fas fa-video"></i> Exam Portion</h4>
+                    <h4><i class="fas fa-file-pdf"></i> Exam Portion</h4>
                   </div>
                   <div class="card-body">
                     <span class="font-weight-bold">Title : {{ $examportion->title }}</span>

@@ -87,7 +87,6 @@
           </li>
         </ul>
       </nav>
-
       <div class="main-sidebar sidebar-style-2">
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
@@ -101,18 +100,16 @@
             <li class="dropdown">
               <a href="{{ route('student.home') }}" class="nav-link">
                 <i data-feather="home"></i><span>Home</span>
-            </a>
-            
-        </li>
-           
+            </a> 
+        </li>  
     <li class="dropdown">
-     
         <a href="{{ route('student.profile') }}" class="nav-link">
             <i data-feather="user"></i><span>Profile</span>
         </a>
-        
     </li>
-
+    <li class="dropdown">
+      <a href="#" class="nav-link"><i data-feather="clipboard"></i><span>Online Exam</span></a>
+    </li>
            <li class="dropdown">
             <a href="{{ route('student.notification') }}" class="nav-link">
             <i data-feather="bell"></i><span>Notifications 
@@ -136,6 +133,7 @@
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="bar-chart"></i><span>Mark Details</span></a>
             </li>
+            
             <li class="dropdown">
               <a href="#" class="nav-link"><i data-feather="edit"></i><span>Question Papers</span></a>
             </li>
