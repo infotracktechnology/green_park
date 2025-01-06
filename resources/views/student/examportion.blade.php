@@ -13,16 +13,28 @@
             <div class="col-md-6 col-lg-12 col-xl-8">
                 <div class="card">
                   <div class="card-header">
-                    <h4><i class="fas fa-file-pdf"></i> Exam Portion</h4>
+                    <h4><i style="font-size: 30px;" class="fas fa-file-pdf"></i> Exam Portion</h4>
                   </div>
                   <div class="card-body">
-                    <span class="font-weight-bold">Title : {{ $examportion->title }}</span>
-                    @if($examportion->attachment)
-                    <a href="/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
-                  <i class="fas fa-paperclip"></i> Attachment
-                    </a>
-                  @endif
-                    </div>
+                    <table class="table table-bordered table-striped">
+                      <tr>
+                        <th>Title</th>
+                        <td>{{ $examportion->title }}</td>
+                      </tr>
+                      <tr>
+                        <th>Attachment</th>
+                        <td>
+                          @if($examportion->attachment)
+                          <a href="/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-paperclip"></i> Download
+                          </a>
+                          @else
+                            <span class="text-danger">No Attachment Available</span>
+                          @endif
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
                                 
                   
