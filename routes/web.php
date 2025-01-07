@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ExamPortionController;
-
+use App\Http\Controllers\ChairmanVideoController;
 
 
 

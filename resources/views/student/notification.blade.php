@@ -52,7 +52,7 @@
                 <!-- Announcement -->
                 <div class="card">
                   <div class="card-header">
-                    <h4><i class="fas fa-bullhorn"></i> Announcements</h4>
+                    <h4><i style="font-size: 30px;" class="fas fa-bullhorn"></i> Announcements</h4>
                     {{-- <div class="card-header-action"> Total Announcement : {{ auth()->user()->announcement()->count() }} </div> --}}
                   </div>
                   <div class="card-body">
