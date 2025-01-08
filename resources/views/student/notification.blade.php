@@ -86,7 +86,7 @@
                                     </div>
                                     <div class="notice-board-item-date mt-2">
                                         @if($announcement->attachment)
-                                            <a href="/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-paperclip"></i> Attachment</a>
+                                            <a href="/public/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-paperclip"></i> Attachment</a>
                                         @endif
                                     </div>
                                 </div>
