@@ -7,6 +7,7 @@
   <title>@yield('title')</title>
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{{asset('css/app.min.css')}}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Template CSS -->
   <link rel="stylesheet" href="{{asset('css/style.css')}}">
   <link rel="stylesheet" href="{{asset('css/components.css')}}">
@@ -24,6 +25,28 @@
       color: red;
       font-weight: bold;
     }
+
+    .nav-link i {
+      font-size: 18px;
+      margin-right: 10px;
+      color: #333;
+    }
+
+    .notification-badge {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: red;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      line-height: 20px;
+      margin-left: 5px;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
   </style>
   @yield('css')
 </head>
@@ -36,8 +59,8 @@
       <nav class="navbar navbar-expand-lg bg-blue main-navbar sticky">
         <div class="form-inline mr-auto">
           <ul class="navbar-nav mr-3">
-            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i data-feather="align-justify"></i></a></li>
-            <li><a href="#" class="nav-link nav-link-lg fullscreen-btn"><i data-feather="maximize"></i></a></li>
+            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i class="fas fa-bars"></i></a></li>
+            <li><a href="#" class="nav-link nav-link-lg fullscreen-btn"><i class="fas fa-expand"></i></a></li>
             <li>
               <form class="form-inline mr-auto">
                 <div class="search-element">
@@ -71,7 +94,7 @@
           </li>
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-              <img alt="image" src="{{asset('img/user.png')}}" class="user-img-radious-style"> 
+              <img alt="image" src="{{asset('img/user.png')}}" class="user-img-radious-style">
               <span class="d-sm-none d-lg-inline-block"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
@@ -91,7 +114,7 @@
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
             <a href="#">
-              <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" /> 
+              <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" />
               <span class="logo-name">Green Park</span>
             </a>
           </div>
@@ -99,74 +122,75 @@
             <li class="menu-header">Main</li>
             <li class="dropdown">
               <a href="{{ route('student.home') }}" class="nav-link">
-                <i data-feather="home"></i><span>Home</span>
-            </a> 
-        </li>  
-    <li class="dropdown">
-        <a href="{{ route('student.profile') }}" class="nav-link">
-            <i data-feather="user"></i><span>Profile</span>
-        </a>
-    </li>
-    <li class="dropdown">
-      <a href="#" class="nav-link"><i data-feather="clipboard"></i><span>Online Exam</span></a>
-    </li>
-           <li class="dropdown">
-            <a href="{{ route('student.notification') }}" class="nav-link">
-            <i data-feather="bell"></i><span>Notifications 
-            @if (session('{{ auth()->user()->announcement->count() }}_new_announcement_count') > 0)
-              <span style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: red; color: white; font-weight: bold; line-height: 20px; text-align: center;">{{ session('new_announcement_count') }}</span>
-            @endif
-            </span>
-             </a> 
+                <i style="font-size: 20px;color:#2196f3;" class="fas fa-home"></i><span>Home</span>
+              </a>
             </li>
             <li class="dropdown">
-              <a href="{{ route('student.chairmanvideo') }}" class="nav-link"><i data-feather="video"></i><span>Chairman's Video</span></a>
+              <a href="{{ route('student.profile') }}" class="nav-link">
+                <i style="font-size: 20px;color:#2196f3;" class="fas fa-user-circle"></i><span>Profile</span>
+              </a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color:#2196f3;" class="fas fa-file-alt"></i><span>Online Exam</span>
+              </a>
+            </li>
+            <li class="dropdown">
+              <a href="{{ route('student.notification') }}" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-bell"></i><span>Notifications</span>
+              </a>
+            </li>
+            <li class="dropdown">
+              <a href="{{ route('student.chairmanvideo') }}" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-video"></i><span>Chairman's Video</span>
+              </a>
             </li>
             @if (auth()->user()->coaching_type != 'Offline')
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="pause-circle"></i><span>Class Videos</span></a>
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="	fas fa-play-circle"></i><span>Class video</span>
+              </a>
             </li>
             @endif
             <li class="dropdown">
-              <a href="{{ route('student.examportion') }}" class="nav-link"><i data-feather="file"></i><span>Exam Portions</span></a>
+              <a href="{{ route('student.examportion') }}" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-file-pdf"></i><span>Exam Portions</span>
+              </a>
             </li>
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="bar-chart"></i><span>Mark Details</span></a>
-            </li>
-            
-            <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="edit"></i><span>Question Papers</span></a>
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-chart-bar"></i><span>Mark Details</span>
+              </a>
             </li>
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="unlock"></i><span>Answer Key</span></a>
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-question-circle"></i><span>Question Papers</span>
+              </a>
             </li>
             <li class="dropdown">
-              <a href="#" class="nav-link"><i data-feather="download-cloud"></i><span>Downloads</span></a>
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-key"></i><span>Answer Key</span>
+              </a>
             </li>
             {{-- <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
-                <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
-                <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
-                <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a></li>
-              </ul>
-            </li>
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-comments"></i><span>Discussion Video</span>
+              </a>
+            </li> --}}
             <li class="dropdown">
-              <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color: #5daaf1;" class="fas fa-download"></i><span>Downloads</span>
+              </a>
             </li>
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
-                <li><a  href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
+            {{-- <li class="dropdown">
+              <a href="#" class="nav-link">
+                <i style="font-size: 20px;color: #2196f3;" class="fas fa-file-alt"></i><span>Worksheet & Answer Key</span>
+              </a>
             </li> --}}
           </ul>
         </aside>
       </div>
-
       @yield('main')
-
       <footer class="main-footer">
         <div class="footer-center">
           <a href="http://www.infotrackin.com/its/" target="_blank">
@@ -176,7 +200,6 @@
       </footer>
     </div>
   </div>
-
   <!-- General JS Scripts -->
   <script src="{{asset('js/app.min.js')}}"></script>
   <script src="{{asset('js/scripts.js')}}"></script>
@@ -199,8 +222,6 @@
         }
     });
 </script>
-
   @yield('js')
 </body>
-
 </html>
