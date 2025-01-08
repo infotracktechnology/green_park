@@ -86,8 +86,11 @@
                                 <td><span class="col-orange">{{ $exam->chemistry_questions }}</span></td>
                             </tr>
                             <tr style="padding:5px;">
-                                <td>Biology</td>
-                                <td><span class="col-orange">{{ $exam->biology_questions }}</span></td>
+                                <td>Botony</td>
+                                <td><span class="col-orange">{{ $exam->botony_questions }}</span></td>
+                            </tr>
+                            <tr style="padding:5px;">
+                                <td>Zoology</td><td><span class="col-orange">{{ $exam->zoology_questions }}</span></td>
                             </tr>
                             <tr style="padding:5px;">
                                 <td>Total</td>

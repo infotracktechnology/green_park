@@ -52,26 +52,32 @@
                                     <option value="All">All</option>
                                     <option value="Physics">Physics</option>
                                     <option value="Chemistry">Chemistry</option>
-                                    <option value="Biology">Biology</option>
+                                    <option value="Botony">Botony</option>
+                                    <option value="zoology">zoology</option>
                                  </select>
                               
                             </div>
-                            <div class="form-group col-lg-3">
+                            <div class="form-group col-lg-2">
                                 <label>Physics Questions</label>
                                 <input type="number" min="1" name="physics_questions" class="form-control form-control-sm">
                             </div>
                             
-                            <div class="form-group col-lg-3">
+                            <div class="form-group col-lg-2">
                                 <label>Chemistry Questions</label>
                                 <input type="number" min="1" name="chemistry_questions" class="form-control form-control-sm">
                             </div>
                             
-                            <div class="form-group col-lg-3">
-                                <label>Biology Questions</label>
-                                <input type="number" min="1" name="biology_questions" class="form-control form-control-sm">
+                            <div class="form-group col-lg-2">
+                                <label>Botony Questions</label>
+                                <input type="number" min="1" name="botony_questions" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="form-group col-lg-2">
+                                <label>Zoology Questions</label>
+                                <input type="number" min="1" name="zoology_questions" class="form-control form-control-sm">
                             </div>
                             
-                            <div class="form-group col-lg-3">
+                            <div class="form-group col-lg-2">
                                 <label>Total Questions</label>
                                 <input type="number" min="1" name="total_questions" id="total_questions" class="form-control form-control-sm" required>
                             </div>
@@ -80,26 +86,29 @@
 
 
 
-                            {{-- <div class="form-group col-lg-3">
-                                <label>Physics Start NO</label>
+                             <div class="form-group col-lg-2">
+                                <label>Physics Start No</label>
                                 <input type="number" min="1" name="phy_start" class="form-control form-control-sm" required>
                             </div>
 
 
 
-                            <div class="form-group col-lg-3">
+                            <div class="form-group col-lg-2">
                                 <label>Chemistry Start No</label>
                                 <input type="number" min="1" name="chem_start" class="form-control form-control-sm" required>
                             </div>
 
 
 
-                            <div class="form-group col-lg-3">
-                                <label>Biology Start No</label>
-                                <input type="number" min="1" name="bio_start" class="form-control form-control-sm" required>
-                            </div> --}}
+                            <div class="form-group col-lg-2">
+                                <label>Botony Start No</label>
+                                <input type="number" min="1" name="bot_start" class="form-control form-control-sm" required>
+                            </div> 
 
-                          
+                          <div class="form-group col-lg-2">
+                                <label>Zoology Start No</label>
+                                <input type="number" min="1" name="zoo_start" class="form-control form-control-sm" required>
+                            </div>
 
 
                             <div class="form-group col-lg-3">
@@ -141,19 +150,22 @@ function filesize(input) {
 <script>
     const phyQuestionsInput = document.querySelector('input[name="physics_questions"]');
     const chemQuestionsInput = document.querySelector('input[name="chemistry_questions"]');
-    const bioQuestionsInput = document.querySelector('input[name="biology_questions"]');
+    const botonyQuestionsInput = document.querySelector('input[name="botony_questions"]');
+    const zoologyQuestionsInput = document.querySelector('input[name="zoology_questions"]');
     const totalQuestionsInput = document.querySelector('input[name="total_questions"]');
 
     phyQuestionsInput.addEventListener('input', calculateTotalQuestions);
     chemQuestionsInput.addEventListener('input', calculateTotalQuestions);
-    bioQuestionsInput.addEventListener('input', calculateTotalQuestions);
+    botonyQuestionsInput.addEventListener('input', calculateTotalQuestions);
+    zoologyQuestionsInput.addEventListener('input', calculateTotalQuestions);
 
     function calculateTotalQuestions() {
         const phyQuestions = parseInt(phyQuestionsInput.value) || 0;
         const chemQuestions = parseInt(chemQuestionsInput.value) || 0;
-        const bioQuestions = parseInt(bioQuestionsInput.value) || 0;
+        const botonyQuestions = parseInt(botonyQuestionsInput.value) || 0;
+        const zoologyQuestions = parseInt(zoologyQuestionsInput.value) || 0;
 
-        const totalQuestions = phyQuestions + chemQuestions + bioQuestions;
+        const totalQuestions = phyQuestions + chemQuestions + botonyQuestions + zoologyQuestions;
 
         totalQuestionsInput.value = totalQuestions;
     }
