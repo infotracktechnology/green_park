@@ -52,7 +52,7 @@
                 <!-- Announcement -->
                 <div class="card">
                   <div class="card-header">
-                    <h4><i class="fas fa-bullhorn"></i> Announcements</h4>
+                    <h4><i style="font-size: 30px;" class="fas fa-bullhorn"></i> Announcements</h4>
                     {{-- <div class="card-header-action"> Total Announcement : {{ auth()->user()->announcement()->count() }} </div> --}}
                   </div>
                   <div class="card-body">
@@ -86,7 +86,7 @@
                                     </div>
                                     <div class="notice-board-item-date mt-2">
                                         @if($announcement->attachment)
-                                            <a href="/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-paperclip"></i> Attachment</a>
+                                            <a href="/public/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-paperclip"></i> Attachment</a>
                                         @endif
                                     </div>
                                 </div>
