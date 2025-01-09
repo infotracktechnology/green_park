@@ -48,7 +48,7 @@
                             </div>
                             <div class="form-group col-lg-3">
                                 <label>Subject Name</label>
-                                <select name="subject_name" id="subject_name" class="form-control form-control-sm" required>
+                                <select name="subject_name[]" id="subject_name" multiple class="select" required>
                                     <option value="All">All</option>
                                     <option value="Physics">Physics</option>
                                     <option value="Chemistry">Chemistry</option>
@@ -88,26 +88,26 @@
 
                              <div class="form-group col-lg-2">
                                 <label>Physics Start No</label>
-                                <input type="number" min="1" name="phy_start" class="form-control form-control-sm" required>
+                                <input type="number" min="1" name="phy_start" class="form-control form-control-sm">
                             </div>
 
 
 
                             <div class="form-group col-lg-2">
                                 <label>Chemistry Start No</label>
-                                <input type="number" min="1" name="chem_start" class="form-control form-control-sm" required>
+                                <input type="number" min="1" name="chem_start" class="form-control form-control-sm">
                             </div>
 
 
 
                             <div class="form-group col-lg-2">
                                 <label>Botony Start No</label>
-                                <input type="number" min="1" name="bot_start" class="form-control form-control-sm" required>
+                                <input type="number" min="1" name="bot_start" class="form-control form-control-sm">
                             </div> 
 
                           <div class="form-group col-lg-2">
                                 <label>Zoology Start No</label>
-                                <input type="number" min="1" name="zoo_start" class="form-control form-control-sm" required>
+                                <input type="number" min="1" name="zoo_start" class="form-control form-control-sm">
                             </div>
 
 

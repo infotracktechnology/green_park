@@ -41,7 +41,7 @@
                 @csrf
             <input type="hidden" name="test_id" value="{{ $exam->id }}">
             <div class="row exam-paper">
-                <div class="col-md-9">
+                <div class="col-md-8">
                     <table>
                         <tbody>
                             <tr>
@@ -74,29 +74,26 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-md-3">
-                    <table border="1" style="width: 100%;">
-                        <tbody>
-                            <tr style="padding:5px;">
-                                <td>Physics</td>
-                                <td><span class="col-orange">{{ $exam->physics_questions }}</span></td>
+                <div class="col-md-4" style="border:dotted;">
+                    <table class="table table-borderless mb-0 test-questions">
+                        <thead>
+                            <tr>
+                                <td> <a class="not-attempted countNotVisited">1</a></td>
+                                <td>Not Visited</td>
+                                <td> <a class="not-answered countNotAnswered">1</a></td>
+                                <td>Not Answered</td>
                             </tr>
-                            <tr style="padding:5px;">
-                                <td>Chemistry</td>
-                                <td><span class="col-orange">{{ $exam->chemistry_questions }}</span></td>
+                            <tr>
+                                <td> <a class="que-save countAnswered">1</a></td>
+                                <td>Answered</td>
+                                <td> <a class="que-mark countMarked">1</a></td>
+                                <td>Marked for Review</td>
                             </tr>
-                            <tr style="padding:5px;">
-                                <td>Botony</td>
-                                <td><span class="col-orange">{{ $exam->botony_questions }}</span></td>
+                            <tr>
+                                <td><a class="que-save-mark countAnsweredAndMarked">1</a></td>
+                                <td colspan="3">Answered &amp; Marked for Review (will be considered for evaluation)</td>
                             </tr>
-                            <tr style="padding:5px;">
-                                <td>Zoology</td><td><span class="col-orange">{{ $exam->zoology_questions }}</span></td>
-                            </tr>
-                            <tr style="padding:5px;">
-                                <td>Total</td>
-                                <td><span class="col-orange">{{ $exam->total_questions }}</span></td>
-                            </tr>
-                        </tbody>
+                        </thead>
                     </table>
                 </div>
                 <div class="col-md-8">
@@ -104,28 +101,31 @@
                     <div class="question-container p-t-30 p-b-10">
                         <input type="hidden" name="total_question" value="{{ count($exam->questions) }}">
                         @foreach ($exam->questions as $index => $question)
-                        <div id="question-{{ $index }}" class="question" style="display: {{ $index === 0 ? 'block' : 'none' }};">
+                        <?php
+                        $key = $index + 1;
+                        ?>
+                        <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
                             <div class="question-panel" style="overflow-y: scroll;max-height: 400px;overflow-x: hidden;">
-                            <h4>Question {{ $index + 1 }}</h4>
+                            <h4>Question {{ $key }}</h4>
                             <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
                         
                             <table class="table table-borderless mb0">
                                 <tbody>
                                     <tr>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="1"> 1 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="2"> 2 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="3"> 3 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="4"> 4 ) </td>
+                                        <td> <input type="radio" name="question[{{ $key }}]" value="1"> 1 ) </td>
+                                        <td> <input type="radio" name="question[{{ $key }}]" value="2"> 2 ) </td>
+                                        <td> <input type="radio" name="question[{{ $key }}]" value="3"> 3 ) </td>
+                                        <td> <input type="radio" name="question[{{ $key }}]" value="4"> 4 ) </td>
                                     </tr>
                                 </tbody>
                             </table>
                             </div>
                             
                         
-                            <button type="button" class="btn-save btn btn-success" data-index="{{ $index }}">Save & Next</button>
-                            <button type="button" class="btn-reset btn btn-light" data-index="{{ $index }}">Clear</button>
-                            <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $index }}">Save &amp; Mark For Review</button>
-                            <button type="button" class="btn-mark btn btn-primary" data-index="{{ $index }}">Mark for Review & Next</button>
+                            <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}">Save & Next</button>
+                            <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
+                            <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $key }}">Save &amp; Mark For Review</button>
+                            <button type="button" class="btn-mark btn btn-primary" data-index="{{ $key }}">Mark for Review & Next</button>
                             
                         </div>
                         @endforeach
@@ -138,34 +138,30 @@
                      </div>
                 </div>
                 <div class="col-md-4">
-                    <div style="border:dotted;margin:10px 0px;">
-                        <table class="table table-borderless mb-0 test-questions">
-                            <thead>
-                                <tr>
-                                    <td> <a class="not-attempted countNotVisited">1</a></td>
-                                    <td>Not Visited</td>
-                                    <td> <a class="not-answered countNotAnswered">1</a></td>
-                                    <td>Not Answered</td>
+                    <div>
+                       
+
+                        <table>
+                            <tbody>
+                                <tr style="padding:5px;">
+                                    <td><button type="button" class="btn btn-link" {{ $exam->phy_start ? "onclick=openQuestion($exam->phy_start)" : "" }}>Physics {{ $exam->physics_questions }}</button></td>
+                                    <td><button type="button" class="btn btn-link" {{ $exam->chem_start ? "onclick=openQuestion($exam->chem_start)" : "" }}>Chemistry {{ $exam->chemistry_questions }}</button></td>
+                                    <td><button type="button" class="btn btn-link" {{ $exam->bio_start ? "onclick=openQuestion($exam->bot_start)" : "" }}>Botony {{ $exam->botony_questions }}</button></td>
+                                    <td><button type="button" class="btn btn-link" {{ $exam->zoo_start ? "onclick=openQuestion($exam->zoo_start)" : "" }}>Zoology{{ $exam->zoology_questions }}</button></td>
+                                    <td><button type="button" class="btn btn-link">Total {{ $exam->total_questions }}</button></td>
                                 </tr>
-                                <tr>
-                                    <td> <a class="que-save countAnswered">1</a></td>
-                                    <td>Answered</td>
-                                    <td> <a class="que-mark countMarked">1</a></td>
-                                    <td>Marked for Review</td>
-                                </tr>
-                                <tr>
-                                    <td><a class="que-save-mark countAnsweredAndMarked">1</a></td>
-                                    <td colspan="3">Answered &amp; Marked for Review (will be considered for evaluation)</td>
-                                </tr>
-                            </thead>
+                            </tbody>
                         </table>
                     </div>
 
                     <div class="panel" style="overflow-y: scroll;">
                         <ul class="pagination test-questions my-4">
                             @foreach ($exam->questions as $index => $question)
-                            <li data-seq="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}">
-                                <a href="javascript:void(0);" class="{{ $index === 0 ? 'not-answered' : 'not-attempted' }}" data-index="{{ $index }}">{{ $index  < 9 ? '0' : '' }}{{ $index + 1 }}</a>
+                            <?php
+                            $key = $index + 1;
+                            ?>
+                            <li data-seq="{{ $key }}" class="{{ $key === 1 ? 'active' : '' }}">
+                                <a href="javascript:void(0);" class="{{ $key === 1 ? 'not-answered' : 'not-attempted' }}" data-index="{{$key }}">{{ $key  < 9 ? '0' : '' }}{{ $key }}</a>
                             </li>
                             @endforeach
                         </ul>
@@ -375,7 +371,7 @@
     });
 
     startTimer();
-    openQuestion(0);
+    openQuestion(1);
     updateCounts();
 
 </script>
