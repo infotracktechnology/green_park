@@ -37,6 +37,7 @@ class ExamController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('questions');
+        $data['subject_name'] = implode(',', $request->subject_name);
         $data['status'] = 'perview';
         foreach ($request->questions as $key => $question) {
             $filename = time().'-'.$key.'.'.$question->getClientOriginalExtension();
