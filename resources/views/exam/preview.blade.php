@@ -144,11 +144,11 @@
                         <table>
                             <tbody>
                                 <tr style="padding:5px;">
-                                    <td><button type="button" class="btn btn-link" {{ $exam->phy_start ? "onclick=openQuestion($exam->phy_start)" : "" }}>Physics {{ $exam->physics_questions }}</button></td>
-                                    <td><button type="button" class="btn btn-link" {{ $exam->chem_start ? "onclick=openQuestion($exam->chem_start)" : "" }}>Chemistry {{ $exam->chemistry_questions }}</button></td>
-                                    <td><button type="button" class="btn btn-link" {{ $exam->bio_start ? "onclick=openQuestion($exam->bot_start)" : "" }}>Botony {{ $exam->botony_questions }}</button></td>
-                                    <td><button type="button" class="btn btn-link" {{ $exam->zoo_start ? "onclick=openQuestion($exam->zoo_start)" : "" }}>Zoology{{ $exam->zoology_questions }}</button></td>
-                                    <td><button type="button" class="btn btn-link">Total {{ $exam->total_questions }}</button></td>
+                                    <td><button type="button" class="btn btn-primary" {{ $exam->phy_start ? "onclick=openQuestion($exam->phy_start)" : "" }}>Physics({{ $exam->physics_questions }})</button></td>
+                                    <td><button type="button" class="btn btn-primary" {{ $exam->chem_start ? "onclick=openQuestion($exam->chem_start)" : "" }}>Chemistry ({{ $exam->chemistry_questions }})</button></td>
+                                    <td><button type="button" class="btn btn-primary" {{ $exam->bio_start ? "onclick=openQuestion($exam->bot_start)" : "" }}>Botany ({{ $exam->botony_questions }})</button></td>
+                                    <td><button type="button" class="btn btn-primary" {{ $exam->zoo_start ? "onclick=openQuestion($exam->zoo_start)" : "" }}>Zoology({{ $exam->zoology_questions }})</button></td>
+                                    <td><button type="button" class="btn btn-primary">Total ({{ $exam->total_questions }})</button></td>
                                 </tr>
                             </tbody>
                         </table>
