@@ -21,10 +21,13 @@
      <div class="card card-primary">
       <div class="card-body">
        <div class="row">
-        <div class="col-md-9 col-sm-12 mb-3">
+        <div class="col-md-8 col-sm-12 mb-3">
          <h6 class="col-deep-purple">Examinations</h6>
         </div>
-        <div class="col-md-3 col-sm-12 mb-3">
+        <div class="col-md-2 col-sm-12 mb-3">
+            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addShechedule">Add Shechedule</button>
+           </div>
+        <div class="col-md-2 col-sm-12 mb-3">
          <a href="{{route('exam.create')}}" class="btn btn-primary btn-block">Add Test</a>
         </div>
        </div>
@@ -37,8 +40,9 @@
             <th>Branch</th>
             <th>Coaching Type</th>
             <th>Name</th>
+            <th>Subject</th>
             <th>Total Questions</th>
-            <th>Duration</th>
+            <th>Perview</th>
             <th>Action</th>
            </tr>
           </thead>
@@ -47,11 +51,14 @@
            @foreach ($tests as $test)
            <tr>
             <td>{{ $test->id }}</td>
-            <td>{{ $test->branch->name }}</td>
+            <td>{{ strpos($test->branch_id, ',') ? 'All' : $test->branch->name }}</td>
             <td>{{ $test->coaching_type }}</td>
             <td>{{ $test->name }}</td>
+            <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>
-            <td>{{ $test->duration }}</td>
+            <td>
+              <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>
+            </td>
             <td>
              <form action="{{ route('exam.destroy', $test->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">
               @csrf 
@@ -73,8 +80,52 @@
     </div>
    </div>
   </div>
+
+
+
  </section>
 </div>
+
+<div class="modal fade" id="addShechedule">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Test Schedule</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ route('exam.index') }}" method="get" enctype="multipart/form-data">
+            <div class="row">
+            <div class="form-group col-12">
+              <label for="branch">Test</label>
+              <select name="test_id" id="test_id" class="form-control form-control-sm" required>
+                <option value="">Select Test</option>
+                @foreach ($tests as $test)
+                <option value="{{ $test->id }}">{{ $test->name }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group col-12">
+                <label>Start Datetime</label>
+                <input type="datetime-local" name="start_at" class="form-control form-control-sm" required>
+              </div>
+
+              <div class="form-group col-12">
+                <label>End Datetime</label>
+                <input type="datetime-local" name="end_at" class="form-control form-control-sm" required>
+              </div>
+
+              <div class="form-group col-12">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 @endsection 
 
 @section('js')

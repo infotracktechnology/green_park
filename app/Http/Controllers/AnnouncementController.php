@@ -13,10 +13,7 @@ class AnnouncementController extends Controller
 
     public function index(Request $request)
     {
-        $announcements = DB::table('announcement')
-            ->join('branch', 'announcement.branch', '=', 'branch.id')
-            ->select('announcement.*', 'branch.name as branch')
-            ->get();
+        $announcements = Announcement::all();
         return view('announcement.index', compact('announcements'));
     }
     public function create()
@@ -28,12 +25,23 @@ class AnnouncementController extends Controller
 
     public function store(Request $request)
     {
-        foreach ($request->branch as $branch) {
-            $data = $request->except('branch');
-            $data['branch'] = $branch;
-            $announcement = Announcement::create($data);
+        
+        $announcement = new Announcement();
+        $announcement->branch = $request->branch;
+        $announcement->coaching_type = $request->coaching_type;
+        $announcement->gender = $request->gender;
+        $announcement->title = $request->title;
+        $announcement->content = $request->content;
+        if ($request->hasFile('attachment')) {
+            $fileName = time() . '.' . $request->attachment->extension();
+            $request->attachment->move(public_path('assets/attachments'), $fileName);
+            $announcement->attachment = 'assets/attachments/' . $fileName;
+        } else {
+            $announcement->attachment = null;
         }
-        //$announcement = Announcement::create($request->all());
+        $announcement->category = $request->coaching_type === 'Offline' ? $request->category : null;
+    
+        $announcement->save();
         return to_route('announcement.index');
     }
 
@@ -57,12 +65,12 @@ class AnnouncementController extends Controller
         return to_route('announcement.index');
     }
     
-    public function notification()
-{
-  
-    return view('student.notification');
-
-}
+    public function notification(Request $request)
+    {
+        $announcements=Announcement::all();
+        return view('student.notification', compact('announcements'));
+    }
+    
 
 
 }
