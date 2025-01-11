@@ -46,84 +46,85 @@
                                 <label>Test Name</label>
                                 <input type="text" name="name" id="name" class="form-control form-control-sm" required>
                             </div>
-                            <div class="form-group col-lg-3">
-                                <label>Subject Name</label>
-                                <select name="subject_name[]" id="subject_name" multiple class="select" required>
-                                    <option value="All">All</option>
-                                    <option value="Physics">Physics</option>
-                                    <option value="Chemistry">Chemistry</option>
-                                    <option value="Botony">Botony</option>
-                                    <option value="zoology">zoology</option>
-                                 </select>
+                        
+                            <div class="form-group  col-lg-12 d-flex align-items-star ">
                               
-                            </div>
-                            <div class="form-group col-lg-2">
-                                <label>Physics Questions</label>
-                                <input type="number" min="1" name="physics_questions" class="form-control form-control-sm">
-                            </div>
-                            
-                            <div class="form-group col-lg-2">
-                                <label>Chemistry Questions</label>
-                                <input type="number" min="1" name="chemistry_questions" class="form-control form-control-sm">
-                            </div>
-                            
-                            <div class="form-group col-lg-2">
-                                <label>Botony Questions</label>
-                                <input type="number" min="1" name="botony_questions" class="form-control form-control-sm">
-                            </div>
-
-                            <div class="form-group col-lg-2">
-                                <label>Zoology Questions</label>
-                                <input type="number" min="1" name="zoology_questions" class="form-control form-control-sm">
+                                <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                                    <input type="checkbox" id="physicsCheckbox" name=subject_name[] value="Physics" class="form-check-input">
+                                    <label for="physicsCheckbox" class="form-check-label">Physics</label>
+                                </div>
+                                <div class="col-lg-3 physics-inputs" style="display: none;">
+                                    <label for="physicsQuestions">Physics Questions</label>
+                                    <input type="number" min="1" name="physics_questions" id="physicsQuestions" class="form-control form-control-sm" disabled>
+                                </div>
+                                <div class="col-lg-3 physics-inputs" style="display: none;">
+                                    <label for="physicsStart">Physics Start No</label>
+                                    <input type="number" min="1" name="phy_start" id="physicsStart" class="form-control form-control-sm" disabled>
+                                </div>
                             </div>
                             
-                            <div class="form-group col-lg-2">
-                                <label>Total Questions</label>
-                                <input type="number" min="1" name="total_questions" id="total_questions" class="form-control form-control-sm" required>
+                            <div class="form-group  col-lg-12 d-flex align-items-star ">
+                               
+                                <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                                    <input type="checkbox" id="chemistryCheckbox" name=subject_name[] value="Chemistry" class="form-check-input">
+                                    <label for="chemistryCheckbox" class="form-check-label">Chemistry</label>
+                                </div>
+                                <div class="col-lg-3 chemistry-inputs" style="display: none;">
+                                    <label for="chemistryQuestions">Chemistry Questions</label>
+                                    <input type="number" min="1" name="chemistry_questions" id="chemistryQuestions" class="form-control form-control-sm" disabled>
+                                </div>
+                                <div class="col-lg-3 chemistry-inputs" style="display: none;">
+                                    <label for="chemistryStart">Chemistry Start No</label>
+                                    <input type="number" min="1" name="chem_start" id="chemistryStart" class="form-control form-control-sm" disabled>
+                                </div>
                             </div>
                             
-                           
-
-
-
-                             <div class="form-group col-lg-2">
-                                <label>Physics Start No</label>
-                                <input type="number" min="1" name="phy_start" class="form-control form-control-sm">
-                            </div>
-
-
-
-                            <div class="form-group col-lg-2">
-                                <label>Chemistry Start No</label>
-                                <input type="number" min="1" name="chem_start" class="form-control form-control-sm">
-                            </div>
-
-
-
-                            <div class="form-group col-lg-2">
-                                <label>Botony Start No</label>
-                                <input type="number" min="1" name="bot_start" class="form-control form-control-sm">
-                            </div> 
-
-                          <div class="form-group col-lg-2">
-                                <label>Zoology Start No</label>
-                                <input type="number" min="1" name="zoo_start" class="form-control form-control-sm">
-                            </div>
-
-
-                            <div class="form-group col-lg-3">
-                                <label>Questions Files</label>
-                                <input type="file" name="questions[]" class="form-control form-control-sm" multiple required accept="image/*" onchange="filesize(this);">
+                            <div class="form-group  col-lg-12 d-flex align-items-star ">
+                               
+                                <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                                    <input type="checkbox" id="botanyCheckbox" name=subject_name[] value="Botany" class="form-check-input">
+                                    <label for="botanyCheckbox" class="form-check-label">Botany</label>
+                                </div>
+                                <div class="col-lg-3 botany-inputs" style="display: none;">
+                                    <label for="botanyQuestions">Botany Questions</label>
+                                    <input type="number" min="1" name="botony_questions" id="botanyQuestions" class="form-control form-control-sm" disabled>
+                                </div>
+                                <div class="col-lg-3 botany-inputs" style="display: none;">
+                                    <label for="botanyStart">Botany Start No</label>
+                                    <input type="number" min="1" name="bot_start" id="botanyStart" class="form-control form-control-sm" disabled>
+                                </div>
                             </div>
                             
-
+                            <div class="form-group  col-lg-12 d-flex align-items-star ">
+                               
+                                <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                                    <input type="checkbox" id="zoologyCheckbox" name=subject_name[] value="Zoology" class="form-check-input">
+                                    <label for="zoologyCheckbox" class="form-check-label">Zoology</label>
+                                </div>
+                                <div class="col-lg-3 zoology-inputs" style="display: none;">
+                                    <label for="zoologyQuestions">Zoology Questions</label>
+                                    <input type="number" min="1" name="zoology_questions" id="zoologyQuestions" class="form-control form-control-sm" disabled>
+                                </div>
+                                <div class="col-lg-3 zoology-inputs" style="display: none;">
+                                    <label for="zoologyStart">Zoology Start No</label>
+                                    <input type="number" min="1" name="zoo_start" id="zoologyStart" class="form-control form-control-sm" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group col-lg-12 row">
+                                <div class="form-group col-lg-2">
+                                    <label>Total Questions</label>
+                                    <input type="number" min="1" name="total_questions" id="total_questions" class="form-control form-control-sm" required>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label>Questions Files</label>
+                                    <input type="file" name="questions[]" class="form-control form-control-sm" multiple required accept="image/*" onchange="filesize(this);">
+                                </div>
+                            </div>
                             
                                 <div class="form-group col-lg-12">
                                    <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
-
-                          
-
 
                            </div>
                         </div>
@@ -135,8 +136,6 @@
    </section>
 </div>
 @endsection
-
-
 @section('js')
 <script>
 function filesize(input) {
@@ -146,29 +145,85 @@ function filesize(input) {
     }
 }
 </script>
-
 <script>
-    const phyQuestionsInput = document.querySelector('input[name="physics_questions"]');
-    const chemQuestionsInput = document.querySelector('input[name="chemistry_questions"]');
-    const botonyQuestionsInput = document.querySelector('input[name="botony_questions"]');
-    const zoologyQuestionsInput = document.querySelector('input[name="zoology_questions"]');
-    const totalQuestionsInput = document.querySelector('input[name="total_questions"]');
+    document.addEventListener('DOMContentLoaded', function () {
+        const subjects = [
+            { checkbox: 'physicsCheckbox', inputs: 'physics-inputs' },
+            { checkbox: 'chemistryCheckbox', inputs: 'chemistry-inputs' },
+            { checkbox: 'botanyCheckbox', inputs: 'botany-inputs' },
+            { checkbox: 'zoologyCheckbox', inputs: 'zoology-inputs' }
+        ];
+    
+        subjects.forEach(subject => {
+            const checkbox = document.getElementById(subject.checkbox);
+            const inputs = document.querySelectorAll(`.${subject.inputs}`);
+    
+            checkbox.addEventListener('change', function () {
+                const isChecked = this.checked;
+                inputs.forEach(input => {
+                    input.style.display = isChecked ? 'block' : 'none';
+                    const inputElement = input.querySelector('input');
+                    if (inputElement) {
+                        inputElement.disabled = !isChecked;
+                        if (!isChecked) {
+                            inputElement.value = '';
+                        }
+                    }
+                });
+                
+            });
+            
+        });
+       
+    });
+    
+    </script>
+    
+<script>
+ document.addEventListener('DOMContentLoaded', function () {
+    const subjects = [
+        { checkbox: 'physicsCheckbox', input: 'physicsQuestions' },
+        { checkbox: 'chemistryCheckbox', input: 'chemistryQuestions' },
+        { checkbox: 'botanyCheckbox', input: 'botanyQuestions' },
+        { checkbox: 'zoologyCheckbox', input: 'zoologyQuestions' }
+    ];
 
-    phyQuestionsInput.addEventListener('input', calculateTotalQuestions);
-    chemQuestionsInput.addEventListener('input', calculateTotalQuestions);
-    botonyQuestionsInput.addEventListener('input', calculateTotalQuestions);
-    zoologyQuestionsInput.addEventListener('input', calculateTotalQuestions);
+    const totalQuestionsInput = document.getElementById('total_questions');
+
+    subjects.forEach(subject => {
+        const checkbox = document.getElementById(subject.checkbox);
+        const input = document.getElementById(subject.input);
+ checkbox.addEventListener('change', function () {
+            input.disabled = !checkbox.checked;
+            input.parentElement.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) input.value = ''; 
+            calculateTotalQuestions();
+        });
+
+       
+        input.addEventListener('input', calculateTotalQuestions);
+    });
 
     function calculateTotalQuestions() {
-        const phyQuestions = parseInt(phyQuestionsInput.value) || 0;
-        const chemQuestions = parseInt(chemQuestionsInput.value) || 0;
-        const botonyQuestions = parseInt(botonyQuestionsInput.value) || 0;
-        const zoologyQuestions = parseInt(zoologyQuestionsInput.value) || 0;
-
-        const totalQuestions = phyQuestions + chemQuestions + botonyQuestions + zoologyQuestions;
-
-        totalQuestionsInput.value = totalQuestions;
+        let total = 0;
+        subjects.forEach(subject => {
+            const input = document.getElementById(subject.input);
+            total += parseInt(input.value) || 0;
+        });
+        totalQuestionsInput.value = total;
     }
-</script>
+});
 
+</script>
+<script>
+    function filesize(input) {
+        const totalQuestions = parseInt(document.getElementById('total_questions').value);
+        const files = input.files;
+    
+        if (files.length !== totalQuestions) {
+            alert("The number of uploaded files must match the total number of questions exactly.");
+            input.value = ""; 
+        }
+    }
+    </script>
 @endsection

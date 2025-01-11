@@ -40,38 +40,41 @@ class ExamController extends Controller
         $data['subject_name'] = implode(',', $request->subject_name);
         $data['status'] = 'perview';
         foreach ($request->questions as $key => $question) {
-            $filename = time().'-'.$key.'.'.$question->getClientOriginalExtension();
+            $filename = time() . '-' . $key . '.' . $question->getClientOriginalExtension();
             $file = $question->move('questions', $filename);
-            $data['questions'][$key] = ['question' => $key, 'image' => "questions/".$filename];
+            $data['questions'][$key] = ['question' => $key, 'image' => "questions/" . $filename];
         }
-        $exam = Exam::create($data);
+        Exam::create($data);
         session()->flash('success', 'Test created successfully');
         return to_route('exam.index');
     }
-    function show(Request $request, Exam $exam){
-       return view('exam.preview',compact('exam'));
+    function show(Request $request, Exam $exam)
+    {
+        return view('exam.preview', compact('exam'));
     }
-    function instruction(Request $request,$test_id){
-        return view('exam.instruction',compact('test_id'));
+    function instruction(Request $request, $test_id)
+    {
+        return view('exam.instruction', compact('test_id'));
     }
 
-    function submit(Request $request){
-       $student_id = auth()->guard('student')->check() ? auth()->user()->id : 0;
-       $exam_answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
-       for ($i=0;$i<$request->total_question;$i++) { 
-        DB::table('exam_answer')->insert([
-            'test_id' => $request->test_id,
-            'q_no' => $i+1,
-            'answer' => $request->question[$i] ?? 0,
-        ]);
-       }
-       return $student_id ? to_route('studentdashboard') : to_route('exam.index');
+    function submit(Request $request)
+    {
+        $student_id = auth()->guard('student')->check() ? auth()->user()->id : 0;
+        $exam_answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
+        for ($i = 0; $i < $request->total_question; $i++) {
+            DB::table('exam_answer')->insert([
+                'test_id' => $request->test_id,
+                'q_no' => $i + 1,
+                'answer' => $request->question[$i] ?? 0,
+            ]);
+        }
+        return $student_id ? to_route('studentdashboard') : to_route('exam.index');
     }
 
 
     function destroy(Request $request, Exam $exam)
     {
-        foreach($exam->questions as $key => $question){
+        foreach ($exam->questions as $key => $question) {
             unlink($question['image']);
         }
         $exam->delete();
@@ -79,12 +82,13 @@ class ExamController extends Controller
         return to_route('exam.index');
     }
 
-    function student_instruction(Request $request,$test_id){
-        return view('exam.student_instruction',compact('test_id'));
+    function student_instruction(Request $request, $test_id)
+    {
+        return view('exam.student_instruction', compact('test_id'));
     }
-    function student_preview(Request $request,$test_id){
+    function student_preview(Request $request, $test_id)
+    {
         $exam = Exam::find($test_id);
-        return view('exam.student',compact('exam'));
+        return view('exam.student', compact('exam'));
     }
-
 }
