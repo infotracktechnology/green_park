@@ -121,13 +121,11 @@
                             </table>
                             </div>
                             
-                        
                             <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}">Save & Next</button>
                             <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
                             <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $key }}">Save &amp; Mark For Review</button>
                             <button type="button" class="btn-mark btn btn-primary" data-index="{{ $key }}">Mark for Review & Next</button>
-                            
-                        </div>
+                         </div>
                         @endforeach
                     </div>
 
@@ -139,21 +137,23 @@
                 </div>
                 <div class="col-md-4">
                     <div>
-                       
-
-                        <table>
-                            <tbody>
-                                <tr style="padding:5px;">
-                                    <td><button type="button" class="btn btn-primary" {{ $exam->phy_start ? "onclick=openQuestion($exam->phy_start)" : "" }}>Physics({{ $exam->physics_questions }})</button></td>
-                                    <td><button type="button" class="btn btn-primary" {{ $exam->chem_start ? "onclick=openQuestion($exam->chem_start)" : "" }}>Chemistry ({{ $exam->chemistry_questions }})</button></td>
-                                    <td><button type="button" class="btn btn-primary" {{ $exam->bio_start ? "onclick=openQuestion($exam->bot_start)" : "" }}>Botany ({{ $exam->botony_questions }})</button></td>
-                                    <td><button type="button" class="btn btn-primary" {{ $exam->zoo_start ? "onclick=openQuestion($exam->zoo_start)" : "" }}>Zoology({{ $exam->zoology_questions }})</button></td>
-                                    <td><button type="button" class="btn btn-primary">Total ({{ $exam->total_questions }})</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <button type="button" class="btn btn-primary m-1" {{ $exam->phy_start ? "onclick=openQuestion($exam->phy_start)" : "" }}>
+                            Physics ({{ $exam->physics_questions }})
+                        </button>
+                        <button type="button" class="btn btn-primary m-1" {{ $exam->chem_start ? "onclick=openQuestion($exam->chem_start)" : "" }}>
+                            Chemistry ({{ $exam->chemistry_questions }})
+                        </button>
+                        <button type="button" class="btn btn-primary m-1" {{ $exam->bot_start ? "onclick=openQuestion($exam->bot_start)" : "" }}>
+                            Botany ({{ $exam->botany_questions }})
+                        </button>
+                        <button type="button" class="btn btn-primary m-1" {{ $exam->zoo_start ? "onclick=openQuestion($exam->zoo_start)" : "" }}>
+                            Zoology ({{ $exam->zoology_questions }})
+                        </button>
+                        <button type="button" class="btn btn-primary m-1">
+                            Total ({{ $exam->total_questions }})
+                        </button>
                     </div>
-
+                
                     <div class="panel" style="overflow-y: scroll;">
                         <ul class="pagination test-questions my-4">
                             @foreach ($exam->questions as $index => $question)
@@ -161,11 +161,12 @@
                             $key = $index + 1;
                             ?>
                             <li data-seq="{{ $key }}" class="{{ $key === 1 ? 'active' : '' }}">
-                                <a href="javascript:void(0);" class="{{ $key === 1 ? 'not-answered' : 'not-attempted' }}" data-index="{{$key }}">{{ $key  < 9 ? '0' : '' }}{{ $key }}</a>
+                                <a href="javascript:void(0);" class="{{ $key === 1 ? 'not-answered' : 'not-attempted' }}" data-index="{{$key }}">{{ $key < 10 ? '0' : '' }}{{ $key }}</a>
                             </li>
                             @endforeach
                         </ul>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -212,10 +213,12 @@
 
 @section('js')
 <script>
+
     var timer = 7200;
     var activeQuestion = 0;
     const questions = @json($exam->questions);
     const form = $('#myForm');
+    const studentId = {{ Auth::guard('student')->check() ? Auth::guard('student')->user()->id : 'null' }}; // Ensure student ID is retrieved correctly
 
     function startTimer() {
         const interval = setInterval(function () {
@@ -234,21 +237,18 @@
         }, 1000);
     }
 
-
     function openQuestion(index) {
         $('.question').hide();
         $(`#question-${index}`).show();
         $('.pagination li').removeClass('active');
         $(`.pagination li[data-seq="${index}"]`).addClass('active');
         const a = $(`.pagination li[data-seq="${index}"] a`);
-        if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) 
-        {
+        if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
             $(a).addClass("not-answered").removeClass("not-attempted");
         }
         activeQuestion = index;
         updateCounts();
     }
-
 
     function updateCounts() {
         let notVisited = 0;
@@ -274,35 +274,32 @@
         $('.countAnsweredAndMarked').text(answeredAndMarked);
     }
 
- 
     $('.btn-save').click(function () {
         const index = $(this).data('index');
         const radio = $(`#question-${index} input[type="radio"]`);
-        if(!radio.is(':checked')) {
+        if (!radio.is(':checked')) {
             alert('Please select an answer first.');
             return;
         }
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save-mark')
             .addClass('que-save');
-            NextQuestion(index);
+        NextQuestion(index);
     });
-
 
     $('.btn-save-mark-answer').click(function () {
         const index = $(this).data('index');
         const radio = $(`#question-${index} input[type="radio"]`);
-        if(!radio.is(':checked')) {
+        if (!radio.is(':checked')) {
             alert('Please select an answer first.');
             return;
         }
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save')
             .addClass('que-save-mark');
-            NextQuestion(index);
+        NextQuestion(index);
     });
 
-   
     $('.btn-mark').click(function () {
         const index = $(this).data('index');
         $(`.pagination li[data-seq="${index}"] a`)
@@ -311,14 +308,37 @@
         NextQuestion(index);
     });
 
-   
     $('.btn-reset').click(function () {
         const index = $(this).data('index');
+        const questionId = questions[index - 1].id; // Assuming questions array has question IDs
+
         $(`#question-${index} input[type="radio"]`).prop('checked', false);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('que-save que-mark que-save-mark')
             .addClass('not-answered');
-            updateCounts();
+        updateCounts();
+
+        // Send AJAX request to store cleared answer
+        if (studentId !== 'null') {
+            $.ajax({
+                url: '{{ route("exam.clearAnswer") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    student_id: studentId,
+                    question_id: questionId,
+                    test_id: {{ $exam->id }}
+                },
+                success: function(response) {
+
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to store cleared answer:', error);
+                }
+            });
+        } else {
+            console.error('Student is not authenticated.');
+        }
     });
 
     $('.pagination a').click(function (e) {
@@ -333,7 +353,6 @@
     $('#btnNextQue').click(function () {
         NextQuestion(activeQuestion);
     });
-
 
     function timefinish() {
         alert('Time is up! Submitting all answers.');
@@ -362,8 +381,9 @@
     $('#btnYesSubmitConfirm').click(function () {
         form.submit();
     });
+
     $('#btnNoSubmitConfirm').click(function () {
-        if(timer === 0) {
+        if (timer === 0) {
             form.submit();
         }
         $('.exam-paper').show();
@@ -373,6 +393,5 @@
     startTimer();
     openQuestion(1);
     updateCounts();
-
 </script>
 @endsection
