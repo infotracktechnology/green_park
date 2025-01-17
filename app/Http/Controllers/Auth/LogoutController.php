@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use illuminate\Database\Eloquent\Model;
 
 class LogoutController extends Controller
 {
@@ -16,8 +17,18 @@ class LogoutController extends Controller
      */
     public function logout(Request $request)
     {
-        // Log the user out
-        Auth::logout();
+        if (Auth::guard('student')->check()) {
+            // Update the active column to 0
+            $student = Auth::guard('student')->user();
+            $student->active = 0;
+            if ($student instanceof \Illuminate\Database\Eloquent\Model) {
+                $student->save();
+            }
+
+            Auth::guard('student')->logout();
+        } elseif (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+        }
 
         // Destroy all session data
         $request->session()->flush();
