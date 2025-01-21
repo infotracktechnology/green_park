@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
+use App\Models\Exam; // Import the Exam model
 use Illuminate\Support\Facades\DB;
 
 
@@ -57,8 +58,8 @@ class StudentController extends Controller
         $districts = DB::table('district_list')->where('State', $Student->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
-        
-        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes','Student'));
+
+        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes', 'Student'));
     }
 
 
@@ -109,16 +110,19 @@ class StudentController extends Controller
 
         return redirect()->route('section.student')->with('success', 'Student details successfully updated.');
     }
-        public function profile()
+    public function profile()
     {
-             return view('student.profile');
+        return view('student.profile');
     }
-        public function home()
+    public function home()
     {
-            return view('student.home');
+        return view('student.home');
     }
-        public function dashboard()
+
+    public function dashboard()
     {
-            return view('dashboards.studentdashboard');
+
+
+        return view('dashboards.studentdashboard');
     }
 }

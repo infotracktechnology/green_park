@@ -47,6 +47,10 @@
       top: 10px;
       right: 15px;
     }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
   @yield('css')
 </head>
@@ -110,86 +114,86 @@
           </li>
         </ul>
       </nav>
-      <div class="main-sidebar sidebar-style-2">
+      <div class="main-sidebar sidebar-style-2" id="sidebar" >
         <aside id="sidebar-wrapper">
-          <div class="sidebar-brand">
-            <a href="#">
-              <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" />
-              <span class="logo-name">Green Park</span>
-            </a>
-          </div>
-          <ul class="sidebar-menu">
-            <li class="menu-header">Main</li>
-            <li class="dropdown">
-              <a href="{{ route('student.home') }}" class="nav-link">
-                <i style="font-size: 20px;color:#2196f3;" class="fas fa-home"></i><span>Home</span>
-              </a>
+            <div class="sidebar-brand">
+                <a href="#">
+                    <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" />
+                    <span class="logo-name">Green Park</span>
+                </a>
+            </div>
+            <ul class="sidebar-menu">
+              <li class="menu-header">Main</li>
+
+              <li class="dropdown exam-link">
+                <a href="#" class="nav-link">
+                    <i style="font-size: 20px;color:#2196f3;" class="fas fa-file-alt"></i><span>Online Exam</span>
+                </a>
             </li>
-            <li class="dropdown">
-              <a href="{{ route('student.profile') }}" class="nav-link">
-                <i style="font-size: 20px;color:#2196f3;" class="fas fa-user-circle"></i><span>Profile</span>
-              </a>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color:#2196f3;" class="fas fa-file-alt"></i><span>Online Exam</span>
-              </a>
-            </li>
-            <li class="dropdown">
-              <a href="{{ route('student.notification') }}" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-bell"></i><span>Notifications</span>
-              </a>
-            </li>
-            <li class="dropdown">
-              <a href="{{ route('student.chairmanvideo') }}" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-video"></i><span>Chairman's Video</span>
-              </a>
-            </li>
-            @if (auth()->user()->coaching_type != 'Offline')
-            <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="	fas fa-play-circle"></i><span>Class video</span>
-              </a>
-            </li>
-            @endif
-            <li class="dropdown">
-              <a href="{{ route('student.examportion') }}" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-file-pdf"></i><span>Exam Portions</span>
-              </a>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-chart-bar"></i><span>Mark Details</span>
-              </a>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-question-circle"></i><span>Question Papers</span>
-              </a>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-key"></i><span>Answer Key</span>
-              </a>
-            </li>
-            {{-- <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-comments"></i><span>Discussion Video</span>
-              </a>
-            </li> --}}
-            <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color: #5daaf1;" class="fas fa-download"></i><span>Downloads</span>
-              </a>
-            </li>
-            {{-- <li class="dropdown">
-              <a href="#" class="nav-link">
-                <i style="font-size: 20px;color: #2196f3;" class="fas fa-file-alt"></i><span>Worksheet & Answer Key</span>
-              </a>
-            </li> --}}
+              <!-- Always visible menu items -->
+              <li class="dropdown exam-link">
+                  <a href="{{ route('student.home') }}" class="nav-link">
+                      <i style="font-size: 20px;color:#2196f3;" class="fas fa-home"></i><span>Home</span>
+                  </a>
+              </li>
+              <li class="dropdown exam-link">
+                  <a href="{{ route('student.profile') }}" class="nav-link">
+                      <i style="font-size: 20px;color:#2196f3;" class="fas fa-user-circle"></i><span>Profile</span>
+                  </a>
+              </li>
+             
+          
+              <!-- Conditionally hide menu items during exam -->
+            
+                  <li class="dropdown non-exam-link">
+                      <a href="{{ route('student.notification') }}" class="nav-link">
+                          <i style="font-size: 20px;color: #2196f3;" class="fas fa-bell"></i><span>Notifications</span>
+                      </a>
+                  </li>
+                  <li class="dropdown non-exam-link">
+                      <a href="{{ route('student.chairmanvideo') }}" class="nav-link">
+                          <i style="font-size: 20px;color: #2196f3;" class="fas fa-video"></i><span>Chairman's Video</span>
+                      </a>
+                  </li>
+                  @if (auth()->user()->coaching_type != 'Offline')
+                  <li class="dropdown non-exam-link">
+                      <a href="#" class="nav-link">
+                          <i style="font-size: 20px;color: #2196f3;" class="fas fa-play-circle"></i><span>Class video</span>
+                      </a>
+                  </li>
+                  @endif
+                  <li class="dropdown non-exam-link">
+                      <a href="{{ route('student.examportion') }}" class="nav-link">
+                          <i style="font-size: 20px;color: #2196f3;" class="fas fa-file-pdf"></i><span>Exam Portions</span>
+                      </a>
+                  </li>
+                  <li class="dropdown non-exam-link">
+                      <a href="#" class="nav-link">
+                          <i style="font-size: 20px;color: #2196f3;" class="fas fa-chart-bar"></i><span>Mark Details</span>
+                      </a>
+                  </li>
+                  <li class="dropdown non-exam-link">
+                      <a href="#" class="nav-link">
+                          <i style="font-size: 20px;color: #2196f3;" class="fas fa-question-circle"></i><span>Question Papers</span>
+                      </a>
+                  </li>
+                  <li class="dropdown non-exam-link">
+                      <a href="#" class="nav-link">
+                          <i style="font-size: 20px;color: #2196f3;" class="fas fa-key"></i><span>Answer Key</span>
+                      </a>
+                  </li>
+                  <li class="dropdown non-exam-link">
+                      <a href="#" class="nav-link">
+                          <i style="font-size: 20px;color: #5daaf1;" class="fas fa-download"></i><span>Downloads</span>
+                      </a>
+                  </li>
+             
           </ul>
+          
+          
         </aside>
-      </div>
+    </div>
+    
       @yield('main')
       <footer class="main-footer">
         <div class="footer-center">
@@ -221,7 +225,8 @@
             window.location.reload(); 
         }
     });
-</script>
+  </script>
+  
   @yield('js')
 </body>
 </html>
