@@ -119,10 +119,13 @@ class StudentController extends Controller
         return view('student.home');
     }
 
+
     public function dashboard()
     {
-
-
-        return view('dashboards.studentdashboard');
+        $coachingType = auth()->user()->coaching_type;
+        $branchId = auth()->user()->branch_id;
+        $isExamOngoing = Exam::getOngoingExams($coachingType, $branchId) ? true : false;
+    
+        return view('dashboards.studentdashboard', compact('isExamOngoing'));
     }
 }

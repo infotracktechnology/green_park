@@ -84,11 +84,81 @@ class ExamController extends Controller
 
     function student_instruction(Request $request, $test_id)
     {
-        return view('exam.student_instruction', compact('test_id'));
+        return view('student.instruction', compact('test_id'));
     }
-    function student_preview(Request $request, $test_id)
+    function student_exam(Request $request, $test_id)
     {
-        $exam = Exam::find($test_id);
-        return view('exam.student', compact('exam'));
+        $exam = Exam::findorFail(base64_decode($test_id));
+        $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
+    
+        if($second < 0){
+            abort(404);
+        }
+        return view('student.exam', compact('exam', 'second'));
     }
+
+public function storeData(Request $request)
+{
+    
+    $this->validate($request, [
+        'id' => 'required',
+        'student_id' => 'required',
+        'test_id' => 'required',
+        'q_no' => 'required',
+        'action' => 'required'
+    ]);
+
+    Exam::create([
+        'id' => $request->input('id'),
+        'student_id' => $request->input('student_id'),
+        'test_id' => $request->input('test_id'),
+        'q_no' => $request->input('q_no'),
+        'action' => $request->input('action')
+    ]);
+
+    return redirect()->back();
+}
+
+    // public function enable(Request $request)
+    // {
+    //     // Logic to re-enable the exam for a student
+    //     // Example:
+    //     $studentId = $request->input('student_id');
+    //     $examId = $request->input('exam_id');
+
+    //     // Fetch the exam and student records and update status
+    //     DB::table('exam_student')
+    //         ->where('student_id', $studentId)
+    //         ->where('exam_id', $examId)
+    //         ->update(['status' => 'enabled']);
+
+    //     return redirect()->back()->with('success', 'Exam re-enabled for the student.');
+    // }
+
+
+    // public function examCompleted()
+    // {
+    //     // Example logic to determine if the exam is completed
+    //     $examCompleted = auth()->user()->exam_completed; // or any condition you use
+    //     return view('your-view-name', ['examCompleted' => $examCompleted]);
+    // }
+    
+    // public function dashboard()
+    // {
+    //     $exam = Exam::where('student_id', auth()->guard('student')->user()->id)->first();
+        
+    //     $examStatus = 'not_ongoing'; // Default status
+    //     if ($exam) {
+    //         $currentTime = now();
+    //         $examStartTime = $exam->start_at;
+    //         $examEndTime = $exam->end_at;
+
+    //         if ($currentTime >= $examStartTime && $currentTime <= $examEndTime) {
+    //             $examStatus = 'ongoing';
+    //         }
+    //     }
+
+    //     return view('dashboard', compact('exam', 'examStatus'));
+    // }
+    
 }

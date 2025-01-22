@@ -23,6 +23,7 @@ class Exam extends Model
         return $this->belongsTo(Branch::class,'branch_id','id');
     }
 
+
     public static function getOngoingExams($coachingType, $branchId)
 {
     return self::where('start_at', '<=', now())  

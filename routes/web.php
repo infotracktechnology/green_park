@@ -64,11 +64,10 @@ Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentd
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
 Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
-Route::get('examinstruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.examinstruction');
-Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
 Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
 Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
-
+Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
+Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
 #Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
 });
 
