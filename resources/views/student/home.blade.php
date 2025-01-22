@@ -102,7 +102,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-md-6 col-lg-12 col-xl-6">
                 <!-- Announcements Section -->
                 <div class="card">
@@ -134,7 +134,7 @@
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <span class="text-muted small">Announcement #{{ $announcement->id }}</span>
-                                        <h5 class="mt-1 mb-2 text-primary" style="font-weight: bold;">{{ $announcement->title }}</h5>
+                                        <h5 class="mt-1 mb-2 text-primary" style="font-weight: bold;">{{ Latest Announcements$announcement->title }}</h5>
                                     </div>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@
                 </div>
                 <!-- Announcements Section -->
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>
 @endsection

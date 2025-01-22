@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 @section('title', 'Examinations')
 @section('css')
 <style>
@@ -50,7 +50,7 @@
                                             <tbody>
                                                 <tr>
                                                     <td style="padding: 0px 5px;">Candidate Name</td>
-                                                    <td> : <span class="col-orange">Admin</span></td>
+                                                    <td> : <span class="col-orange">{{ auth()->user()->student_name  }}</span></td>
                                                 </tr>
                                                 <tr>
                                                     <td style="padding: 0px 5px;">Exam Name</td>
@@ -217,7 +217,7 @@
 
 @section('js')
 <script>
-    var timer = 7200;
+    var timer = Number({{ $second }});
     var activeQuestion = 0;
     const questions = @json($exam->questions);
     const form = $('#myForm');

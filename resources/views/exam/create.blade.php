@@ -12,7 +12,7 @@
           <div class="row">
               <div class="col-12">
                   <div class="card card-primary">
-                     <form method="post" id="myForm" action="{{ route('exam.store') }}" enctype="multipart/form-data">
+                     <form method="post" id="myForm" action="{{ route('exam.store') }}" enctype="multipart/form-data" onsubmit="return validateForm()">
                         @csrf
                         <div class="card-body">
                            <div class="row">
@@ -139,9 +139,12 @@
 @section('js')
 <script>
 function filesize(input) {
-    if(["image/png", "image/jpeg", "image/jpg"].indexOf(file.type) == -1) {
-        alert("Please upload a valid image file!");
-        input.value = "";
+    const totalQuestions = parseInt(document.getElementById('total_questions').value);
+    const files = input.files;
+
+    if (files.length !== totalQuestions) {
+        alert("The number of uploaded files must match the total number of questions exactly.");
+        input.value = ""; 
     }
 }
 </script>
@@ -216,14 +219,26 @@ function filesize(input) {
 
 </script>
 <script>
-    function filesize(input) {
+    function validateForm() {
         const totalQuestions = parseInt(document.getElementById('total_questions').value);
-        const files = input.files;
-    
-        if (files.length !== totalQuestions) {
-            alert("The number of uploaded files must match the total number of questions exactly.");
-            input.value = ""; 
+        const startNumbers = [
+            { input: 'physicsStart', name: 'Physics' },
+            { input: 'chemistryStart', name: 'Chemistry' },
+            { input: 'botanyStart', name: 'Botany' },
+            { input: 'zoologyStart', name: 'Zoology' }
+        ];
+
+        for (let i = 0; i < startNumbers.length; i++) {
+            const startInput = document.getElementById(startNumbers[i].input);
+            if (startInput && startInput.value) {
+                const startNumber = parseInt(startInput.value);
+                if (startNumber > totalQuestions) {
+                    alert(`${startNumbers[i].name} start number cannot be higher than the total number of questions.`);
+                    return false;
+                }
+            }
         }
+        return true;
     }
-    </script>
+</script>
 @endsection
