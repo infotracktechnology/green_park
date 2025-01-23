@@ -119,6 +119,7 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <input type="hidden" name="status[{{ $key }}]" id="status-{{ $key }}" value="not answer">
                                 <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}">Save & Next</button>
                                 <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
                                 <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $key }}">Save &amp; Mark For Review</button>
@@ -275,6 +276,56 @@
         $('.countMarked').text(marked);
         $('.countAnsweredAndMarked').text(answeredAndMarked);
     }
+    function setStatus(index, status) {
+        document.getElementById('status-' + index).value = status;
+    }
+
+    $('.btn-save').click(function () {
+        const index = $(this).data('index');
+        const radio = $(`#question-${index} input[type="radio"]`);
+        if (!radio.is(':checked')) {
+            alert('Please select an answer first.');
+            return;
+        }
+        setStatus(index, 'answer');
+        $(`.pagination li[data-seq="${index}"] a`)
+            .removeClass('not-answered que-mark que-save-mark')
+            .addClass('que-save');
+        NextQuestion(index);
+    });
+
+    $('.btn-save-mark-answer').click(function () {
+        const index = $(this).data('index');
+        const radio = $(`#question-${index} input[type="radio"]`);
+        if (!radio.is(':checked')) {
+            alert('Please select an answer first.');
+            return;
+        }
+        setStatus(index, 'answer & mark');
+        $(`.pagination li[data-seq="${index}"] a`)
+            .removeClass('not-answered que-mark que-save')
+            .addClass('que-save-mark');
+        NextQuestion(index);
+    });
+
+    $('.btn-mark').click(function () {
+        const index = $(this).data('index');
+        setStatus(index, 'mark');
+        $(`.pagination li[data-seq="${index}"] a`)
+            .removeClass('not-answered que-save que-save-mark')
+            .addClass('que-mark');
+        NextQuestion(index);
+    });
+
+    $('.btn-reset').click(function () {
+        const index = $(this).data('index');
+        $(`#question-${index} input[type="radio"]`).prop('checked', false);
+        setStatus(index, 'clear');
+        $(`.pagination li[data-seq="${index}"] a`)
+            .removeClass('que-save que-mark que-save-mark')
+            .addClass('not-answered');
+        updateCounts();
+    });
 
     $('.btn-save').click(function () {
         const index = $(this).data('index');
