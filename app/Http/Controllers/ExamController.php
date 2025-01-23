@@ -56,21 +56,35 @@ class ExamController extends Controller
     {
         return view('exam.instruction', compact('test_id'));
     }
+ 
+    public function submit(Request $request)
+{
+    $student_id = $request->student_id ?? 0;
 
-    function submit(Request $request)
-    {
-        $student_id = auth()->guard('student')->check() ? auth()->user()->id : 0;
-        $exam_answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
-        for ($i = 0; $i < $request->total_question; $i++) {
+
+    DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
+
+    for ($i = 1; $i <= $request->total_question; $i++) {
+        if (isset($request->question[$i])) {
+            $status = $request->status[$i] ?? null;
+            $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
+
             DB::table('exam_answer')->insert([
                 'test_id' => $request->test_id,
-                'q_no' => $i + 1,
-                'answer' => $request->question[$i] ?? 0,
+                'student_id' => $student_id,
+                'q_no' => $i,
+                'answer' => $answer,
+                'status' => $status,
+                
             ]);
         }
-        return $student_id ? to_route('studentdashboard') : to_route('exam.index');
     }
+ 
+    return $student_id ? to_route('studentdashboard') : to_route('exam.index');
+}
+    
 
+    
 
     function destroy(Request $request, Exam $exam)
     {
@@ -84,40 +98,47 @@ class ExamController extends Controller
 
     function student_instruction(Request $request, $test_id)
     {
+        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->first();
+        if ($exam_answer) {
+            abort(403, 'You have already attempted this test');
+        }
         return view('student.instruction', compact('test_id'));
     }
     function student_exam(Request $request, $test_id)
     {
         $exam = Exam::findorFail(base64_decode($test_id));
         $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
-    
-        if($second < 0){
+        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->first();
+        if ($exam_answer) {
+            abort(403, 'You have already attempted this test');
+        }
+        if ($second < 0) {
             abort(404);
         }
         return view('student.exam', compact('exam', 'second'));
     }
 
-public function storeData(Request $request)
-{
-    
-    $this->validate($request, [
-        'id' => 'required',
-        'student_id' => 'required',
-        'test_id' => 'required',
-        'q_no' => 'required',
-        'action' => 'required'
-    ]);
+    public function storeData(Request $request)
+    {
 
-    Exam::create([
-        'id' => $request->input('id'),
-        'student_id' => $request->input('student_id'),
-        'test_id' => $request->input('test_id'),
-        'q_no' => $request->input('q_no'),
-        'action' => $request->input('action')
-    ]);
+        $this->validate($request, [
+            'id' => 'required',
+            'student_id' => 'required',
+            'test_id' => 'required',
+            'q_no' => 'required',
+            'action' => 'required'
+        ]);
 
-    return redirect()->back();
-}
+        Exam::create([
+            'id' => $request->input('id'),
+            'student_id' => $request->input('student_id'),
+            'test_id' => $request->input('test_id'),
+            'q_no' => $request->input('q_no'),
+            'action' => $request->input('action')
+        ]);
+
+        return redirect()->back();
+    }
 
     // public function enable(Request $request)
     // {
@@ -142,11 +163,11 @@ public function storeData(Request $request)
     //     $examCompleted = auth()->user()->exam_completed; // or any condition you use
     //     return view('your-view-name', ['examCompleted' => $examCompleted]);
     // }
-    
+
     // public function dashboard()
     // {
     //     $exam = Exam::where('student_id', auth()->guard('student')->user()->id)->first();
-        
+
     //     $examStatus = 'not_ongoing'; // Default status
     //     if ($exam) {
     //         $currentTime = now();
@@ -160,5 +181,5 @@ public function storeData(Request $request)
 
     //     return view('dashboard', compact('exam', 'examStatus'));
     // }
-    
+
 }
