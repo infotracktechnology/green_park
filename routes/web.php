@@ -52,9 +52,11 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
   
     Route::resource('exam', 'App\Http\Controllers\ExamController');
+
     Route::resource('chairmanvideo', 'App\Http\Controllers\ChairmanVideoController');
     Route::get('exam/instruction/{test_id}', 'App\Http\Controllers\ExamController@instruction')->name('exam.instruction');
     Route::resource('examportion', 'App\Http\Controllers\ExamPortionController');
+    
 });
 
 #students routes
@@ -72,3 +74,9 @@ Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
+// Route to show the form
+Route::get('exam/enable', [App\Http\Controllers\ExamController::class, 'enable'])->name('exam.enable');
+
+// Route to handle the form submission
+Route::post('/exam/enable', [App\Http\Controllers\ExamController::class, 'enableExam'])->name('exam.enableExam');
+

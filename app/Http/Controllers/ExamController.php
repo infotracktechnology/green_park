@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Exam;
+use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
@@ -105,18 +106,28 @@ class ExamController extends Controller
         return view('student.instruction', compact('test_id'));
     }
     function student_exam(Request $request, $test_id)
-    {
-        $exam = Exam::findorFail(base64_decode($test_id));
-        $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
-        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->first();
-        if ($exam_answer) {
-            abort(403, 'You have already attempted this test');
-        }
-        if ($second < 0) {
-            abort(404);
-        }
-        return view('student.exam', compact('exam', 'second'));
+{
+    $exam = Exam::findOrFail(base64_decode($test_id));
+    $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
+
+    // Check if the student has already attempted the exam
+    $exam_answer = DB::table('exam_answer')
+        ->where('test_id', base64_decode($test_id))
+        ->where('student_id', auth()->user()->id)
+        ->first();
+
+    // Allow retake only if the exam is enabled again
+    if ($exam_answer && !DB::table('enable_exam')->where('student_id', auth()->user()->id)->where('test_id', base64_decode($test_id))->exists()) {
+        abort(403, 'You have already attempted this test');
     }
+
+    if ($second < 0) {
+        abort(404); // Exam has ended
+    }
+
+    return view('student.exam', compact('exam', 'second'));
+}
+
 
     public function storeData(Request $request)
     {
@@ -139,7 +150,55 @@ class ExamController extends Controller
 
         return redirect()->back();
     }
+    public function enable(Request $request)
+    {
+        $tests = Exam::where('end_at', '>', Carbon::now())->get();
+        $students = collect();
 
+        if ($request->has('test_id')) {
+            $students = DB::table('students')
+            ->join('exam_answer', 'students.id', '=', 'exam_answer.student_id')
+            ->where('exam_answer.test_id', $request->test_id)
+            ->distinct()
+            ->select('students.user_name', 'students.id')
+            ->get();
+        }
+        
+
+        return view('exam.enable', compact('tests', 'students'));
+    }
+
+    public function enableExam(Request $request)
+    {
+        $request->validate([
+            'test_id' => 'required|exists:exams,id',
+            'student_id' => 'required|exists:students,id',
+        ]);
+
+        $studentId = $request->student_id;
+        $testId = $request->test_id;
+
+        // Delete previous exam answers for the student if any
+        DB::table('exam_answer')
+            ->where('student_id', $studentId)
+            ->where('test_id', $testId)
+            ->delete();
+
+        // Enable the exam for the student by inserting into enable_exam table
+        $enabledExam = DB::table('enable_exam')->updateOrInsert(
+            ['student_id' => $studentId, 'test_id' => $testId],
+            ['enabled_at' => now()]
+        );
+
+        if ($enabledExam) {
+            return redirect()->back()->with('success', 'Exam enabled successfully!');
+        }
+
+        return redirect()->back()->with('error', 'Failed to enable exam.');
+    }
+    
+    
+    
     // public function enable(Request $request)
     // {
     //     // Logic to re-enable the exam for a student
