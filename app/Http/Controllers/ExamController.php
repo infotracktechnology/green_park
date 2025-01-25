@@ -57,35 +57,33 @@ class ExamController extends Controller
     {
         return view('exam.instruction', compact('test_id'));
     }
- 
+
     public function submit(Request $request)
-{
-    $student_id = $request->student_id ?? 0;
+    {
+        $student_id = $request->student_id ?? 0;
 
 
-    DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
+        DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
 
-    for ($i = 1; $i <= $request->total_question; $i++) {
-        if (isset($request->question[$i])) {
-            $status = $request->status[$i] ?? null;
-            $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
+        for ($i = 1; $i <= $request->total_question; $i++) {
+                $status = $request->status[$i] ?? null;
+                $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
 
-            DB::table('exam_answer')->insert([
-                'test_id' => $request->test_id,
-                'student_id' => $student_id,
-                'q_no' => $i,
-                'answer' => $answer,
-                'status' => $status,
-                
-            ]);
+                DB::table('exam_answer')->insert([
+                    'test_id' => $request->test_id,
+                    'student_id' => $student_id,
+                    'q_no' => $i,
+                    'answer' => $answer,
+                    'status' => $status,
+
+                ]);
         }
-    }
- 
-    return $student_id ? to_route('studentdashboard') : to_route('exam.index');
-}
-    
 
-    
+        return $student_id ? to_route('studentdashboard') : to_route('exam.index');
+    }
+
+
+
 
     function destroy(Request $request, Exam $exam)
     {
@@ -106,114 +104,77 @@ class ExamController extends Controller
         return view('student.instruction', compact('test_id'));
     }
     function student_exam(Request $request, $test_id)
-{
-    $exam = Exam::findOrFail(base64_decode($test_id));
-    $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
-
-    // Check if the student has already attempted the exam
-    $exam_answer = DB::table('exam_answer')
-        ->where('test_id', base64_decode($test_id))
-        ->where('student_id', auth()->user()->id)
-        ->first();
-
-    // Allow retake only if the exam is enabled again
-    if ($exam_answer && !DB::table('enable_exam')->where('student_id', auth()->user()->id)->where('test_id', base64_decode($test_id))->exists()) {
-        abort(403, 'You have already attempted this test');
-    }
-
-    if ($second < 0) {
-        abort(404); // Exam has ended
-    }
-
-    return view('student.exam', compact('exam', 'second'));
-}
-
-
-    public function storeData(Request $request)
     {
+        $exam = Exam::findOrFail(base64_decode($test_id));
+        $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
 
-        $this->validate($request, [
-            'id' => 'required',
-            'student_id' => 'required',
-            'test_id' => 'required',
-            'q_no' => 'required',
-            'action' => 'required'
-        ]);
+        $exam_answer = DB::table('exam_answer')
+            ->where('test_id', base64_decode($test_id))
+            ->where('student_id', auth()->user()->id)
+            ->first();
 
-        Exam::create([
-            'id' => $request->input('id'),
-            'student_id' => $request->input('student_id'),
+        if ($second < 0) {
+            abort(404);
+        }
+
+        return view('student.exam', compact('exam', 'second'));
+    }
+
+
+    public function clearLog(Request $request)
+    {
+        DB::table('clear_log')->insert([
+            'student_id' => auth()->user()->id,
             'test_id' => $request->input('test_id'),
             'q_no' => $request->input('q_no'),
-            'action' => $request->input('action')
+            'action' => 'clear',
         ]);
 
-        return redirect()->back();
+        return response()->json(['message' => 'Log cleared successfully']);
     }
+    
+    
     public function enable(Request $request)
     {
         $tests = Exam::where('end_at', '>', Carbon::now())->get();
         $students = collect();
+        $testId = $request->input('test_id');
 
-        if ($request->has('test_id')) {
-            $students = DB::table('students')
-            ->join('exam_answer', 'students.id', '=', 'exam_answer.student_id')
-            ->where('exam_answer.test_id', $request->test_id)
+        if ($testId) {
+            $students = DB::table('student')  // Corrected table name
+            ->join('exam_answer', 'student.id', '=', 'exam_answer.student_id')
+            ->where('exam_answer.test_id', $testId)
             ->distinct()
-            ->select('students.user_name', 'students.id')
+            ->select('student.id', 'student.user_name')
             ->get();
-        }
-        
 
-        return view('exam.enable', compact('tests', 'students'));
+            // If it's an AJAX request, return students as JSON
+            if ($request->ajax()) {
+                return response()->json($students);
+            }
+        }
+
+        return view('exam.enable', compact('tests', 'students', 'testId'));
     }
 
     public function enableExam(Request $request)
     {
         $request->validate([
-            'test_id' => 'required|exists:exams,id',
-            'student_id' => 'required|exists:students,id',
+            'test_id' => 'required|exists:exam,id',
+            'student_id' => 'required|exists:student,id',
         ]);
-
+    
         $studentId = $request->student_id;
         $testId = $request->test_id;
-
+    
         // Delete previous exam answers for the student if any
         DB::table('exam_answer')
             ->where('student_id', $studentId)
             ->where('test_id', $testId)
             ->delete();
-
-        // Enable the exam for the student by inserting into enable_exam table
-        $enabledExam = DB::table('enable_exam')->updateOrInsert(
-            ['student_id' => $studentId, 'test_id' => $testId],
-            ['enabled_at' => now()]
-        );
-
-        if ($enabledExam) {
-            return redirect()->back()->with('success', 'Exam enabled successfully!');
-        }
-
-        return redirect()->back()->with('error', 'Failed to enable exam.');
+    
+        return redirect()->back()->with('success', 'Exam enabled successfully!');
     }
-    
-    
-    
-    // public function enable(Request $request)
-    // {
-    //     // Logic to re-enable the exam for a student
-    //     // Example:
-    //     $studentId = $request->input('student_id');
-    //     $examId = $request->input('exam_id');
-
-    //     // Fetch the exam and student records and update status
-    //     DB::table('exam_student')
-    //         ->where('student_id', $studentId)
-    //         ->where('exam_id', $examId)
-    //         ->update(['status' => 'enabled']);
-
-    //     return redirect()->back()->with('success', 'Exam re-enabled for the student.');
-    // }
 
 
     // public function examCompleted()

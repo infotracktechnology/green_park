@@ -223,7 +223,7 @@
     var activeQuestion = 0;
     const questions = @json($exam->questions);
     const form = $('#examForm');
-
+ 
     function startTimer() {
         const interval = setInterval(function () {
             if (timer > 0) {
@@ -282,6 +282,23 @@
         document.getElementById('status-' + index).value = status;
     }
 
+    function clearLog(testid, qno) {
+        $.ajax({
+            url: "{{ route('exam.clearlog') }}",
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            method: 'POST',
+            data: {
+                test_id: testid,
+                q_no: qno,
+            },
+            success: function (data) {
+                console.log(data);
+            },
+        });
+    }
+ 
     $('.btn-save').click(function () {
         const index = $(this).data('index');
         const radio = $(`#question-${index} input[type="radio"]`);
@@ -321,8 +338,13 @@
 
     $('.btn-reset').click(function () {
         const index = $(this).data('index');
+        if($(`#question-${index} input[type="radio"]`).is(':checked')) {
+            clearLog({{ $exam->id }}, index);
+        }
+
         $(`#question-${index} input[type="radio"]`).prop('checked', false);
         setStatus(index, 'clear');
+
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('que-save que-mark que-save-mark')
             .addClass('not-answered');
@@ -343,7 +365,7 @@
     });
 
     function timefinish() {
-        alert('Time is up! Submitting all answers.');
+        //alert('Time is up! Submitting all answers.');
         form.submit();
     }
 
@@ -362,13 +384,8 @@
     }
 
     $(".btn-submit-answer").click(function () {
-        // Validate start numbers before showing the summary
-        if (validateStartNumbers()) {
-            $('.exam-paper').hide();
-            $('.exam-summery').show();
-        } else {
-            alert('Start number for a subject is higher than the total number of questions.');
-        }
+        $('.exam-paper').hide();
+        $('.exam-summery').show();
     });
 
     $('#btnYesSubmitConfirm').click(function () {
@@ -383,22 +400,22 @@
         $('.exam-summery').hide();
     });
 
-    function validateStartNumbers() {
-        const totalQuestions = {{ $exam->total_questions }};
-        const startNumbers = [
-            {{ $exam->phy_start ?? 'null' }},
-            {{ $exam->chem_start ?? 'null' }},
-            {{ $exam->bot_start ?? 'null' }},
-            {{ $exam->zoo_start ?? 'null' }}
-        ];
+    // function validateStartNumbers() {
+    //     const totalQuestions = {{ $exam->total_questions }};
+    //     const startNumbers = [
+    //         {{ $exam->phy_start ?? 'null' }},
+    //         {{ $exam->chem_start ?? 'null' }},
+    //         {{ $exam->bot_start ?? 'null' }},
+    //         {{ $exam->zoo_start ?? 'null' }}
+    //     ];
 
-        for (let i = 0; i < startNumbers.length; i++) {
-            if (startNumbers[i] !== null && startNumbers[i] >= totalQuestions) {
-                return false;
-            }
-        }
-        return true;
-    }
+    //     for (let i = 0; i < startNumbers.length; i++) {
+    //         if (startNumbers[i] !== null && startNumbers[i] >= totalQuestions) {
+    //             return false;
+    //         }
+    //     }
+    //     return true;
+    // }
 
     startTimer();
     openQuestion(1);

@@ -403,13 +403,8 @@
     }
 
     $(".btn-submit-answer").click(function () {
-        // Validate start numbers before showing the summary
-        if (validateStartNumbers()) {
-            $('.exam-paper').hide();
-            $('.exam-summery').show();
-        } else {
-            alert('Start number for a subject is higher than the total number of questions.');
-        }
+        $('.exam-paper').hide();
+        $('.exam-summery').show();
     });
 
     $('#btnYesSubmitConfirm').click(function () {
@@ -424,22 +419,7 @@
         $('.exam-summery').hide();
     });
 
-    function validateStartNumbers() {
-        const totalQuestions = {{ $exam->total_questions }};
-        const startNumbers = [
-            {{ $exam->phy_start ?? 'null' }},
-            {{ $exam->chem_start ?? 'null' }},
-            {{ $exam->bot_start ?? 'null' }},
-            {{ $exam->zoo_start ?? 'null' }}
-        ];
 
-        for (let i = 0; i < startNumbers.length; i++) {
-            if (startNumbers[i] !== null && startNumbers[i] >= totalQuestions) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     startTimer();
     openQuestion(1);
