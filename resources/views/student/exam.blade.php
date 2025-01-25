@@ -36,9 +36,10 @@
 <div class="main-content">
     <section class="section">
         <div class="section-body">
-            <form method="post" id="myForm" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
+            <form method="post" id="examForm" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="test_id" value="{{ $exam->id }}">
+                <input type="hidden" name="student_id" value="{{ auth()->user()->id }}">
                 <div class="row exam-paper">
                     <div class="col-md-8">
                         <table>
@@ -119,6 +120,7 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <input type="hidden" name="status[{{ $key }}]" id="status-{{ $key }}" value="not answer">
                                 <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}">Save & Next</button>
                                 <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
                                 <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $key }}">Save &amp; Mark For Review</button>
@@ -220,7 +222,7 @@
     var timer = Number({{ $second }});
     var activeQuestion = 0;
     const questions = @json($exam->questions);
-    const form = $('#myForm');
+    const form = $('#examForm');
 
     function startTimer() {
         const interval = setInterval(function () {
@@ -276,6 +278,10 @@
         $('.countAnsweredAndMarked').text(answeredAndMarked);
     }
 
+    function setStatus(index, status) {
+        document.getElementById('status-' + index).value = status;
+    }
+
     $('.btn-save').click(function () {
         const index = $(this).data('index');
         const radio = $(`#question-${index} input[type="radio"]`);
@@ -283,6 +289,7 @@
             alert('Please select an answer first.');
             return;
         }
+        setStatus(index, 'answer');
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save-mark')
             .addClass('que-save');
@@ -296,6 +303,7 @@
             alert('Please select an answer first.');
             return;
         }
+        setStatus(index, 'answer & mark');
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save')
             .addClass('que-save-mark');
@@ -304,6 +312,7 @@
 
     $('.btn-mark').click(function () {
         const index = $(this).data('index');
+        setStatus(index, 'mark');
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-save que-save-mark')
             .addClass('que-mark');
@@ -313,6 +322,7 @@
     $('.btn-reset').click(function () {
         const index = $(this).data('index');
         $(`#question-${index} input[type="radio"]`).prop('checked', false);
+        setStatus(index, 'clear');
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('que-save que-mark que-save-mark')
             .addClass('not-answered');
