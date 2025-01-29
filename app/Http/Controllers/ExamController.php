@@ -199,7 +199,7 @@ class ExamController extends Controller
                 'ea.student_id',
                 'ea.test_id',
                 'e.name as exam_name',
-                DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'), // Format date as string
+                DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'), //Format date as string
                 'ea.q_no',
                 'ea.answer'
             )
