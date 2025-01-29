@@ -127,6 +127,7 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('exam.index') }}" class="nav-link"> Add Test</a></li>
                 <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
+                <li><a href="{{ route('exam.test') }}" class="nav-link">Test Report</a></li>
               </ul>
             </li>
             <li class="dropdown">

@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ExamPortionController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ChairmanVideoController;
 
 
@@ -58,6 +59,14 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('examportion', 'App\Http\Controllers\ExamPortionController');
     Route::get('enable/exam', [App\Http\Controllers\ExamController::class, 'enable'])->name('exam.enable');
     Route::post('enable/exam', [App\Http\Controllers\ExamController::class, 'enableExam'])->name('exam.enableExam');
+
+    // Route::get('test/exam', [App\Http\Controllers\ExamController::class, 'test'])->name('exam.test');
+    Route::get('test/exam', [ExamController::class, 'test'])->name('exam.test');
+Route::post('exam/test/download', [ExamController::class, 'downloadTestReport'])->name('exam.test.download');
+
+    
+
+
   
 });
 
