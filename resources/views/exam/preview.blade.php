@@ -389,7 +389,7 @@
     }
 
     function NextQuestion(index) {
-        if (index < questions.length - 1) {
+        if (index < questions.length) {
             openQuestion(index + 1);
         }
         return;
