@@ -66,17 +66,17 @@ class ExamController extends Controller
         DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
 
         for ($i = 1; $i <= $request->total_question; $i++) {
-                $status = $request->status[$i] ?? null;
-                $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
+            $status = $request->status[$i] ?? null;
+            $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
 
-                DB::table('exam_answer')->insert([
-                    'test_id' => $request->test_id,
-                    'student_id' => $student_id,
-                    'q_no' => $i,
-                    'answer' => $answer,
-                    'status' => $status,
+            DB::table('exam_answer')->insert([
+                'test_id' => $request->test_id,
+                'student_id' => $student_id,
+                'q_no' => $i,
+                'answer' => $answer,
+                'status' => $status,
 
-                ]);
+            ]);
         }
 
         return $student_id ? to_route('studentdashboard') : to_route('exam.index');
@@ -132,8 +132,8 @@ class ExamController extends Controller
 
         return response()->json(['message' => 'Log cleared successfully']);
     }
-    
-    
+
+
     public function enable(Request $request)
     {
         $tests = Exam::where('end_at', '>', Carbon::now())->get();
@@ -141,14 +141,14 @@ class ExamController extends Controller
         $testId = $request->input('test_id');
 
         if ($testId) {
-            $students = DB::table('student')  // Corrected table name
-            ->join('exam_answer', 'student.id', '=', 'exam_answer.student_id')
-            ->where('exam_answer.test_id', $testId)
-            ->distinct()
-            ->select('student.id', 'student.user_name')
-            ->get();
+            $students = DB::table('student')
+                ->join('exam_answer', 'student.id', '=', 'exam_answer.student_id')
+                ->where('exam_answer.test_id', $testId)
+                ->distinct()
+                ->select('student.id', 'student.user_name')
+                ->get();
 
-            // If it's an AJAX request, return students as JSON
+
             if ($request->ajax()) {
                 return response()->json($students);
             }
@@ -163,19 +163,103 @@ class ExamController extends Controller
             'test_id' => 'required|exists:exam,id',
             'student_id' => 'required|exists:student,id',
         ]);
-    
+
         $studentId = $request->student_id;
         $testId = $request->test_id;
-    
+
         // Delete previous exam answers for the student if any
         DB::table('exam_answer')
             ->where('student_id', $studentId)
             ->where('test_id', $testId)
             ->delete();
-    
+
         return redirect()->back()->with('success', 'Exam enabled successfully!');
     }
 
+    public function test()
+    {
+        $tests = Exam::all();
+        return view('exam.test', compact('tests'));
+    }
+
+
+    public function downloadTestReport(Request $request)
+    {
+        $testId = $request->input('test_id');
+        $reportData = DB::table('exam_answer as ea')
+            ->join('exam as e', 'e.id', '=', 'ea.test_id')
+            ->join('branch as b', 'b.id', '=', 'e.branch_id')
+            ->join('student as s', 's.id', '=', 'ea.student_id')
+            ->select(
+                's.coaching_type',
+                'b.name as branch_name',
+                's.user_name as username',
+                's.student_name',
+                's.section',
+                'ea.student_id',
+                'ea.test_id',
+                'e.name as exam_name',
+                DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'), // Format date as string
+                'ea.q_no',
+                'ea.answer'
+            )
+            ->where('ea.test_id', $testId)
+            ->get()
+            ->groupBy('student_id');
+
+        $headers = [
+            'Coaching Type',
+            'Branch Name',
+            'Username',
+            'Student Name',
+            'Section',
+            'Student ID',
+            'Test ID',
+            'Exam Name',
+            'Exam Date',
+        ];
+
+        $maxQuestions = $reportData->flatten()->max('q_no');
+
+        for ($i = 1; $i <= $maxQuestions; $i++) {
+            $headers[] = "A{$i}";
+        }
+
+        $csvData = [$headers];
+
+        foreach ($reportData as $studentId => $answers) {
+            $student = $answers->first();
+            $row = [
+                $student->coaching_type,
+                $student->branch_name,
+                $student->username,
+                $student->student_name,
+                $student->section,
+                $student->student_id,
+                $student->test_id,
+                $student->exam_name,
+                $student->exam_date,
+            ];
+
+            for ($i = 1; $i <= $maxQuestions; $i++) {
+                $row[] = $answers->firstWhere('q_no', $i)->answer ?? '';
+            }
+
+            $csvData[] = $row;
+        }
+
+        $filename = "test_report_{$testId}.csv";
+        return response()->stream(function () use ($csvData) {
+            $file = fopen('php://output', 'w');
+            foreach ($csvData as $line) {
+                fputcsv($file, $line);
+            }
+            fclose($file);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ]);
+    }
 
     // public function examCompleted()
     // {
