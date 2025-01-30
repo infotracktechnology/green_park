@@ -51,6 +51,6 @@ class Student extends Authenticatable
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
     }
 
- 
+   
    
 }

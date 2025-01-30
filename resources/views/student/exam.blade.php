@@ -75,7 +75,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-md-4" style="border:dotted;">
+                    <d0iv class="col-md-4" style="border:dotted;">
                         <table class="table table-borderless mb-0 test-questions">
                             <thead>
                                 <tr>

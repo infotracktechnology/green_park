@@ -16,18 +16,36 @@ class ExamController extends Controller
     public function index(Request $request)
     {
         $tests = Exam::all();
+
         if ($request->has('test_id')) {
             $test = Exam::find($request->test_id);
             $test->update([
                 'start_at' => Carbon::parse($request->start_at),
                 'end_at' => Carbon::parse($request->end_at),
+                'status' => 'scheduled',
                 'duration' => Carbon::parse($request->end_at)->diffInSeconds($request->start_at),
             ]);
+
             session()->flash('success', 'Test Scheduled successfully');
             return to_route('exam.index');
         }
+
+        $exams = DB::table('exam as e')
+            ->leftJoin('exam_answer as ea', 'e.id', '=', 'ea.test_id')
+            ->select('e.id as exam_id', 'e.name', DB::raw('COUNT(DISTINCT ea.student_id) as student_count'))
+            ->groupBy('e.id', 'e.name')
+            ->get();
+
+        // Merge student_count with tests
+        $tests = $tests->map(function ($test) use ($exams) {
+            $exam = $exams->firstWhere('exam_id', $test->id);
+            $test->student_count = $exam ? $exam->student_count : 0;
+            return $test;
+        });
+
         return view('exam.index', compact('tests'));
     }
+
     public function create()
     {
         $branches = Branch::all();
