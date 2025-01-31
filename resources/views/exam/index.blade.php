@@ -30,6 +30,7 @@
         <div class="col-md-2 col-sm-12 mb-3">
          <a href="{{route('exam.create')}}" class="btn btn-primary btn-block">Add Test</a>
         </div>
+        
        </div>
        <div class="col-12">
         <div class="table-responsive">
@@ -42,6 +43,8 @@
             <th>Name</th>
             <th>Subject</th>
             <th>Total Questions</th>
+            <th>status</th>
+            <th>Test attend</th>
             <th>Perview</th>
             <th>Action</th>
            </tr>
@@ -56,6 +59,12 @@
             <td>{{ $test->name }}</td>
             <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>
+            <td>
+              <span class="badge badge-{{ $test->status == 'scheduled' ? 'success' : 'danger' }}">{{ $test->status }}</span>
+          </td>
+            <td>{{ $test->student_count }}</td>
+            
+
             <td>
               <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>
             </td>
