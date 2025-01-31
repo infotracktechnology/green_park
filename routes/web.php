@@ -34,7 +34,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('auth.login');
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('branch', 'App\Http\Controllers\BranchController');
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
-   
+
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
     Route::resource('student', 'App\Http\Controllers\StudentController');
     Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
@@ -62,18 +62,12 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     // Route::get('test/exam', [App\Http\Controllers\ExamController::class, 'test'])->name('exam.test');
     Route::get('test/exam', [ExamController::class, 'test'])->name('exam.test');
-Route::post('exam/test/download', [ExamController::class, 'downloadTestReport'])->name('exam.test.download');
-
-    
-
-
-  
+    Route::post('exam/test/download', [ExamController::class, 'downloadTestReport'])->name('exam.test.download');
 });
 
 #students routes
 
 Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function () {
-
 Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentdashboard');
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
