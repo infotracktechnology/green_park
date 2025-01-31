@@ -33,7 +33,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('auth.login');
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('branch', 'App\Http\Controllers\BranchController');
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
-
+    
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
     Route::resource('student', 'App\Http\Controllers\StudentController');
     Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
