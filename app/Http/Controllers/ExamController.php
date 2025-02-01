@@ -55,6 +55,10 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'test_id' => 'required|numeric|unique:exam,test_id',
+        ]);
+
         $data = $request->except('questions');
         $data['subject_name'] = implode(',', $request->subject_name);
         $data['status'] = 'perview';

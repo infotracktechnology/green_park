@@ -41,6 +41,12 @@
                                     <option value="Online Live">Online Live</option>
                                  </select>
                               </div>
+                              <div class="form-group col-lg-3">
+                                <label>Test ID</label>
+                                <input type="number" name="test_id" id="test_id" class="form-control form-control-sm" required>
+                            </div>
+
+
 
                               <div class="form-group col-lg-3">
                                 <label>Test Name</label>
