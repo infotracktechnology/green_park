@@ -62,6 +62,10 @@
                                                     <td> : <span class="col-orange"> {{ $exam->subject_name }}</span></td>
                                                 </tr>
                                                 <tr>
+                                                    <td style="padding: 0px 5px;">Total Questions</td>
+                                                    <td> : <span class="col-orange"> {{ $exam->total_questions }}</span></td>
+                                                </tr>
+                                                <tr>
                                                     <td style="padding: 0px 5px;">Remaining Time</td>
                                                     <td>
                                                         : <span class="badge badge-danger" id="timerDisplay">00:00:00</span>
@@ -156,9 +160,9 @@
                                 Zoology ({{ $exam->zoology_questions }})
                             </button>
                             @endif
-                            <button type="button" class="btn btn-primary m-1">
+                            {{-- <button type="button" class="btn btn-primary m-1">
                                 Total ({{ $exam->total_questions }})
-                            </button>
+                            </button> --}}
                         </div>
                     
                         <div class="panel" style="overflow-y: scroll;">
@@ -327,48 +331,48 @@
         updateCounts();
     });
 
-    $('.btn-save').click(function () {
-        const index = $(this).data('index');
-        const radio = $(`#question-${index} input[type="radio"]`);
-        if (!radio.is(':checked')) {
-            alert('Please select an answer first.');
-            return;
-        }
-        $(`.pagination li[data-seq="${index}"] a`)
-            .removeClass('not-answered que-mark que-save-mark')
-            .addClass('que-save');
-        NextQuestion(index);
-    });
+    // $('.btn-save').click(function () {
+    //     const index = $(this).data('index');
+    //     const radio = $(`#question-${index} input[type="radio"]`);
+    //     if (!radio.is(':checked')) {
+    //         alert('Please select an answer first.');
+    //         return;
+    //     }
+    //     $(`.pagination li[data-seq="${index}"] a`)
+    //         .removeClass('not-answered que-mark que-save-mark')
+    //         .addClass('que-save');
+    //     NextQuestion(index);
+    // });
 
-    $('.btn-save-mark-answer').click(function () {
-        const index = $(this).data('index');
-        const radio = $(`#question-${index} input[type="radio"]`);
-        if (!radio.is(':checked')) {
-            alert('Please select an answer first.');
-            return;
-        }
-        $(`.pagination li[data-seq="${index}"] a`)
-            .removeClass('not-answered que-mark que-save')
-            .addClass('que-save-mark');
-        NextQuestion(index);
-    });
+    // $('.btn-save-mark-answer').click(function () {
+    //     const index = $(this).data('index');
+    //     const radio = $(`#question-${index} input[type="radio"]`);
+    //     if (!radio.is(':checked')) {
+    //         alert('Please select an answer first.');
+    //         return;
+    //     }
+    //     $(`.pagination li[data-seq="${index}"] a`)
+    //         .removeClass('not-answered que-mark que-save')
+    //         .addClass('que-save-mark');
+    //     NextQuestion(index);
+    // });
 
-    $('.btn-mark').click(function () {
-        const index = $(this).data('index');
-        $(`.pagination li[data-seq="${index}"] a`)
-            .removeClass('not-answered que-save que-save-mark')
-            .addClass('que-mark');
-        NextQuestion(index);
-    });
+    // $('.btn-mark').click(function () {
+    //     const index = $(this).data('index');
+    //     $(`.pagination li[data-seq="${index}"] a`)
+    //         .removeClass('not-answered que-save que-save-mark')
+    //         .addClass('que-mark');
+    //     NextQuestion(index);
+    // });
 
-    $('.btn-reset').click(function () {
-        const index = $(this).data('index');
-        $(`#question-${index} input[type="radio"]`).prop('checked', false);
-        $(`.pagination li[data-seq="${index}"] a`)
-            .removeClass('que-save que-mark que-save-mark')
-            .addClass('not-answered');
-        updateCounts();
-    });
+    // $('.btn-reset').click(function () {
+    //     const index = $(this).data('index');
+    //     $(`#question-${index} input[type="radio"]`).prop('checked', false);
+    //     $(`.pagination li[data-seq="${index}"] a`)
+    //         .removeClass('que-save que-mark que-save-mark')
+    //         .addClass('not-answered');
+    //     updateCounts();
+    // });
 
     $('.pagination a').click(function (e) {
         const index = $(this).data('index');

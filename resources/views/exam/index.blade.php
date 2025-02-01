@@ -40,6 +40,7 @@
             <th>Test Code</th>
             <th>Branch</th>
             <th>Coaching Type</th>
+            <th>Test ID</th>
             <th>Name</th>
             <th>Subject</th>
             <th>Total Questions</th>
@@ -56,6 +57,7 @@
             <td>{{ $test->id }}</td>
             <td>{{ strpos($test->branch_id, ',') ? 'All' : $test->branch->name }}</td>
             <td>{{ $test->coaching_type }}</td>
+            <td>{{ $test->test_id }}</td>
             <td>{{ $test->name }}</td>
             <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>

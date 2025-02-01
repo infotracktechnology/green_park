@@ -63,6 +63,10 @@
                                                     <td> : <span class="col-orange"> {{ $exam->subject_name }}</span></td>
                                                 </tr>
                                                 <tr>
+                                                    <td style="padding: 0px 5px;">Total Questions</td>
+                                                    <td> : <span class="col-orange"> {{ $exam->total_questions }}</span></td>
+                                                </tr>
+                                                <tr>
                                                     <td style="padding: 0px 5px;">Remaining Time</td>
                                                     <td>
                                                         : <span class="badge badge-danger" id="timerDisplay">00:00:00</span>
@@ -157,9 +161,9 @@
                                 Zoology ({{ $exam->zoology_questions }})
                             </button>
                             @endif
-                            <button type="button" class="btn btn-primary m-1">
+                            {{-- <button type="button" class="btn btn-primary m-1">
                                 Total ({{ $exam->total_questions }})
-                            </button>
+                            </button> --}}
                         </div>
                     
                         <div class="panel" style="overflow-y: scroll;">
