@@ -283,6 +283,50 @@ class ExamController extends Controller
         ]);
     }
 
+
+
+    public function offline()
+    {
+        return view('exam.offline');
+    }
+
+    public function offlineUpload(Request $request)
+    {
+    
+        $request->validate([
+            'offline' => 'required|mimes:csv|max:1024', // Only CSV files with a maximum size of 1 MB
+        ], [
+            'offline.required' => 'The  file is required.',
+            'offline.mimes' => 'The  file must be a file of type: csv.',
+            'offline.max' => 'The  file may not be greater than 1 MB.',
+        ]);
+        return back()->with('success', 'File uploaded successfully.');
+    }
+
+    public function answerKey()
+    {
+        return view('exam.answerkey');
+    }
+
+    public function uploadAnswerKey(Request $request)
+    {
+        $request->validate([
+            'answer_key' => 'required|mimes:csv|max:1024', 
+        ], [
+            'answer_key.required' => 'The answer key file is required.',
+            'answer_key.mimes' => 'The answer key file must be a file of type: csv.',
+            'answer_key.max' => 'The answer key file may not be greater than 1 MB.',
+        ]);
+
+    
+        return back()->with('success', 'File uploaded successfully.');
+    }
+
+
+
+   
+
+
     // public function examCompleted()
     // {
     //     // Example logic to determine if the exam is completed
