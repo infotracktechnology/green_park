@@ -15,12 +15,15 @@
                     <form method="post" id="myForm" action="{{ route('exam.offline.upload') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
+                            <div class="col-md-8 col-sm-12 mb-3">
+                                <h6 class="col-deep-purple">Offline/OMR Upload</h6>
+                               </div>
                             <div class="row">
-    
+                                
                                <!-- Test ID Dropdown -->
                                <div class="form-group col-lg-4">
-                                <label>Offline/OMR Upload</label>
-                                <input type="file" name="offline" class="form-control form-control-sm" required>
+                                <label>&nbsp;</label>
+                                <input type="file" name="offline" class="form-control form-control-sm" accept=".csv"  required>
                                 @if ($errors->has('offline'))
                                     <span class="text-danger">{{ $errors->first('offline') }}</span>
                                 @endif
