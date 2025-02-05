@@ -112,6 +112,7 @@
                                 <div class="question-panel" style="overflow-y: scroll;max-height: 400px;overflow-x: hidden;">
                                     <h4>Question {{ $key }}</h4>
                                     <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
+                                    <input type="hidden" name="subject[{{ $key }}]" value="{{ $question['subject'] }}">
                                     <table class="table table-borderless mb0">
                                         <tbody>
                                             <tr>

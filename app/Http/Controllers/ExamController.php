@@ -55,10 +55,6 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'test_id' => 'required|numeric|unique:exam,test_id',
-        ]);
-
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
         $data['subject_name'] = implode(',', $request->subject_name);
         $data['status'] = 'preview';
@@ -69,7 +65,7 @@ class ExamController extends Controller
             if ($request->hasFile($subject."_files")) {
                 foreach ($request->file($subject."_files") as $key => $file) {
                     $q_no = $key + 1;
-                    $filename = time() . '-' . $q_no . '.' . $file->getClientOriginalExtension();
+                    $filename = $request->id.'-'.$subject.'-'.$q_no.'.'.$file->getClientOriginalExtension();
                     $file->move('questions', $filename);
                     $questions[] = ['subject' => $subject, 'image' => "questions/" . $filename];
                 }
@@ -100,11 +96,13 @@ class ExamController extends Controller
 
         for ($i = 1; $i <= $request->total_question; $i++) {
             $status = $request->status[$i] ?? null;
+            $subject = $request->subject[$i] ?? null;
             $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
 
             DB::table('exam_answer')->insert([
                 'test_id' => $request->test_id,
                 'student_id' => $student_id,
+                'subject' => $subject,
                 'q_no' => $i,
                 'answer' => $answer,
                 'status' => $status,
