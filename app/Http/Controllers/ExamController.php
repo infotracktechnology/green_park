@@ -59,18 +59,29 @@ class ExamController extends Controller
             'test_id' => 'required|numeric|unique:exam,test_id',
         ]);
 
-        $data = $request->except('questions');
+        $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
         $data['subject_name'] = implode(',', $request->subject_name);
-        $data['status'] = 'perview';
-        foreach ($request->questions as $key => $question) {
-            $filename = time() . '-' . $key . '.' . $question->getClientOriginalExtension();
-            $file = $question->move('questions', $filename);
-            $data['questions'][$key] = ['question' => $key, 'image' => "questions/" . $filename];
+        $data['status'] = 'preview';
+    
+        $questions = [];
+    
+        foreach (['physics', 'chemistry', 'botany', 'zoology'] as $subject) {
+            if ($request->hasFile($subject."_files")) {
+                foreach ($request->file($subject."_files") as $key => $file) {
+                    $q_no = $key + 1;
+                    $filename = time() . '-' . $q_no . '.' . $file->getClientOriginalExtension();
+                    $file->move('questions', $filename);
+                    $questions[] = ['subject' => $subject, 'image' => "questions/" . $filename];
+                }
+            }
         }
+    
+        $data['questions'] = $questions;
         Exam::create($data);
         session()->flash('success', 'Test created successfully');
         return to_route('exam.index');
     }
+
     function show(Request $request, Exam $exam)
     {
         return view('exam.preview', compact('exam'));
@@ -109,6 +120,7 @@ class ExamController extends Controller
 
     function destroy(Request $request, Exam $exam)
     {
+       
         foreach ($exam->questions as $key => $question) {
             unlink($question['image']);
         }
