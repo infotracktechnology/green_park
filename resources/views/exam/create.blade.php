@@ -43,7 +43,7 @@
                               </div>
                               <div class="form-group col-lg-3">
                                 <label>Test ID</label>
-                                <input type="number" name="test_id" id="test_id" class="form-control form-control-sm" required>
+                                <input type="number" name="id" id="test_id" class="form-control form-control-sm" required>
                             </div>
 
 

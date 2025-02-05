@@ -37,7 +37,7 @@
          <table class="table table-striped table-sm" id="myTable">
           <thead>
            <tr role="row">
-            <th>Test Code</th>
+            <th>Test ID</th>
             <th>Branch</th>
             <th>Coaching Type</th>
             <th>Test ID</th>
