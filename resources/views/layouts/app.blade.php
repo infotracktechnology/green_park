@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
     .select2 {
@@ -128,6 +129,8 @@
                 <li><a href="{{ route('exam.index') }}" class="nav-link"> Add Test</a></li>
                 <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
                 <li><a href="{{ route('exam.test') }}" class="nav-link">Test Report</a></li>
+                {{-- <li><a href="{{route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li> --}}
+                <li><a href="{{route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
               </ul>
             </li>
             <li class="dropdown">
@@ -155,6 +158,7 @@
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script>
     $(document).ready(function () {
       $('.select').each(function () {

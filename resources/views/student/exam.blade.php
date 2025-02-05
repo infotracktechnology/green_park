@@ -63,6 +63,10 @@
                                                     <td> : <span class="col-orange"> {{ $exam->subject_name }}</span></td>
                                                 </tr>
                                                 <tr>
+                                                    <td style="padding: 0px 5px;">Total Questions</td>
+                                                    <td> : <span class="col-orange"> {{ $exam->total_questions }}</span></td>
+                                                </tr>
+                                                <tr>
                                                     <td style="padding: 0px 5px;">Remaining Time</td>
                                                     <td>
                                                         : <span class="badge badge-danger" id="timerDisplay">00:00:00</span>
@@ -147,9 +151,9 @@
                                 Chemistry ({{ $exam->chemistry_questions }})
                             </button>
                             @endif
-                            @if(isset($exam->bot_start) && $exam->bot_start < $exam->total_questions && $exam->botany_questions > 0)
+                            @if(isset($exam->bot_start) && $exam->bot_start < $exam->total_questions && $exam->botony_questions > 0)
                             <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->bot_start }})">
-                                Botany ({{ $exam->botany_questions }})
+                                Botany ({{ $exam->botony_questions }})
                             </button>
                             @endif
                             @if(isset($exam->zoo_start) && $exam->zoo_start < $exam->total_questions && $exam->zoology_questions > 0)
@@ -157,9 +161,9 @@
                                 Zoology ({{ $exam->zoology_questions }})
                             </button>
                             @endif
-                            <button type="button" class="btn btn-primary m-1">
+                            {{-- <button type="button" class="btn btn-primary m-1">
                                 Total ({{ $exam->total_questions }})
-                            </button>
+                            </button> --}}
                         </div>
                     
                         <div class="panel" style="overflow-y: scroll;">

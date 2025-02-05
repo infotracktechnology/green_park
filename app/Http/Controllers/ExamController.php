@@ -55,18 +55,33 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->except('questions');
+        $request->validate([
+            'test_id' => 'required|numeric|unique:exam,test_id',
+        ]);
+
+        $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
         $data['subject_name'] = implode(',', $request->subject_name);
-        $data['status'] = 'perview';
-        foreach ($request->questions as $key => $question) {
-            $filename = time() . '-' . $key . '.' . $question->getClientOriginalExtension();
-            $file = $question->move('questions', $filename);
-            $data['questions'][$key] = ['question' => $key, 'image' => "questions/" . $filename];
+        $data['status'] = 'preview';
+    
+        $questions = [];
+    
+        foreach (['physics', 'chemistry', 'botany', 'zoology'] as $subject) {
+            if ($request->hasFile($subject."_files")) {
+                foreach ($request->file($subject."_files") as $key => $file) {
+                    $q_no = $key + 1;
+                    $filename = time() . '-' . $q_no . '.' . $file->getClientOriginalExtension();
+                    $file->move('questions', $filename);
+                    $questions[] = ['subject' => $subject, 'image' => "questions/" . $filename];
+                }
+            }
         }
+    
+        $data['questions'] = $questions;
         Exam::create($data);
         session()->flash('success', 'Test created successfully');
         return to_route('exam.index');
     }
+
     function show(Request $request, Exam $exam)
     {
         return view('exam.preview', compact('exam'));
@@ -105,6 +120,7 @@ class ExamController extends Controller
 
     function destroy(Request $request, Exam $exam)
     {
+       
         foreach ($exam->questions as $key => $question) {
             unlink($question['image']);
         }
@@ -278,6 +294,50 @@ class ExamController extends Controller
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ]);
     }
+
+
+
+    public function offline()
+    {
+        return view('exam.offline');
+    }
+
+    public function offlineUpload(Request $request)
+    {
+    
+        $request->validate([
+            'offline' => 'required|mimes:csv|max:1024', // Only CSV files with a maximum size of 1 MB
+        ], [
+            'offline.required' => 'The  file is required.',
+            'offline.mimes' => 'The  file must be a file of type: csv.',
+            'offline.max' => 'The  file may not be greater than 1 MB.',
+        ]);
+        return back()->with('success', 'File uploaded successfully.');
+    }
+
+    public function answerKey()
+    {
+        return view('exam.answerkey');
+    }
+
+    public function uploadAnswerKey(Request $request)
+    {
+        $request->validate([
+            'answer_key' => 'required|mimes:csv|max:1024', 
+        ], [
+            'answer_key.required' => 'The answer key file is required.',
+            'answer_key.mimes' => 'The answer key file must be a file of type: csv.',
+            'answer_key.max' => 'The answer key file may not be greater than 1 MB.',
+        ]);
+
+    
+        return back()->with('success', 'File uploaded successfully.');
+    }
+
+
+
+   
+
 
     // public function examCompleted()
     // {

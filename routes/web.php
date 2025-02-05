@@ -11,6 +11,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ExamPortionController;
 use App\Http\Controllers\ExamController;
+
 use App\Http\Controllers\ChairmanVideoController;
 
 
@@ -63,6 +64,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     // Route::get('test/exam', [App\Http\Controllers\ExamController::class, 'test'])->name('exam.test');
     Route::get('test/exam', [ExamController::class, 'test'])->name('exam.test');
     Route::post('exam/test/download', [ExamController::class, 'downloadTestReport'])->name('exam.test.download');
+
+
+    
 });
 
 #students routes
@@ -84,6 +88,12 @@ Route::post('/exam/clearlog', 'App\Http\Controllers\ExamController@clearlog')->n
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
 
 
+Route::get('/exam/offline', [ExamController::class, 'offline'])->name('exam.offline.index');
+Route::post('/exam/offline', [ExamController::class, 'offlineUpload'])->name('exam.offline.upload');
+
+
+Route::get('/exam/answerkey', [ExamController::class, 'answerKey'])->name('exam.answerkey');
+Route::post('/exam/answerkey', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
 
 // Route to show the form
 

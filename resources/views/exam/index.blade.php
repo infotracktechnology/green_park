@@ -37,9 +37,10 @@
          <table class="table table-striped table-sm" id="myTable">
           <thead>
            <tr role="row">
-            <th>Test Code</th>
+            <th>Test ID</th>
             <th>Branch</th>
             <th>Coaching Type</th>
+            <th>Test ID</th>
             <th>Name</th>
             <th>Subject</th>
             <th>Total Questions</th>
@@ -56,6 +57,7 @@
             <td>{{ $test->id }}</td>
             <td>{{ strpos($test->branch_id, ',') ? 'All' : $test->branch->name }}</td>
             <td>{{ $test->coaching_type }}</td>
+            <td>{{ $test->test_id }}</td>
             <td>{{ $test->name }}</td>
             <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>
@@ -117,15 +119,17 @@
               </select>
             </div>
             <div class="form-group col-12">
-                <label>Start Datetime</label>
-                <input type="datetime-local" name="start_at" class="form-control form-control-sm" required>
-              </div>
-
-              <div class="form-group col-12">
-                <label>End Datetime</label>
-                <input type="datetime-local" name="end_at" class="form-control form-control-sm" required>
-              </div>
-
+              <label>Start Datetime</label>
+              <input type="datetime-local" id="start_at" name="start_at" class="form-control form-control-sm" required>
+          </div>
+          
+          <div class="form-group col-12">
+              <label>End Datetime</label>
+              <input type="datetime-local" id="end_at" name="end_at" class="form-control form-control-sm" required>
+          </div>
+          
+         
+          
               <div class="form-group col-12">
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
@@ -149,5 +153,15 @@
   ],
  });
 </script>
+<script>
+  document.getElementById('start_at').addEventListener('change', function () {
+      const startTime = this.value;
+      const endTimeInput = document.getElementById('end_at');
+     endTimeInput.min = startTime;
 
+     if (endTimeInput.value && endTimeInput.value < startTime) {
+          endTimeInput.value = startTime;
+      }
+  });
+</script>
 @endsection
