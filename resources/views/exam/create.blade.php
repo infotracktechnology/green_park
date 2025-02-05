@@ -42,7 +42,7 @@
                                  </select>
                               </div>
                               <div class="form-group col-lg-3">
-                                <label>Test ID</label>
+                                <label>Test ID <span class="text-danger">(should be unique*)</span></label>
                                 <input type="number" name="id" id="id" class="form-control form-control-sm" required>
                             </div>
 
