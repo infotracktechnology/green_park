@@ -133,10 +133,10 @@
                     
                     <div class="form-group col-lg-3">
                         <label>Mother Mobile No</label>
-                         <input type="text" name="mother_ph_no"  class="form-control form-control-sm @error('mother_ph_no') is-invalid @enderror" required>
-                         @error('mother_ph_no')
+                         <input type="text" name="mother_ph_no"  class="form-control form-control-sm " >
+                         {{-- @error('mother_ph_no')
                          <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                         @enderror 
+                         @enderror  --}}
                     </div>
 
 
