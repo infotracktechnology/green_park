@@ -10,9 +10,9 @@
    <section class="section">
       <div class="section-body"> 
           <div class="row">
-              <div class="col-12">
+             <div class="col-12">
                   <div class="card card-primary">
-                     <form method="post" id="myForm" action="{{ route('exam.store') }}" enctype="multipart/form-data" onsubmit="return validateForm()">
+                     <form method="post" id="myForm" action="{{ route('exam.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                            <div class="row">
@@ -23,7 +23,7 @@
 
                               <div class="form-group col-lg-3">
                                 <label>Branch</label>
-                                <select name="branch_id" class="form-control form-control-sm" required>
+                                <select name="branch_id[]" class="select" multiple required>
                                     <option value="{{ $branches->implode('id', ',') }}">All</option>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -34,7 +34,7 @@
 
                               <div class="form-group col-lg-3">
                                  <label>Coaching Type</label>
-                                 <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
+                                 <select name="coaching_type[]" id="coaching_type" class="select"  multiple required>
                                     <option value="Offline,Online Recorded,Online Live">All</option>
                                     <option value="Offline">Offline</option>
                                     <option value="Online Recorded">Online Recorded</option>
@@ -45,8 +45,6 @@
                                 <label>Test ID <span class="text-danger">(should be unique*)</span></label>
                                 <input type="number" name="id" id="id" class="form-control form-control-sm numberk" required>
                             </div>
-
-
 
                               <div class="form-group col-lg-3">
                                 <label>Test Name</label>
@@ -156,28 +154,21 @@
 @endsection
 @section('js')
 <script>
-function validateFileCount(questionInputId, fileInputId) {
-    const questionCount = parseInt(document.getElementById(questionInputId).value);
-    const fileInput = document.getElementById(fileInputId);
-    const files = fileInput.files;
-
-    if (files.length !== questionCount) {
-        alert(`The number of uploaded files must match the number of questions exactly for ${questionInputId.replace('Questions', '')}.`);
-        fileInput.value = ""; 
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function () {
     const subjects = [
-        { checkbox: 'physicsCheckbox', inputs: 'physics-inputs' },
-        { checkbox: 'chemistryCheckbox', inputs: 'chemistry-inputs' },
-        { checkbox: 'botanyCheckbox', inputs: 'botany-inputs' },
-        { checkbox: 'zoologyCheckbox', inputs: 'zoology-inputs' }
+        { checkbox: 'physicsCheckbox', inputs: 'physics-inputs', questions: 'physicsQuestions', files: 'physicsFile' },
+        { checkbox: 'chemistryCheckbox', inputs: 'chemistry-inputs', questions: 'chemistryQuestions', files: 'chemistryFile' },
+        { checkbox: 'botanyCheckbox', inputs: 'botany-inputs', questions: 'botanyQuestions', files: 'botanyFile' },
+        { checkbox: 'zoologyCheckbox', inputs: 'zoology-inputs', questions: 'zoologyQuestions', files: 'zoologyFile' }
     ];
+
+    const totalQuestionsInput = document.getElementById('total_questions');
 
     subjects.forEach(subject => {
         const checkbox = document.getElementById(subject.checkbox);
         const inputs = document.querySelectorAll(`.${subject.inputs}`);
+        const questionInput = document.getElementById(subject.questions);
+        const fileInput = document.getElementById(subject.files);
 
         checkbox.addEventListener('change', function () {
             const isChecked = this.checked;
@@ -191,85 +182,78 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             });
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const subjects = [
-        { checkbox: 'physicsCheckbox', input: 'physicsQuestions' },
-        { checkbox: 'chemistryCheckbox', input: 'chemistryQuestions' },
-        { checkbox: 'botanyCheckbox', input: 'botanyQuestions' },
-        { checkbox: 'zoologyCheckbox', input: 'zoologyQuestions' }
-    ];
-
-    const totalQuestionsInput = document.getElementById('total_questions');
-
-    subjects.forEach(subject => {
-        const checkbox = document.getElementById(subject.checkbox);
-        const input = document.getElementById(subject.input);
-        checkbox.addEventListener('change', function () {
-            input.disabled = !checkbox.checked;
-            input.parentElement.style.display = checkbox.checked ? 'block' : 'none';
-            if (!checkbox.checked) input.value = ''; 
             calculateTotalQuestions();
         });
 
-        input.addEventListener('input', calculateTotalQuestions);
+        questionInput.addEventListener('input', calculateTotalQuestions);
+        fileInput.addEventListener('change', function () {
+            validateFileCount(subject.questions, subject.files);
+        });
     });
 
     function calculateTotalQuestions() {
         let total = 0;
         subjects.forEach(subject => {
-            const input = document.getElementById(subject.input);
+            const input = document.getElementById(subject.questions);
             total += parseInt(input.value) || 0;
         });
         totalQuestionsInput.value = total;
     }
 });
 
-function validateForm() {
-    const totalQuestions = parseInt(document.getElementById('total_questions').value);
-    const startNumbers = [
-        { input: 'physicsStart', name: 'Physics' },
-        { input: 'chemistryStart', name: 'Chemistry' },
-        { input: 'botanyStart', name: 'Botany' },
-        { input: 'zoologyStart', name: 'Zoology' }
-    ];
+function validateFileCount(questionInputId, fileInputId) {
+    const questionCount = parseInt(document.getElementById(questionInputId).value);
+    const fileInput = document.getElementById(fileInputId);
+    const files = fileInput.files;
 
-    for (let i = 0; i < startNumbers.length; i++) {
-        const startInput = document.getElementById(startNumbers[i].input);
-        if (startInput && startInput.value) {
-            const startNumber = parseInt(startInput.value);
-            if (startNumber > totalQuestions) {
-                alert(`${startNumbers[i].name} start number cannot be higher than the total number of questions.`);
-                return false;
-            }
-        }
+    if (files.length !== questionCount) {
+        alert(`The number of uploaded files must match the number of questions exactly for ${questionInputId.replace('Questions', '')}.`);
+        fileInput.value = ""; 
     }
-
-    const subjects = [
-        { checkbox: 'physicsCheckbox', questions: 'physicsQuestions', files: 'physicsFile' },
-        { checkbox: 'chemistryCheckbox', questions: 'chemistryQuestions', files: 'chemistryFile' },
-        { checkbox: 'botanyCheckbox', questions: 'botanyQuestions', files: 'botanyFile' },
-        { checkbox: 'zoologyCheckbox', questions: 'zoologyQuestions', files: 'zoologyFile' }
-    ];
-
-    for (let i = 0; i < subjects.length; i++) {
-        const checkbox = document.getElementById(subjects[i].checkbox);
-        if (checkbox.checked) {
-            const questionCount = parseInt(document.getElementById(subjects[i].questions).value);
-            const fileInput = document.getElementById(subjects[i].files);
-            const files = fileInput.files;
-
-            if (files.length !== questionCount) {
-                alert(`The number of uploaded files must match the number of questions exactly for ${subjects[i].checkbox.replace('Checkbox', '')}.`);
-                return false;
-            }
-        }
-    }
-
-    return true;
 }
+
+// function validateForm() {
+//     const totalQuestions = parseInt(document.getElementById('total_questions').value);
+//     const startNumbers = [
+//         { input: 'physicsStart', name: 'Physics' },
+//         { input: 'chemistryStart', name: 'Chemistry' },
+//         { input: 'botanyStart', name: 'Botany' },
+//         { input: 'zoologyStart', name: 'Zoology' }
+//     ];
+
+//     for (let i = 0; i < startNumbers.length; i++) {
+//         const startInput = document.getElementById(startNumbers[i].input);
+//         if (startInput && startInput.value) {
+//             const startNumber = parseInt(startInput.value);
+//             if (startNumber > totalQuestions) {
+//                 alert(`${startNumbers[i].name} start number cannot be higher than the total number of questions.`);
+//                 return false;
+//             }
+//         }
+//     }
+
+//     const subjects = [
+//         { checkbox: 'physicsCheckbox', questions: 'physicsQuestions', files: 'physicsFile' },
+//         { checkbox: 'chemistryCheckbox', questions: 'chemistryQuestions', files: 'chemistryFile' },
+//         { checkbox: 'botanyCheckbox', questions: 'botanyQuestions', files: 'botanyFile' },
+//         { checkbox: 'zoologyCheckbox', questions: 'zoologyQuestions', files: 'zoologyFile' }
+//     ];
+
+//     for (let i = 0; i < subjects.length; i++) {
+//         const checkbox = document.getElementById(subjects[i].checkbox);
+//         if (checkbox.checked) {
+//             const questionCount = parseInt(document.getElementById(subjects[i].questions).value);
+//             const fileInput = document.getElementById(subjects[i].files);
+//             const files = fileInput.files;
+
+//             if (files.length !== questionCount) {
+//                 alert(`The number of uploaded files must match the number of questions exactly for ${subjects[i].checkbox.replace('Checkbox', '')}.`);
+//                 return false;
+//             }
+//         }
+//     }
+
+//     return true;
+// }
 </script>
 @endsection

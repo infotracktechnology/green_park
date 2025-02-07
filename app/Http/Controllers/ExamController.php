@@ -57,6 +57,8 @@ class ExamController extends Controller
     {
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
         $data['subject_name'] = implode(',', $request->subject_name);
+        $data['branch_id'] = implode(',', $request->branch_id);
+        $data['coaching_type'] = implode(',', $request->coaching_type);
         $data['status'] = 'preview';
     
         $questions = [];
