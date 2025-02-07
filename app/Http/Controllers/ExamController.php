@@ -36,7 +36,7 @@ class ExamController extends Controller
             ->groupBy('e.id', 'e.name')
             ->get();
 
-        // Merge student_count with tests
+  
         $tests = $tests->map(function ($test) use ($exams) {
             $exam = $exams->firstWhere('exam_id', $test->id);
             $test->student_count = $exam ? $exam->student_count : 0;

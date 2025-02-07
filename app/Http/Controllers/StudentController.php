@@ -43,7 +43,7 @@ class StudentController extends Controller
             'ph_no1' => ['unique:student,ph_no1', 'numeric', 'regex:/^[6-9]\d{9}$/'],
             'ph_no2' => ['unique:student,ph_no2', 'numeric', 'regex:/^[6-9]\d{9}$/'],
             'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
+            // 'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
         ]);
 
         Student::create($request->all());
