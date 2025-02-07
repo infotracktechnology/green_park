@@ -35,10 +35,13 @@
                               <div class="form-group col-lg-3">
                                  <label>Coaching Type</label>
                                  <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
-                                    <option value="Offline,Online Recorded,Online Live">All</option>
+                                    <option value="Offline,Online Recorded,Online Live,Test Series,11,12">All</option>
                                     <option value="Offline">Offline</option>
                                     <option value="Online Recorded">Online Recorded</option>
                                     <option value="Online Live">Online Live</option>
+                                    <option value="Test Series">Test Series</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
                                  </select>
                               </div>
                               <div class="form-group col-lg-3">
