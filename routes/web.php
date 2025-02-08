@@ -61,10 +61,10 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::get('test/exam', [ExamController::class, 'test'])->name('exam.test');
     Route::post('exam/test/download', [ExamController::class, 'downloadTestReport'])->name('exam.test.download');
-    Route::get('/exam/offline', [ExamController::class, 'offline'])->name('exam.offline.index');
-    Route::post('/exam/offline', [ExamController::class, 'offlineUpload'])->name('exam.offline.upload');
-    Route::get('/exam/answerkey', [ExamController::class, 'answerKey'])->name('exam.answerkey');
-    Route::post('/exam/answerkey', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
+    Route::get('offline/exam', [ExamController::class, 'offline'])->name('exam.offline.index');
+    Route::post('offline/exam', [ExamController::class, 'offlineUpload'])->name('exam.offline.upload');
+    Route::get('answerkey/exam', [ExamController::class, 'answerKey'])->name('exam.answerkey');
+    Route::post('answerkey/exam', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
 });
 
 #students routes

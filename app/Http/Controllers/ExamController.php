@@ -9,6 +9,7 @@ use App\Models\Exam;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ImportController;
 
 class ExamController extends Controller
 {
@@ -305,11 +306,8 @@ class ExamController extends Controller
     
         $request->validate([
             'offline' => 'required|mimes:csv|max:1024', // Only CSV files with a maximum size of 1 MB
-        ], [
-            'offline.required' => 'The  file is required.',
-            'offline.mimes' => 'The  file must be a file of type: csv.',
-            'offline.max' => 'The  file may not be greater than 1 MB.',
         ]);
+
         return back()->with('success', 'File uploaded successfully.');
     }
 
@@ -318,48 +316,16 @@ class ExamController extends Controller
         return view('exam.answerkey');
     }
 
-    public function uploadAnswerKey(Request $request)
+    public function uploadAnswerKey(Request $request,ImportController $import)
     {
         $request->validate([
-            'answer_key' => 'required|mimes:csv|max:1024', 
-        ], [
-            'answer_key.required' => 'The answer key file is required.',
-            'answer_key.mimes' => 'The answer key file must be a file of type: csv.',
-            'answer_key.max' => 'The answer key file may not be greater than 1 MB.',
+            'answer_key' => 'required|max:1024', 
         ]);
 
-    
-        return back()->with('success', 'File uploaded successfully.');
+        $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
+        dd($answers);
+        //return back()->with('success', 'File uploaded successfully.');
     }
 
-
-
-   
-
-
-    // public function examCompleted()
-    // {
-    //     // Example logic to determine if the exam is completed
-    //     $examCompleted = auth()->user()->exam_completed; // or any condition you use
-    //     return view('your-view-name', ['examCompleted' => $examCompleted]);
-    // }
-
-    // public function dashboard()
-    // {
-    //     $exam = Exam::where('student_id', auth()->guard('student')->user()->id)->first();
-
-    //     $examStatus = 'not_ongoing'; // Default status
-    //     if ($exam) {
-    //         $currentTime = now();
-    //         $examStartTime = $exam->start_at;
-    //         $examEndTime = $exam->end_at;
-
-    //         if ($currentTime >= $examStartTime && $currentTime <= $examEndTime) {
-    //             $examStatus = 'ongoing';
-    //         }
-    //     }
-
-    //     return view('dashboard', compact('exam', 'examStatus'));
-    // }
 
 }
