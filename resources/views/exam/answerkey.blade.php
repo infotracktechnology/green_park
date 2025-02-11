@@ -12,12 +12,12 @@
           <div class="row">
               <div class="col-12">
                   <div class="card card-primary">
-                    <form method="post" id="myForm" action="{{ route('exam.answerkey.upload') }}" enctype="multipart/form-data" onsubmit="return validateForm()">
+                    <form method="post" id="myForm" action="{{ route('exam.answerkey.upload') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
 
                            <div class="col-md-8 col-sm-12 mb-3">
-                              <h6 class="col-deep-purple">Offline/OMR Upload</h6>
+                              <h6 class="col-deep-purple">Answer Key Upload</h6>
                              </div>
                             <div class="row">
     

@@ -152,7 +152,7 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <input type="hidden" name="status[{{ $key }}]" id="status-{{ $key }}" value="not answer">
+                                <input type="hidden" name="status[{{ $key }}]" id="status-{{ $key }}" value="not-attempted">
                                 <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}">Save & Next</button>
                                 <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
                                 <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $key }}">Save &amp; Mark For Review</button>
@@ -176,8 +176,10 @@
                                 <?php
                                 $key = $index + 1;
                                 ?>
-                                <li data-seq="{{ $key }}" class="{{ $key === 1 ? 'active' : '' }}">
-                                    <a href="javascript:void(0);" class="{{ $key === 1 ? 'not-answered' : 'not-attempted' }}" data-index="{{$key }}">{{ $key < 10 ? '0' : '' }}{{ $key }}</a>
+                                <li data-seq="{{ $key }}">
+                                <a href="javascript:void(0);" class="not-attempted" data-index="{{ $key }}">
+                                {{ $key < 10 ? '0' : '' }}{{ $key }}
+                                </a>
                                 </li>
                                 @endforeach
                             </ul>
@@ -231,6 +233,7 @@
     var activeQuestion = 0;
     const questions = @json($exam->questions);
     const form = $('#examForm');
+    var testid = Number({{ $exam->id }});
  
     function startTimer() {
         const interval = setInterval(function () {
@@ -249,6 +252,11 @@
         }, 1000);
     }
 
+
+    function setStatus(qno, status,ans) {
+        document.getElementById('status-' + qno).value = status;
+    }
+
     function openQuestion(index) {
         $('.question').hide();
         $(`#question-${index}`).show();
@@ -258,6 +266,7 @@
         if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
             $(a).addClass("not-answered").removeClass("not-attempted");
         }
+        setStatus(index, 'not-answered',0);
         activeQuestion = index;
         updateCounts();
     }
@@ -286,9 +295,7 @@
         $('.countAnsweredAndMarked').text(answeredAndMarked);
     }
 
-    function setStatus(index, status) {
-        document.getElementById('status-' + index).value = status;
-    }
+  
 
     function clearLog(testid, qno) {
         $.ajax({
@@ -314,7 +321,7 @@
             alert('Please select an answer first.');
             return;
         }
-        setStatus(index, 'answer');
+        setStatus(index, 'que-save',radio.val());
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save-mark')
             .addClass('que-save');
@@ -328,7 +335,7 @@
             alert('Please select an answer first.');
             return;
         }
-        setStatus(index, 'answer & mark');
+        setStatus(index, 'que-save-mark',radio.val());
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save')
             .addClass('que-save-mark');
@@ -337,7 +344,7 @@
 
     $('.btn-mark').click(function () {
         const index = $(this).data('index');
-        setStatus(index, 'mark');
+        setStatus(index, 'que-mark',0);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-save que-save-mark')
             .addClass('que-mark');
@@ -347,11 +354,11 @@
     $('.btn-reset').click(function () {
         const index = $(this).data('index');
         if($(`#question-${index} input[type="radio"]`).is(':checked')) {
-            clearLog({{ $exam->id }}, index);
+            clearLog(testid,index);
         }
 
         $(`#question-${index} input[type="radio"]`).prop('checked', false);
-        setStatus(index, 'clear');
+        setStatus(index, 'not-answered',0);
 
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('que-save que-mark que-save-mark')
@@ -407,23 +414,6 @@
         $('.exam-paper').show();
         $('.exam-summery').hide();
     });
-
-    // function validateStartNumbers() {
-    //     const totalQuestions = {{ $exam->total_questions }};
-    //     const startNumbers = [
-    //         {{ $exam->phy_start ?? 'null' }},
-    //         {{ $exam->chem_start ?? 'null' }},
-    //         {{ $exam->bot_start ?? 'null' }},
-    //         {{ $exam->zoo_start ?? 'null' }}
-    //     ];
-
-    //     for (let i = 0; i < startNumbers.length; i++) {
-    //         if (startNumbers[i] !== null && startNumbers[i] >= totalQuestions) {
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
 
     startTimer();
     openQuestion(1);
