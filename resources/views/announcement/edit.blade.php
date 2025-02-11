@@ -43,6 +43,9 @@
                                 <option value="Offline" {{ $announcement->coaching_type == 'Offline' ? 'selected' : '' }}>Offline</option>
                                 <option value="Online Recorded" {{ $announcement->coaching_type == 'Online Recorded' ? 'selected' : '' }}>Online Recorded</option>
                                 <option value="Online Live" {{ $announcement->coaching_type == 'Online Live' ? 'selected' : '' }}>Online Live</option>
+                                <option value="Test Series" {{ $announcement->coaching_type == 'Test Series' ? 'selected' : '' }}>Test Series</option>
+                                <option value="11" {{ $announcement->coaching_type == '11' ? 'selected' : '' }}>11</option>
+                                <option value="12" {{ $announcement->coaching_type == '12' ? 'selected' : '' }}>12</option>
                              </select>
                          </div>
                   
