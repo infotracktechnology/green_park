@@ -78,7 +78,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-md-4" style="border:dotted;">
+                    <div class="col-md-4">
+                        <div class="mt-2"  style="border:dotted;">
                         <table class="table table-borderless mb-0 test-questions">
                             <thead>
                                 <tr>
@@ -99,6 +100,32 @@
                                 </tr>
                             </thead>
                         </table>
+                     </div>
+
+                        <div class="mt-2">
+                            @if(isset($exam->phy_start) && $exam->phy_start < $exam->total_questions && $exam->physics_questions > 0)
+                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->phy_start }})">
+                                Physics ({{ $exam->physics_questions }})
+                            </button>
+                            @endif
+                            @if(isset($exam->chem_start) && $exam->chem_start < $exam->total_questions && $exam->chemistry_questions > 0)
+                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->chem_start }})">
+                                Chemistry ({{ $exam->chemistry_questions }})
+                            </button>
+                            @endif
+                            @if(isset($exam->bot_start) && $exam->bot_start < $exam->total_questions && $exam->botony_questions > 0)
+                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->bot_start }})">
+                                Botany ({{ $exam->botony_questions }})
+                            </button>
+                            @endif
+                            @if(isset($exam->zoo_start) && $exam->zoo_start < $exam->total_questions && $exam->zoology_questions > 0)
+                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->zoo_start }})">
+                                Zoology ({{ $exam->zoology_questions }})
+                            </button>
+                            @endif
+                          
+                        </div>
+
                     </div>
                     <div class="col-md-8">
                         <!-- Question Display -->
@@ -140,31 +167,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div>
-                            @if(isset($exam->phy_start) && $exam->phy_start < $exam->total_questions && $exam->physics_questions > 0)
-                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->phy_start }})">
-                                Physics ({{ $exam->physics_questions }})
-                            </button>
-                            @endif
-                            @if(isset($exam->chem_start) && $exam->chem_start < $exam->total_questions && $exam->chemistry_questions > 0)
-                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->chem_start }})">
-                                Chemistry ({{ $exam->chemistry_questions }})
-                            </button>
-                            @endif
-                            @if(isset($exam->bot_start) && $exam->bot_start < $exam->total_questions && $exam->botony_questions > 0)
-                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->bot_start }})">
-                                Botany ({{ $exam->botony_questions }})
-                            </button>
-                            @endif
-                            @if(isset($exam->zoo_start) && $exam->zoo_start < $exam->total_questions && $exam->zoology_questions > 0)
-                            <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->zoo_start }})">
-                                Zoology ({{ $exam->zoology_questions }})
-                            </button>
-                            @endif
-                            {{-- <button type="button" class="btn btn-primary m-1">
-                                Total ({{ $exam->total_questions }})
-                            </button> --}}
-                        </div>
+                        
                     
                         <div class="panel" style="overflow-y: scroll;">
                             <ul class="pagination test-questions my-4">
@@ -179,7 +182,7 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                
             </div>
 
             <div class="row exam-summery justify-content-center" style="display: none;">
