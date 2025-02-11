@@ -96,16 +96,17 @@ class ExamController extends Controller
 
 
         DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
+        $exam_answers =  DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->get()->keyBy('q_no');
 
         for ($i = 1; $i <= $request->total_question; $i++) {
             $status = $request->status[$i] ?? null;
             $subject = $request->subject[$i] ?? null;
-            $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
+            $answer = $status == 'que-save' || $status == 'que-save-mark' ? $request->question[$i] : 0;
 
             $data = ['test_id' => $request->test_id,'student_id' => $student_id,'subject' => $subject,'q_no' => $i,
             'answer' => $answer,'status' => $status];
-            $exam_answer =  DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->where('q_no', $i)->first();
-            if($exam_answer) {
+
+            if(isset($exam_answers[$i])){ 
                 DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->where('q_no', $i)->update($data);
             }else{
                 DB::table('exam_answer')->insert($data);
@@ -141,20 +142,29 @@ class ExamController extends Controller
     function student_exam(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
+        $answers =  DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->orderBy('updated_at', 'desc')->get();
+        $maxQuestions = $answers->first()->q_no ?? 0;
+        $answers = $answers->keyBy('q_no');
         $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
-
-        $exam_answer = DB::table('exam_answer')
-            ->where('test_id', base64_decode($test_id))
-            ->where('student_id', auth()->user()->id)
-            ->first();
 
         if ($second < 0) {
             abort(404);
         }
-
-        return view('student.exam', compact('exam', 'second'));
+      
+        return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
     }
+ 
+    function Save(Request $request){
+        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
+        $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->first();
+        if($answer){
+            DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->update($data);
+        }else{
+            DB::table('exam_answer')->insert($data);
+        }
 
+        return response()->json(['message' => 'Answer saved successfully']);
+    }
 
     public function clearLog(Request $request)
     {
@@ -202,7 +212,6 @@ class ExamController extends Controller
         $studentId = $request->student_id;
         $testId = $request->test_id;
 
-        // Delete previous exam answers for the student if any
         DB::table('exam_answer')
             ->where('student_id', $studentId)
             ->where('test_id', $testId)
@@ -307,7 +316,7 @@ class ExamController extends Controller
     {
     
         $request->validate([
-            'offline' => 'required|mimes:csv|max:1024', // Only CSV files with a maximum size of 1 MB
+            'offline' => 'required|mimes:csv|max:1024',
         ]);
 
         return back()->with('success', 'File uploaded successfully.');
