@@ -102,15 +102,15 @@ class ExamController extends Controller
             $subject = $request->subject[$i] ?? null;
             $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
 
-            DB::table('exam_answer')->insert([
-                'test_id' => $request->test_id,
-                'student_id' => $student_id,
-                'subject' => $subject,
-                'q_no' => $i,
-                'answer' => $answer,
-                'status' => $status,
+            $data = ['test_id' => $request->test_id,'student_id' => $student_id,'subject' => $subject,'q_no' => $i,
+            'answer' => $answer,'status' => $status];
+            $exam_answer =  DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->where('q_no', $i)->first();
+            if($exam_answer) {
+                DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->where('q_no', $i)->update($data);
+            }else{
+                DB::table('exam_answer')->insert($data);
+            }
 
-            ]);
         }
 
         return $student_id ? to_route('studentdashboard') : to_route('exam.index');
