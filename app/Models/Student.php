@@ -9,6 +9,8 @@ use App\Models\Announcement;
 use App\Models\Branch;
 use App\Models\Chairmanvideo;
 use App\Models\Examportion;
+use App\Models\ExamAnswer;
+
 
 class Student extends Authenticatable
 {
@@ -48,4 +50,7 @@ class Student extends Authenticatable
     {
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
     }
+
+   
+   
 }

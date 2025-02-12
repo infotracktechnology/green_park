@@ -41,6 +41,9 @@
                                 <option value="Offline">Offline</option>
                                 <option value="Online Recorded">Online Recorded</option>
                                 <option value="Online Live">Online Live</option>
+                                <option value="Test Series">Test Series</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
                             </select>
                         </div>
                         
@@ -133,10 +136,10 @@
                     
                     <div class="form-group col-lg-3">
                         <label>Mother Mobile No</label>
-                         <input type="text" name="mother_ph_no"  class="form-control form-control-sm @error('mother_ph_no') is-invalid @enderror" required>
-                         @error('mother_ph_no')
+                         <input type="text" name="mother_ph_no"  class="form-control form-control-sm " >
+                         {{-- @error('mother_ph_no')
                          <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                         @enderror 
+                         @enderror  --}}
                     </div>
 
 

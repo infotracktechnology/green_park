@@ -50,7 +50,7 @@ class ImportController extends Controller
     }
 
 
-    private function parseCSV($filePath){
+    public function parseCSV($filePath){
     $csvData = [];
     if (($handle = fopen($filePath, 'r')) !== false) {
         $header = null;
