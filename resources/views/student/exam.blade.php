@@ -234,6 +234,8 @@
     const questions = @json($exam->questions);
     const form = $('#examForm');
     var testid = Number({{ $exam->id }});
+    var max_qno = Number({{ $maxQuestions }});
+
  
     function startTimer() {
         const interval = setInterval(function () {
@@ -255,6 +257,25 @@
 
     function setStatus(qno, status,ans) {
         document.getElementById('status-' + qno).value = status;
+        var subject = $(`[name="subject[${qno}]`).val();
+        $.ajax({
+            url: "{{ route('exam.save') }}",
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            method: 'POST',
+            data: {
+                test_id: testid,
+                q_no: qno,
+                subject: subject,
+                status: status,
+                answer: ans
+            },
+            success: function (data) {
+                //console.log(data);
+            },
+        });
+        
     }
 
     function openQuestion(index) {
@@ -266,7 +287,6 @@
         if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
             $(a).addClass("not-answered").removeClass("not-attempted");
         }
-        setStatus(index, 'not-answered',0);
         activeQuestion = index;
         updateCounts();
     }
@@ -368,6 +388,7 @@
 
     $('.pagination a').click(function (e) {
         const index = $(this).data('index');
+        setStatus(index, 'not-answered',0);
         openQuestion(index);
     });
 
@@ -416,7 +437,7 @@
     });
 
     startTimer();
-    openQuestion(1);
+    openQuestion(max_qno+1);
     updateCounts();
 </script>
 @endsection

@@ -80,7 +80,7 @@ Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('s
 Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
 Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
 Route::post('/exam/clearlog', 'App\Http\Controllers\ExamController@clearlog')->name('exam.clearlog');
-
+Route::post('/exam/save', 'App\Http\Controllers\ExamController@Save')->name('exam.save');
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
