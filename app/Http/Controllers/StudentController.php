@@ -128,4 +128,17 @@ class StudentController extends Controller
     
         return view('dashboards.studentdashboard', compact('isExamOngoing'));
     }
+
+    function marksheet(Request $request){
+        $sid = auth()->user()->id;
+        $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid order by b.updated_at desc limit 5");
+        return view('student.marksheet',compact('tests'));
+    }
+
+    function mark_subject(Request $request){
+        
+    }
+    function mark_download(Request $request){
+        
+    }
 }
