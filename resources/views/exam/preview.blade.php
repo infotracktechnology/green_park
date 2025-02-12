@@ -78,19 +78,19 @@
                     <table border="1" style="width: 100%;">
                         <tbody>
                             <tr style="padding:5px;">
-                                <td>Physics</td>
+                                <td><a>Physics</a></td>
                                 <td><span class="col-orange">{{ $exam->physics_questions }}</span></td>
                             </tr>
                             <tr style="padding:5px;">
-                                <td>Chemistry</td>
+                                <td><a>Chemistry</a></td>
                                 <td><span class="col-orange">{{ $exam->chemistry_questions }}</span></td>
                             </tr>
                             <tr style="padding:5px;">
-                                <td>Botony</td>
+                                <td><a>Botony</a></td>
                                 <td><span class="col-orange">{{ $exam->botony_questions }}</span></td>
                             </tr>
                             <tr style="padding:5px;">
-                                <td>Zoology</td><td><span class="col-orange">{{ $exam->zoology_questions }}</span></td>
+                                <td><a>Zoology</a></td><td><span class="col-orange">{{ $exam->zoology_questions }}</span></td>
                             </tr>
                             <tr style="padding:5px;">
                                 <td>Total</td>

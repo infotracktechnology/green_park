@@ -222,6 +222,10 @@
         }
     });
 </script>
+  {{-- <script>
+    $(document).on('contextmenu', event => event.preventDefault());
+    $(document).on('mousedown', event => event.preventDefault());
+  </script> --}}
   @yield('js')
 </body>
 </html>
