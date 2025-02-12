@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ExamPortionController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ChairmanVideoController;
 
 
@@ -40,7 +41,6 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
     Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
-
     Route::resource('hostel', App\Http\Controllers\HostelController::class);
     Route::delete('room/delete/{id}', [HostelController::class, 'deleteRoom'])->name('room.delete');
     Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
@@ -52,9 +52,20 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
   
     Route::resource('exam', 'App\Http\Controllers\ExamController');
+
     Route::resource('chairmanvideo', 'App\Http\Controllers\ChairmanVideoController');
     Route::get('exam/instruction/{test_id}', 'App\Http\Controllers\ExamController@instruction')->name('exam.instruction');
     Route::resource('examportion', 'App\Http\Controllers\ExamPortionController');
+    Route::get('enable/exam', [App\Http\Controllers\ExamController::class, 'enable'])->name('exam.enable');
+    Route::post('enable/exam', [App\Http\Controllers\ExamController::class, 'enableExam'])->name('exam.enableExam');
+
+    Route::get('test/exam', [ExamController::class, 'test'])->name('exam.test');
+    Route::post('exam/test/download', [ExamController::class, 'downloadTestReport'])->name('exam.test.download');
+    Route::get('offline/exam', [ExamController::class, 'offline'])->name('exam.offline.index');
+    Route::post('offline/exam', [ExamController::class, 'offlineUpload'])->name('exam.offline.upload');
+    Route::get('answerkey/exam', [ExamController::class, 'answerKey'])->name('exam.answerkey');
+    Route::post('answerkey/exam', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
+    Route::get('exam/report/dump', 'App\Http\Controllers\ExamController@Dump_Report')->name('exam.report.dump');
 });
 
 #students routes
@@ -64,12 +75,18 @@ Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentd
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
 Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
-Route::get('examinstruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.examinstruction');
-Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
 Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
 Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
 
-#Route::view('/teacher/dashboard', 'dashboards.teacherdashboard')->name('teacherdashboard');
+Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
+Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
+Route::post('/exam/clearlog', 'App\Http\Controllers\ExamController@clearlog')->name('exam.clearlog');
+Route::post('/exam/save', 'App\Http\Controllers\ExamController@Save')->name('exam.save');
+Route::get('marksheet',[StudentController::class, 'marksheet'])->name('student.marksheet');
+Route::get('mark/subject/{test_id}',[StudentController::class, 'mark_subject'])->name('student.mark_subject');
+Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download'])->name('student.mark_download');
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
+
+

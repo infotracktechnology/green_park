@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
+use App\Models\Exam; // Import the Exam model
 use Illuminate\Support\Facades\DB;
 
 
@@ -42,7 +43,7 @@ class StudentController extends Controller
             'ph_no1' => ['unique:student,ph_no1', 'numeric', 'regex:/^[6-9]\d{9}$/'],
             'ph_no2' => ['unique:student,ph_no2', 'numeric', 'regex:/^[6-9]\d{9}$/'],
             'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
+            // 'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
         ]);
 
         Student::create($request->all());
@@ -57,8 +58,8 @@ class StudentController extends Controller
         $districts = DB::table('district_list')->where('State', $Student->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
-        
-        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes','Student'));
+
+        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes', 'Student'));
     }
 
 
@@ -109,16 +110,35 @@ class StudentController extends Controller
 
         return redirect()->route('section.student')->with('success', 'Student details successfully updated.');
     }
-        public function profile()
+    public function profile()
     {
-             return view('student.profile');
+        return view('student.profile');
     }
-        public function home()
+    public function home()
     {
-            return view('student.home');
+        return view('student.home');
     }
-        public function dashboard()
+
+
+    public function dashboard()
     {
-            return view('dashboards.studentdashboard');
+        $coachingType = auth()->user()->coaching_type;
+        $branchId = auth()->user()->branch_id;
+        $isExamOngoing = Exam::getOngoingExams($coachingType, $branchId) ? true : false;
+    
+        return view('dashboards.studentdashboard', compact('isExamOngoing'));
+    }
+
+    function marksheet(Request $request){
+        $sid = auth()->user()->id;
+        $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid order by b.updated_at desc limit 5");
+        return view('student.marksheet',compact('tests'));
+    }
+
+    function mark_subject(Request $request){
+        
+    }
+    function mark_download(Request $request){
+        
     }
 }
