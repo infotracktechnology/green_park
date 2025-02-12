@@ -167,7 +167,7 @@
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
+                  <a href="{{ route('student.marksheet') }}" class="nav-link">
                     <i class="fas fa-chart-bar" style="font-size: 20px; color: #2196f3;"></i><span>Mark Details</span>
                   </a>
                 </li>

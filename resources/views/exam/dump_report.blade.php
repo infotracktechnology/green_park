@@ -12,9 +12,10 @@
     th, td {
         border: 1px solid #000;
         padding: 5px;
+        color: #000 !important;
     }
     th {
-        background-color: #f4f4f4;
+        background-color: #eeece1;
     }
 </style>
 @endsection
@@ -52,8 +53,13 @@
                         </div>
                         @if($testId)
                         <div class="row m-t-20">
+                            <div class="col-lg-12">
+                                <button class="btn btn-primary m-b-20" onclick="exportTable();"><i class="fa fa-download"></i> Export to PDF</button>
+                            </div>
+
+                            <div class="col-lg-12">
                             <div class="table-responsive">
-                                <table>
+                                <table id="export">
                                  <thead>
                                   <tr role="row">
                                    <th rowspan="2">S.NO</th>
@@ -108,6 +114,7 @@
                                 </table>
                             </div>
                         </div>
+                        </div>
                         @endif
                         
                      </div>
@@ -121,5 +128,20 @@
 @endsection
 
 @section('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    function exportTable() {
+        const table = document.getElementById('export');
+        const options = {
+            margin: 2,
+            filename: 'test_dump_report.pdf',
+            jsPDF :{ unit: 'mm', format: 'A4', orientation: 'landscape' }
+        };
+        html2pdf().set(options).from(table).save().then(() => {
+            alert('PDF successfully generated');
+            location.href = "{{ route('exam.report.dump') }}";
+        });
+    }
+</script>
 
 @endsection

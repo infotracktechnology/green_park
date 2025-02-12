@@ -82,6 +82,9 @@ Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student
 Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
 Route::post('/exam/clearlog', 'App\Http\Controllers\ExamController@clearlog')->name('exam.clearlog');
 Route::post('/exam/save', 'App\Http\Controllers\ExamController@Save')->name('exam.save');
+Route::get('marksheet',[StudentController::class, 'marksheet'])->name('student.marksheet');
+Route::get('mark/subject/{test_id}',[StudentController::class, 'mark_subject'])->name('student.mark_subject');
+Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download'])->name('student.mark_download');
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
