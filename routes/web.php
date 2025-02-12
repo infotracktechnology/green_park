@@ -65,6 +65,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::post('offline/exam', [ExamController::class, 'offlineUpload'])->name('exam.offline.upload');
     Route::get('answerkey/exam', [ExamController::class, 'answerKey'])->name('exam.answerkey');
     Route::post('answerkey/exam', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
+    Route::get('exam/report/dump', 'App\Http\Controllers\ExamController@Dump_Report')->name('exam.report.dump');
 });
 
 #students routes
