@@ -38,96 +38,45 @@
         <div class="section-body">
             <form method="post" id="myForm" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
                 @csrf
-            <input type="hidden" name="test_id" value="{{ $exam->id }}">
-            <div class="row exam-paper">
-                <div class="col-md-9">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td style="padding: 5px 15px; border: 2px solid #666"><i class="fa fa-user" style="font-size:90px;"></i></td>
-                                <td>
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td style="padding: 0px 5px;">Candidate Name</td>
-                                                <td> : <span class="col-orange">Admin</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 0px 5px;">Exam Name</td>
-                                                <td> : <span class="col-orange">{{ $exam->name }}</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 0px 5px;">Subject Name</td>
-                                                <td> : <span class="col-orange"> {{ $exam->subject_name }}</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 0px 5px;">Remaining Time</td>
-                                                <td>
-                                                    : <span class="badge badge-danger" id="timerDisplay">00:00:00</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-3">
-                    <table border="1" style="width: 100%;">
-                        <tbody>
-                            <tr style="padding:5px;">
-                                <td><a>Physics</a></td>
-                                <td><span class="col-orange">{{ $exam->physics_questions }}</span></td>
-                            </tr>
-                            <tr style="padding:5px;">
-                                <td><a>Chemistry</a></td>
-                                <td><span class="col-orange">{{ $exam->chemistry_questions }}</span></td>
-                            </tr>
-                            <tr style="padding:5px;">
-                                <td><a>Botony</a></td>
-                                <td><span class="col-orange">{{ $exam->botony_questions }}</span></td>
-                            </tr>
-                            <tr style="padding:5px;">
-                                <td><a>Zoology</a></td><td><span class="col-orange">{{ $exam->zoology_questions }}</span></td>
-                            </tr>
-                            <tr style="padding:5px;">
-                                <td>Total</td>
-                                <td><span class="col-orange">{{ $exam->total_questions }}</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-8">
-                    <!-- Question Display -->
-                    <div class="question-container p-t-30 p-b-10">
-                        <input type="hidden" name="total_question" value="{{ count($exam->questions) }}">
-                        @foreach ($exam->questions as $index => $question)
-                        <div id="question-{{ $index }}" class="question" style="display: {{ $index === 0 ? 'block' : 'none' }};">
-                            <div class="question-panel" style="overflow-y: scroll;max-height: 400px;overflow-x: hidden;">
-                            <h4>Question {{ $index + 1 }}</h4>
-                            <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
-                        
-                            <table class="table table-borderless mb0">
-                                <tbody>
-                                    <tr>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="1"> 1 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="2"> 2 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="3"> 3 ) </td>
-                                        <td> <input type="radio" name="question[{{ $index }}]" value="4"> 4 ) </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            </div>
-                            
-                        
-                            <button type="button" class="btn-save btn btn-success" data-index="{{ $index }}">Save & Next</button>
-                            <button type="button" class="btn-reset btn btn-light" data-index="{{ $index }}">Clear</button>
-                            <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $index }}">Save &amp; Mark For Review</button>
-                            <button type="button" class="btn-mark btn btn-primary" data-index="{{ $index }}">Mark for Review & Next</button>
-                            
-                        </div>
-                        @endforeach
+                <input type="hidden" name="test_id" value="{{ $exam->id }}">
+                <div class="row exam-paper">
+                    <div class="col-md-8">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 5px 15px; border: 2px solid #666"><i class="fa fa-user" style="font-size:90px;"></i></td>
+                                    <td>
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding: 0px 5px;">Candidate Name</td>
+                                                    <td> : <span class="col-orange">Admin</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 0px 5px;">Exam Name</td>
+                                                    <td> : <span class="col-orange">{{ $exam->name }}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 0px 5px;">Subject Name</td>
+                                                    <td> : <span class="col-orange"> {{ $exam->subject_name }}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 0px 5px;">Total Questions</td>
+                                                    <td> : <span class="col-orange"> {{ $exam->total_questions }}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 0px 5px;">Remaining Time</td>
+                                                    <td>
+                                                        : <span class="badge badge-danger" id="timerDisplay">00:00:00</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                     <div class="col-md-4">
                         <div class="mt-2"  style="border:dotted;">
