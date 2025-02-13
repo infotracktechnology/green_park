@@ -378,8 +378,7 @@
         }
 
         $(`#question-${index} input[type="radio"]`).prop('checked', false);
-        setStatus(index, 'not-answered',0);
-
+       
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('que-save que-mark que-save-mark')
             .addClass('not-answered');
@@ -388,7 +387,6 @@
 
     $('.pagination a').click(function (e) {
         const index = $(this).data('index');
-        setStatus(index, 'not-answered',0);
         openQuestion(index);
     });
 
