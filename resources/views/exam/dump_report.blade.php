@@ -130,12 +130,12 @@
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-    function exportTable() {
+    async function exportTable() {
         const table = document.getElementById('export');
         const options = {
-            margin: 2,
-            filename: 'test_dump_report.pdf',
-            jsPDF :{ unit: 'mm', format: 'A4', orientation: 'landscape' }
+        margin:[0.5,0,0.5,0],
+        filename:"test_dump_report.pdf",
+        jsPDF:{ unit: 'in', format: 'letter', orientation: 'landscape' },
         };
         html2pdf().set(options).from(table).save().then(() => {
             alert('PDF successfully generated');
