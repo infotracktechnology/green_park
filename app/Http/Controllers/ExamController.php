@@ -138,19 +138,19 @@ class ExamController extends Controller
         return view('student.instruction', compact('test_id'));
     }
     function student_exam(Request $request, $test_id)
-    {
-        $exam = Exam::findOrFail(base64_decode($test_id));
-        $answers =  DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->orderBy('updated_at', 'desc')->get();
-        $maxQuestions = $answers->first()->q_no ?? 0;
-        $answers = $answers->keyBy('q_no');
-        $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
+{
+    $exam = Exam::findOrFail(base64_decode($test_id));
+    $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->orderBy('updated_at', 'desc')->get();
+    $maxQuestions = $answers->first()->q_no ?? 0;
+    $answers = $answers->keyBy('q_no');
+    $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
 
-        if ($second < 0) {
-            abort(404);
-        }
-      
-        return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
+    if ($second < 0) {
+        abort(404);
     }
+
+    return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
+}
  
     function Save(Request $request){
         $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
