@@ -30,7 +30,7 @@
                         <tr>
                             <td>{{ $test->exam_date }}</td>
                             <td>{{ $test->name }}</td>
-                            <td><a href="{{ route('student.mark_download', $test->test_id) }}">{{ $test->mark  }} / {{ $test->total }}</a></td>
+                            <td><a href="{{ route('student.mark_subject', $test->test_id) }}">{{ $test->mark  }} / {{ $test->total }}</a></td>
                             <td>
                                 <?php
                                 $overall_mark = \DB::select("SELECT sum(mark)mark from exam_answer where test_id=$test->test_id group by student_id order by mark desc limit 1");

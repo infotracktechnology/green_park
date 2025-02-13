@@ -135,10 +135,17 @@ class StudentController extends Controller
         return view('student.marksheet',compact('tests'));
     }
 
-    function mark_subject(Request $request){
+    function mark_subject(Request $request, $test_id){
+        $sid = auth()->user()->id;
+        $test = DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject FROM `exam_answer` where test_id=$test_id and student_id=$sid group by subject");
+        return view('student.mark_subject',compact('test'));
         
     }
-    function mark_download(Request $request){
-        
+    function mark_download(Request $request, $test_id){
+        $sid = auth()->user()->id;
+        $answers = DB::table('exam_answer')->where('test_id', $test_id)->where('student_id', $sid)->orderBy('q_no')->get();
+        $answers = $answers->chunk(45);
+        $exam = DB::table('exam')->where('id', $test_id)->selectRaw("name,id,DATE_FORMAT(start_at, '%d-%m-%Y')exam_date")->first();
+        return view('student.mark_download',compact('answers','exam'));
     }
 }
