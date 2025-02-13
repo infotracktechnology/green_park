@@ -337,7 +337,8 @@
             alert('Please select an answer first.');
             return;
         }
-        setStatus(index, 'que-save', radio.val());
+        var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+        setStatus(index, 'que-save',answer);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save-mark')
             .addClass('que-save');
@@ -351,7 +352,8 @@
             alert('Please select an answer first.');
             return;
         }
-        setStatus(index, 'que-save-mark', radio.val());
+        var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+        setStatus(index, 'que-save-mark',answer);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save')
             .addClass('que-save-mark');
@@ -450,4 +452,5 @@
         updateCounts();
     });
 </script>
+
 @endsection
