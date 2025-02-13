@@ -106,9 +106,7 @@ class ExamController extends Controller
             $data = ['test_id' => $request->test_id,'student_id' => $student_id,'subject' => $subject,'q_no' => $i,
             'answer' => $answer,'status' => $status];
 
-            if(isset($exam_answers[$i])){ 
-                DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->where('q_no', $i)->update($data);
-            }else{
+            if(!isset($exam_answers[$i])){ 
                 DB::table('exam_answer')->insert($data);
             }
 
