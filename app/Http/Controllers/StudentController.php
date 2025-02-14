@@ -79,9 +79,10 @@ class StudentController extends Controller
     }
 
 
-    public function destroy($id)
+    public function destroy(Student $student)
     {
-        // Add delete logic here if needed
+        $student->delete();
+        return redirect()->route('student.index')->with('success', 'Student deleted successfully.');
     }
 
 
