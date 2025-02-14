@@ -131,8 +131,9 @@ class ExamController extends Controller
 
     function student_instruction(Request $request, $test_id)
     {
+        $exam = Exam::findOrFail(base64_decode($test_id));
         $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->selectRaw('count(q_no) as total_question')->first();
-        if ($exam_answer && $exam_answer->total_question == 180) {
+        if ($exam_answer && $exam_answer->total_question == $exam->total_question) {
             abort(403, 'You have already attempted this test');
         }
         return view('student.instruction', compact('test_id'));
