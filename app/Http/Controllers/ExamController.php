@@ -81,6 +81,23 @@ class ExamController extends Controller
         return to_route('exam.index');
     }
 
+    public function edit(Request $request, Exam $exam)
+    {
+        $branches = Branch::all();
+        return view('exam.edit', compact('exam', 'branches'));
+    }
+
+
+    public function update(Request $request, Exam $exam)
+    {
+        $data = $request->all();
+        $data['branch_id'] = implode(',', $request->branch_id);
+        $data['coaching_type'] = implode(',', $request->coaching_type);
+        $exam->update($data);
+        session()->flash('success', 'Test updated successfully');
+        return to_route('exam.index');
+    }
+
     function show(Request $request, Exam $exam)
     {
         return view('exam.preview', compact('exam'));
@@ -94,8 +111,6 @@ class ExamController extends Controller
     {
         $student_id = $request->student_id ?? 0;
 
-
-        DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
         $exam_answers =  DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->get()->keyBy('q_no');
 
         for ($i = 1; $i <= $request->total_question; $i++) {
@@ -111,6 +126,7 @@ class ExamController extends Controller
             }
 
         }
+        
 
         return $student_id ? to_route('studentdashboard') : to_route('exam.index');
     }
@@ -133,9 +149,10 @@ class ExamController extends Controller
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
         $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->selectRaw('count(q_no) as total_question')->first();
-        if ($exam_answer && $exam_answer->total_question == $exam->total_question) {
+        if ($exam_answer && $exam_answer->total_question == $exam->total_questions) {
             abort(403, 'You have already attempted this test');
         }
+        
         return view('student.instruction', compact('test_id'));
     }
     function student_exam(Request $request, $test_id)
@@ -147,7 +164,7 @@ class ExamController extends Controller
     $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
 
     if ($second < 0) {
-        abort(404);
+        abort(403, 'Exam Time is Over');
     }
 
     return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));

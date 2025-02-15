@@ -41,6 +41,9 @@
                 <input type="hidden" name="test_id" value="{{ $exam->id }}">
                 <input type="hidden" name="student_id" value="{{ auth()->user()->id }}">
                 <div class="row exam-paper">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger" role="alert"><p class="font-weight-bold">Exam automatically submitted you switched tabs or left the exam window.</p></div>
+                    </div>
                     <div class="col-md-8">
                         <table>
                             <tbody>
@@ -235,7 +238,7 @@
     const form = $('#examForm');
     var testid = Number({{ $exam->id }});
     var max_qno = Number({{ $maxQuestions }});
-
+    max_qno = max_qno > 0 ? max_qno : 1;
     const answers = @json($answers);
 
     function startTimer() {
@@ -408,7 +411,7 @@
     }
 
     function PreviousQuestion(index) {
-        if (index > 0) {
+        if (index > 1) {
             openQuestion(index - 1);
         }
         return;
@@ -432,7 +435,7 @@
     });
 
     startTimer();
-    openQuestion(max_qno + 1);
+    openQuestion(max_qno);
     updateCounts();
     $(document).ready(function () {
         Object.keys(answers).forEach(qno => {
@@ -450,6 +453,10 @@
         });
 
         updateCounts();
+    });
+
+    window.addEventListener('blur', function() {
+        //form.submit();
     });
 </script>
 
