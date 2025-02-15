@@ -4,8 +4,9 @@
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}" />
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css"/>
 @endsection 
-
 
 @section('main')
 <div class="main-content">
@@ -43,9 +44,12 @@
             <th>Name</th>
             <th>Subject</th>
             <th>Total Questions</th>
+            <th>Start Time</th>
+            <th>End Time</th>
             <th>status</th>
             <th>Test attend</th>
             <th>Perview</th>
+            <th>Edit</th>
             <th>Action</th>
            </tr>
           </thead>
@@ -59,6 +63,8 @@
             <td>{{ $test->name }}</td>
             <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>
+            <td>{{ $test->start_at }}</td>
+            <td>{{ $test->end_at }}</td>
             <td>
               <span class="badge badge-{{ $test->status == 'scheduled' ? 'success' : 'danger' }}">{{ $test->status }}</span>
           </td>
@@ -67,6 +73,7 @@
             <td>
               <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>
             </td>
+            <td><a href="{{ route('exam.edit', $test->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a></td>
             <td>
              <form action="{{ route('exam.destroy', $test->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">
               @csrf 
@@ -117,12 +124,13 @@
             </div>
             <div class="form-group col-12">
               <label>Start Datetime</label>
-              <input type="datetime-local" id="start_at" name="start_at" class="form-control form-control-sm" required>
+              <input type="text" id="start_at"  name="start_at" class="datetime-picker form-control form-control-sm" required>
           </div>
           
           <div class="form-group col-12">
               <label>End Datetime</label>
-              <input type="datetime-local" id="end_at" name="end_at" class="form-control form-control-sm" required>
+              <input type="text" id="end_at" name="end_at" class="datetime-picker form-control form-control-sm" required>
+              <div id="end_at_error" class="text-danger"></div>
           </div>
           
          
@@ -142,6 +150,8 @@
 <script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
  const table = $("#myTable").DataTable({
   lengthMenu: [
@@ -149,8 +159,28 @@
    [10, 25, 50, "All"],
   ],
  });
+ flatpickr(".datetime-picker", {
+        enableTime: true,
+        allowInput: true,
+        dateFormat: "Y-m-d H:i",
+        plugins: [
+            new confirmDatePlugin({
+                confirmText: "OK",
+                showAlways: false,
+            })
+        ]
+    });
+    $('#end_at').change(function() {
+        $('#end_at_error').text('');
+        const startTime = new Date($('#start_at').val());
+        const endTime = new Date($(this).val());
+        if (startTime >= endTime) {
+            $('#end_at_error').text('End time must be greater than start time.');
+            $(this).val('');
+        }
+    })
 </script>
-<script>
+{{-- <script>
   document.getElementById('start_at').addEventListener('change', function () {
       const startTime = this.value;
       const endTimeInput = document.getElementById('end_at');
@@ -160,5 +190,5 @@
           endTimeInput.value = startTime;
       }
   });
-</script>
+</script> --}}
 @endsection
