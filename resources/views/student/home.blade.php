@@ -2,6 +2,10 @@
 
 @section('title', 'Dashboard')
 
+@section("meta")
+<meta http-equiv="refresh" content="30">
+@endsection
+
 @section('css')
 <style>
   .announcement-item {
@@ -55,6 +59,7 @@
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
   }
 </style>
+
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
 @endsection

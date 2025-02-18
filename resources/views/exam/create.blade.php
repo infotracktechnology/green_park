@@ -24,6 +24,7 @@
                               <div class="form-group col-lg-3">
                                 <label>Branch</label>
                                 <select name="branch_id[]" class="select" multiple required>
+                                    <option value="">Select Branch</option>
                                     <option value="{{ $branches->implode('id', ',') }}">All</option>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -35,7 +36,8 @@
                               <div class="form-group col-lg-3">
                                  <label>Coaching Type</label>
 
-                                 <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
+                                 <select name="coaching_type[]" id="coaching_type" class="select" multiple required>
+                                    <option value="">Select Coaching Type</option>
                                     <option value="Offline,Online Recorded,Online Live,Test Series,11,12">All</option>
                                     <option value="Offline">Offline</option>
                                     <option value="Online Recorded">Online Recorded</option>
