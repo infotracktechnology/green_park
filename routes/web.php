@@ -65,6 +65,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::post('offline/exam', [ExamController::class, 'offlineUpload'])->name('exam.offline.upload');
     Route::get('answerkey/exam', [ExamController::class, 'answerKey'])->name('exam.answerkey');
     Route::post('answerkey/exam', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
+    Route::get('exam/report/dump', 'App\Http\Controllers\ExamController@Dump_Report')->name('exam.report.dump');
 });
 
 #students routes
@@ -80,7 +81,10 @@ Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('s
 Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
 Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
 Route::post('/exam/clearlog', 'App\Http\Controllers\ExamController@clearlog')->name('exam.clearlog');
-
+Route::post('/exam/save', 'App\Http\Controllers\ExamController@Save')->name('exam.save');
+Route::get('marksheet',[StudentController::class, 'marksheet'])->name('student.marksheet');
+Route::get('mark/subject/{test_id}',[StudentController::class, 'mark_subject'])->name('student.mark_subject');
+Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download'])->name('student.mark_download');
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');

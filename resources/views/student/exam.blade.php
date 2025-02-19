@@ -41,6 +41,9 @@
                 <input type="hidden" name="test_id" value="{{ $exam->id }}">
                 <input type="hidden" name="student_id" value="{{ auth()->user()->id }}">
                 <div class="row exam-paper">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger" role="alert"><p class="font-weight-bold">Exam automatically submitted you switched tabs or left the exam window.</p></div>
+                    </div>
                     <div class="col-md-8">
                         <table>
                             <tbody>
@@ -230,11 +233,14 @@
 @section('js')
 <script>
     var timer = Number({{ $second }});
-    var activeQuestion = 0;
+    var activeQuestion = {{ $maxQuestions }};
     const questions = @json($exam->questions);
     const form = $('#examForm');
     var testid = Number({{ $exam->id }});
- 
+    var max_qno = Number({{ $maxQuestions }});
+    max_qno = max_qno > 0 ? max_qno : 1;
+    const answers = @json($answers);
+
     function startTimer() {
         const interval = setInterval(function () {
             if (timer > 0) {
@@ -252,9 +258,26 @@
         }, 1000);
     }
 
-
-    function setStatus(qno, status,ans) {
+    function setStatus(qno, status, ans) {
         document.getElementById('status-' + qno).value = status;
+        var subject = $(`[name="subject[${qno}]`).val();
+        $.ajax({
+            url: "{{ route('exam.save') }}",
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            method: 'POST',
+            data: {
+                test_id: testid,
+                q_no: qno,
+                subject: subject,
+                status: status,
+                answer: ans
+            },
+            success: function (data) {
+                //console.log(data);
+            },
+        });
     }
 
     function openQuestion(index) {
@@ -266,7 +289,6 @@
         if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
             $(a).addClass("not-answered").removeClass("not-attempted");
         }
-        setStatus(index, 'not-answered',0);
         activeQuestion = index;
         updateCounts();
     }
@@ -279,11 +301,10 @@
         let answeredAndMarked = 0;
 
         $('.pagination a').each(function () {
-            const className = $(this).attr('class');
-            if (className === 'not-answered') notAnswered++;
-            if (className === 'que-save') answered++;
-            if (className === 'que-mark') marked++;
-            if (className === 'que-save-mark') answeredAndMarked++;
+            if ($(this).hasClass('not-answered')) notAnswered++;
+            if ($(this).hasClass('que-save')) answered++;
+            if ($(this).hasClass('que-mark')) marked++;
+            if ($(this).hasClass('que-save-mark')) answeredAndMarked++;
         });
 
         notVisited = questions.length - (notAnswered + answered + marked + answeredAndMarked);
@@ -294,8 +315,6 @@
         $('.countMarked').text(marked);
         $('.countAnsweredAndMarked').text(answeredAndMarked);
     }
-
-  
 
     function clearLog(testid, qno) {
         $.ajax({
@@ -313,7 +332,7 @@
             },
         });
     }
- 
+
     $('.btn-save').click(function () {
         const index = $(this).data('index');
         const radio = $(`#question-${index} input[type="radio"]`);
@@ -321,7 +340,8 @@
             alert('Please select an answer first.');
             return;
         }
-        setStatus(index, 'que-save',radio.val());
+        var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+        setStatus(index, 'que-save',answer);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save-mark')
             .addClass('que-save');
@@ -335,7 +355,8 @@
             alert('Please select an answer first.');
             return;
         }
-        setStatus(index, 'que-save-mark',radio.val());
+        var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+        setStatus(index, 'que-save-mark',answer);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-mark que-save')
             .addClass('que-save-mark');
@@ -344,7 +365,7 @@
 
     $('.btn-mark').click(function () {
         const index = $(this).data('index');
-        setStatus(index, 'que-mark',0);
+        setStatus(index, 'que-mark', 0);
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('not-answered que-save que-save-mark')
             .addClass('que-mark');
@@ -353,12 +374,11 @@
 
     $('.btn-reset').click(function () {
         const index = $(this).data('index');
-        if($(`#question-${index} input[type="radio"]`).is(':checked')) {
-            clearLog(testid,index);
+        if ($(`#question-${index} input[type="radio"]`).is(':checked')) {
+            clearLog(testid, index);
         }
 
         $(`#question-${index} input[type="radio"]`).prop('checked', false);
-        setStatus(index, 'not-answered',0);
 
         $(`.pagination li[data-seq="${index}"] a`)
             .removeClass('que-save que-mark que-save-mark')
@@ -380,7 +400,6 @@
     });
 
     function timefinish() {
-        //alert('Time is up! Submitting all answers.');
         form.submit();
     }
 
@@ -392,7 +411,7 @@
     }
 
     function PreviousQuestion(index) {
-        if (index > 0) {
+        if (index > 1) {
             openQuestion(index - 1);
         }
         return;
@@ -416,7 +435,29 @@
     });
 
     startTimer();
-    openQuestion(1);
+    openQuestion(max_qno);
     updateCounts();
+    $(document).ready(function () {
+        Object.keys(answers).forEach(qno => {
+            const answer = answers[qno];
+            const status = answer.status;
+            const ans = answer.answer;
+
+            if (status === 'que-save' || status === 'que-save-mark') {
+                $(`#question-${qno} input[type="radio"][value="${ans}"]`).prop('checked', true);
+            }
+
+            $(`.pagination li[data-seq="${qno}"] a`)
+                .removeClass('not-attempted not-answered que-mark que-save que-save-mark')
+                .addClass(status);
+        });
+
+        updateCounts();
+    });
+
+    window.addEventListener('blur', function() {
+        //form.submit();
+    });
 </script>
+
 @endsection

@@ -81,6 +81,23 @@ class ExamController extends Controller
         return to_route('exam.index');
     }
 
+    public function edit(Request $request, Exam $exam)
+    {
+        $branches = Branch::all();
+        return view('exam.edit', compact('exam', 'branches'));
+    }
+
+
+    public function update(Request $request, Exam $exam)
+    {
+        $data = $request->all();
+        $data['branch_id'] = implode(',', $request->branch_id);
+        $data['coaching_type'] = implode(',', $request->coaching_type);
+        $exam->update($data);
+        session()->flash('success', 'Test updated successfully');
+        return to_route('exam.index');
+    }
+
     function show(Request $request, Exam $exam)
     {
         return view('exam.preview', compact('exam'));
@@ -94,24 +111,22 @@ class ExamController extends Controller
     {
         $student_id = $request->student_id ?? 0;
 
-
-        DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->delete();
+        $exam_answers =  DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->get()->keyBy('q_no');
 
         for ($i = 1; $i <= $request->total_question; $i++) {
             $status = $request->status[$i] ?? null;
             $subject = $request->subject[$i] ?? null;
-            $answer = $status == 'answer' || $status == 'answer & mark' ? $request->question[$i] : 0;
+            $answer = $status == 'que-save' || $status == 'que-save-mark' ? $request->question[$i] : 0;
 
-            DB::table('exam_answer')->insert([
-                'test_id' => $request->test_id,
-                'student_id' => $student_id,
-                'subject' => $subject,
-                'q_no' => $i,
-                'answer' => $answer,
-                'status' => $status,
+            $data = ['test_id' => $request->test_id,'student_id' => $student_id,'subject' => $subject,'q_no' => $i,
+            'answer' => $answer,'status' => $status];
 
-            ]);
+            if(!isset($exam_answers[$i])){ 
+                DB::table('exam_answer')->insert($data);
+            }
+
         }
+        
 
         return $student_id ? to_route('studentdashboard') : to_route('exam.index');
     }
@@ -132,29 +147,40 @@ class ExamController extends Controller
 
     function student_instruction(Request $request, $test_id)
     {
-        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->first();
-        if ($exam_answer) {
+        $exam = Exam::findOrFail(base64_decode($test_id));
+        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->selectRaw('count(q_no) as total_question')->first();
+        if ($exam_answer && $exam_answer->total_question == $exam->total_questions) {
             abort(403, 'You have already attempted this test');
         }
+        
         return view('student.instruction', compact('test_id'));
     }
     function student_exam(Request $request, $test_id)
-    {
-        $exam = Exam::findOrFail(base64_decode($test_id));
-        $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
+{
+    $exam = Exam::findOrFail(base64_decode($test_id));
+    $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->orderBy('updated_at', 'desc')->get();
+    $maxQuestions = $answers->first()->q_no ?? 0;
+    $answers = $answers->keyBy('q_no');
+    $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
 
-        $exam_answer = DB::table('exam_answer')
-            ->where('test_id', base64_decode($test_id))
-            ->where('student_id', auth()->user()->id)
-            ->first();
-
-        if ($second < 0) {
-            abort(404);
-        }
-
-        return view('student.exam', compact('exam', 'second'));
+    if ($second < 0) {
+        abort(403, 'Exam Time is Over');
     }
 
+    return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
+}
+ 
+    function Save(Request $request){
+        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
+        $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->first();
+        if($answer){
+            DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->update($data);
+        }else{
+            DB::table('exam_answer')->insert($data);
+        }
+
+        return response()->json(['message' => 'Answer saved successfully']);
+    }
 
     public function clearLog(Request $request)
     {
@@ -202,7 +228,6 @@ class ExamController extends Controller
         $studentId = $request->student_id;
         $testId = $request->test_id;
 
-        // Delete previous exam answers for the student if any
         DB::table('exam_answer')
             ->where('student_id', $studentId)
             ->where('test_id', $testId)
@@ -307,7 +332,7 @@ class ExamController extends Controller
     {
     
         $request->validate([
-            'offline' => 'required|mimes:csv|max:1024', // Only CSV files with a maximum size of 1 MB
+            'offline' => 'required|mimes:csv|max:1024',
         ]);
 
         return back()->with('success', 'File uploaded successfully.');
@@ -331,15 +356,22 @@ class ExamController extends Controller
         foreach ($answers as $answer) {
             $exam_answers = DB::table('exam_answer')->where('test_id', $answer['tid'])->where('answer','>',0)->get();
             foreach ($exam_answers as $row) {
-              $ans_key = $answer["a$row->q_no"];
-              $ans_key = explode('|', $ans_key);
+              $ans = $answer["a$row->q_no"];
+              $ans_key = explode('|', $ans);
               $mark = in_array($row->answer, $ans_key) ? 4 : -1;
-              DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark]);
+              DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark,'answer_key' => $ans]);
             }
             
         }
 
         return back()->with('success', 'File uploaded successfully.');
+    }
+
+    function Dump_Report(Request $request){
+        $testId = $request->test_id ?? 0;
+        $tests = Exam::all();
+        $results = DB::select("SELECT test_id,student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.id join branch c on b.campus=c.id where test_id=$testId group by student_id order by mark desc");
+        return view('exam.dump_report',compact('testId','results','tests'));
     }
 
 

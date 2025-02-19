@@ -38,7 +38,7 @@ class ExamPortionController extends Controller
     }
     public function examportion(Request $request)
     {
-        $examportion = auth()->user()->examportion();
+        $examportion = auth()->user()->examportion()->latest()->first();
        
         return view('student.examportion', compact('examportion'));
     }

@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+  @yield('meta')
   <title>@yield('title')</title>
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{{asset('css/app.min.css')}}">
@@ -167,7 +168,7 @@
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
+                  <a href="{{ route('student.marksheet') }}" class="nav-link">
                     <i class="fas fa-chart-bar" style="font-size: 20px; color: #2196f3;"></i><span>Mark Details</span>
                   </a>
                 </li>
@@ -223,8 +224,11 @@
             window.location.reload(); 
         }
     });
+</script>
+  <script>
+    $(document).on('contextmenu', event => event.preventDefault());
+    $(document).on('mousedown', event => event.preventDefault());
   </script>
-  
   @yield('js')
 </body>
 </html>

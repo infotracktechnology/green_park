@@ -131,6 +131,7 @@
                 <li><a href="{{ route('exam.test') }}" class="nav-link">Test Report</a></li>
                 {{-- <li><a href="{{route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li> --}}
                 <li><a href="{{route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
+                <li><a href="{{ route('exam.report.dump') }}" class="nav-link">Result Report</a></li>
               </ul>
             </li>
             <li class="dropdown">
@@ -177,6 +178,10 @@
         }
     });
 </script>
+{{-- <script>
+    $(document).on('contextmenu', event => event.preventDefault());
+    $(document).on('mousedown', event => event.preventDefault());
+</script> --}}
   @yield('js')
 </body>
 </html>
