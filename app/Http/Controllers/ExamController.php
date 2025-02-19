@@ -340,31 +340,41 @@ class ExamController extends Controller
 
     public function answerKey()
     {
-        return view('exam.answerkey');
+        $answerkey_logs = DB::table('answerkey_log')->orderBy('upload_time', 'desc')->get();
+        return view('exam.answerkey', compact('answerkey_logs'));
     }
 
-    public function uploadAnswerKey(Request $request,ImportController $import)
+    public function uploadAnswerKey(Request $request, ImportController $import)
     {
+       
         $request->validate([
-            'answer_key' => 'required|max:1024', 
+            'answer_key' => 'required|max:1024',
         ]);
 
         $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
-        if(!isset($answers[0]['tid']))
-         return back()->with('error', 'File is not in the correct format.');
-
-        foreach ($answers as $answer) {
-            $exam_answers = DB::table('exam_answer')->where('test_id', $answer['tid'])->where('answer','>',0)->get();
-            foreach ($exam_answers as $row) {
-              $ans = $answer["a$row->q_no"];
-              $ans_key = explode('|', $ans);
-              $mark = in_array($row->answer, $ans_key) ? 4 : -1;
-              DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark,'answer_key' => $ans]);
-            }
-            
+     if (!isset($answers[0]['tid'])) {
+            return back()->with('error', 'File is not in the correct format.');
         }
+    
+       
+        $originalFileName = $request->file('answer_key')->getClientOriginalName();
+        $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
+        foreach ($answers as $answer) {
+           $exam_answers = DB::table('exam_answer')->where('test_id', $answer['tid'])->where('answer', '>', 0)->get();
+        foreach ($exam_answers as $row) {
+                $ans = $answer["a$row->q_no"];
+                $ans_key = explode('|', $ans);
+                $mark = in_array($row->answer, $ans_key) ? 4 : -1;
+           DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $ans]);
+            }
+        }
+    DB::table('answerkey_log')->insert([
+            'file_name' => $originalFileName,
+            'upload_time' => $uploadTime,
+            'test_id' => $answer['tid'],
 
-        return back()->with('success', 'File uploaded successfully.');
+        ]);
+     return redirect()->back()->with('success', 'Answer key uploaded successfully.');
     }
 
     function Dump_Report(Request $request){
