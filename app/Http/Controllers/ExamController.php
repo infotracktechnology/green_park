@@ -128,19 +128,19 @@ class ExamController extends Controller
         }
         
 
-        return $student_id ? to_route('studentdashboard') : to_route('exam.index');
+     return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.index');
     }
 
 
 
 
     function destroy(Request $request, Exam $exam)
-    {
-       
+    {  
         foreach ($exam->questions as $key => $question) {
             unlink($question['image']);
         }
         $exam->delete();
+        DB::table('exam_answer')->where('test_id', $exam->id)->delete();
         session()->flash('success', 'Test deleted successfully');
         return to_route('exam.index');
     }
@@ -149,8 +149,8 @@ class ExamController extends Controller
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
         $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->selectRaw('count(q_no) as total_question')->first();
-        if ($exam_answer && $exam_answer->total_question == $exam->total_questions) {
-            abort(403, 'You have already attempted this test');
+        if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
+            return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
         }
         
         return view('student.instruction', compact('test_id'));
@@ -164,7 +164,7 @@ class ExamController extends Controller
     $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
 
     if ($second < 0) {
-        abort(403, 'Exam Time is Over');
+       return redirect()->route('studentdashboard')->with('error', 'Exam Time is up!');
     }
 
     return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
@@ -352,7 +352,7 @@ class ExamController extends Controller
         ]);
 
         $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
-     if (!isset($answers[0]['tid'])) {
+     if (!isset($answers[0]['test_id'])) {
             return back()->with('error', 'File is not in the correct format.');
         }
     
@@ -360,7 +360,7 @@ class ExamController extends Controller
         $originalFileName = $request->file('answer_key')->getClientOriginalName();
         $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
         foreach ($answers as $answer) {
-           $exam_answers = DB::table('exam_answer')->where('test_id', $answer['tid'])->where('answer', '>', 0)->get();
+           $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->get();
         foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
@@ -368,12 +368,14 @@ class ExamController extends Controller
            DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $ans]);
             }
         }
-    DB::table('answerkey_log')->insert([
-            'file_name' => $originalFileName,
-            'upload_time' => $uploadTime,
-            'test_id' => $answer['tid'],
+
+        DB::table('answerkey_log')->insert([
+                'file_name' => $originalFileName,
+                'upload_time' => $uploadTime,
+                'test_id' => $answer['test_id'],
 
         ]);
+
      return redirect()->back()->with('success', 'Answer key uploaded successfully.');
     }
 

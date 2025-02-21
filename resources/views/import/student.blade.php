@@ -18,9 +18,14 @@
                             @csrf
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-12 mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <h6 class="col-deep-purple">Student Import</h6>
                                     </div>
+
+                                    <div class="col-md-6 col-sm-12 mb-3">
+                                        <a href="{{ env('APP_URL').'template/student_template.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Student Data Upload Template (Format)</a>
+                                       </div>
+
                                     <div class="form-group col-lg-3">
                                         <label for="branch">Select Branch:</label>
                                         <select name="branch" id="branch" class="form-control form-control-sm" required>

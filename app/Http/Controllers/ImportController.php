@@ -38,9 +38,13 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
-                   $student = Student::find($row['id']);
-                   unset($row['id']);
-                   $student->update($row);
+                   if(isset($row['id'])){
+                    $student = Student::find($row['id']);
+                    $student->update($row);
+                   }
+                   else{
+                    $student = Student::create($row);
+                   }
                 }
                 return back()->with('success', 'CSV file uploaded and data saved successfully!');
             }
