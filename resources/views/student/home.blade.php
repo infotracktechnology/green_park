@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section("meta")
-<meta http-equiv="refresh" content="30">
+<meta http-equiv="refresh" content="60">
 @endsection
 
 @section('css')
@@ -68,6 +68,16 @@
 <div class="main-content">
     <div class="section-body">
         <div class="row">
+
+            <div class="col-lg-12">
+                @if(session('success'))
+                    <div class="alert alert-success"><b>{{ session('success') }}</b></div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-danger"><b>{{ session('error') }}</b></div>
+                @endif
+            </div>
+
             <div class="col-xl-4 col-lg-6">
                 <div class="card l-bg-green">
                     <div class="card-statistic-3">
@@ -76,7 +86,7 @@
                             <h4 class="card-title">{{ auth()->user()->student_name }}</h4>
                             <span>{{ auth()->user()->dob }}</span>
                             <p class="mb-0 text-sm">
-                                <span class="text-nowrap"><strong>Coaching Type :</strong> {{ auth()->user()->coaching_type }}</span>
+                                <span class="text-nowrap"><strong>Coaching Type:</strong> {{ auth()->user()->coaching_type }}</span>
                             </p>
                         </div>
                     </div>
