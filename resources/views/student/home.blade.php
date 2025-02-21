@@ -86,7 +86,7 @@
                             <h4 class="card-title">{{ auth()->user()->student_name }}</h4>
                             <span>{{ auth()->user()->dob }}</span>
                             <p class="mb-0 text-sm">
-                                <span class="text-nowrap"><strong>Coaching Type :</strong> {{ auth()->user()->coaching_type }}</span>
+                                <span class="text-nowrap"><strong>Coaching Type:</strong> {{ auth()->user()->coaching_type }}</span>
                             </p>
                         </div>
                     </div>
