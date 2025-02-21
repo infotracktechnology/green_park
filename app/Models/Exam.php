@@ -20,18 +20,21 @@ class Exam extends Model
 
     function branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id','id');
+        if(strpos($this->branch_id, ',')){
+            return Branch::whereIn('id', explode(',', $this->branch_id))->get()->implode('name', ', ');
+        }
+        return Branch::find($this->branch_id)->name;
     }
 
 
     public static function getOngoingExams($coachingType, $branchId)
-{
+    {
     return self::where('start_at', '<=', now())  
                 ->where('end_at', '>=', now())    
                 ->where('coaching_type', 'like', "%$coachingType%")
                 ->where('branch_id', 'like', "%$branchId%")->first();
 
-}
+    }
     
 	public static function boot()
 	{

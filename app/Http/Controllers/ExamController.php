@@ -135,12 +135,12 @@ class ExamController extends Controller
 
 
     function destroy(Request $request, Exam $exam)
-    {
-       
+    {  
         foreach ($exam->questions as $key => $question) {
             unlink($question['image']);
         }
         $exam->delete();
+        DB::table('exam_answer')->where('test_id', $exam->id)->delete();
         session()->flash('success', 'Test deleted successfully');
         return to_route('exam.index');
     }
@@ -149,7 +149,7 @@ class ExamController extends Controller
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
         $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->selectRaw('count(q_no) as total_question')->first();
-        if ($exam_answer && $exam_answer->total_question == $exam->total_questions) {
+        if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
             abort(403, 'You have already attempted this test');
         }
         
@@ -368,12 +368,14 @@ class ExamController extends Controller
            DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $ans]);
             }
         }
-    DB::table('answerkey_log')->insert([
-            'file_name' => $originalFileName,
-            'upload_time' => $uploadTime,
-            'test_id' => $answer['tid'],
+
+        DB::table('answerkey_log')->insert([
+                'file_name' => $originalFileName,
+                'upload_time' => $uploadTime,
+                'test_id' => $answer['tid'],
 
         ]);
+
      return redirect()->back()->with('success', 'Answer key uploaded successfully.');
     }
 
