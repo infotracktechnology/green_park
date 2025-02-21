@@ -11,14 +11,28 @@
       <div class="section-body"> 
           <div class="row">
               <div class="col-12">
+            @if(session()->has('success'))
+               <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
+           @endif
+           
+           @if(session()->has('error'))
+               <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
+           @endif
+
                   <div class="card card-primary">
                     <form method="post" id="myForm" action="{{ route('exam.offline.upload') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
-                            <div class="col-md-8 col-sm-12 mb-3">
+                            <div class="row">
+                            <div class="col-md-6 col-sm-12 mb-3">
                                 <h6 class="col-deep-purple">Offline/OMR Upload</h6>
                                </div>
-                            <div class="row">
+
+                               <div class="col-md-6 col-sm-12 mb-3">
+                                <a href="#" class="btn btn-primary"><i class="fa fa-download"></i> Offline/OMR Upload Template (Format)</a>
+                               </div>
+
+                           
                                 
                                <!-- Test ID Dropdown -->
                                <div class="form-group col-lg-4">
