@@ -13,11 +13,11 @@
               <div class="col-12">
                @if(session()->has('success'))
                <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
-               @endif
-
-               @if(session()->has('error'))
-               <div class="alert alert-error alert-dismissible show fade">{{ session('error') }}</div>
-               @endif
+           @endif
+           
+           @if(session()->has('error'))
+               <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
+           @endif
 
                   <div class="card card-primary">
                     <form method="post" id="myForm" action="{{ route('exam.answerkey.upload') }}" enctype="multipart/form-data">
@@ -44,6 +44,32 @@
                              </div>
                             </div>
                          </div>
+
+
+                         <div class="card-body">
+                            <h6 class="col-deep-purple">Uploaded File Information</h6>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm" id="myTable">
+                              <thead>
+                                <tr>
+                                  <th>Test ID</th>
+                                  <th>File Name</th>
+                                  <th>Upload Time</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @foreach($answerkey_logs as $log)
+                                <tr>
+                                  <td>{{ $log->test_id }}</td>
+                                  <td>{{ $log->file_name }}</td>
+                                  <td>{{ $log->upload_time }}</td>
+                                </tr>
+                                @endforeach
+                              </tbody>
+                            </table>
+                          </div>
+
+                         
                       </form>
                   </div>
               </div>
@@ -53,5 +79,12 @@
 </div>
 @endsection
 @section('js')
-
+<script>
+    const table = $("#myTable").DataTable({
+     lengthMenu: [
+      [10, 25, 50, -1],
+      [10, 25, 50, "All"],
+     ],
+    });
+  </script>
 @endsection
