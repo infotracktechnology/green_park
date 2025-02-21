@@ -171,8 +171,6 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                       
-                    
                         <div class="panel" style="overflow-y: scroll;">
                             <ul class="pagination test-questions my-4">
                                 @foreach ($exam->questions as $index => $question)
@@ -187,10 +185,8 @@
                                 @endforeach
                             </ul>
                         </div>
-                   
                 </div>
             </div>
-
             <div class="row exam-summery justify-content-center" style="display: none;">
                 <h3>Exam Summary</h3>
                 <table class="table table-bordered">
@@ -216,7 +212,6 @@
                     </tbody>
                 </table>
                 <hr>
-                
                 <div class="col-md-12 text-center">
                     <h4> Are you sure you want to submit for final marking?<br>No changes will be allowed after submission.</h4>
                     <button type="button" class="btn btn-light btn-lg mx-auto" id="btnYesSubmitConfirm">Yes</button>
