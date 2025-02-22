@@ -37,10 +37,17 @@ class Student extends Authenticatable
             $model->save();
         });
     }
-    public function announcement()
-    {
-        return Announcement::where('branch', $this->campus)->where('gender', $this->gender)->where('coaching_type', $this->coaching_type);
-    }
+   public function announcement()
+   {
+       return Announcement::where('branch', 'like', "%{$this->campus}%")
+           ->where('coaching_type', 'like', "%{$this->coaching_type}%")
+           ->where(function ($query) {
+               $query->where('gender', $this->gender)
+                     ->orWhere('gender', 'All');
+           })
+           ->latest()
+           ->get();
+   }
 
     function chairmanvideo()
     {

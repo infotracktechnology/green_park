@@ -49,48 +49,36 @@
     <div class="section-body">
         <div class="row">
             <div class="col-md-6 col-lg-12 col-xl-12">
-                <!-- Announcement -->
                 <div class="card">
                   <div class="card-header">
                     <h4><i style="font-size: 30px;" class="fas fa-bullhorn"></i> Announcements</h4>
-                    {{-- <div class="card-header-action"> Total Announcement : {{ auth()->user()->announcement()->count() }} </div> --}}
                   </div>
                   <div class="card-body">
                     <div class="notice-board">
-                        @forelse(auth()->user()->announcement()
-                        ->where('branch', auth()->user()->campus)
-                        ->orWhere('branch', 'All')
-                        ->where('coaching_type', auth()->user()->coaching_type)
-                        ->orWhere('coaching_type', 'All')
-                        ->where('gender', auth()->user()->gender)
-                        ->orWhere('gender', 'All')
-                        ->latest()
-                        ->get() as $announcement)
-                        
-                        @if(
-                            ($announcement->branch === auth()->user()->campus || $announcement->branch === 'All') &&
-                            ($announcement->coaching_type === auth()->user()->coaching_type || $announcement->coaching_type === 'All') &&
-                            ($announcement->gender === auth()->user()->gender || $announcement->gender === 'All') &&
-                            ($announcement->coaching_type !== 'Offline' || ($announcement->coaching_type === 'Offline' && ($announcement->category === 'All'|| $announcement->category === null || $announcement->category === auth()->user()->hostel_dayscholar)))
-                        )
-                                <div class="notice-board-item border p-3 mb-3 rounded">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="notice-board-id"><i class="fas fa-id-badge"></i> <strong>#</strong> {{ $announcement->id }}</div>
-                                        <div class="badge badge-info">{{ $announcement->created_at->format('d M Y') }}</div>
+                        @forelse(auth()->user()->announcement() as $announcement)
+                            <div class="notice-board-item border p-3 mb-3 rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="notice-board-id">
+                                        <i class="fas fa-id-badge"></i> <strong>#</strong> {{ $announcement->id }}
                                     </div>
-                                    <div class="notice-board-item-title mt-2">
-                                        <i class="fas fa-heading"></i> <strong>Title :</strong> {{ $announcement->title }}
-                                    </div>
-                                    <div class="notice-board-item-content">
-                                        <i class="fas fa-align-left"></i> <strong>Content :</strong> {!! $announcement->content !!}
-                                    </div>
-                                    <div class="notice-board-item-date mt-2">
-                                        @if($announcement->attachment)
-                                            <a href="/public/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-paperclip"></i> Attachment</a>
-                                        @endif
+                                    <div class="badge badge-info">
+                                        {{ $announcement->created_at->format('d M Y') }}
                                     </div>
                                 </div>
-                            @endif
+                                <div class="notice-board-item-title mt-2">
+                                    <i class="fas fa-heading"></i> <strong>Title :</strong> {{ $announcement->title }}
+                                </div>
+                                <div class="notice-board-item-content">
+                                    <i class="fas fa-align-left"></i> <strong>Content :</strong> {!! $announcement->content !!}
+                                </div>
+                                <div class="notice-board-item-date mt-2">
+                                    @if($announcement->attachment)
+                                        <a href="/public/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer">
+                                            <i class="fas fa-paperclip"></i> Attachment
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
                         @empty
                             <div class="notice-board-item border p-3 mb-3 rounded text-center">
                                 <div class="notice-board-item-date text-muted">
@@ -101,7 +89,6 @@
                     </div>
                 </div>
                 </div>
-                <!-- Notice board -->
               </div>
             </div>
         </div>
