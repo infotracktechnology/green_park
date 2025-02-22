@@ -58,7 +58,7 @@
            @foreach ($tests as $test)
            <tr>
             <td>{{ $test->id }}</td>
-            <td>{{ strpos($test->branch_id, ',') ? 'All' : $test->branch->name }}</td>
+            <td>{{ $test->branch() }}</td>
             <td>{{ $test->coaching_type }}</td>
             <td>{{ $test->name }}</td>
             <td>{{ $test->subject_name }}</td>
