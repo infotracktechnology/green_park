@@ -70,11 +70,6 @@ class AnnouncementController extends Controller
         return to_route('announcement.index');
     }
     
-    public function notification(Request $request)
-    {
-        $announcements=Announcement::all();
-        return view('student.notification', compact('announcements'));
-    }
     
 
 

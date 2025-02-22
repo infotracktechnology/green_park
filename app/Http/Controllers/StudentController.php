@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Exam; // Import the Exam model
 use Illuminate\Support\Facades\DB;
+use App\Models\Announcement;
 
 
 class StudentController extends Controller
@@ -149,4 +150,10 @@ class StudentController extends Controller
         $exam = DB::table('exam')->where('id', $test_id)->selectRaw("name,id,DATE_FORMAT(start_at, '%d-%m-%Y')exam_date")->first();
         return view('student.mark_download',compact('answers','exam'));
     }
+public function notification(Request $request)
+{
+    $announcements = auth()->user()->announcement();
+
+    return view('student.notification', compact('announcements'));
+}
 }

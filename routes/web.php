@@ -74,7 +74,7 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function
 Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentdashboard');
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
-Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
+Route::get('notification',[StudentController::class, 'notification'])->name('student.notification');
 Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
 Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
 
