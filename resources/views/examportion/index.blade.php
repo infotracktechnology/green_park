@@ -24,8 +24,8 @@
             <div class="col-md-9 col-sm-12 mb-3">
             <h6 class="col-deep-purple">Exam Portion</h6>
             </div>
-            <div class="col-md-3 col-sm-12 mb-3">
-                <a href="{{route('examportion.create')}}" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Add PDF</a>
+            <div class="col-md-2 col-sm-6 mb-3 ">
+                <a href="{{route('examportion.create')}}" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Add</a>
                   </div>
                   </div>
                   <div class="col-12">
@@ -46,7 +46,15 @@
                 @foreach ($examportions as $examportion)
                 <tr>
                   
-                  <td>{{ strpos($examportion->branch_id, ',') ? 'All' : $test->branch->name }}</td>
+                  <td>
+                    @php
+                        $branchNames = collect(explode(',', $examportion->branch_id))
+                            ->map(fn($branchId) => optional(app\Models\Branch::find(trim($branchId)))->name)
+                            ->filter()
+                            ->implode(', ');
+                    @endphp
+                    {{ $branchNames }}
+                </td>
                   <td>{{$examportion->coaching_type}}</td>
                   <td>{{$examportion->title}}</td>
                  <td>{{$examportion->attachment}}</td>

@@ -1,8 +1,8 @@
 @extends('layouts.app')
-
 @section('title', ' Announcement')
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}">
+<link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}">
 @endsection
 @section('main')
 <div class="main-content">
@@ -20,28 +20,26 @@
                                  <h6 class="col-deep-purple">Add Announcement</h6>
                               </div>
 
-                              <div class="form-group col-lg-3">
+                              <div class="form-group col-lg-4">
                                 <label for="branch">Branch</label>
-                                <select name="branch" id="branch" class="form-control form-control-sm"  required>
-                                    <option value="All" selected>All Branches</option>
+                                <select name="branch[]" id="branch" class="select2 form-control " multiple="multiple" required>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
-                              <div class="form-group col-lg-3">
-                                 <label>Coaching Type</label>
-                                 <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
-                                    <option value="All" selected>All Types</option>
+                            <div class="form-group col-lg-4">
+                                <label>Coaching Type</label>
+                                <select name="coaching_type[]" id="coaching_type" class="select2 form-control form-control-sm" multiple="multiple" required>
                                     <option value="Offline">Offline</option>
                                     <option value="Online Recorded">Online Recorded</option>
                                     <option value="Online Live">Online Live</option>
                                     <option value="Test Series">Test Series</option>
                                     <option value="11">11</option>
                                     <option value="12">12</option>
-                                 </select>
-                              </div>
+                                </select>
+                            </div>
 
                               <div class="form-group col-lg-3" id="categoryDiv" style="display: none;">
                                 <label>Category</label>
@@ -97,6 +95,13 @@
 
 @section('js')
 <script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
+<script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
+<script>
+    $(document).ready(function() {
+      $('.select2').select2();
+      
+    });
+  </script>
 <script>
     document.getElementById('coaching_type').addEventListener('change', function() {
         var categoryDiv = document.getElementById('categoryDiv');
@@ -109,7 +114,6 @@
         }
     });
 
-    // Initial check if the page loads with a predefined value
     window.onload = function() {
         var coachingType = document.getElementById('coaching_type').value;
         var categoryDiv = document.getElementById('categoryDiv');

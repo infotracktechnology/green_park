@@ -24,8 +24,8 @@
                     <div class="col-md-9 col-sm-12 mb-3">
                     <h6 class="col-deep-purple">Announcement</h6>
                     </div>
-                    <div class="col-md-3 col-sm-12 mb-3">
-                  <a href="{{route('announcement.create')}}" class="btn btn-primary btn-block">Add Announcement</a>
+                    <div class="col-md-2 col-sm-6 mb-3">
+                  <a href="{{route('announcement.create')}}" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Add </a>
                     </div>
                     </div>
                     <div class="col-12">
@@ -39,7 +39,6 @@
           <th>Coaching Type</th>
           <th>Gender</th>
           <th>Title</th>
-         <th>Category</th>
           <th>Action</th>
         </tr>
   
@@ -48,11 +47,18 @@
         <tbody>
           @foreach ($announcements as $announcement)
           <tr>
-           <td>{{ $announcement->branch_id == 'All' ? 'All' : $announcement->branch }}</td>
+            <td>
+                @php
+                    $branchNames = collect(explode(',', $announcement->branch))
+                        ->map(fn($branchId) => optional(app\Models\Branch::find(trim($branchId)))->name)
+                        ->filter()
+                        ->implode(', ');
+                @endphp
+                {{ $branchNames }}
+            </td>
             <td>{{$announcement->coaching_type}}</td>
             <td>{{$announcement->gender}}</td>
             <td>{{$announcement->title}}</td>
-           <td>{{$announcement->category}}</td>
            
             {{-- <td>
               <a href="{{ route('announcement.edit', $announcement->id) }}" class="btn btn-warning text-white">

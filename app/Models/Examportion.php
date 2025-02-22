@@ -14,8 +14,5 @@ class Examportion extends Model
     {
         return $this->belongsTo(Branch::class,'branch_id','id');
     }
-    public static function boot()
-	{
-		parent::boot();
-    }
+   
 }
