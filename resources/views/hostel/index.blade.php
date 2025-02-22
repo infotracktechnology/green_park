@@ -43,8 +43,7 @@
           <th>Name</th>
           <th>Type</th>
           <th>Warden Name</th>
-          <th>Mobile No</th>
-          <th>Address</th>
+        <th>Room Type</th>
           <th>Edit</th>
           {{-- <th>Action</th> --}}
         </tr>
@@ -59,8 +58,7 @@
             <td>{{$hostel->name}}</td>
             <td>{{$hostel->type}}</td>
             <td>{{$hostel->warden_name}}</td>
-            <td>{{$hostel->phone_no}}</td>
-            <td>{{$hostel->address}}</td>
+            <td>{{$hostel->room_type}}</td>
             <td>
               <a href="{{ route('hostel.edit', $hostel->id) }}" class="btn btn-warning text-white">
                  <i class="fas fa-edit"></i>

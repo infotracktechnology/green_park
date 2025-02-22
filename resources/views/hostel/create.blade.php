@@ -46,9 +46,16 @@
                                  </select>
                              </div>
                              
+                             <div class="form-group col-lg-3">
+                              <label>Room Type</label>
+                              <select name="room_type" class="form-control form-control-sm" >
+                                 <option value="">Select</option>
+                                 <option value="AC">AC</option>
+                                 <option value="Non AC">Non AC</option>
+                              </select>
+                           </div>
                              
-                             
-                              <div class="form-group col-lg-3">
+                              {{-- <div class="form-group col-lg-3">
                                  <label>Address</label>
                                  <input type="text" name="address" class="form-control form-control-sm" required>
                               </div>
@@ -78,7 +85,7 @@
                                  @error('phone_no')
                                  <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                                  @enderror
-                              </div>
+                              </div> --}}
                               <div class="col-md-12 col-sm-12 mb-3">
                                  <h6 class="col-deep-purple">Room Details</h6>
                               </div>
@@ -96,20 +103,20 @@
                                        <label>Room No</label>
                                        <input type="text" name="rooms[0][room_no]" class="form-control form-control-sm" required>
                                     </div>
-                                    <div class="form-group col-lg-2">
-                                       <label>Room Type</label>
-                                       <select name="rooms[0][room_type]" class="form-control form-control-sm" >
-                                          <option value="">Select</option>
-                                          <option value="AC">AC</option>
-                                          <option value="Non AC">Non AC</option>
-                                       </select>
-                                    </div>
+                                    
                                     <div class="form-group col-lg-2">
                                        <label for="no_of_beds">No of Beds</label>
                                        <div class="d-flex align-items-center">
                                           <input type="text" name="rooms[0][no_of_beds]" class="form-control form-control-sm me-2" required>
-                                          <button style="margin-left: 10px;" type="button" class="btn btn-warning btn-sm add-row" id="add"><i class="fa fa-plus"></i></button>
+                                         
                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-2">
+                                       <label>Cart No</label>
+                                       <div class="d-flex align-items-center">
+                                       <input type="text" name="rooms[0][cart_no]" class="form-control form-control-sm" required>
+                                       <button style="margin-left: 10px;" type="button" class="btn btn-warning btn-sm add-row" id="add"><i class="fa fa-plus"></i></button>
+                                    </div>
                                     </div>
                                  </div>
                               </div>

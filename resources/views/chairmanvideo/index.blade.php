@@ -21,11 +21,11 @@
             <div class="card-body">
 
             <div class="row">
-            <div class="col-md-9 col-sm-12 mb-3">
+            <div class="col-md-9 col-sm-8 mb-2">
             <h6 class="col-deep-purple">Chairman Video</h6>
             </div>
-            <div class="col-md-3 col-sm-12 mb-3">
-                <a href="{{route('chairmanvideo.create')}}" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Add Video</a>
+            <div class="col-md-2 col-sm-6 mb-3">
+                <a href="{{route('chairmanvideo.create')}}" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Add</a>
                   </div>
                   </div>
                   <div class="col-12">
@@ -47,7 +47,15 @@
                 @foreach ($chairmanvideos as $chairmanvideo)
                 <tr>
                   
-                  <td>{{ strpos($chairmanvideo->branch_id, ',') ? 'All' : $test->branch->name }}</td>
+                  <td>
+                    @php
+                        $branchNames = collect(explode(',', $chairmanvideo->branch_id))
+                            ->map(fn($branchId) => optional(app\Models\Branch::find(trim($branchId)))->name)
+                            ->filter()
+                            ->implode(', ');
+                    @endphp
+                    {{ $branchNames }}
+                </td>
                   <td>{{$chairmanvideo->coaching_type}}</td>
                   <td>{{$chairmanvideo->gender}}</td>
                   <td>{{$chairmanvideo->title}}</td>
