@@ -46,49 +46,18 @@
                                         <option value="" disabled selected>-- Choose Warden --</option>
                                         @foreach ($staffs as $staff)
                                             <option value="{{ $staff->name }}" @if($hostel->warden_name == $staff->name) selected @endif>{{ $staff->name }}</option>
-                                            <option value="{{ $staff->id }}" @if($hostel->warden_name == $staff->id) selected @endif>{{ $staff->name }}</option>
+                                            {{-- <option value="{{ $staff->id }}" @if($hostel->warden_name == $staff->id) selected @endif>{{ $staff->name }}</option> --}}
                                         @endforeach
                                     </select>
                                 </div>
 
                                 <div class="form-group col-lg-3">
-                                    <label>Address</label>
-                                    <input type="text" name="address" value="{{ $hostel->address }}" class="form-control form-control-sm" required>
-                                </div>
-
-                                <div class="form-group col-lg-3">
-                                    <label>State</label>
-                                    <select name="state" onchange="City(this.value);" class="form-control form-control-sm" required>
-                                      <option value="">Select State</option>
-                                      @foreach ($states as $state)
-                                      <option value="{{$state->State}}" @if($hostel->state == $state->State) selected @endif>{{$state->State}}</option>
-                                      @endforeach
+                                    <label>Room Type</label>
+                                    <select name="room_type" id="room_type" class="form-control form-control-sm" required>
+                                        <option value="">Select</option>
+                                        <option value="AC" @if($hostel->room_type == 'AC') selected @endif>AC</option>
+                                        <option value="Non AC" @if($hostel->room_type == 'Non AC') selected @endif>Non AC</option>
                                     </select>
-                               </div>
-
-                                <div class="form-group col-lg-3">
-                                    <label>City</label>
-                                     <select name="city" id="city"  class="form-control form-control-sm" required >
-                                       <option value="">Select City</option>
-                                       @foreach ($districts as $district) 
-                                       <option value="{{$district->District}}" @if($hostel->city == $district->District) selected @endif>{{$district->District}}</option>
-                                       @endforeach
-                                     </select>
-                                </div>
-
-                                
-
-                                <div class="form-group col-lg-3">
-                                    <label>Pincode</label>
-                                    <input type="number" name="pincode" value="{{ $hostel->pincode }}" class="form-control form-control-sm" required>
-                                </div>
-
-                                <div class="form-group col-lg-3">
-                                    <label>Contact Mobile No</label>
-                                    <input type="text" name="phone_no" value="{{ $hostel->phone_no }}" maxlength="10" class="form-control form-control-sm @error('phone_no') is-invalid @enderror">
-                                    @error('phone_no')
-                                    <div class="alert alert-danger">{{ $message }}</div>
-                                    @enderror
                                 </div>
 
                                 <!-- Room Details -->
@@ -120,15 +89,7 @@
                                             <input type="text" name="rooms[{{ $index }}][room_no]" value="{{ $room->room_no }}" class="form-control form-control-sm" required>
                                         </div>
 
-                                        <!-- Room Type -->
-                                        <div class="form-group col-lg-2">
-                                            <label>Room Type</label>
-                                            <select name="rooms[{{ $index }}][room_type]" class="form-control form-control-sm" required>
-                                                <option value="">Select</option>
-                                                <option value="AC" @if($room->room_type == 'AC') selected @endif>AC</option>
-                                                <option value="Non AC" @if($room->room_type == 'Non AC') selected @endif>Non AC</option>
-                                            </select>
-                                        </div>
+                                        
 
                                         <!-- No of Beds -->
                                         <div class="form-group col-lg-2">
@@ -136,6 +97,14 @@
                                             <div class="d-flex align-items-center">
                                             <input type="number" name="rooms[{{ $index }}][no_of_beds]" value="{{ $room->no_of_beds }}" class="form-control form-control-sm" required>
                                             {{-- <button style="margin-left: 10px;" type="button" class="btn btn-danger btn-sm" onclick="deleteRoom(event);"><i class="fa fa-trash"></i></button> --}}
+                                        </div>
+                                        </div>
+
+                                        <!-- Cart No -->
+                                        <div class="form-group col-lg-2">
+                                            <label>Cart No</label>
+                                            <div class="d-flex align-items-center">
+                                            <input type="text" name="rooms[{{ $index }}][cart_no]" value="{{ $room->cart_no }}" class="form-control form-control-sm" required>
                                         </div>
                                         </div>
 
@@ -163,7 +132,6 @@
 @section('js')
 <script>
      function deleteRoom(e){
-        // Check if the clicked element is a delete button
         if (e.target && e.target.classList.contains('btn-danger')) {
             const roomRow = e.target.closest('.room-row');
             roomRow.remove();
@@ -175,7 +143,6 @@
   const roomDetailsContainer = document.getElementById('roomDetails');
   const addRoomBtn = document.getElementById('addRoomBtn');
 
-  // Add new room on button click
   addRoomBtn.addEventListener('click', function() {
     const roomIndex = roomDetailsContainer.querySelectorAll('.room-row').length;
     const newRoomRow = `
@@ -211,7 +178,6 @@
     roomDetailsContainer.insertAdjacentHTML('beforeend', newRoomRow);
   });
 
-  // Event delegation for delete buttons
  
 
 });

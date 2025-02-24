@@ -6,13 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\Chairmanvideo;
+use Illuminate\Support\Facades\DB;
 
 class ChairmanVideoController extends Controller
 {
     public function index()
     {
         $chairmanvideos = Chairmanvideo::all();
-        return view('chairmanvideo.index', compact('chairmanvideos'));
+        $branches = Branch::all();
+        $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
+        return view('chairmanvideo.index', compact('chairmanvideos', 'branches', 'branchList'));
     }
     public function create()
     {
@@ -22,8 +25,8 @@ class ChairmanVideoController extends Controller
     public function store(Request $request)
     {
         $chairmanvideos = new Chairmanvideo();
-        $chairmanvideos->branch_id = $request->branch_id;
-        $chairmanvideos->coaching_type = $request->coaching_type;
+        $chairmanvideos->branch_id = implode(',', $request->branch_id);
+    $chairmanvideos->coaching_type = implode(',', $request->coaching_type);
         $chairmanvideos->gender = $request->gender;
         $chairmanvideos->title = $request->title;
         $chairmanvideos->link = $request->link;

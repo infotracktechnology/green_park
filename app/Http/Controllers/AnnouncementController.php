@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
-use Mockery\Generator\StringManipulation\Pass\Pass;
 
 class AnnouncementController extends Controller
 {
@@ -14,7 +13,9 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         $announcements = Announcement::all();
-        return view('announcement.index', compact('announcements'));
+        $branches = Branch::all();
+        $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
+        return view('announcement.index', compact('announcements', 'branches', 'branchList'));
     }
     public function create()
     {
@@ -24,27 +25,30 @@ class AnnouncementController extends Controller
 
 
     public function store(Request $request)
-    {
-        
-        $announcement = new Announcement();
-        $announcement->branch = $request->branch;
-        $announcement->coaching_type = $request->coaching_type;
-        $announcement->gender = $request->gender;
-        $announcement->title = $request->title;
-        $announcement->content = $request->content;
-        if ($request->hasFile('attachment')) {
-            $fileName = time() . '.' . $request->attachment->extension();
-            $request->attachment->move(public_path('assets/attachments'), $fileName);
-            $announcement->attachment = 'assets/attachments/' . $fileName;
-        } else {
-            $announcement->attachment = null;
-        }
-        $announcement->category = $request->coaching_type === 'Offline' ? $request->category : null;
-    
-        $announcement->save();
-        return to_route('announcement.index');
+{
+    $announcement = new Announcement();
+    $announcement->branch = implode(',', $request->branch);
+    $announcement->coaching_type = implode(',', $request->coaching_type);
+    $announcement->gender = $request->gender;
+    $announcement->title = $request->title;
+    $announcement->content = $request->content;
+
+    if ($request->hasFile('attachment')) {
+        $fileName = time() . '.' . $request->attachment->extension();
+        $request->attachment->move(public_path('assets/attachments'), $fileName);
+        $announcement->attachment = 'assets/attachments/' . $fileName;
+    } else {
+        $announcement->attachment = null;
     }
 
+    $announcement->category = in_array('Offline', $request->coaching_type) ? $request->category : null;
+
+    $announcement->save();
+    
+    return to_route('announcement.index');
+}
+
+    
     public function edit(Request $request, Announcement $announcement)
     {
         $branches = DB::table('branch')->select('id', 'name')->get();
@@ -65,11 +69,6 @@ class AnnouncementController extends Controller
         return to_route('announcement.index');
     }
     
-    public function notification(Request $request)
-    {
-        $announcements=Announcement::all();
-        return view('student.notification', compact('announcements'));
-    }
     
 
 

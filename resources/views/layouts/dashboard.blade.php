@@ -79,6 +79,13 @@
           </ul>
         </div>
         <ul class="navbar-nav navbar-right">
+
+          <li class="nav-item dropdown">
+            <a href="#" class="nav-link nav-link-lg" id="exam-timer-container" style="display: none;">
+                ⏳ Exam starts in <span id="exam-timer"></span>
+            </a>
+        </li>
+        
           <li class="dropdown dropdown-list-toggle">
             <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
             <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
@@ -229,6 +236,49 @@
     $(document).on('contextmenu', event => event.preventDefault());
     // $(document).on('mousedown', event => event.preventDefault());
   </script>
+  <script>
+   
+   document.addEventListener("DOMContentLoaded", function () {
+    var examStartTime = "{{ $examStartTime ?? '' }}"; // Get exam start time from backend
+
+    if (!examStartTime) {
+        console.log("No upcoming exams.");
+        return;
+    }
+
+    var examStart = new Date(examStartTime).getTime();
+    var timerElement = document.getElementById('exam-timer');
+    var timerContainer = document.getElementById('exam-timer-container');
+
+    function updateTimer() {
+        var now = new Date().getTime();
+        var timeDiff = examStart - now;
+
+        if (timeDiff <= 0) {
+            timerElement.innerHTML = "Exam has started!";
+            timerContainer.style.display = "none"; // Hide text when exam starts
+            clearInterval(timerInterval);
+            return;
+        }
+
+        var hours = Math.floor(timeDiff / (1000 * 60 * 60));
+        var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+        var timeString = (hours > 0 ? hours + "h " : "") + 
+                         (minutes > 0 ? minutes + "m " : "") + 
+                         seconds + "s";
+
+        timerElement.innerHTML = timeString;
+        timerContainer.style.display = "inline"; // Show text when exam is upcoming
+    }
+
+    var timerInterval = setInterval(updateTimer, 1000);
+    updateTimer(); // Run immediately on page load
+});
+
+</script>
+
   @yield('js')
 </body>
 </html>

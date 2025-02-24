@@ -59,17 +59,114 @@
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
   }
 </style>
+<style>
+  /* ... (Your existing styles) ... */
+
+    /* Scrolling Message */
+    .scrolling-text {
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+        display: block;
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+        background: #ff5733; /* Or any color you prefer */
+        padding: 10px;
+        text-align: center;
+        position: fixed; /* Or relative if you don't want it fixed */
+        top: 0;
+        left: 0;
+        z-index: 1000; /* Ensure it's on top */
+    }
+
+    /* Timer Styling */
+    #exam-timer {
+        font-size: 20px;
+        font-weight: bold;
+        color: red;
+        text-align: center;
+        margin-top: 10px; /* Adjust as needed */
+    }
+
+    .hidden {
+        display: none;
+    }
+  </style>
+  <style>
+    .scrolling-text {
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+        display: block;
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+        background: #ff5733; /* Or any color you prefer */
+        padding: 10px;
+        text-align: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000; /* Ensure it's on top */
+        animation: scrollText 10s linear infinite;
+    }
+
+    @keyframes scrollText {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+</style>
 
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
+<style>
+    .scrolling-text {
+        position: fixed;
+        width: 100%;
+        top: 10px;
+        background-color: red;
+        color: white;
+        padding: 10px;
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        display: none; /* Hidden by default */
+    }
+    .scrolling-text span {
+        font-weight: bold;
+    }
+    .scrolling-container {
+        width: 100%;
+        overflow: hidden;
+    }
+    .scrolling-content {
+        display: inline-block;
+        white-space: nowrap;
+        animation: scroll-left 10s linear infinite;
+    }
+    @keyframes scroll-left {
+        from { transform: translateX(100%); }
+        to { transform: translateX(-100%); }
+    }
+</style>
 @endsection
 
 @section('main')
+
 <div class="main-content">
+
     <div class="section-body">
         <div class="row">
-
+           
+        
             <div class="col-lg-12">
+                <div id="exam-alert" class="alert alert-danger alert-dismissible fade show" style="display: none;">
+                    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <b>⚠️ If the Exam Link Doesn't Work, Please logout and login again.</b>
+                </div>
                 @if(session('success'))
                     <div class="alert alert-success"><b>{{ session('success') }}</b></div>
                 @endif
@@ -77,6 +174,10 @@
                     <div class="alert alert-danger"><b>{{ session('error') }}</b></div>
                 @endif
             </div>
+        
+            {{-- <marquee behavior="scroll" direction="left" id="marquee" style="display: none;">
+                Exam starts in <span id="exam-timer"></span>
+            </marquee> --}}
 
             <div class="col-xl-4 col-lg-6">
                 <div class="card l-bg-green">
@@ -170,4 +271,98 @@
         </div> --}}
     </div>
 </div>
+
 @endsection
+@section('js')
+
+{{-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var examStartTime = "{{ $examStartTime ?? '' }}"; // Get exam start time from backend
+    
+        if (!examStartTime) {
+            console.log("No upcoming exams.");
+            return;
+        }
+    
+        var examStart = new Date(examStartTime); 
+        var timerElement = document.getElementById('exam-timer');
+        var marqueeElement = document.getElementById('marquee');
+    
+        function updateTimer() {
+            var now = new Date();
+            var timeDiff = examStart - now;
+    
+            if (timeDiff <= 0) {
+                timerElement.innerHTML = "Exam has started!";
+                marqueeElement.style.display = "none"; // Hide scrolling message
+                clearInterval(timerInterval);
+                return;
+            }
+    
+            // Calculate hours, minutes, seconds
+            var hours = Math.floor(timeDiff / (1000 * 60 * 60));
+            var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+    
+            var timeString = (hours > 0 ? hours + "h " : "") +
+                             (minutes > 0 ? minutes + "m " : "") +
+                             seconds + "s";
+    
+            timerElement.innerHTML = timeString;
+            marqueeElement.innerHTML = " Exam starts in " + timeString + " Get Ready!";
+            marqueeElement.style.display = "block"; // Show scrolling message
+        }
+    
+        var timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // Run immediately
+    });
+    </script> --}}
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    var examStartTime = "{{ $examStartTime ?? '' }}"; // Get exam start time from backend
+
+    if (!examStartTime) {
+        console.log("No upcoming exams.");
+        return;
+    }
+
+    var examStart = new Date(examStartTime).getTime();
+    var timerElement = document.getElementById('exam-timer');
+    var timerContainer = document.getElementById('exam-timer-container');
+    var examAlert = document.getElementById('exam-alert');
+
+    function updateTimer() {
+        var now = new Date().getTime();
+        var timeDiff = examStart - now;
+
+        if (timeDiff <= 0) {
+            timerElement.innerHTML = "Exam has started!";
+            timerContainer.style.display = "none"; // Hide text when exam starts
+            examAlert.style.display = "none"; // Hide alert when exam starts
+            clearInterval(timerInterval);
+            return;
+        }
+
+        var hours = Math.floor(timeDiff / (1000 * 60 * 60));
+        var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+        var timeString = (hours > 0 ? hours + "h " : "") + 
+                         (minutes > 0 ? minutes + "m " : "") + 
+                         seconds + "s";
+
+        timerElement.innerHTML = timeString;
+        timerContainer.style.display = "inline"; // Show text when exam is upcoming
+        examAlert.style.display = "block"; // Show alert before exam
+    }
+
+    var timerInterval = setInterval(updateTimer, 1000);
+    updateTimer(); // Run immediately on page load
+});
+
+        </script>
+@endsection
+
+
