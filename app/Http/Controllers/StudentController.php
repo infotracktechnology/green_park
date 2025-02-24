@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Exam; // Import the Exam model
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 
 class StudentController extends Controller
@@ -121,15 +122,22 @@ class StudentController extends Controller
     }
 
 
-    public function dashboard()
-    {
-        $coachingType = auth()->user()->coaching_type;
-        $branchId = auth()->user()->branch_id;
-        $isExamOngoing = Exam::getOngoingExams($coachingType, $branchId) ? true : false;
-    
-        return view('dashboards.studentdashboard', compact('isExamOngoing'));
-    }
+   
+public function dashboard()
+{
+    $coachingType = auth()->user()->coaching_type;
+    $branchId = auth()->user()->branch_id;
 
+    $exam = Exam::where('start_at', '>', now())
+        ->where('coaching_type', 'LIKE', "%$coachingType%")
+        ->where('branch_id', 'LIKE', "%$branchId%")
+        ->orderBy('start_at', 'asc')
+        ->first();
+
+    $examStartTime = $exam ? $exam->start_at->toIso8601String() : null; 
+
+    return view('dashboards.studentdashboard', compact('examStartTime'));
+}
     function marksheet(Request $request){
         $sid = auth()->user()->id;
         $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid group by test_id order by b.updated_at desc limit 5");
@@ -149,4 +157,26 @@ class StudentController extends Controller
         $exam = DB::table('exam')->where('id', $test_id)->selectRaw("name,id,DATE_FORMAT(start_at, '%d-%m-%Y')exam_date")->first();
         return view('student.mark_download',compact('answers','exam'));
     }
+
+
+    public function getExamStartTime()
+    {
+        $exam = Exam::latest()->first(); // Get the latest exam (modify as needed)
+        
+        if (!$exam || !$exam->start_at) {
+            return response()->json(['error' => 'Exam start time not found'], 404);
+        }
+
+        return response()->json([
+            'start_at' => Carbon::parse($exam->start_at)->toISOString() // Convert to JS format
+        ]);
+    }
+
+
+
+
+
 }
+
+
+
