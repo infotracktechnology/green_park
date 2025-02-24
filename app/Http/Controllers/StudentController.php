@@ -7,6 +7,8 @@ use App\Models\Student;
 use App\Models\Exam; // Import the Exam model
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Announcement;
+
 
 
 class StudentController extends Controller
@@ -159,6 +161,7 @@ public function dashboard()
     }
 
 
+
     public function getExamStartTime()
     {
         $exam = Exam::latest()->first(); // Get the latest exam (modify as needed)
@@ -173,8 +176,12 @@ public function dashboard()
     }
 
 
+public function notification(Request $request)
+{
+    $announcements = auth()->user()->announcement();
 
-
+    return view('student.notification', compact('announcements'));
+}
 
 }
 

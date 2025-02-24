@@ -29,54 +29,43 @@ class HostelController extends Controller
 
     public function create(Request $request)
     {
-        $branches = DB::table('branch')->select('id', 'name')->get(); // Fetch branch details
+        $branches = DB::table('branch')->select('id', 'name')->get(); 
         $staffs = DB::table('staff')->select('id', 'name')->get();
-        $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get(); // Fetch state list
+        $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get(); 
         if ($request->has('state')) {
             $districts = DB::table('district_list')->where('State', $request->state)->select('District')->distinct()->orderby('District')->get();
-            return response()->json($districts); // Return districts as JSON for dynamic city selection
+            return response()->json($districts);
         }
 
-        return view('hostel.create', compact('branches', 'states', 'staffs')); // Pass $branches to the view
+        return view('hostel.create', compact('branches', 'states', 'staffs')); 
     }
 
     public function store(Request $request)
     {
-        // Validate main hostel details
         $request->validate([
             'branch_id' => 'required|exists:branch,id',
             'name' => 'required|string|max:255',
             'type' => 'required|string',
             'warden_name' => 'required|string',
-            'address' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
-            'pincode' => 'nullable|numeric',
-            'phone_no' => 'required|numeric|digits:10|unique:hostel,phone_no',
+            'room_type' => 'required|string',
         ]);
 
-        // Save hostel details
         $hostel = Hostel::create($request->only([
             'branch_id',
             'name',
             'type',
             'warden_name',
-            'address',
-            'city',
-            'state',
-            'pincode',
-            'phone_no'
+            'room_type'
         ]));
 
-        // Save room details
         if ($request->has('rooms')) {
             foreach ($request->rooms as $room) {
                 $hostel->rooms()->create([
                     'block_no' => $room['block_no'],
                     'floor_no' => $room['floor_no'],
                     'room_no' => $room['room_no'],
-                    'room_type' => $room['room_type'],
                     'no_of_beds' => $room['no_of_beds'],
+                    'cart_no' => $room['cart_no'],
                 ]);
             }
         }
@@ -90,50 +79,39 @@ class HostelController extends Controller
         $hostel = Hostel::with('rooms')->findOrFail($id);
         $branches = Branch::all();
         $staffs = Staff::all();
-        $districts = DB::table('district_list')->where('State', $hostel->state)->select('District')->distinct()->orderby('District')->get();
-        $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get();
-        return view('hostel.edit', compact('hostel', 'states', 'districts', 'branches', 'staffs'));
+        // $districts = DB::table('district_list')->where('State', $hostel->state)->select('District')->distinct()->orderby('District')->get();
+        // $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get();
+        return view('hostel.edit', compact('hostel',  'branches', 'staffs'));
     }
 
     public function update(Request $request, $id)
     {
-        // Validate the hostel details
         $request->validate([
             'branch_id' => 'required|exists:branch,id',
             'name' => 'required|string|max:255',
             'type' => 'required|string',
             'warden_name' => 'required|string',
-            'address' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
-            'pincode' => 'nullable|numeric',
-            'phone_no' => 'required|numeric|digits:10',
+            'room_type' => 'required|string',
         ]);
 
-        // Update hostel details
         $hostel = Hostel::findOrFail($id);
         $hostel->update($request->only([
             'branch_id',
             'name',
             'type',
             'warden_name',
-            'address',
-            'city',
-            'state',
-            'pincode',
-            'phone_no'
+            'room_type'
         ]));
 
         $hostel->rooms()->delete();
-        // Update room details
         if ($request->has('rooms')) {
             foreach ($request->rooms as $room) {
                 $hostel->rooms()->create([
                     'block_no' => $room['block_no'],
                     'floor_no' => $room['floor_no'],
                     'room_no' => $room['room_no'],
-                    'room_type' => $room['room_type'],
                     'no_of_beds' => $room['no_of_beds'],
+                    'cart_no' => $room['cart_no'],
                 ]);
             }
         }
@@ -145,12 +123,10 @@ class HostelController extends Controller
     public function destroy(Request $request, Hostel $hostel)
     {
         DB::transaction(function () use ($hostel) {
-            // Delete room details
             $hostel->rooms()->each(function ($room) {
                 $room->delete();
             });
 
-            // Delete hostel
             $hostel->delete();
         });
 
@@ -159,19 +135,14 @@ class HostelController extends Controller
     }
     public function deleteRoom($id)
     {
-        // Find the room by its ID
         $room = HostelRoom::findOrFail($id);
 
-        // Log the room being deleted for debugging purposes
         Log::info('Deleting room:', ['room' => $room]);
 
-        // Delete the room only
         $room->delete();
 
-        // Log the success for debugging purposes
         Log::info('Room deleted successfully.', ['room_id' => $id]);
 
-        // Redirect back with a success message
         return redirect()->back()->with('success', 'Room deleted successfully.');
     }
 

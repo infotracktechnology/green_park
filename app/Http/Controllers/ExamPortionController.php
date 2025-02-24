@@ -7,13 +7,16 @@ use App\Models\Exam;
 use Illuminate\Http\Request;
 use App\Models\Examportion;
 use App\Models\Branch;
+use Illuminate\Support\Facades\DB;
 
 class ExamPortionController extends Controller
 {
     public function index()
     {
         $examportions = Examportion::all();
-        return view('examportion.index', compact('examportions'));
+        $branches = Branch::all();
+        $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
+        return view('examportion.index', compact('examportions', 'branches', 'branchList'));
     }
     public function create()
     {
@@ -23,6 +26,8 @@ class ExamPortionController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('attachment');
+        $data['branch_id'] = implode(',', $request->branch_id);
+        $data['coaching_type'] = implode(',', $request->coaching_type);
         $attachment = $request->attachment;
         $filename = time().'.'.$attachment->getClientOriginalExtension();
         $file = $attachment->move('examportions', $filename);
