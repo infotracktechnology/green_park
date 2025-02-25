@@ -30,15 +30,12 @@
                                 </select>
                             </div>
                             
+                           
                             <div class="form-group col-lg-3">
-                                <label>AC/Non AC</label>
-                                <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" required>
-                                    <option value="">Select AC/Non AC</option>
-                                    <option value="AC" @if($Student->ac_nonac == 'AC') selected @endif>AC</option>
-                                    <option value="Non AC" @if($Student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
-                                </select>
+                                <label for="student_name">Student Name</label>
+                                <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $Student->student_name) }}" class="form-control form-control-sm alphabetsOnly" required>
+                               
                             </div>
-                            
                             
 
         
@@ -57,18 +54,23 @@
         
                             <div class="form-group col-lg-3">
                                <label>Hostel/Day Scholar</label>
-                                <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm"  >
+                                <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" >
                                     <option value="">Select Option</option>
                                     <option value="Hostel" @if($Student->hostel_dayscholar == 'Hostel') selected @endif>Hostel</option>
                                     <option value="Day Scholar" @if($Student->hostel_dayscholar == 'Day Scholar') selected @endif>Day Scholar</option>
                                 </select>
                             </div>
-        
+
                             <div class="form-group col-lg-3">
-                                <label for="student_name">Student Name</label>
-                                <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $Student->student_name) }}" class="form-control form-control-sm alphabetsOnly" required>
-                               
+                                <label>AC/Non AC</label>
+                                <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" required>
+                                    <option value="">Select AC/Non AC</option>
+                                    <option value="AC" @if($Student->ac_nonac == 'AC') selected @endif>AC</option>
+                                    <option value="Non AC" @if($Student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
+                                </select>
                             </div>
+        
+                            
                             
         
                             <div class="form-group col-lg-3">
@@ -79,7 +81,7 @@
                             
                             <div class="form-group col-lg-3">
                                 <label for="ph_no2">Mobile No 2</label>
-                                <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $Student->ph_no2) }}" class="form-control form-control-sm digits" required>
+                                <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $Student->ph_no2) }}" class="form-control form-control-sm digits">
                                
                             </div>
         
@@ -122,25 +124,25 @@
         
                             <div class="form-group col-lg-3">
                                 <label for="father_name">Father Name</label>
-                                <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $Student->father_name) }}" class="form-control form-control-sm alphabetsOnly" required>
+                                <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $Student->father_name) }}" class="form-control form-control-sm alphabetsOnly">
                                
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label for="father_ph_no">Father Mobile No</label>
-                                <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $Student->father_ph_no) }}" class="form-control form-control-sm digits" required>
+                                <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $Student->father_ph_no) }}" class="form-control form-control-sm digits">
                               
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label for="mother_name">Mother Name</label>
-                                <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $Student->mother_name) }}" class="form-control form-control-sm alphabetsOnly" required>
+                                <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $Student->mother_name) }}" class="form-control form-control-sm alphabetsOnly">
                              
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label for="mother_ph_no">Mother Mobile No</label>
-                                <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $Student->mother_ph_no) }}" class="form-control form-control-sm digits" required>
+                                <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $Student->mother_ph_no) }}" class="form-control form-control-sm digits">
                               
                             </div>
                             
@@ -160,7 +162,7 @@
         
                              <div class="form-group col-lg-3">
                                 <label>Blood Group</label>
-                                 <select name="blood_group" class="form-control form-control-sm" required>
+                                 <select name="blood_group" class="form-control form-control-sm">
                                      <option value="">Select Blood Group</option>
                                      <option value="A+" @if($Student->blood_group == 'A+') selected @endif>A+</option>
                                      <option value="A-" @if($Student->blood_group == 'A-') selected @endif>A-</option>
@@ -186,7 +188,7 @@
                           
 <div class="form-group col-lg-3">
     <label for="aadhar_card_no">Aadhar Card No</label>
-    <input type="number" name="aadhar_card_no" id="aadhar_card_no" value="{{ old('aadhar_card_no', $Student->aadhar_card_no) }}" class="form-control form-control-sm" required pattern="^[0-9]{12}$">
+    <input type="number" name="aadhar_card_no" id="aadhar_card_no" value="{{ old('aadhar_card_no', $Student->aadhar_card_no) }}" class="form-control form-control-sm" pattern="^[0-9]{12}$">
     <div class="invalid-feedback">
         Aadhar card number should be exactly 12 digits.
     </div>
@@ -237,14 +239,19 @@
         
                             <div class="form-group col-lg-3">
                                 <label>Caste</label>
-                                 <input type="text" name="caste" value="{{$Student->caste}}" class="form-control form-control-sm" required>
+                                 <input type="text" name="caste" value="{{$Student->caste}}" class="form-control form-control-sm">
                             </div>
         
                             <div class="form-group col-lg-3">
                                 <label for="student_whatsapp_no">Student WhatsApp No</label>
-                                <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $Student->student_whatsapp_no) }}" class="form-control form-control-sm digits" required>
+                                <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $Student->student_whatsapp_no) }}" class="form-control form-control-sm digits">
                                
                             </div>     
+
+                            <div class="form-group col-lg-12">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                             </div>
+
                         </fieldset>
 
                         <h3> Address</h3>
@@ -298,66 +305,75 @@
         
                             <div class="form-group col-lg-3">
                                 <label for="parent_whatsapp_no">Parent WhatsApp No</label>
-                                <input type="number" name="parent_whatsapp_no" id="parent_whatsapp_no" value="{{ old('parent_whatsapp_no', $Student->parent_whatsapp_no) }}" class="form-control form-control-sm digits" required>
+                                <input type="number" name="parent_whatsapp_no" id="parent_whatsapp_no" value="{{ old('parent_whatsapp_no', $Student->parent_whatsapp_no) }}" class="form-control form-control-sm digits">
                                
                             </div>
         
                             <div class="form-group col-lg-3">
                                 <label>Email ID</label>
-                                 <input type="email" name="email" value="{{$Student->email}}" class="form-control form-control-sm" required>
+                                 <input type="email" name="email" value="{{$Student->email}}" class="form-control form-control-sm">
                             </div>
+
+                            <div class="form-group col-lg-12">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                             </div>
+
                         </fieldset>
                         <h3>Parent Details</h3>
                         <fieldset class="row">
                             <div class="form-group col-lg-3">
                                 <label>Father Qualification</label>
-                                <input type="text" name="father_qualification" value="{{$Student->father_qualification}}" class="form-control form-control-sm" required>
+                                <input type="text" name="father_qualification" value="{{$Student->father_qualification}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Father Occupation</label>
-                                <input type="text" name="father_occupation" value="{{$Student->father_occupation}}" class="form-control form-control-sm" required>
+                                <input type="text" name="father_occupation" value="{{$Student->father_occupation}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Father Annual Income</label>
-                                <input type="number" name="father_annual_income" value="{{$Student->father_annual_income}}" class="form-control form-control-sm" required>
+                                <input type="number" name="father_annual_income" value="{{$Student->father_annual_income}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Father Designation</label>
-                                <input type="text" name="father_designation" value="{{$Student->father_designation}}" class="form-control form-control-sm" required>
+                                <input type="text" name="father_designation" value="{{$Student->father_designation}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Father's Place of Work</label>
-                                <input type="text" name="fathers_place_of_work" value="{{$Student->fathers_place_of_work}}" class="form-control form-control-sm" required>
+                                <input type="text" name="fathers_place_of_work" value="{{$Student->fathers_place_of_work}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Mother Qualification</label>
-                                <input type="text" name="mother_qualification" value="{{$Student->mother_qualification}}" class="form-control form-control-sm" required>
+                                <input type="text" name="mother_qualification" value="{{$Student->mother_qualification}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Mother Occupation</label>
-                                <input type="text" name="mother_occupation" value="{{$Student->mother_occupation}}" class="form-control form-control-sm" required>
+                                <input type="text" name="mother_occupation" value="{{$Student->mother_occupation}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Mother Annual Income</label>
-                                <input type="number" name="mother_annual_income" value="{{$Student->mother_annual_income}}" class="form-control form-control-sm" required>
+                                <input type="number" name="mother_annual_income" value="{{$Student->mother_annual_income}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Mother Designation</label>
-                                <input type="text" name="mother_designation" value="{{$Student->mother_designation}}" class="form-control form-control-sm" required>
+                                <input type="text" name="mother_designation" value="{{$Student->mother_designation}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Mother's Place of Work</label>
-                                <input type="text" name="mother_place_of_work" value="{{$Student->mother_place_of_work}}" class="form-control form-control-sm" required>
+                                <input type="text" name="mother_place_of_work" value="{{$Student->mother_place_of_work}}" class="form-control form-control-sm">
                             </div>
+                           
+                            <div class="form-group col-lg-12">
+                                   <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
                             
                             
                         </fieldset>
@@ -386,17 +402,17 @@
     
                             <div class="form-group col-lg-3">
                                 <label>District Name of the School (X std)</label>
-                                <input type="text" name="district_name_school_X_std" value="{{$Student->district_name_school_X_std}}" class="form-control form-control-sm" required>
+                                <input type="text" name="district_name_school_X_std" value="{{$Student->district_name_school_X_std}}" class="form-control form-control-sm">
                             </div>
     
                             <div class="form-group col-lg-3">
                                 <label>Total Marks Obtained in X std</label>
-                                <input type="number" name="total_marks_X_std" value="{{$Student->total_marks_X_std}}" class="form-control form-control-sm" required>
+                                <input type="number" name="total_marks_X_std" value="{{$Student->total_marks_X_std}}" class="form-control form-control-sm">
                             </div>
     
                             <div class="form-group col-lg-3">
                                 <label>Board of Study (XII std)</label>
-                                <select name="board_of_study_XII_std" class="form-control form-control-sm" required>
+                                <select name="board_of_study_XII_std" class="form-control form-control-sm">
                                     <option value="">Select Board</option>
                                     <option value="STATEBOARD" {{ $Student->board_of_study_XII_std == 'STATEBOARD' ? 'selected' : '' }}>STATEBOARD</option>
                                     <option value="CBSE" {{ $Student->board_of_study_XII_std == 'CBSE' ? 'selected' : '' }}>CBSE</option>
@@ -420,6 +436,10 @@
                                 <label>Total Marks Obtained in XII std</label>
                                 <input type="number" name="total_marks_XII_std" value="{{$Student->total_marks_XII_std}}" class="form-control form-control-sm" required>
                             </div>
+
+                            <div class="form-group col-lg-12">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                             </div>
 
                         </fieldset>
 
@@ -539,7 +559,7 @@
                         <div class="form-group col-lg-4">
                             <label>Subject 4</label>
                             <input type="text" name="S4" value="{{ $Student->S4
-                             ?? 'Biology' }}" class="form-control form-control-sm" required readonly>
+                             ?? 'Biology' }}" class="form-control form-control-sm" readonly>
                             </div>
 
                         <div class="form-group col-lg-4">
@@ -557,7 +577,9 @@
     <label>Total Marks</label>
     <input type="number" id="total_marks" name="total_marks" value="{{$Student->total_marks}}" class="form-control form-control-sm" readonly>
 </div>
-                        
+<div class="form-group col-lg-12">
+    <button type="submit" class="btn btn-primary">Submit</button>
+ </div>
 
 
                         </fieldset>
@@ -566,22 +588,22 @@
                         <fieldset class="row">
                             <div class="form-group col-lg-3">
                                 <label>Total No of Attempts in NEET</label>
-                                <input type="number" name="total_attempts_neet" value="{{$Student->total_attempts_neet}}" class="form-control form-control-sm" required>
+                                <input type="number" name="total_attempts_neet" value="{{$Student->total_attempts_neet}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>NEET Score - 2024</label>
-                                <input type="number" name="neet_score_2024" value="{{$Student->neet_score_2024}}" class="form-control form-control-sm" required>
+                                <input type="number" name="neet_score_2024" value="{{$Student->neet_score_2024}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>NEET Score - 2025</label>
-                                <input type="number" name="neet_score_2025" value="{{$Student->neet_score_2025}}" class="form-control form-control-sm" required>
+                                <input type="number" name="neet_score_2025" value="{{$Student->neet_score_2025}}" class="form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-3">
                                 <label>Are you Repeater or Re-repeater</label>
-                                <select name="repeater_re_repeater" class="form-control form-control-sm" required>
+                                <select name="repeater_re_repeater" class="form-control form-control-sm">
                                     <option value="" disabled selected>Select an option</option>
                                     <option value="repeater" {{ $Student->repeater_re_repeater == 'repeater' ? 'selected' : '' }}>Repeater</option>
                                     <option value="re-repeater" {{ $Student->repeater_re_repeater == 're-repeater' ? 'selected' : '' }}>Re-repeater</option>
@@ -593,7 +615,7 @@
                             
                             <div class="form-group col-lg-3">
                                 <label>Previous Course Studied for NEET</label>
-                                <select name="previous_course_studied_neet" class="form-control form-control-sm" required>
+                                <select name="previous_course_studied_neet" class="form-control form-control-sm">
                                     <option value="">Select Course</option>
                                     <option value="Integrated" {{ $Student->previous_course_studied_neet == 'Integrated' ? 'selected' : '' }}>Integrated</option>
                                     <option value="Crash course" {{ $Student->previous_course_studied_neet == 'Crash course' ? 'selected' : '' }}>Crash course</option>
@@ -604,13 +626,13 @@
         
         <div class="form-group col-lg-3">
             <label>Name of the Institution Studied</label>
-            <input type="text" name="institution_studied_name" value="{{$Student->institution_studied_name}}" class="form-control form-control-sm" required>
+            <input type="text" name="institution_studied_name" value="{{$Student->institution_studied_name}}" class="form-control form-control-sm">
         </div>
         
         
         <div class="form-group col-lg-3">
             <label>Institution Bill Type</label>
-            <select name="institution_bill_type" class="form-control form-control-sm" required>
+            <select name="institution_bill_type" class="form-control form-control-sm">
                 <option value="">Select Bill Type</option>
                 <option value="GPCC, Namakkal" {{ $Student->institution_bill_type == 'GPCC, Namakkal' ? 'selected' : '' }}>GPCC, Namakkal</option>
                 <option value="GPI, Namakkal" {{ $Student->institution_bill_type == 'GPI, Namakkal' ? 'selected' : '' }}>GPI, Namakkal</option>

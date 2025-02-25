@@ -82,7 +82,7 @@
 
           <li class="nav-item dropdown">
             <a href="#" class="nav-link nav-link-lg" id="exam-timer-container" style="display: none;">
-                ⏳ Exam starts in <span id="exam-timer"></span>
+                <span style="font-size: 24px;">⏰</span> Exam starts in <span id="exam-timer" class="col-white"></span>
             </a>
         </li>
         
