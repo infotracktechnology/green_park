@@ -156,7 +156,7 @@
                                     </table>
                                 </div>
                                 <input type="hidden" name="status[{{ $key }}]" id="status-{{ $key }}" value="not-attempted">
-                                <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}">Save & Next</button>
+                                <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}"> {{ $key == $exam->total_questions ? 'Save & Submit' : 'Save & Next' }} </button>
                                 <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
                                 <button type="button" class="btn btn-warning btn-save-mark-answer" data-index="{{ $key }}">Save &amp; Mark For Review</button>
                                 <button type="button" class="btn-mark btn btn-primary" data-index="{{ $key }}">Mark for Review & Next</button>
@@ -399,6 +399,7 @@
     }
 
     function NextQuestion(index) {
+        updateCounts();
         if (index < questions.length) {
             openQuestion(index + 1);
         }
@@ -406,6 +407,7 @@
     }
 
     function PreviousQuestion(index) {
+        updateCounts();
         if (index > 1) {
             openQuestion(index - 1);
         }
