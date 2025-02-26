@@ -23,7 +23,7 @@
                                     </div>
 
                                     <div class="col-md-6 col-sm-12 mb-3">
-                                        <a href="{{ env('APP_URL').'template/student_template_new.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Student Data Upload Template (Format)</a>
+                                        <a href="{{ env('APP_URL').'template/student_export.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Student Data Upload Template Format (Bulk Insert)</a>
                                        </div>
 
                                     <div class="form-group col-lg-3">
