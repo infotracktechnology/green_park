@@ -41,7 +41,7 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
-                  $row = array_merge($row, ['campus' => $branch]);
+                    $row = array_merge($row, ['campus' => $branch]);
                    if(isset($row['id'])){
                     $student = Student::find($row['id']);
                     $student->update($row);
@@ -63,7 +63,7 @@ class ImportController extends Controller
     if (($handle = fopen($filePath, 'r')) !== false) {
         $header = null;
 
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+        while (($row = fgetcsv($handle, 10000, ',')) !== false) {
             // Ignore empty rows
             if (empty(array_filter($row))) {
                 continue;
