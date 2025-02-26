@@ -34,7 +34,8 @@ class ExamController extends Controller
         $exams = DB::table('exam as e')
             ->leftJoin('exam_answer as ea', 'e.id', '=', 'ea.test_id')
             ->select('e.id as exam_id', 'e.name', DB::raw('COUNT(DISTINCT ea.student_id) as student_count'))
-            ->groupBy('e.id', 'e.name')
+            ->where('ea.student_id', '>', 0)
+            ->groupBy('e.id')
             ->get();
 
   
