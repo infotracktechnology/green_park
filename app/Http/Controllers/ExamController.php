@@ -364,7 +364,7 @@ class ExamController extends Controller
         foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
-                $mark = in_array($row->answer, $ans_key) ? 4 : -1;
+                $mark = in_array($row->answer, $ans_key) && array_sum($ans_key) > 0 ? 4 : -1;
            DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $ans]);
             }
         }
