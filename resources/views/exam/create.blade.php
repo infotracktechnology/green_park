@@ -49,7 +49,10 @@
                               </div>
                               <div class="form-group col-lg-3">
                                 <label>Test ID <span class="text-danger">(should be unique*)</span></label>
-                                <input type="number" name="id" id="id" class="form-control form-control-sm numberk" required>
+                                <input type="number" name="id" id="id" class="form-control form-control-sm numberk @error('id') is-invalid @enderror" required>
+                                @error('id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                               <div class="form-group col-lg-3">
@@ -208,7 +211,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const inputElement = input.querySelector('input');
                 if (inputElement) {
                     inputElement.disabled = !isChecked;
-                    inputElement.required = isChecked;
+                    if (inputElement.type !== 'file') {
+                        inputElement.required = isChecked;
+                    }
                     if (!isChecked) {
                         inputElement.value = '';
                     }
