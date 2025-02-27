@@ -345,27 +345,48 @@ class ExamController extends Controller
             return back()->with('error', 'File is not in the correct format.');
         }
         
-        // foreach ($answers as $answer) {
-        // $exam = Exam::find($answer['test_id']);
-        // $total_questions = $exam->total_questions;
+        foreach ($answers as $answer) {
+        $exam = Exam::find($answer['test_id']);
 
-        // $phy_start = is_null($exam->phy_start) ? 0 : $exam->phy_start;
-        // $chem_start = is_null($exam->chem_start) ? 0 : $exam->chem_start;
-        // $bot_start = is_null($exam->bot_start) ? 0 : $exam->bot_start;
-        // $zoo_start = is_null($exam->zoo_start) ? 0 : $exam->zoo_start;
+        if (!$exam) {
+            return back()->with('error', 'Exam with ID ' . $answer['test_id'] . ' not found.');
+        }
 
-        // $phy_end = is_null($exam->phy_end) ? 0 : $exam->phy_end;
-        // $chem_end = is_null($exam->chem_end) ? 0 : $exam->chem_end;
-        // $bot_end = is_null($exam->bot_end) ? 0 : $exam->bot_end;
-        // $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
+        $total_questions = $exam->total_questions;
 
-        //     for ($i = 1; $i <= $total_questions; $i++) {
-        //         $q_no = $answer["Q$i"] ?? 0;
+        $phy_start = is_null($exam->phy_start) ? 0 : $exam->phy_start;
+        $chem_start = is_null($exam->chem_start) ? 0 : $exam->chem_start;
+        $bot_start = is_null($exam->bot_start) ? 0 : $exam->bot_start;
+        $zoo_start = is_null($exam->zoo_start) ? 0 : $exam->zoo_start;
+
+        $phy_end = is_null($exam->phy_end) ? 0 : $exam->phy_end;
+        $chem_end = is_null($exam->chem_end) ? 0 : $exam->chem_end;
+        $bot_end = is_null($exam->bot_end) ? 0 : $exam->bot_end;
+        $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
+
+            for ($i = 1; $i <= $total_questions; $i++) {
+                $q_no = $answer["Q$i"] ?? 0;
+                $subject = $this->determineSubject($i, $phy_start, $phy_end, $chem_start, $chem_end, $bot_start, $bot_end, $zoo_start, $zoo_end);
                
-        //     }
-        // }
+            }
+        }
 
         return back()->with('success', 'File uploaded successfully.');
+    }
+
+    public function determineSubject($question, $phyStart, $phyEnd, $chemStart, $chemEnd, $botStart, $botEnd, $zooStart, $zooEnd){
+
+        if ($phyStart <= $question && $question <= $phyEnd && $phyEnd != 0) {
+            return 'physics';
+        } elseif ($chemStart <= $question && $question <= $chemEnd && $chemEnd != 0) {
+            return 'chemistry';
+        } elseif ($botStart <= $question && $question <= $botEnd && $botEnd != 0) {
+            return 'botany';
+        } elseif ($zooStart <= $question && $question <= $zooEnd && $zooEnd != 0) {
+            return 'zoology';
+        } else {
+            return 'NULL';
+        }
     }
 
     public function answerKey()
