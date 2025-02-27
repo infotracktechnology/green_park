@@ -46,7 +46,25 @@
                                 <label>&nbsp;</label>
                                 <button type="submit" class="btn btn-primary btn-block">Upload</button>
                              </div> --}}
+
+                             <div class="col-md-12 m-t-20">
+                              <h6 class="col-deep-purple">Answer Key Preview</h6>
+                              </div>
+                              
+                              <div class="col-md-12">
+                              <div class="table-responsive">
+                                <table class="table table-bordered table-striped" id="preview">
+                                </table>
+                              </div>
+                              </div>
+
+                              <div class="form-group col-md-12">
+                                <label>&nbsp;</label>
+                                <button type="submit" class="btn btn-primary">Validate</button>
+                             </div>
+
                             </div>
+
                          </div>
                         </div>
 
@@ -58,6 +76,7 @@
                               <thead>
                                 <tr>
                                   <th>S.No</th>
+                                  <th>Test Ids</th>
                                   <th>File Name</th>
                                   <th>Upload Time</th>
                                 </tr>
@@ -66,6 +85,7 @@
                                 @foreach($answerkey_logs as $log)
                                 <tr>
                                   <td>{{ $loop->iteration }}</td>
+                                  <td>{{ $log->test_id }}</td>
                                   <td>{{ $log->file_name }}</td>
                                   <td>{{ $log->upload_time }}</td>
                                 </tr>
@@ -85,6 +105,7 @@
 </div>
 @endsection
 @section('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <script>
     $('#answer_key').on('change', function() {
       let file = this.files[0];
@@ -93,7 +114,29 @@
         alert('Please select only CSV file');
         return false;
       }
+   Papa.parse(file, {
+    header: true,
+    dynamicTyping: true,
+    skipEmptyLines: true,
+      complete: function(results) {
+        let tableHtml = '<thead><tr>';
+        Object.keys(results.data[0]).forEach(header => {
+            tableHtml += `<th>${header}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
 
+        results.data.forEach(row => {
+            tableHtml += '<tr>';
+            Object.values(row).forEach(value => {
+                tableHtml += `<td>${value}</td>`;
+            });
+            tableHtml += '</tr>';
+        });
+        tableHtml += '</tbody>';
+
+        $('#preview').html(tableHtml);
+    }
+});
     })
   </script>
 @endsection
