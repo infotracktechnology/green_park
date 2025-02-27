@@ -42,14 +42,15 @@
                                   @endif
                                </div>
     
-                               <div class="form-group col-lg-2">
+                               {{-- <div class="form-group col-lg-2">
                                 <label>&nbsp;</label>
                                 <button type="submit" class="btn btn-primary btn-block">Upload</button>
-                             </div>
+                             </div> --}}
                             </div>
                          </div>
+                        </div>
 
-
+                        <div class="card card-success">
                          <div class="card-body">
                             <h6 class="col-deep-purple">Uploaded File Information</h6>
                             <div class="table-responsive">
@@ -57,7 +58,6 @@
                               <thead>
                                 <tr>
                                   <th>S.No</th>
-                                  <th>Test ID</th>
                                   <th>File Name</th>
                                   <th>Upload Time</th>
                                 </tr>
@@ -66,7 +66,6 @@
                                 @foreach($answerkey_logs as $log)
                                 <tr>
                                   <td>{{ $loop->iteration }}</td>
-                                  <td>{{ $log->test_id }}</td>
                                   <td>{{ $log->file_name }}</td>
                                   <td>{{ $log->upload_time }}</td>
                                 </tr>
@@ -74,6 +73,7 @@
                               </tbody>
                             </table>
                           </div>
+                         </div>
 
                          
                       </form>
@@ -91,7 +91,9 @@
       if(file.type != 'text/csv') {
         $('#answer_key').val('');
         alert('Please select only CSV file');
+        return false;
       }
+
     })
   </script>
 @endsection

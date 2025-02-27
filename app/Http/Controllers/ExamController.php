@@ -57,6 +57,10 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'id' => 'required|unique:exam,id',
+        ]);
+
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
         $data['subject_name'] = implode(',', $request->subject_name);
         $data['branch_id'] = implode(',', $request->branch_id);
@@ -340,31 +344,33 @@ class ExamController extends Controller
          if (!isset($answers[0]['test_id'])) {
             return back()->with('error', 'File is not in the correct format.');
         }
-        $exam = Exam::find($answers[0]['test_id']);
-        $total_questions = $exam->total_questions;
+        
+        // foreach ($answers as $answer) {
+        // $exam = Exam::find($answer['test_id']);
+        // $total_questions = $exam->total_questions;
 
-        $phy_start = is_null($exam->phy_start) ? 0 : $exam->phy_start;
-        $chem_start = is_null($exam->chem_start) ? 0 : $exam->chem_start;
-        $bot_start = is_null($exam->bot_start) ? 0 : $exam->bot_start;
-        $zoo_start = is_null($exam->zoo_start) ? 0 : $exam->zoo_start;
+        // $phy_start = is_null($exam->phy_start) ? 0 : $exam->phy_start;
+        // $chem_start = is_null($exam->chem_start) ? 0 : $exam->chem_start;
+        // $bot_start = is_null($exam->bot_start) ? 0 : $exam->bot_start;
+        // $zoo_start = is_null($exam->zoo_start) ? 0 : $exam->zoo_start;
 
-        $phy_end = is_null($exam->phy_end) ? 0 : $exam->phy_end;
-        $chem_end = is_null($exam->chem_end) ? 0 : $exam->chem_end;
-        $bot_end = is_null($exam->bot_end) ? 0 : $exam->bot_end;
-        $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
-     
-        foreach ($answers as $answer) {
-            for ($i = 1; $i <= $total_questions; $i++) {
-                $q_no = $answer["Q$i"] ?? 0;
-            }
-        }
+        // $phy_end = is_null($exam->phy_end) ? 0 : $exam->phy_end;
+        // $chem_end = is_null($exam->chem_end) ? 0 : $exam->chem_end;
+        // $bot_end = is_null($exam->bot_end) ? 0 : $exam->bot_end;
+        // $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
+
+        //     for ($i = 1; $i <= $total_questions; $i++) {
+        //         $q_no = $answer["Q$i"] ?? 0;
+               
+        //     }
+        // }
 
         return back()->with('success', 'File uploaded successfully.');
     }
 
     public function answerKey()
     {
-        $answerkey_logs = DB::table('answerkey_log')->orderBy('upload_time', 'desc')->get();
+        $answerkey_logs = DB::table('key_log')->where('type', 'answer_key')->latest()->take(10)->get();
         return view('exam.answerkey', compact('answerkey_logs'));
     }
 
@@ -393,11 +399,11 @@ class ExamController extends Controller
             }
         }
 
-        DB::table('answerkey_log')->insert([
+        DB::table('key_log')->insert([
                 'file_name' => $originalFileName,
                 'upload_time' => $uploadTime,
-                'test_id' => $answer['test_id'],
-
+                'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+                'type' => 'answer_key',
         ]);
 
      return redirect()->back()->with('success', 'Answer key uploaded successfully.');
