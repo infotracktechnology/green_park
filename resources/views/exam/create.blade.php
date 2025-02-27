@@ -63,14 +63,20 @@
                                     <input type="checkbox" id="physicsCheckbox" name="subject_name[]" value="Physics" class="form-check-input">
                                     <label for="physicsCheckbox" class="form-check-label">Physics</label>
                                 </div>
-                                <div class="col-lg-3 physics-inputs" style="display: none;">
+                                <div class="col-lg-2 physics-inputs" style="display: none;">
                                     <label for="physicsQuestions">Physics Questions</label>
                                     <input type="number" min="1" max="180" name="physics_questions" id="physicsQuestions" class="form-control form-control-sm" disabled>
                                 </div>
-                                <div class="col-lg-3 physics-inputs" style="display: none;">
+                                <div class="col-lg-2 physics-inputs" style="display: none;">
                                     <label for="physicsStart">Physics Start No</label>
                                     <input type="number" min="1" name="phy_start" id="physicsStart" class="form-control form-control-sm" disabled>
                                 </div>
+
+                                <div class="col-lg-2 physics-inputs" style="display: none;">
+                                    <label>Physics End No</label>
+                                    <input type="number" min="1" name="phy_end" class="form-control form-control-sm" disabled>
+                                </div>
+
                                 <div class="col-lg-3 physics-inputs" style="display: none;">
                                     <label for="physicsFile">Physics Files</label>
                                     <input type="file" name="physics_files[]" id="physicsFile" class="form-control form-control-sm" accept="image/*" multiple disabled onchange="validateFileCount('physicsQuestions', 'physicsFile')">
@@ -83,14 +89,20 @@
                                     <input type="checkbox" id="chemistryCheckbox" name="subject_name[]" value="Chemistry" class="form-check-input">
                                     <label for="chemistryCheckbox" class="form-check-label">Chemistry</label>
                                 </div>
-                                <div class="col-lg-3 chemistry-inputs" style="display: none;">
+                                <div class="col-lg-2 chemistry-inputs" style="display: none;">
                                     <label for="chemistryQuestions">Chemistry Questions</label>
                                     <input type="number" min="1" max="180" name="chemistry_questions" id="chemistryQuestions" class="form-control form-control-sm" disabled>
                                 </div>
-                                <div class="col-lg-3 chemistry-inputs" style="display: none;">
+                                <div class="col-lg-2 chemistry-inputs" style="display: none;">
                                     <label for="chemistryStart">Chemistry Start No</label>
                                     <input type="number" min="1" name="chem_start" id="chemistryStart" class="form-control form-control-sm" disabled>
                                 </div>
+
+                                <div class="col-lg-2 chemistry-inputs" style="display: none;">
+                                    <label>Chemistry End No</label>
+                                    <input type="number" min="1" name="chem_end" class="form-control form-control-sm" disabled>
+                                </div>
+
                                 <div class="col-lg-3 chemistry-inputs" style="display: none;">
                                     <label for="chemistryFile">Chemistry Files</label>
                                     <input type="file" name="chemistry_files[]" id="chemistryFile" class="form-control form-control-sm" accept="image/*" multiple disabled onchange="validateFileCount('chemistryQuestions', 'chemistryFile')">
@@ -103,14 +115,21 @@
                                     <input type="checkbox" id="botanyCheckbox" name="subject_name[]" value="Botany" class="form-check-input">
                                     <label for="botanyCheckbox" class="form-check-label">Botany</label>
                                 </div>
-                                <div class="col-lg-3 botany-inputs" style="display: none;">
+                                <div class="col-lg-2 botany-inputs" style="display: none;">
                                     <label for="botanyQuestions">Botany Questions</label>
                                     <input type="number" min="1" max="180" name="botony_questions" id="botanyQuestions" class="form-control form-control-sm" disabled>
                                 </div>
-                                <div class="col-lg-3 botany-inputs" style="display: none;">
+                                <div class="col-lg-2 botany-inputs" style="display: none;">
                                     <label for="botanyStart">Botany Start No</label>
                                     <input type="number" min="1" name="bot_start" id="botanyStart" class="form-control form-control-sm" disabled>
                                 </div>
+
+                                
+                                <div class="col-lg-2 botany-inputs" style="display: none;">
+                                    <label>Botany End No</label>
+                                    <input type="number" min="1" name="bot_end" class="form-control form-control-sm" disabled>
+                                </div>
+
                                 <div class="col-lg-3 botany-inputs" style="display: none;">
                                     <label for="botanyFile">Botany Files</label>
                                     <input type="file" name="botany_files[]" id="botanyFile" class="form-control form-control-sm" accept="image/*" multiple disabled onchange="validateFileCount('botanyQuestions', 'botanyFile')">
@@ -123,14 +142,20 @@
                                     <input type="checkbox" id="zoologyCheckbox" name="subject_name[]" value="Zoology" class="form-check-input">
                                     <label for="zoologyCheckbox" class="form-check-label">Zoology</label>
                                 </div>
-                                <div class="col-lg-3 zoology-inputs" style="display: none;">
+                                <div class="col-lg-2 zoology-inputs" style="display: none;">
                                     <label for="zoologyQuestions">Zoology Questions</label>
                                     <input type="number" min="1" max="180" name="zoology_questions" id="zoologyQuestions" class="form-control form-control-sm" disabled>
                                 </div>
-                                <div class="col-lg-3 zoology-inputs" style="display: none;">
+                                <div class="col-lg-2 zoology-inputs" style="display: none;">
                                     <label for="zoologyStart">Zoology Start No</label>
                                     <input type="number" min="1" name="zoo_start" id="zoologyStart" class="form-control form-control-sm" disabled>
                                 </div>
+
+                                <div class="col-lg-2 botany-inputs" style="display: none;">
+                                    <label>Zoology End No</label>
+                                    <input type="number" min="1" name="zoo_end" class="form-control form-control-sm" disabled>
+                                </div>
+
                                 <div class="col-lg-3 zoology-inputs" style="display: none;">
                                     <label for="zoologyFile">Zoology Files</label>
                                     <input type="file" name="zoology_files[]" id="zoologyFile" class="form-control form-control-sm" accept="image/*" multiple disabled onchange="validateFileCount('zoologyQuestions', 'zoologyFile')">
@@ -183,6 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const inputElement = input.querySelector('input');
                 if (inputElement) {
                     inputElement.disabled = !isChecked;
+                    inputElement.required = isChecked;
                     if (!isChecked) {
                         inputElement.value = '';
                     }

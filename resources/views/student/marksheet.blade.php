@@ -13,6 +13,7 @@
                     <h4>Mark Details</h4>
                   </div>
                   <div class="card-body">
+                    <div class="table-responsive">
                     <table class="table table-bordered table-striped">
                       <thead>
                         <tr>
@@ -44,6 +45,7 @@
                         @endif
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 </div>
                 
