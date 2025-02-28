@@ -88,5 +88,5 @@ Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download']
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
-
+Route::get('video/{id}', 'App\Http\Controllers\ChairmanVideoController@video');
 

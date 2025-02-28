@@ -341,7 +341,7 @@ class ExamController extends Controller
         ]);
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
-         if (!isset($answers[0]['test_id'])) {
+         if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id'])) {
             return back()->with('error', 'File is not in the correct format.');
         }
         
@@ -350,6 +350,10 @@ class ExamController extends Controller
 
         if (!$exam) {
             return back()->with('error', 'Exam with ID ' . $answer['test_id'] . ' not found.');
+        }
+
+        if($answer['MODE'] != "OMR"){
+            continue;
         }
 
         $total_questions = $exam->total_questions;
@@ -367,7 +371,15 @@ class ExamController extends Controller
             for ($i = 1; $i <= $total_questions; $i++) {
                 $q_no = $answer["Q$i"] ?? 0;
                 $subject = $this->determineSubject($i, $phy_start, $phy_end, $chem_start, $chem_end, $bot_start, $bot_end, $zoo_start, $zoo_end);
-               
+                DB::table('exam_answer')->insert([
+                    'student_id' => $answer['student_id'],
+                    'test_id' => $answer['test_id'],
+                    'q_no' => $i,
+                    'subject' => $subject,
+                    'answer' => $q_no,
+                    'mode' => $answer['MODE']
+                ]);
+            
             }
         }
 
