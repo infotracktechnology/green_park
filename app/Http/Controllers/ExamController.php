@@ -431,10 +431,15 @@ class ExamController extends Controller
            DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $ans]);
             }
         }
+        $filename = date('Y-m-d H-i-s').$originalFileName;
+        $request->answer_key->move('answer_key',$filename);
+        $path = 'answer_key/'.$filename;
 
         DB::table('key_log')->insert([
                 'file_name' => $originalFileName,
                 'upload_time' => $uploadTime,
+                'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
+                'path' => $path,
                 'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
                 'type' => 'answer_key',
         ]);
@@ -447,6 +452,11 @@ class ExamController extends Controller
         $tests = Exam::all();
         $results = DB::select("SELECT test_id,student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.id join branch c on b.campus=c.id where test_id=$testId group by student_id order by mark desc");
         return view('exam.dump_report',compact('testId','results','tests'));
+    }
+
+    function deleteAnswerKey($id,$test_id){
+        DB::table('key_log')->where('id', $id)->delete();
+        return redirect()->route('exam.answerkey')->with('success', 'Answer key log deleted successfully.');
     }
 
 

@@ -29,7 +29,7 @@
                                </div>
 
                                <div class="col-md-6 col-sm-12 mb-3">
-                                <a href="#" class="btn btn-primary"><i class="fa fa-download"></i> Offline/OMR Upload Template (Format)</a>
+                                <a href="{{ env('APP_URL').'template/omr_response.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Offline/OMR Upload Template (Format)</a>
                                </div>
 
                            
