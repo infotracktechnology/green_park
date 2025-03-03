@@ -20,9 +20,10 @@
            @endif
 
                   <div class="card card-primary">
-                    <form method="post" id="myForm" action="{{ route('exam.answerkey.upload') }}" enctype="multipart/form-data">
-                        @csrf
+                   
                         <div class="card-body">
+                          <form method="post" id="myForm" action="{{ route('exam.answerkey.upload') }}" enctype="multipart/form-data">
+                            @csrf
                             <div class="row">
 
                               <div class="col-md-6 col-sm-12 mb-3">
@@ -64,6 +65,7 @@
                              </div>
 
                             </div>
+                          </form>
 
                          </div>
                         </div>
@@ -77,8 +79,11 @@
                                 <tr>
                                   <th>S.No</th>
                                   <th>Test Ids</th>
+                                  <th>Test Name</th>
                                   <th>File Name</th>
                                   <th>Upload Time</th>
+                                  <th>Download</th>
+                                  <th>Delete</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -86,8 +91,17 @@
                                 <tr>
                                   <td>{{ $loop->iteration }}</td>
                                   <td>{{ $log->test_id }}</td>
+                                  <td>{{ $log->test_name }}</td>
                                   <td>{{ $log->file_name }}</td>
                                   <td>{{ $log->upload_time }}</td>
+                                  <td>{!! $log->path!= null ? '<a href="'.env('APP_URL').$log->path.'" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>' : 'N/A' !!}</td>
+                                  <td>
+                                    <form action="{{ route('answerkey.delete', ['id' => $log->id, 'test_id' => $log->test_id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete?');">
+                                      @csrf
+                                      @method('DELETE')
+                                      <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                  </td>
                                 </tr>
                                 @endforeach
                               </tbody>
@@ -96,7 +110,7 @@
                          </div>
 
                          
-                      </form>
+                      
                   </div>
               </div>
           </div>

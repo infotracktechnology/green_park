@@ -56,7 +56,7 @@ class Student extends Authenticatable
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
     }
     private static function generatePassword($length = 8){
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $characters = 'ABCDFGHIJKMNQRSTXYZ0123456789';
         $password = '';
         for ($i = 0; $i < $length; $i++) {
             $password .= $characters[random_int(0, strlen($characters) - 1)];
