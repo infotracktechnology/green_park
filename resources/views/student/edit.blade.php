@@ -40,7 +40,7 @@
 
                             <div class="form-group col-lg-3">
                                 <label>Password</label>
-                                 <input type="date" name="password_1" value="{{$Student->password_1}}" class="form-control form-control-sm" required>
+                                 <input type="text" name="password_1" value="{{$Student->password_1}}" class="form-control form-control-sm" required>
                             
                              </div>
                             
