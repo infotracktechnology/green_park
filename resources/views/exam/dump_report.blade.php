@@ -54,7 +54,7 @@
                         @if($testId)
                         <div class="row m-t-20">
                             <div class="col-lg-12">
-                                <button class="btn btn-primary m-b-20" onclick="exportTable();"><i class="fa fa-download"></i> Export to PDF</button>
+                                <button class="btn btn-primary m-b-20" id="exportpdf"><i class="fa fa-download"></i> Export to PDF</button>
                             </div>
 
                             <div class="col-lg-12">
@@ -130,7 +130,7 @@
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-    async function exportTable() {
+    function exportTable() {
         const table = document.getElementById('export');
         const options = {
         margin:[0.5,0,0.5,0],
@@ -142,6 +142,10 @@
             location.href = "{{ route('exam.report.dump') }}";
         });
     }
+    $('#exportpdf').click(function(e){
+        e.preventDefault();
+        exportTable();
+    });
 </script>
 
 @endsection

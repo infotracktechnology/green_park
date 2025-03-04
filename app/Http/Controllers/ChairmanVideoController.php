@@ -53,4 +53,8 @@ class ChairmanVideoController extends Controller
        
        return view('student.chairmanvideo', compact('chairmanvideo'));
     }
+
+    public function video(Request $request, $id){
+        return view('layouts.video', compact('id'));
+    }
 }

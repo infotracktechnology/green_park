@@ -108,7 +108,7 @@
                 <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
                 <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
-                <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a></li>
+                {{-- <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a></li> --}}
               </ul>
             </li>
             <li class="dropdown">
