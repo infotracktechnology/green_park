@@ -355,7 +355,7 @@
 
         timerElement.innerHTML = timeString;
         timerContainer.style.display = "inline"; // Show text when exam is upcoming
-        examAlert.style.display = "block"; // Show alert before exam
+        //examAlert.style.display = "block"; // Show alert before exam
     }
 
     var timerInterval = setInterval(updateTimer, 1000);

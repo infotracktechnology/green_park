@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Models;
-
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
@@ -29,7 +27,7 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
-            $model->password_1 = Str::random(8);
+            $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
         });
         static::created(function ($model) {
@@ -57,7 +55,14 @@ class Student extends Authenticatable
     {
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
     }
-
+    private static function generatePassword($length = 8){
+        $characters = 'ABCDFGHIJKMNQRSTXYZ0123456789';
+        $password = '';
+        for ($i = 0; $i < $length; $i++) {
+            $password .= $characters[random_int(0, strlen($characters) - 1)];
+        }
+        return $password;
+    }
    
    
 }

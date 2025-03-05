@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Student;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ImportController extends Controller
 {
@@ -27,6 +28,8 @@ class ImportController extends Controller
             'csv_file' => 'required|mimes:csv,txt|max:2048', // Only CSV files up to 2MB
         ]);
 
+        $branch = $request->branch;
+
         // Step 2: Handle file upload
         if ($request->hasFile('csv_file')) {
             $file = $request->file('csv_file');
@@ -38,6 +41,7 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
+                    $row = array_merge($row, ['campus' => $branch]);
                    if(isset($row['id'])){
                     $student = Student::find($row['id']);
                     $student->update($row);
@@ -59,7 +63,7 @@ class ImportController extends Controller
     if (($handle = fopen($filePath, 'r')) !== false) {
         $header = null;
 
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+        while (($row = fgetcsv($handle, 10000, ',')) !== false) {
             // Ignore empty rows
             if (empty(array_filter($row))) {
                 continue;

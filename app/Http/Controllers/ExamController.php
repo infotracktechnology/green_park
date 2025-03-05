@@ -34,7 +34,8 @@ class ExamController extends Controller
         $exams = DB::table('exam as e')
             ->leftJoin('exam_answer as ea', 'e.id', '=', 'ea.test_id')
             ->select('e.id as exam_id', 'e.name', DB::raw('COUNT(DISTINCT ea.student_id) as student_count'))
-            ->groupBy('e.id', 'e.name')
+            ->where('ea.student_id', '>', 0)
+            ->groupBy('e.id')
             ->get();
 
   
@@ -56,6 +57,10 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'id' => 'required|unique:exam,id',
+        ]);
+
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
         $data['subject_name'] = implode(',', $request->subject_name);
         $data['branch_id'] = implode(',', $request->branch_id);
@@ -328,19 +333,77 @@ class ExamController extends Controller
         return view('exam.offline');
     }
 
-    public function offlineUpload(Request $request)
+    public function offlineUpload(Request $request, ImportController $import)
     {
     
         $request->validate([
-            'offline' => 'required|mimes:csv|max:1024',
+            'offline' => 'required|mimes:csv,txt|max:1024',
         ]);
+
+        $answers = $import->parseCSV($request->file('offline')->getRealPath());
+         if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id'])) {
+            return back()->with('error', 'File is not in the correct format.');
+        }
+        
+        foreach ($answers as $answer) {
+        $exam = Exam::find($answer['test_id']);
+
+        if (!$exam) {
+            return back()->with('error', 'Exam with ID ' . $answer['test_id'] . ' not found.');
+        }
+
+        if($answer['MODE'] != "OMR"){
+            continue;
+        }
+
+        $total_questions = $exam->total_questions;
+
+        $phy_start = is_null($exam->phy_start) ? 0 : $exam->phy_start;
+        $chem_start = is_null($exam->chem_start) ? 0 : $exam->chem_start;
+        $bot_start = is_null($exam->bot_start) ? 0 : $exam->bot_start;
+        $zoo_start = is_null($exam->zoo_start) ? 0 : $exam->zoo_start;
+
+        $phy_end = is_null($exam->phy_end) ? 0 : $exam->phy_end;
+        $chem_end = is_null($exam->chem_end) ? 0 : $exam->chem_end;
+        $bot_end = is_null($exam->bot_end) ? 0 : $exam->bot_end;
+        $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
+
+            for ($i = 1; $i <= $total_questions; $i++) {
+                $q_no = $answer["Q$i"] ?? 0;
+                $subject = $this->determineSubject($i, $phy_start, $phy_end, $chem_start, $chem_end, $bot_start, $bot_end, $zoo_start, $zoo_end);
+                DB::table('exam_answer')->insert([
+                    'student_id' => $answer['student_id'],
+                    'test_id' => $answer['test_id'],
+                    'q_no' => $i,
+                    'subject' => $subject,
+                    'answer' => $q_no,
+                    'mode' => $answer['MODE']
+                ]);
+            
+            }
+        }
 
         return back()->with('success', 'File uploaded successfully.');
     }
 
+    public function determineSubject($question, $phyStart, $phyEnd, $chemStart, $chemEnd, $botStart, $botEnd, $zooStart, $zooEnd){
+
+        if ($phyStart <= $question && $question <= $phyEnd && $phyEnd != 0) {
+            return 'physics';
+        } elseif ($chemStart <= $question && $question <= $chemEnd && $chemEnd != 0) {
+            return 'chemistry';
+        } elseif ($botStart <= $question && $question <= $botEnd && $botEnd != 0) {
+            return 'botany';
+        } elseif ($zooStart <= $question && $question <= $zooEnd && $zooEnd != 0) {
+            return 'zoology';
+        } else {
+            return 'NULL';
+        }
+    }
+
     public function answerKey()
     {
-        $answerkey_logs = DB::table('answerkey_log')->orderBy('upload_time', 'desc')->get();
+        $answerkey_logs = DB::table('key_log')->where('type', 'answer_key')->latest()->take(10)->get();
         return view('exam.answerkey', compact('answerkey_logs'));
     }
 
@@ -364,16 +427,21 @@ class ExamController extends Controller
         foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
-                $mark = in_array($row->answer, $ans_key) ? 4 : -1;
+                $mark = in_array($row->answer, $ans_key) && array_sum($ans_key) > 0 ? 4 : -1;
            DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $ans]);
             }
         }
+        $filename = date('Y-m-d H-i-s').$originalFileName;
+        $request->answer_key->move('answer_key',$filename);
+        $path = 'answer_key/'.$filename;
 
-        DB::table('answerkey_log')->insert([
+        DB::table('key_log')->insert([
                 'file_name' => $originalFileName,
                 'upload_time' => $uploadTime,
-                'test_id' => $answer['test_id'],
-
+                'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
+                'path' => $path,
+                'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+                'type' => 'answer_key',
         ]);
 
      return redirect()->back()->with('success', 'Answer key uploaded successfully.');
@@ -384,6 +452,11 @@ class ExamController extends Controller
         $tests = Exam::all();
         $results = DB::select("SELECT test_id,student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.id join branch c on b.campus=c.id where test_id=$testId group by student_id order by mark desc");
         return view('exam.dump_report',compact('testId','results','tests'));
+    }
+
+    function deleteAnswerKey($id,$test_id){
+        DB::table('key_log')->where('id', $id)->delete();
+        return redirect()->route('exam.answerkey')->with('success', 'Answer key log deleted successfully.');
     }
 
 

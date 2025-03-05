@@ -71,6 +71,7 @@ class StudentController extends Controller
         $data = $request->all();
         $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
         $data['ac_nonac'] = $data['ac_nonac'] ?? null;
+        $data['password']  = bcrypt($request->password_1);
 
         $student->update($data);
 
