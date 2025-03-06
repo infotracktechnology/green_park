@@ -341,7 +341,7 @@ class ExamController extends Controller
         ]);
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
-         if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id']) && !isset($answers[0]['MODE'])) {
+         if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id'])) {
             return back()->with('error', 'File is not in the template format.');
         }
         
@@ -352,9 +352,9 @@ class ExamController extends Controller
             return back()->with('error', 'Exam with ID ' . $answer['test_id'] . ' not found.');
         }
 
-        if($answer['MODE'] != "OMR"){
-            continue;
-        }
+        // if($answer['MODE'] != "OMR"){
+        //     continue;
+        // }
 
         $total_questions = $exam->total_questions;
 
@@ -377,7 +377,7 @@ class ExamController extends Controller
                     'q_no' => $i,
                     'subject' => $subject,
                     'answer' => $q_no,
-                    'mode' => $answer['MODE']
+                    'mode' => "OMR",
                 ]);
             
             }
