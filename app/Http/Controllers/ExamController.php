@@ -341,7 +341,7 @@ class ExamController extends Controller
         ]);
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
-         if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id'])) {
+         if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id']) && !isset($answers[0]['MODE'])) {
             return back()->with('error', 'File is not in the correct format.');
         }
         
