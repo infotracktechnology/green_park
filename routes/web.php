@@ -12,6 +12,9 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ExamPortionController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ChairmanVideoController;
+use App\Http\Controllers\QuestionKeyController;
+use App\Http\Controllers\AnswerkeyController;
+
 
 
 
@@ -66,7 +69,14 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('answerkey/exam', [ExamController::class, 'answerKey'])->name('exam.answerkey');
     Route::post('answerkey/exam', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
     Route::get('exam/report/dump', 'App\Http\Controllers\ExamController@Dump_Report')->name('exam.report.dump');
-    Route::delete('answerkey/delete/{id}/{test_id}', [App\Http\Controllers\ExamController::class, 'deleteAnswerKey'])->name('answerkey.delete');
+
+    Route::resource('questionkey', QuestionKeyController::class);
+    Route::get('/questionkey/download/{id}', [QuestionKeyController::class, 'download'])->name('questionkey.download');
+    
+    Route::resource('answerkey', AnswerKeyController::class);
+    Route::get('/answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
+    
+    
 });
 
 #students routes
@@ -75,9 +85,12 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function
 Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentdashboard');
 Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
 Route::get('home',[StudentController::class, 'home'])->name('student.home');
-Route::get('notification',[StudentController::class, 'notification'])->name('student.notification');
+Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
 Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
 Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
+Route::get('answerkey',[AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
+Route::get('questionkey', [QuestionKeyController::class, 'questionkey'])->name('student.questionKey');
+
 
 Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
 Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
@@ -89,5 +102,5 @@ Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download']
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
-Route::get('video/{id}', 'App\Http\Controllers\ChairmanVideoController@video');
+
 
