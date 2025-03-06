@@ -69,6 +69,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('answerkey/exam', [ExamController::class, 'answerKey'])->name('exam.answerkey');
     Route::post('answerkey/exam', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
     Route::get('exam/report/dump', 'App\Http\Controllers\ExamController@Dump_Report')->name('exam.report.dump');
+    
+    Route::delete('answerkey/delete/{id}/{test_id}', [App\Http\Controllers\ExamController::class, 'deleteAnswerKey'])->name('answerkey.delete');
 
     Route::resource('questionkey', QuestionKeyController::class);
     Route::get('/questionkey/download/{id}', [QuestionKeyController::class, 'download'])->name('questionkey.download');
