@@ -23,12 +23,21 @@
                                     </div>
 
                                     <div class="col-md-6 col-sm-12 mb-3">
-                                        <a href="{{ env('APP_URL').'template/student_export.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Student Data Upload Template Format (Bulk Insert)</a>
+                                        <a href="{{ env('APP_URL').'template/student_export.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Student Data Upload Template Format (Bulk Add)</a>
                                        </div>
 
-                                    <div class="form-group col-lg-3">
+                                       <div class="form-group col-lg-3">
+                                        <label for="branch">Select Operation:</label>
+                                        <select name="operation" id="operation" class="form-control form-control-sm" required>
+                                            <option value="" disabled selected>-- Choose  Operation--</option>
+                                            <option value="add">Add</option>
+                                            <option value="update">Update</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group col-lg-3 branch">
                                         <label for="branch">Select Branch:</label>
-                                        <select name="branch" id="branch" class="form-control form-control-sm" required>
+                                        <select name="branch" id="branch" class="form-control form-control-sm">
                                             <option value="" disabled selected>-- Choose Branch --</option>
                                             @foreach ($branches as $branch)
                                                 <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -50,19 +59,32 @@
 
                         
 
-                        <script>
-                            document.querySelector('input[type="file"]').addEventListener('change', function (e) {
-                                const file = e.target.files[0];
-                                if (file.size > 2 * 1024 * 1024) { // 2MB in bytes
-                                    alert("File size must not exceed 2MB!");
-                                    e.target.value = ""; // Clear the file input
-                                }
-                            });
-                        </script>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </div>
+@endsection
+@section('js')
+<script>
+    $("#operation").on('change', function() {
+        if($(this).val() == 'update') {
+            $('.branch').hide();
+            $('#branch').prop('required', false);
+        }
+        else {
+            $('.branch').show();
+            $('#branch').prop('required', true);
+        }
+        });
+
+         document.querySelector('input[type="file"]').addEventListener('change', function (e) {
+                                const file = e.target.files[0];
+                                if (file.size > 2 * 1024 * 1024) { // 2MB in bytes
+                                    alert("File size must not exceed 2MB!");
+                                    e.target.value = ""; // Clear the file input
+                                }
+                            });
+</script>
 @endsection
