@@ -180,12 +180,13 @@
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
-                    <i class="fas fa-question-circle" style="font-size: 20px; color: #2196f3;"></i><span>Question Papers</span>
+                  <a href="{{ route('student.questionKey') }}" class="nav-link">
+
+ <i class="fas fa-question-circle" style="font-size: 20px; color: #2196f3;"></i><span>Question Papers</span>
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
+                  <a href="{{ route('student.answerkey') }}" class="nav-link">
                     <i class="fas fa-key" style="font-size: 20px; color: #2196f3;"></i><span>Answer Key</span>
                   </a>
                 </li>

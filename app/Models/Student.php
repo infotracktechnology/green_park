@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Chairmanvideo;
 use App\Models\Examportion;
 use App\Models\ExamAnswer;
+use App\Models\AnswerKey;
 
 
 class Student extends Authenticatable
@@ -55,6 +56,16 @@ class Student extends Authenticatable
     {
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
     }
+
+    // public function answerKey()
+    // {
+    //     return AnswerKey::where('branch', 'like', "%$this->campus%")
+    //         ->where('coaching_type', 'like', "%$this->coaching_type%")
+    //         ->latest()
+    //         ->first();
+    // }
+    
+
     private static function generatePassword($length = 8){
         $characters = 'ABCDFGHIJKMNQRSTXYZ0123456789';
         $password = '';

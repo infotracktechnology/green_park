@@ -120,6 +120,8 @@
                 <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
                 <li><a href="{{route('chairmanvideo.index')}}"  class="nav-link"> Chairman Video</a></li>
                 <li><a href="{{route('examportion.index')}}"  class="nav-link"> Exam Portion</a></li>
+                <li><a href="{{route('questionkey.index')}}"  class="nav-link"> Question Key</a></li>
+                <li><a href="{{route('answerkey.index')}}"  class="nav-link"> Answer key</a></li>
                 {{-- <li><a href="#"  class="nav-link"> Class Video</a></li> --}}
               </ul>
             </li>
