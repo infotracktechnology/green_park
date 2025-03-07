@@ -16,7 +16,7 @@ class ExamController extends Controller
 
     public function index(Request $request)
     {
-        $tests = Exam::all();
+        $tests = Exam::latest()->take(25)->get();
 
         if ($request->has('test_id')) {
             $test = Exam::find($request->test_id);
@@ -403,6 +403,7 @@ class ExamController extends Controller
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
             'path' => $path,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+            'no_rows' => count($answers),
             'type' => 'offline_key',
         ]);
 
@@ -464,6 +465,7 @@ class ExamController extends Controller
                 'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
                 'path' => $path,
                 'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+                'no_rows' => count($answers),
                 'type' => 'answer_key',
         ]);
 
