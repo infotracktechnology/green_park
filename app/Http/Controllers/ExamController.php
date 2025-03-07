@@ -342,7 +342,7 @@ class ExamController extends Controller
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
          if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id'])) {
-            return back()->with('error', 'File is not in the correct format.');
+            return back()->with('error', 'File is not in the template format.');
         }
         
         foreach ($answers as $answer) {
@@ -352,9 +352,10 @@ class ExamController extends Controller
             return back()->with('error', 'Exam with ID ' . $answer['test_id'] . ' not found.');
         }
 
-        if($answer['MODE'] != "OMR"){
+        if($answer['mode']!=='OMR') {
             continue;
         }
+       
 
         $total_questions = $exam->total_questions;
 
@@ -369,7 +370,7 @@ class ExamController extends Controller
         $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
 
             for ($i = 1; $i <= $total_questions; $i++) {
-                $q_no = $answer["Q$i"] ?? 0;
+                $q_no = $answer["q$i"];
                 $subject = $this->determineSubject($i, $phy_start, $phy_end, $chem_start, $chem_end, $bot_start, $bot_end, $zoo_start, $zoo_end);
                 DB::table('exam_answer')->insert([
                     'student_id' => $answer['student_id'],
@@ -377,13 +378,13 @@ class ExamController extends Controller
                     'q_no' => $i,
                     'subject' => $subject,
                     'answer' => $q_no,
-                    'mode' => $answer['MODE']
+                    'mode' => "OMR",
                 ]);
             
             }
         }
 
-        return back()->with('success', 'File uploaded successfully.');
+        return back()->with('success', 'Offline File uploaded successfully.');
     }
 
     public function determineSubject($question, $phyStart, $phyEnd, $chemStart, $chemEnd, $botStart, $botEnd, $zooStart, $zooEnd){
