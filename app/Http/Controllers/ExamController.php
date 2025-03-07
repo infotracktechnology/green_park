@@ -403,6 +403,7 @@ class ExamController extends Controller
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
             'path' => $path,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+            'no_rows' => count($answers),
             'type' => 'offline_key',
         ]);
 
@@ -464,6 +465,7 @@ class ExamController extends Controller
                 'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
                 'path' => $path,
                 'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+                'no_rows' => count($answers),
                 'type' => 'answer_key',
         ]);
 
