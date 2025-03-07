@@ -54,6 +54,51 @@
                       </form>
                     
                   </div>
+
+                  
+                  <div class="card card-success">
+                    <div class="card-body">
+                       <h6 class="col-deep-purple">Uploaded File Information</h6>
+                       <div class="table-responsive">
+                           <table class="table table-striped table-sm" id="myTable">
+                         <thead>
+                           <tr>
+                             <th>S.No</th>
+                             <th>Test Ids</th>
+                             <th>Test Name</th>
+                             <th>File Name</th>
+                             <th>Upload Time</th>
+                             <th>Download</th>
+                             <th>Delete</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           @foreach($offline_logs as $log)
+                           <tr>
+                             <td>{{ $loop->iteration }}</td>
+                             <td>{{ $log->test_id }}</td>
+                             <td>{{ $log->test_name }}</td>
+                             <td>{{ $log->file_name }}</td>
+                             <td>{{ $log->upload_time }}</td>
+                             <td>{!! $log->path!= null ? '<a href="'.env('APP_URL').$log->path.'" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>' : 'N/A' !!}</td>
+                             <td>
+                               <form action="{{ route('offline.delete', ['id' => $log->id, 'test_id' => $log->test_id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete?');">
+                                 @csrf
+                                 @method('DELETE')
+                                 <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                               </form>
+                             </td>
+                           </tr>
+                           @endforeach
+                         </tbody>
+                       </table>
+                     </div>
+                    </div>
+
+                    
+                 
+             </div>
+
               </div>
           </div>
       </div>
