@@ -352,11 +352,10 @@ class ExamController extends Controller
             return back()->with('error', 'Exam with ID ' . $answer['test_id'] . ' not found.');
         }
 
-    $exam_answer = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->first();
-         
-        if($exam_answer) {
+        if($answer['mode']!=='OMR') {
             continue;
         }
+       
 
         $total_questions = $exam->total_questions;
 
@@ -371,17 +370,16 @@ class ExamController extends Controller
         $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
 
             for ($i = 1; $i <= $total_questions; $i++) {
-                $q_no = $answer["Q$i"];
+                $q_no = $answer["q$i"];
                 $subject = $this->determineSubject($i, $phy_start, $phy_end, $chem_start, $chem_end, $bot_start, $bot_end, $zoo_start, $zoo_end);
-                dd($q_no);
-                // DB::table('exam_answer')->insert([
-                //     'student_id' => $answer['student_id'],
-                //     'test_id' => $answer['test_id'],
-                //     'q_no' => $i,
-                //     'subject' => $subject,
-                //     'answer' => $q_no,
-                //     'mode' => "OMR",
-                // ]);
+                DB::table('exam_answer')->insert([
+                    'student_id' => $answer['student_id'],
+                    'test_id' => $answer['test_id'],
+                    'q_no' => $i,
+                    'subject' => $subject,
+                    'answer' => $q_no,
+                    'mode' => "OMR",
+                ]);
             
             }
         }
