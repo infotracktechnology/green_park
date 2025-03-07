@@ -40,7 +40,7 @@
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
                                      <option value="{{ $test->id }}" @if($test->id == $testId) selected @endif>
-                                         {{ $test->name }}
+                                        {{ $test->id }} - {{ $test->name }}
                                      </option>
                                  @endforeach
                              </select>
