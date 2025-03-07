@@ -355,6 +355,11 @@ class ExamController extends Controller
         if($answer['mode']!=='OMR') {
             continue;
         }
+        $exam_answer = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->first();
+
+        if ($exam_answer) {
+            continue;
+        }
        
 
         $total_questions = $exam->total_questions;
