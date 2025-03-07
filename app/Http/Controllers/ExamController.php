@@ -16,7 +16,7 @@ class ExamController extends Controller
 
     public function index(Request $request)
     {
-        $tests = Exam::all();
+        $tests = Exam::latest()->take(25)->get();
 
         if ($request->has('test_id')) {
             $test = Exam::find($request->test_id);
