@@ -473,10 +473,13 @@ class ExamController extends Controller
     }
 
     function Dump_Report(Request $request){
-        $testId = $request->test_id ?? 0;
-        $tests = Exam::all();
-        $results = DB::select("SELECT test_id,student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.id join branch c on b.campus=c.id where test_id=$testId group by student_id order by mark desc");
-        return view('exam.dump_report',compact('testId','results','tests'));
+        $test_name = $request->test_name ?? '';
+        $tests = Exam::groupBy('name')->get();
+        $test_ids = Exam::where('name', $test_name)->implode('id', ',');
+        $test_ids = $test_ids != '' ? $test_ids : 0;
+
+        $results = DB::select("SELECT test_id,student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
+        return view('exam.dump_report',compact('test_name','results','tests','test_ids'));
     }
 
     function deleteAnswerKey($id,$test_id){
@@ -490,5 +493,108 @@ class ExamController extends Controller
         return redirect()->route('exam.offline.index')->with('success', 'Answer key log deleted successfully.');
     }
 
+    function csv_download($test_ids, Request $request)
+    {
+    
+        $testIdsArray = explode(',', $test_ids);
+        $testIdsArray = array_map('intval', $testIdsArray);
+        $testIdsString = implode(',', $testIdsArray);
+    
+        $results = DB::table('exam_answer as a')
+            ->join('student as b', 'a.student_id', '=', 'b.id')
+            ->join('branch as c', 'b.campus', '=', 'c.id')
+            ->whereIn('a.test_id', $testIdsArray)
+            ->select(
+                'a.test_id',
+                'a.student_id',
+                'a.mode as stmode',
+                DB::raw('GROUP_CONCAT(DISTINCT a.subject) as subjects'),
+                DB::raw('SUM(a.mark) as mark'),
+                'b.student_name',
+                'c.name',
+                'b.coaching_type',
+                'b.gender',
+                'b.section'
+            )
+            ->groupBy('a.student_id')
+            ->orderByDesc('mark')
+            ->get();
+    
+      
+    
+        $subjects = explode(',', $results[0]->subjects);
+    
+        $headers = [
+            'S.NO',
+            'SID',
+            'Mode',
+            'Name',
+            'Sex',
+            'Campus',
+            'Coach Type',
+            'SEC',
+        ];
+    
+        foreach ($subjects as $subject) {
+            $headers[] = $subject . ' R';
+            $headers[] = $subject . ' W';
+            $headers[] = $subject . ' L';
+            $headers[] = $subject . ' TOT';
+        }
+        $headers[] = 'Net Total';
+    
+        $csvData = [$headers];
+    
+        foreach ($results as $key => $result) {
+            $row = [
+                $key + 1,
+                $result->student_id,
+                $result->stmode,
+                $result->student_name,
+                $result->gender,
+                $result->name,
+                $result->coaching_type,
+                $result->section,
+            ];
+    
+            $subjectMarks = [];
+            foreach ($subjects as $subject) {
+                $marks = DB::table('exam_answer')
+                    ->whereIn('test_id', $testIdsArray)
+                    ->where('student_id', $result->student_id)
+                    ->where('subject', $subject)
+                    ->select(
+                        DB::raw('SUM(CASE WHEN mark = 4 THEN 1 ELSE 0 END) as r'),
+                        DB::raw('SUM(CASE WHEN mark = -1 THEN 1 ELSE 0 END) as w'),
+                        DB::raw('SUM(CASE WHEN mark = 0 THEN 1 ELSE 0 END) as l'),
+                        DB::raw('SUM(mark) as tot')
+                    )
+                    ->first();
+    
+                $subjectMarks[] = $marks->r ?? 0;
+                $subjectMarks[] = $marks->w ?? 0;
+                $subjectMarks[] = $marks->l ?? 0;
+                $subjectMarks[] = $marks->tot ?? 0;
+            }
+    
+            $row = array_merge($row, $subjectMarks);
+            $row[] = $result->mark;
+    
+            $csvData[] = $row;
+        }
+    
+        $filename = "test_report_dump.csv";
+    
+        return response()->stream(function () use ($csvData) {
+            $file = fopen('php://output', 'w');
+            foreach ($csvData as $line) {
+                fputcsv($file, $line);
+            }
+            fclose($file);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ]);
+    }
 
 }
