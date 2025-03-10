@@ -40,7 +40,7 @@
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
                                      <option value="{{ $test->id }}" @if($test->id == $testId) selected @endif>
-                                         {{ $test->name }}
+                                        {{ $test->id }} - {{ $test->name }}
                                      </option>
                                  @endforeach
                              </select>
@@ -51,7 +51,7 @@
                             <button type="submit" class="btn btn-primary btn-block">Submit</button>
                          </div>
                         </div>
-                        @if($testId)
+                        @if($testId && $results)
                         <div class="row m-t-20">
                             <div class="col-lg-12">
                                 <button class="btn btn-primary m-b-20" id="exportpdf"><i class="fa fa-download"></i> Export to PDF</button>
@@ -115,6 +115,10 @@
                             </div>
                         </div>
                         </div>
+                        @else
+                       
+                        <p>No data found</p>
+                       
                         @endif
                         
                      </div>

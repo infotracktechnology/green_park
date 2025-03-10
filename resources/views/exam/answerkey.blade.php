@@ -81,6 +81,7 @@
                                   <th>Test Ids</th>
                                   <th>Test Name</th>
                                   <th>File Name</th>
+                                  <th>No Records</th>
                                   <th>Upload Time</th>
                                   <th>Download</th>
                                   <th>Delete</th>
@@ -93,6 +94,7 @@
                                   <td>{{ $log->test_id }}</td>
                                   <td>{{ $log->test_name }}</td>
                                   <td>{{ $log->file_name }}</td>
+                                  <td>{{ $log->no_rows }}</td>
                                   <td>{{ $log->upload_time }}</td>
                                   <td>{!! $log->path!= null ? '<a href="'.env('APP_URL').$log->path.'" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>' : 'N/A' !!}</td>
                                   <td>

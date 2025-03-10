@@ -16,7 +16,7 @@ class ExamController extends Controller
 
     public function index(Request $request)
     {
-        $tests = Exam::all();
+        $tests = Exam::latest()->take(25)->get();
 
         if ($request->has('test_id')) {
             $test = Exam::find($request->test_id);
@@ -330,7 +330,8 @@ class ExamController extends Controller
 
     public function offline()
     {
-        return view('exam.offline');
+        $offline_logs = DB::table('key_log')->where('type', 'offline_key')->latest()->take(10)->get();
+        return view('exam.offline',compact('offline_logs'));
     }
 
     public function offlineUpload(Request $request, ImportController $import)
@@ -353,6 +354,12 @@ class ExamController extends Controller
         }
 
         if($answer['mode']!=='OMR') {
+            continue;
+        }
+        
+    $exam_answer = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->first();
+
+        if ($exam_answer) {
             continue;
         }
        
@@ -383,6 +390,22 @@ class ExamController extends Controller
             
             }
         }
+
+        $originalFileName = $request->file('offline')->getClientOriginalName();
+        $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
+        $filename = date('Y-m-d H-i-s').$originalFileName;
+        $request->offline->move('answer_key',$filename);
+        $path = 'answer_key/'.$filename;
+        
+        DB::table('key_log')->insert([
+            'file_name' => $originalFileName,
+            'upload_time' => $uploadTime,
+            'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
+            'path' => $path,
+            'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+            'no_rows' => count($answers),
+            'type' => 'offline_key',
+        ]);
 
         return back()->with('success', 'Offline File uploaded successfully.');
     }
@@ -442,6 +465,7 @@ class ExamController extends Controller
                 'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
                 'path' => $path,
                 'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+                'no_rows' => count($answers),
                 'type' => 'answer_key',
         ]);
 
@@ -458,6 +482,12 @@ class ExamController extends Controller
     function deleteAnswerKey($id,$test_id){
         DB::table('key_log')->where('id', $id)->delete();
         return redirect()->route('exam.answerkey')->with('success', 'Answer key log deleted successfully.');
+    }
+
+    function deleteOfflineKey($id,$test_id){
+        DB::table('key_log')->where('id', $id)->delete();
+        DB::table('exam_answer')->where('test_id', $test_id)->delete();
+        return redirect()->route('exam.offline.index')->with('success', 'Answer key log deleted successfully.');
     }
 
 
