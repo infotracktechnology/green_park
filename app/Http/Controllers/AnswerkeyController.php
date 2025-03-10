@@ -29,7 +29,7 @@ return view('answerkey.index', compact('answerKeys'));
             'title' => 'required|string|max:255',
             'branch' => 'required|array',
             'coaching_type' => 'required|array',
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'file' => 'required|file|mimes:pdf|max:2048',
         ]);
     
         $file = $request->file('file');
@@ -65,7 +65,7 @@ return view('answerkey.index', compact('answerKeys'));
             'title' => 'required|string|max:255',
             'branch' => 'required|array',
             'coaching_type' => 'required|array',
-            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'file' => 'nullable|file|mimes:pdf|max:2048',
         ]);
     
         $answerKey = AnswerKey::findOrFail($id);
@@ -112,7 +112,7 @@ return view('answerkey.index', compact('answerKeys'));
 
     public function answerkey()
     {
-        $answerKeys = AnswerKey::latest()->get(); // Fetch all answer keys
+        $answerKeys = AnswerKey::latest()->take(5)->get(); // Fetch all answer keys
         return view('student.answerKey', compact('answerKeys'));
     }
     
