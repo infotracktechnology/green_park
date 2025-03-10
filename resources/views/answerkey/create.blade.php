@@ -25,17 +25,22 @@
                              
      
 
-        <div class="form-group col-lg-4">
-            <label for="branch">Branch</label>
-            <select name="branch[]" class="form-control select2" multiple required>
-                @foreach ($branches as $branch)
-                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                @endforeach
-            </select>
-        </div>
+                              <div class="form-group col-lg-4">
+                                <label for="branch">Branch</label>
+                                <select name="branch[]" class="form-control form-control-sm select2 @error('branch') is-invalid @enderror" multiple required>
+                                    @foreach ($branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('branch')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            
+
         <div class="form-group col-lg-5">
             <label>Coaching Type</label>
-            <select name="coaching_type[]" class="form-control select2" multiple required>
+            <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
                 <option value="Offline">Offline</option>
                 <option value="Online Recorded">Online Recorded</option>
                 <option value="Online Live">Online Live</option>
@@ -47,12 +52,13 @@
 
         <div class="form-group col-lg-3">
             <label for="title">Title</label>
-            <input type="text" name="title" class="form-control" required>
+            <input type="text" name="title" class="form-control form-control-sm" required>
         </div>
         
         <div class="form-group col-lg-4">
-            <label for="file">Attachment</label>
-            <input type="file" name="file" class="form-control" required>
+            <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
+           
+            <input type="file" name="file" class="form-control form-control-sm" required>
         </div>
         
  <div class="form-group col-lg-12">

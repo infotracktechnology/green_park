@@ -28,9 +28,9 @@
 
                               <div class="form-group col-lg-4">
                                 <label for="branch">Branch</label>
-                                <select name="branch[]" class="form-control select2" multiple required>
+                                <select name="branch[]" class="form-control select2 @error('branch') is-invalid @enderror" multiple required>
                                     @php
-                                        $selectedBranches = explode(',', $answerKey->branch); // Convert stored string to array
+                                        $selectedBranches = explode(',', $questionKey->branch); // Convert stored string to array
                                     @endphp
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}" 
@@ -39,11 +39,14 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('branch')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                             
                             <div class="form-group col-lg-5">
                                 <label>Coaching Type</label>
-                                <select name="coaching_type[]" class="form-control select2" multiple required>
+                                <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
                                     @php
                                         $selectedTypes = explode(',', $answerKey->coaching_type); // Convert stored string to array
                                     @endphp
@@ -58,12 +61,13 @@
 
                             <div class="form-group col-lg-3">
                                 <label for="title">Title</label>
-                                <input type="text" name="title" class="form-control" required value="{{ $answerKey->title }}">
+                                <input type="text" name="title" class="form-control form-control-sm" required value="{{ $answerKey->title }}">
                             </div>
 
                             <div class="form-group col-lg-4">
-                                <label for="file">Attachment</label>
-                                <input type="file" name="file" id="fileInput" class="form-control">
+                                <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
+
+                                <input type="file" name="file" id="fileInput" class="form-control form-control-sm">
                                 <small id="fileName">
                                     @if($answerKey->file_path)
                                         {{ basename($answerKey->file_path) }}
