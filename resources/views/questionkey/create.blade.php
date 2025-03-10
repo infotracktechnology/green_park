@@ -37,7 +37,7 @@
 
         <div class="form-group col-lg-5">
             <label>Coaching Type</label>
-            <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
+            <select name="coaching_type[]" class="form-control form-control-sm select2 @error('coaching_type') is-invalid @enderror" multiple required>
                 <option value="Offline">Offline</option>
                 <option value="Online Recorded">Online Recorded</option>
                 <option value="Online Live">Online Live</option>
@@ -45,16 +45,25 @@
                 <option value="11">11</option>
                 <option value="12">12</option>
             </select>
+            @error('coaching_type')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
         </div>
 
         <div class="form-group col-lg-3">
             <label for="title">Title</label>
-            <input type="text" name="title" class="form-control form-control-sm" required>
+            <input type="text" name="title" class="form-control form-control-sm @error('title') is-invalid @enderror" required>
+            @error('title')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
         </div>
         
         <div class="form-group col-lg-4">
             <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
-            <input type="file" name="file" class="form-control form-control-sm" required>
+            <input type="file" name="file" class="form-control form-control-sm @error('file') is-invalid @enderror" required>
+            @error('file')
+            <span class="text-danger">{{ $message }}</span>
+            @enderror
         </div>
  <div class="form-group col-lg-12">
         <button type="submit" class="btn btn-primary">Submit</button>
