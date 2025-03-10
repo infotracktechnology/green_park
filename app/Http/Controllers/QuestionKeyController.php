@@ -35,7 +35,7 @@ class QuestionKeyController extends Controller
             'title' => 'required|string|max:255',
             'branch' => 'required|array',
             'coaching_type' => 'required|array',
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'file' => 'required|file|mimes:pdf|max:2048',
         ]);
     
         $file = $request->file('file');
@@ -71,7 +71,7 @@ class QuestionKeyController extends Controller
             'title' => 'required|string|max:255',
             'branch' => 'required|array',
             'coaching_type' => 'required|array',
-            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'file' => 'nullable|file|mimes:pdf|max:2048',
         ]);
     
         $questionKey = QuestionKey::findOrFail($id);
@@ -115,7 +115,7 @@ class QuestionKeyController extends Controller
 
     public function questionkey()
     {
-        $questionKeys = QuestionKey::latest()->get(); // Fetch all answer keys
+        $questionKeys = QuestionKey::latest()->take(5)->get(); // Fetch all answer keys
         return view('student.questionKey', compact('questionKeys'));
     }
 }
