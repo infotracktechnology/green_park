@@ -14,6 +14,8 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ChairmanVideoController;
 use App\Http\Controllers\QuestionKeyController;
 use App\Http\Controllers\AnswerkeyController;
+use App\Http\Controllers\DownloadController;
+
 
 
 
@@ -79,6 +81,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     
     Route::resource('answerkey', AnswerKeyController::class);
     Route::get('/answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
+
+    Route::resource('download', DownloadController::class);
+    
     
     
 });
