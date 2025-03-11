@@ -79,8 +79,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     
     Route::resource('answerkey', AnswerKeyController::class);
     Route::get('/answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
+    Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
     
-    
+    Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
 });
 
 #students routes

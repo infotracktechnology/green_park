@@ -3,6 +3,8 @@
 
 @section('title', 'Test Dump Report')
 @section('css')
+<link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}" />
+<link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}" />
 <style>
     table {
         width: 100%;
@@ -34,13 +36,13 @@
                         <h6>Test Dump Report</h6>
                         <div class="row">
                            
-                          <div class="form-group col-lg-3">
+                          <div class="form-group col-lg-4">
                              <label>Test ID</label>
-                             <select name="test_id" id="test_id" class="form-control form-control-sm" required>
+                             <select name="test_name" id="test_name" class="form-control form-control-sm" required>
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
-                                     <option value="{{ $test->id }}" @if($test->id == $testId) selected @endif>
-                                        {{ $test->id }} - {{ $test->name }}
+                                     <option value="{{ $test->name }}" @if($test->name == $test_name) selected @endif>
+                                      {{ $test->name }}
                                      </option>
                                  @endforeach
                              </select>
@@ -51,18 +53,24 @@
                             <button type="submit" class="btn btn-primary btn-block">Submit</button>
                          </div>
                         </div>
-                        @if($testId && $results)
+                        @if($test_name && $results)
                         <div class="row m-t-20">
                             <div class="col-lg-12">
                                 <button class="btn btn-primary m-b-20" id="exportpdf"><i class="fa fa-download"></i> Export to PDF</button>
+                                <a class="btn btn-primary m-b-20" href="{{ route('exam.csv_download', ['test_ids' => $test_ids]) }}"><i class="fa fa-download"></i> Export to CSV</a>
                             </div>
+
+                            <?php
+                            $subjects = explode(',', $results[0]->subjects);
+                            ?>
 
                             <div class="col-lg-12">
                             <div class="table-responsive">
-                                <table id="export">
+                                <table  id="export">
                                  <thead>
                                   <tr role="row">
                                    <th rowspan="2">S.NO</th>
+                                  
                                    <th rowspan="2">SID</th>
                                    <th rowspan="2">Mode</th>
                                    <th rowspan="2">Name</th>
@@ -70,9 +78,7 @@
                                    <th rowspan="2">Campus</th>
                                    <th rowspan="2">Coach Type</th>
                                    <th rowspan="2">SEC</th>
-                                    <?php
-                                    $subjects = explode(',', $results[0]->subjects);
-                                    ?>
+                            
                                    @foreach ($subjects as $subject)
                                    <th colspan="4">{{ $subject }}</th>
                                    @endforeach
@@ -92,6 +98,7 @@
                                     @foreach ($results as $result)
                                     <tr>
                                        <td>{{ $loop->iteration }}</td>
+                                      
                                        <td>{{ $result->student_id }}</td>
                                        <td>{{ $result->stmode }}</td>
                                        <td>{{ $result->student_name }}</td>
@@ -101,7 +108,7 @@
                                        <td>{{ $result->section }}</td>
                                        @foreach ($subjects as $subject)
                                        <?php
-                                       $marks = \DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot FROM `exam_answer` where test_id=$testId and student_id=$result->student_id and subject='$subject'");
+                                       $marks = \DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,subject FROM `exam_answer` where test_id in($test_ids) and student_id=$result->student_id and subject='$subject'");
                                        ?>
                                        <td>{{ $marks[0]->r }}</td>
                                        <td>{{ $marks[0]->w }}</td>
@@ -132,8 +139,12 @@
 @endsection
 
 @section('js')
+<script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
+<script src="{{asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <script>
+
     function exportTable() {
         const table = document.getElementById('export');
         const options = {
@@ -150,6 +161,8 @@
         e.preventDefault();
         exportTable();
     });
+
+
 </script>
 
 @endsection
