@@ -14,6 +14,8 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ChairmanVideoController;
 use App\Http\Controllers\QuestionKeyController;
 use App\Http\Controllers\AnswerkeyController;
+use App\Http\Controllers\DownloadController;
+
 
 
 
@@ -79,6 +81,11 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     
     Route::resource('answerkey', AnswerKeyController::class);
     Route::get('/answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
+
+    Route::resource('download', DownloadController::class);
+    Route::get('/download/download/{id}', [AnswerKeyController::class, 'download'])->name('download.download');
+
+    
     Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
     
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
@@ -95,7 +102,7 @@ Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->n
 Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
 Route::get('answerkey',[AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
 Route::get('questionkey', [QuestionKeyController::class, 'questionkey'])->name('student.questionKey');
-
+Route::get('download', [DownloadController::class, 'download'])->name('student.download');
 
 Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
 Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
