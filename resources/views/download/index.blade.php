@@ -63,7 +63,7 @@
                                             </td>
                                             <td>{{ implode(', ', explode(',', $download->coaching_type)) }}</td>
                                             <td>
-                                                <a href="{{ env('APP_URL').$download->file_path }}" class="btn btn-primary text-white" download><i class="fas fa-download"></i></a>
+                                                <a href="{{ env('APP_URL') . '/' . $download->file_path }}" class="btn btn-primary text-white" download><i class="fas fa-download"></i></a>
                                             </td>
                                             <td>
                                                 <a href="{{ route('download.edit', $download->id) }}" class="btn btn-warning text-white">

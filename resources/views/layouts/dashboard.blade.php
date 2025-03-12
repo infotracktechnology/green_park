@@ -191,7 +191,7 @@
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
+                  <a href="{{ route('student.download') }}" class="nav-link">
                     <i class="fas fa-download" style="font-size: 20px; color: #5daaf1;"></i><span>Downloads</span>
                   </a>
                 </li>

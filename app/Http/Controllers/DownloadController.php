@@ -12,7 +12,7 @@ class DownloadController extends Controller
 
     public function index() 
     { 
-        $download = Download::all();
+        $download = Download::latest()->get();
         return view('download.index',compact('download'));
     }
 
@@ -23,6 +23,7 @@ class DownloadController extends Controller
     }
  
 
+   
     public function store(Request $request)
     {
         $request->validate([
@@ -34,9 +35,9 @@ class DownloadController extends Controller
     
         $file = $request->file('file');
         $fileName = time() . '_' . $file->getClientOriginalName();
+  
         $filePath = $file->move('download', $fileName);
-      
-    
+     
         // Convert array to comma-separated string
         $branchData = implode(',', $request->branch);
         $coachingTypeData = implode(',', $request->coaching_type);
@@ -48,10 +49,10 @@ class DownloadController extends Controller
             'file_path' => $filePath,
         ]);
     
-       
     
         return redirect()->route('download.index')->with('success', 'Answer Key added successfully!');
     }
+    
 
     
     public function edit($id)
@@ -98,24 +99,24 @@ class DownloadController extends Controller
     public function destroy($id)
     {
         $download = Download::findOrFail($id);
-      
-        $filePath = storage_path('download' . $download->file_path);
-
+        $filePath = public_path($download->file_path); // Correct file path
+    
         if (file_exists($filePath)) {
             unlink($filePath);
         }
-
+    
         $download->delete();
-
+    
         return redirect()->route('download.index')->with('success', 'Answer Key deleted successfully!');
     }
+    
 
     
 
     public function download()
     {
         $download = Download::latest()->take(5)->get(); // Fetch all answer keys
-        return view('student.download', compact('downloads'));
+        return view('student.download', compact('download'));
     }
      
 }

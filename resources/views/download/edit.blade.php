@@ -30,7 +30,7 @@
                                 <label for="branch">Branch</label>
                                 <select name="branch[]" class="form-control select2 @error('branch') is-invalid @enderror" multiple required>
                                     @php
-                                        $selectedBranches = explode(',', $questionKey->branch); // Convert stored string to array
+                                        $selectedBranches = explode(',', $download->branch); // Convert stored string to array
                                     @endphp
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}" 
@@ -48,7 +48,7 @@
                                 <label>Coaching Type</label>
                                 <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
                                     @php
-                                        $selectedTypes = explode(',', $answerKey->coaching_type); // Convert stored string to array
+                                        $selectedTypes = explode(',', $download->coaching_type); // Convert stored string to array
                                     @endphp
                                     @foreach(['Offline', 'Online Recorded', 'Online Live', 'Test Series', '11', '12'] as $type)
                                         <option value="{{ $type }}" {{ in_array($type, $selectedTypes) ? 'selected' : '' }}>
@@ -61,7 +61,7 @@
 
                             <div class="form-group col-lg-3">
                                 <label for="title">Title</label>
-                                <input type="text" name="title" class="form-control form-control-sm" required value="{{ $answerKey->title }}">
+                                <input type="text" name="title" class="form-control form-control-sm" required value="{{ $download->title }}">
                             </div>
 
                             <div class="form-group col-lg-4">
@@ -69,8 +69,8 @@
 
                                 <input type="file" name="file" id="fileInput" class="form-control form-control-sm">
                                 <small id="fileName">
-                                    @if($answerKey->file_path)
-                                        {{ basename($answerKey->file_path) }}
+                                    @if($download->file_path)
+                                        {{ basename($download->file_path) }}
                                     @endif
                                 </small>
                             </div>
@@ -99,7 +99,7 @@
 @section('js')
 <script>
     document.getElementById('fileInput').addEventListener('change', function() {
-        let fileName = this.files[0] ? this.files[0].name : "{{ basename($answerKey->file_path) }}";
+        let fileName = this.files[0] ? this.files[0].name : "{{ basename($download->file_path) }}";
         document.getElementById('fileName').innerText = fileName;
     });
 </script>
