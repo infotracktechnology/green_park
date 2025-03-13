@@ -37,7 +37,7 @@
                         <div class="row">
                            
                           <div class="form-group col-lg-4">
-                             <label>Test ID</label>
+                             <label>Test Name</label>
                              <select name="test_name" id="test_name" class="form-control form-control-sm" required>
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
@@ -70,7 +70,7 @@
                                  <thead>
                                   <tr role="row">
                                    <th rowspan="2">S.NO</th>
-                                  
+                                   <th rowspan="2">Test Id</th>
                                    <th rowspan="2">SID</th>
                                    <th rowspan="2">Mode</th>
                                    <th rowspan="2">Name</th>
@@ -98,7 +98,7 @@
                                     @foreach ($results as $result)
                                     <tr>
                                        <td>{{ $loop->iteration }}</td>
-                                      
+                                       <td>{{ $result->test_id }}</td>
                                        <td>{{ $result->student_id }}</td>
                                        <td>{{ $result->stmode }}</td>
                                        <td>{{ $result->student_name }}</td>
