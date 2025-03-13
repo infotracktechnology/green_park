@@ -25,19 +25,51 @@
                     <div class="card-body">
   
                     <div class="row">
+                    @if(session('error'))
+                    <div class="col-md-12">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                        </div>
+                    </div>
+                    @endif
                     <div class="col-md-10 col-sm-12 mb-3">
                     <h6 class="col-deep-purple">Exam Section Wise Report</h6>
                     </div>
                     </div>
 
+                    <div class="col-md-12">
+                    <form method="get" id="myForm" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
+                           <div class="row">
+                            
+                             <div class="form-group col-lg-4">
+                                <label>Test Name</label>
+                                <select name="test_name" id="test_name" class="form-control form-control-sm" required>
+                                    <option value="">Select Test</option>
+                                    @foreach ($tests as $test)
+                                        <option value="{{ $test->name }}" @if($test->name == $test_name) selected @endif>
+                                         {{ $test->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+   
+                              <div class="form-group col-lg-2">
+                               <label>&nbsp;</label>
+                               <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                            </div>
+                           </div>
+                    </form>
+                    </div>
+
+                    @if($test_name)
                     <div class="col-md-6 offset-md-3">
                     <div class="table-responsive">
-      <table class="table table-striped table-sm" id="myTable">
+      <table class="table table-striped table-sm">
   
         <thead>
             <tr>
                 <th>#</th>
-                <th>Details Report (Omr Print)</th>
+                <th>OMR Valuation Report</th>
                 <th>Overall Report</th>
             </tr>
         </thead>
@@ -45,8 +77,8 @@
             @foreach($sections as $row)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td><a href="{{ route('report.section_exam') }}" target="_blank">{{ $row->section }}</a></td>
-                    <td><a href="{{ route('report.section_exam') }}" target="_blank">{{ $row->section }}</a></td>
+                    <td><a href="{{ route('report.section_exam',['section' => $row->section,'test_name' => $test_name,'type' => 'omr']) }}" target="_blank">{{ $row->section }}</a></td>
+                    <td><a href="{{ route('report.section_exam',['section' => $row->section,'test_name' => $test_name,'type' => 'overall']) }}" target="_blank">{{ $row->section }}</a></td>
                 </tr>
         @endforeach
           
@@ -55,6 +87,9 @@
     </table>
                 </div>
             </div>
+
+            @endif
+
         </div>
     </div>
 
