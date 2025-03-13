@@ -30,6 +30,10 @@
             box-sizing: border-box;
             page-break-after: always;
         }
+
+        tr {
+            page-break-inside: avoid;
+        }
     </style>
 </head>
 <body>
@@ -127,6 +131,8 @@
         var opt = {
             margin: [0, 0, 0, 0],
             filename: "{{ $section }} - omr_print.pdf",
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
         };
         html2pdf().set(opt).from(printContainer).save().then(function(){

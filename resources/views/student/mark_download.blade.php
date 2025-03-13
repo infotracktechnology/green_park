@@ -31,6 +31,11 @@
       .break:before, .break:after{  
     display: block!important;
 }
+
+
+tr {
+    page-break-inside: avoid;
+}
  
     </style>
    </head>
@@ -88,9 +93,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
  <script type="text/javascript">
   var opt = {
-    margin:[1,0,1,0],
+    margin:[0.5,0,0,0],
     filename:"{{ $exam->name }}-{{ $exam->exam_date }}.pdf",
-    jsPDF:{ unit: 'in', format: 'letter', orientation: 'portrait' },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 }, 
+    pagebreak: {  mode: ['css', 'legacy'], },
   };
 html2pdf().set(opt).from(document.body).save().then(function(){
   window.location.href="{{ route('student.marksheet') }}";

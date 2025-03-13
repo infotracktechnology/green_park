@@ -30,6 +30,10 @@
             padding: 0;
             box-sizing: border-box;
         }
+
+        tr {
+            page-break-inside: avoid;
+        }
     </style>
 </head>
 <body>
@@ -84,6 +88,8 @@
             margin: [0, 0.1, 0, 0],
             filename: "{{ $section }} - overall_print.pdf",
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 }, 
             pagebreak: { 
             mode: ['css', 'legacy'],
             },
