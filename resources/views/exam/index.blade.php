@@ -48,7 +48,7 @@
             <th>End Time</th>
             <th>status</th>
             <th>Test attend</th>
-            <th>Publish</th>
+            <th>Result Publish</th>
             <th>Perview</th>
             <th>Edit</th>
             <th>Action</th>
