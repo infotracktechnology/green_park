@@ -112,6 +112,7 @@ class AnswerKeyController extends Controller
     public function answerkey()
     {
         $answerKeys = AnswerKey::latest()->take(5)->get(); // Fetch all answer keys
-        return view('student.answerkey', compact('answerkeys'));
+        return view('student.answerkey', compact('answerKeys'))
+        ;
     }
 }
