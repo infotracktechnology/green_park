@@ -23,11 +23,16 @@
             font-weight: bold;
         }
         .page {
-            width: 8.2in; 
-            min-height: 11in;
+            width: 8.2in;
+            height: 10.8in;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            page-break-after: always;
+        }
+
+        tr {
+            page-break-inside: avoid;
         }
     </style>
 </head>
@@ -126,6 +131,8 @@
         var opt = {
             margin: [0, 0, 0, 0],
             filename: "{{ $section }} - omr_print.pdf",
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
         };
         html2pdf().set(opt).from(printContainer).save().then(function(){
