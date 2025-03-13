@@ -84,6 +84,9 @@
             margin: [0, 0.1, 0, 0],
             filename: "{{ $section }} - overall_print.pdf",
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            pagebreak: { 
+            mode: ['css', 'legacy'],
+            },
         };
         html2pdf().set(opt).from(printContainer).save().then(function(){
             alert('Report successfully generated');

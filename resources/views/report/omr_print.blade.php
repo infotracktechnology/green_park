@@ -23,11 +23,12 @@
             font-weight: bold;
         }
         .page {
-            width: 8.2in; 
-            min-height: 11in;
+            width: 8.2in;
+            height: 10.8in;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            page-break-after: always;
         }
     </style>
 </head>

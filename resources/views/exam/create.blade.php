@@ -170,6 +170,15 @@
                                     <label>Total Questions</label>
                                     <input type="number" min="1" name="total_questions" id="total_questions" class="form-control form-control-sm" required>
                                 </div>
+
+                                <div class="form-group col-lg-3">
+                                    <label>Result Publish</label>
+                                    <select name="publish" id="publish" class="form-control form-control-sm" required>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </div>
+
                             </div>
                             
                                 <div class="form-group col-lg-12">

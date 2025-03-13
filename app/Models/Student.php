@@ -9,6 +9,7 @@ use App\Models\Chairmanvideo;
 use App\Models\Examportion;
 use App\Models\ExamAnswer;
 use App\Models\AnswerKey;
+use App\Models\QuestionKey;
 
 
 class Student extends Authenticatable
@@ -65,6 +66,11 @@ class Student extends Authenticatable
     public function questionkey()
     {
         return QuestionKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->take(5)->get();
+    }
+
+    public function downloads()
+    {
+        return Download::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->get();
     }
     
 
