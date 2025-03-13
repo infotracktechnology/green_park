@@ -458,8 +458,8 @@ class ExamController extends Controller
                 }
                 else
                 {
-                    $mark = 0;
-                    $answer_key = "DROP";
+                    $mark = NULL;
+                    $answer_key = "DEL";
                 }
 
               DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);

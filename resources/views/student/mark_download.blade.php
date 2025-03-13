@@ -6,12 +6,9 @@
       <title>Mark Sheet</title>
       <style type="text/css">
         body{
-
-             font-family:Verdana, Geneva, sans-serif;
-
+            font-family: Helvetica, Arial, sans-serif;
              line-height:25px;
-
-             font-size:14px;
+             font-size:13px;
 
       }
       @media print {
@@ -70,10 +67,19 @@
             </tr>
             @foreach($answer as $key=>$item)
             <tr>
+              <?php
+              $mark = '';
+              if($item->answer_key == "DEL"){
+                  $mark = 'DEL';
+              }
+              else {
+                  $mark = $item->mark == 4 ? 'C' : ($item->mark == -1 ? 'W' : 'L');
+              }
+              ?>
                 <td>{{ $item->q_no }}</td>
                 <td>{{ $item->answer_key==null ? 0 : $item->answer_key }}</td>
                 <td>{{ $item->answer }}</td>
-                <td>{{ $item->mark == 4 ? 'C' : ($item->mark == -1 ? 'W' : 'L') }}</td>
+                <td>{{ $mark }}</td>
             </tr>
             @endforeach
      </table>
