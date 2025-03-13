@@ -116,6 +116,6 @@ class QuestionKeyController extends Controller
     public function questionkey()
     {
         $questionKeys = QuestionKey::latest()->take(5)->get(); // Fetch all answer keys
-        return view('student.questionKey', compact('questionKeys'));
+        return view('student.questionkey', compact('questionkeys'));
     }
 }
