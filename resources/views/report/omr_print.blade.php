@@ -6,27 +6,24 @@
     <title>Mark Sheet</title>
     <style type="text/css">
         body {
-            font-family:"Calibri", sans-serif;
-            font-size: 12px;
-            padding: 0px 5px;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11px;
         }
 
         table {
             border-collapse: collapse;
-            width: 100%;
         }
 
         .table th, .table thead th, .table td {
             border: 1px solid #000;
             padding: 0.5px 0px 0.5px 0px;
             text-align: center;
-            font-size: 12px;
         }
         .table th{
             font-weight: bold;
         }
         .page {
-            width: 8.5in; 
+            width: 8.2in; 
             min-height: 11in;
             margin: 0;
             padding: 0;
@@ -45,7 +42,7 @@
                 <h3 style="text-align: center;margin: 15px 0px;">OMR VALUATION REPORT - {{  $test_id }}</h3>
                 <div style="display: flex;margin: 10px 0px;">
                     @foreach($answer as $row)
-                        <table class="table" style="margin: 5px;text-align: center;">
+                        <table class="table" style="margin: 0px 10px;text-align: center;width: 200px;">
                             <tr>
                                 <th>QNo</th>
                                 <th>Key</th>
@@ -53,11 +50,20 @@
                                 <th>Res</th>
                             </tr>
                             @foreach($row as $key=>$item)
+                            <?php
+                            $mark = '';
+                            if($item->answer_key == "DEL"){
+                                $mark = 'DEL';
+                            }
+                            else {
+                                $mark = $item->mark == 4 ? 'C' : ($item->mark == -1 ? 'W' : 'L');
+                            }
+                            ?>
                                 <tr>
                                     <td>{{ $item->q_no }}</td>
                                     <td>{{ $item->answer_key==null ? 0 : $item->answer_key }}</td>
                                     <td>{{ $item->answer }}</td>
-                                    <td>{{ $item->mark == 4 ? 'C' : ($item->mark == -1 ? 'W' : 'L') }}</td>
+                                    <td>{{ $mark }}</td>
                                 </tr>
                             @endforeach
                         </table>
