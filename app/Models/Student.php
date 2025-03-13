@@ -57,13 +57,15 @@ class Student extends Authenticatable
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
     }
 
-    // public function answerKey()
-    // {
-    //     return AnswerKey::where('branch', 'like', "%$this->campus%")
-    //         ->where('coaching_type', 'like', "%$this->coaching_type%")
-    //         ->latest()
-    //         ->first();
-    // }
+    public function answerkey()
+    {
+        return AnswerKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->take(5)->get();
+    }
+
+    public function questionkey()
+    {
+        return QuestionKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->take(5)->get();
+    }
     
 
     private static function generatePassword($length = 8){
