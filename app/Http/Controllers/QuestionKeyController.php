@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\QuestionKey;
 use App\Models\Branch;
+use App\Models\Student;
 
 
 
@@ -113,9 +114,9 @@ class QuestionKeyController extends Controller
         return redirect()->route('questionkey.index')->with('success', 'Question Key deleted successfully!');
     }
 
-    public function questionkey()
+    public function questionkey(Student $student)
     {
-        $questionKeys = QuestionKey::latest()->take(5)->get(); // Fetch all answer keys
+        $questionKeys = $student->questionkey();
         return view('student.questionkey', compact('questionKeys'));
     }
 }
