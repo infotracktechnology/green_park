@@ -65,5 +65,11 @@ Route::group(['prefix' => 'v2'], function () {
         $downloads = $student->downloads();
         return response()->json($downloads);
     });
+
+    Route::get('/classvideos/{subject}', function (Student $student, $subject) {
+        $classvideos = $student->classvideo($subject);
+        $classvideos = $classvideos->groupBy('period');
+        return response()->json($classvideos);
+    });
     
 });

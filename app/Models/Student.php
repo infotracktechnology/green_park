@@ -72,6 +72,11 @@ class Student extends Authenticatable
     {
         return Download::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->get();
     }
+
+    public function classvideo($subject = ''){
+        $datetime = date('Y-m-d H:i:s');
+        return ClassVideo::where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->get();
+    }
     
 
     private static function generatePassword($length = 8){

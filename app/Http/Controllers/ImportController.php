@@ -40,6 +40,7 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
+                    $row = array_map('ucwords', $row);
                    if(isset($row['id'])){
                     $student = Student::find($row['id']);
                     $student->update($row);
