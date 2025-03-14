@@ -23,8 +23,6 @@
                                  <h6 class="col-deep-purple">Answer Key Details</h6>
                               </div>
                               
-                             
-     
 
                               <div class="form-group col-lg-4">
                                 <label for="branch">Branch</label>
