@@ -59,7 +59,7 @@ public function update(Request $request, $id)
 
     public function classvideo(Request $request,Student $student)
     {
-        $subject = $request->subject ?? '';
+        $subject = $request->subject ?? 0;
         $classvideos = $student->classvideo($subject);
         $classvideos = $classvideos->groupBy('period');
         
