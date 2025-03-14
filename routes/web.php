@@ -16,6 +16,9 @@ use App\Http\Controllers\QuestionKeyController;
 use App\Http\Controllers\AnswerkeyController;
 use App\Http\Controllers\DownloadController;
 
+use App\Http\Controllers\ClassVideoController;
+
+
 
 
 
@@ -84,7 +87,11 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::resource('download', DownloadController::class);
     Route::get('/download/download/{id}', [AnswerKeyController::class, 'download'])->name('download.download');
+   
 
+    Route::resource('classvideo', ClassVideoController::class);
+    
+   
     
     Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
     
@@ -103,6 +110,8 @@ Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('s
 Route::get('answerkey',[AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
 Route::get('questionkey', [QuestionKeyController::class, 'questionkey'])->name('student.questionKey');
 Route::get('download', [DownloadController::class, 'download'])->name('student.download');
+Route::get('classvideo', [ClassVideoController::class, 'classvideo'])->name('student.classvideo');
+
 
 Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
 Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');

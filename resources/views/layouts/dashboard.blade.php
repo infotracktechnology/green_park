@@ -164,7 +164,7 @@
                 </li>
                 @if (auth()->user()->coaching_type != 'Offline')
                   <li class="dropdown">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('student.classvideo') }}" class="nav-link">
                       <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Class Video</span>
                     </a>
                   </li>
