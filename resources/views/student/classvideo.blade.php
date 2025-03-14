@@ -54,6 +54,8 @@
             `</div>
             </div>
 
+            @if($subject)
+
                 <div class="col-lg-12">
                     <div class="card card-info">
                         <div class="card-body">
@@ -90,6 +92,7 @@
                             </div>
                             </div>
                         </div>
+                        @endif
                     
                 </div>
                 

@@ -109,9 +109,9 @@ class AnswerKeyController extends Controller
 
 
 
-    public function answerkey(Student $student)
+    public function answerkey()
     {
-        $answerKeys = $student->answerkey();
+        $answerKeys = auth('student')->user()->answerkey();
         return view('student.answerkey', compact('answerKeys'));
     }
 }

@@ -69,6 +69,13 @@ class AnnouncementController extends Controller
         return to_route('announcement.index');
     }
     
+    public function notification(Request $request)
+    {
+    $announcements = auth()->user()->announcement();
+
+    return view('student.notification', compact('announcements'));
+    }
+
     
 
 

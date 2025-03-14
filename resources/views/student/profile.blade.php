@@ -35,7 +35,8 @@
     <div class="section-body">
         {{-- <marquee behavior="scroll" direction="left" style="background-color: #e61515cb; padding: 10px; color: white; font-weight: bold;">****** Today is {{ date('l, F jS') }} and your upcoming class is :CHEMISTRY *****</marquee> --}}
         <div class="row mt-sm-4">
-          
+                <div class="col-md-6">
+
                 <div class="card author-box">
                     <div class="card-body">
                         <div class="author-box-center">
@@ -66,7 +67,9 @@
                 </div>
                 
                         </div>
-                        <div class="card author-box">
+                </div>
+                <div class="col-md-6">
+                        <div class="card  author-box">
                           <div class="card-body">
                               <div class="author-box-center">
                                   <div class="clearfix"></div>
@@ -86,9 +89,10 @@
                       </div>
                       
                               </div>
+                </div>
 
                     </div>
-                    <div class="col-12 col-md-12 col-lg-8">
+                    <div class="col-12 col-md-12 col-lg-12">
                         <div class="card">
                             <div class="padding-20">
                               <ul class="nav nav-tabs" id="myTab2" role="tablist">

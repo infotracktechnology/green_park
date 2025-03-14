@@ -116,7 +116,7 @@ class QuestionKeyController extends Controller
 
     public function questionkey(Student $student)
     {
-        $questionKeys = $student->questionkey();
+        $questionKeys = auth('student')->user()->questionkey();
         return view('student.questionkey', compact('questionKeys'));
     }
 }
