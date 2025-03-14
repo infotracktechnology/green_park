@@ -8,6 +8,8 @@
         body {
             font-family: Helvetica, Arial, sans-serif;
             font-size: 11px;
+            margin: 0;
+            padding: 0;
         }
 
         table {
@@ -16,23 +18,71 @@
 
         .table th, .table thead th, .table td {
             border: 1px solid #000;
-            padding: 0.5px 0px 0.5px 0px;
+            padding: 0.5px 2px;
             text-align: center;
+            font-size: 11px;
         }
-        .table th{
+        
+        .table th {
             font-weight: bold;
         }
+        
         .page {
             width: 8.2in;
             height: 10.8in;
             margin: 0;
-            padding: 0;
+            padding: 0.25in;
             box-sizing: border-box;
             page-break-after: always;
+            position: relative;
         }
 
         tr {
             page-break-inside: avoid;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin: 0 0 15px 0;
+        }
+        
+        .tables-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: nowrap;
+        }
+        
+        .answer-table {
+            width: 23%;
+            box-sizing: border-box;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .student-name, .exam-name {
+            margin: 0;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        .summary-table {
+            width: 90%;
+            margin: 0 auto;
+        }
+        
+        .summary-table .bold-row {
+            font-weight: bold;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -44,10 +94,11 @@
          $test_id = $answer[0][0]->test_id;
          ?>
             <div class="page">
-                <h3 style="text-align: center;margin: 15px 0px;">OMR VALUATION REPORT - {{  $test_id }}</h3>
-                <div style="display: flex;margin: 10px 0px;">
+                <h3 class="page-title">OMR VALUATION REPORT - {{  $test_id }}</h3>
+                
+                <div class="tables-container">
                     @foreach($answer as $row)
-                        <table class="table" style="margin: 0px 10px;text-align: center;width: 200px;">
+                        <table class="table answer-table">
                             <tr>
                                 <th>QNo</th>
                                 <th>Key</th>
@@ -74,6 +125,7 @@
                         </table>
                     @endforeach
                 </div>
+                
                 <div class="footer">
                     <?php
                     $sid = $answer[0][0]->student_id;
@@ -85,10 +137,13 @@
                     $l=0;
                     $test = DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject FROM `exam_answer` where test_id=$test_id and student_id=$sid group by subject");
                     ?>
-                    <h3 style="float:left; margin: 0px 5px;">STUDENT NAME : {{ $student_name }}</h3>
-                    <h3 style="float:right; margin: 0 5px;">EXAM NAME : {{ $test_name }}</h3>
                     
-                    <table class="table" style="margin: 0px 20px;text-align: center;width:80%;">
+                    <div class="student-info">
+                        <h3 class="student-name">STUDENT NAME : {{ $student_name }}</h3>
+                        <h3 class="exam-name">EXAM NAME : {{ $test_name }}</h3>
+                    </div>
+                    
+                    <table class="table summary-table">
                         <tr>
                             <th></th>
                             <th>Right (*4)</th>
@@ -112,8 +167,8 @@
                             <td>{{ $key->tot }} </td>
                         </tr>
                         @endforeach
-                        <tr style="font-weight: bold;font-size:13px;">
-                            <td>Total Mark</th>
+                        <tr class="bold-row">
+                            <td>Total Mark</td>
                             <td>{{ $r }}</td>
                             <td>{{ $w }}</td>
                             <td>{{ $l }}</td>
