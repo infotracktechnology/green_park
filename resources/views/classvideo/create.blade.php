@@ -2,6 +2,12 @@
 
 @section('title', 'Class Video')
 
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+@endsection
+
 @section('main')
 <div class="main-content">
     <section class="section">
