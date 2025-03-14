@@ -41,7 +41,6 @@
                                             <th>Chapter</th>
                                             <th>Period</th>
                                             <th>Video Id</th>
-                                            <th>Video URL</th>
                                             <th>Start At</th>
                                             <th>End At</th>
                                             <th>Edit</th>
@@ -56,8 +55,6 @@
                                             <td>{{ $classvideo->chapter }}</td>
                                             <td>{{ $classvideo->period }}</td>
                                             <td>{{ $classvideo->video_id }}</td>
-                                            <td><a href="{{ $classvideo->video_url }}" target="_blank">{{ $classvideo->video_url }}</a></td>
-
                                             <td>{{ $classvideo->start_at }}</td>
                                             <td>{{ $classvideo->end_at }}</td>
                                             <td>

@@ -75,7 +75,7 @@
 
                                         @forelse(isset($classvideos[$i]) ? $classvideos[$i] : [] as $video)
                                         <?php
-                                        $videoId = preg_match('/vimeo\.com\/(\d+)/', $video->video_url, $matches) ? $matches[1] : null;
+                                        $videoId = $video->video_id ?? null;
                                         ?>
                                         <iframe src="https://player.vimeo.com/video/{{ $videoId }}" 
                                         frameborder="0" 
