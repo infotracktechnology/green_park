@@ -26,7 +26,7 @@
 
                               <div class="form-group col-lg-4">
                                  <label>Subject</label>
-                                 <select name="subject" class="form-control" required>
+                                 <select name="subject" class="form-control form-control-sm" required>
                                     <option value="">Select Subject</option>
                                     <option value="physics" {{ $classvideo->subject == 'physics' ? 'selected' : '' }}>Physics</option>
                                     <option value="chemistry" {{ $classvideo->subject == 'chemistry' ? 'selected' : '' }}>Chemistry</option>
@@ -37,12 +37,12 @@
 
                               <div class="form-group col-lg-4">
                                  <label>Chapter</label>
-                                 <input type="text" name="chapter" class="form-control" value="{{ $classvideo->chapter }}" required>
+                                 <input type="text" name="chapter" class="form-control form-control-sm" value="{{ $classvideo->chapter }}" required>
                               </div>
 
                               <div class="form-group col-lg-4">
                                  <label>Period</label>
-                                 <select name="period" class="form-control" required>
+                                 <select name="period" class="form-control form-control-sm" required>
                                     <option value="">Select Period</option>
                                     @for($i = 1; $i <= 6; $i++)
                                        <option value="{{ $i }}" {{ $classvideo->period == $i ? 'selected' : '' }}>Period {{ $i }}</option>
@@ -52,22 +52,19 @@
 
                               <div class="form-group col-lg-4">
                                  <label for="video_id">Video ID</label>
-                                 <input type="text" name="video_id" class="form-control" value="{{ $classvideo->video_id }}" required>
+                                 <input type="text" name="video_id" class="form-control form-control-sm" value="{{ $classvideo->video_id }}" required>
                               </div>
 
-                              <div class="form-group col-lg-4">
-                                 <label for="video_url">Video URLs</label>
-                                 <textarea name="video_url" class="form-control" required>{{ $classvideo->video_url }}</textarea>
+                             
+
+                              <div class="form-group col-lg-3">
+                                 <label>Start Datetime</label>
+                                 <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" value="{{ $classvideo->start_at }}" required>
                               </div>
 
-                              <div class="form-group col-lg-4">
-                                 <label>Start Date</label>
-                                 <input type="text" id="start_at" name="start_at" class="datetime-picker form-control" value="{{ $classvideo->start_at }}" required>
-                              </div>
-
-                              <div class="form-group col-lg-4">
+                              <div class="form-group col-lg-3">
                                  <label>End Datetime</label>
-                                 <input type="text" id="end_at" name="end_at" class="datetime-picker form-control" value="{{ $classvideo->end_at }}" required>
+                                 <input type="text" id="end_at" name="end_at" class="datetime-picker form-control form-control-sm" value="{{ $classvideo->end_at }}" required>
                                  <div id="end_at_error" class="text-danger"></div>
                               </div>
 

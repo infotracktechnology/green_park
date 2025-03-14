@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Models\Download;
+use App\Models\Student;
 
 
 class DownloadController extends Controller
@@ -113,9 +114,9 @@ class DownloadController extends Controller
 
     
 
-    public function download()
+    public function download(Student $student)
     {
-        $download = Download::latest()->take(5)->get(); // Fetch all answer keys
+        $download = auth('student')->user()->downloads();
         return view('student.download', compact('download'));
     }
      

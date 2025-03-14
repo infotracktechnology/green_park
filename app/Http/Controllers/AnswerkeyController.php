@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AnswerKey;
 use App\Models\Branch;
-
+use App\Models\Student;
 
 class AnswerKeyController extends Controller
 {
@@ -111,8 +111,7 @@ class AnswerKeyController extends Controller
 
     public function answerkey()
     {
-        $answerKeys = AnswerKey::latest()->take(5)->get(); // Fetch all answer keys
-        return view('student.answerkey', compact('answerKeys'))
-        ;
+        $answerKeys = auth('student')->user()->answerkey();
+        return view('student.answerkey', compact('answerKeys'));
     }
 }

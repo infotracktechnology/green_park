@@ -34,21 +34,42 @@ Route::group(['prefix' => 'v2'], function () {
         $student = Student::findorFail($student_id);
         return response()->json($student);
     });
-    Route::get('/chairmanvideo',  function (Request $request) {
-        $chairmanvideo = Chairmanvideo::latest()->first();
+    Route::get('/chairmanvideo',  function (Request $request,Student $student) {
+        $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
-    Route::get('/announcements', function (Request $request) {
-        $announcements = Announcement::latest()->get();
+    Route::get('/announcements', function (Request $request,Student $student) {
+        $announcements = $student->announcement();
         return response()->json($announcements);
     });
-    Route::get('/examportion', function (Request $request) {
-        $examportion = Examportion::latest()->get();
+    Route::get('/examportion', function (Request $request,Student $student) {
+        $examportion = $student->examportion();
         return response()->json($examportion);
     });
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
-        $results = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$student_id group by test_id order by b.updated_at desc limit 5");
+        $results = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
         return response()->json($results);
+    });
+
+    Route::get('/questionkey', function (Request $request,Student $student) {
+        $questionkey = $student->questionkey();
+        return response()->json($questionkey);
+    });
+
+    Route::get('/answerkey', function (Request $request,Student $student) {
+        $answerkey = $student->answerkey();
+        return response()->json($answerkey);
+    });
+
+    Route::get('/downloads', function (Request $request,Student $student) {
+        $downloads = $student->downloads();
+        return response()->json($downloads);
+    });
+
+    Route::get('/classvideos/{subject}', function (Student $student, $subject) {
+        $classvideos = $student->classvideo($subject);
+        $classvideos = $classvideos->groupBy('period');
+        return response()->json($classvideos);
     });
     
 });

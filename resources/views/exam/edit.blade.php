@@ -61,13 +61,21 @@ $coaching_types = explode(',', $exam->coaching_type);
 
                             <div class="form-group col-lg-4">
                                 <label>Start Datetime</label>
-                                <input type="text" id="start_at" value="{{ $exam->start_at }}"  name="start_at" class="datetime-picker form-control form-control-sm" required>
+                                <input type="text" id="start_at" value="{{ $exam->start_at }}"  name="start_at" class="datetime-picker form-control form-control-sm">
                             </div>
                             
                             <div class="form-group col-lg-4">
                                 <label>End Datetime</label>
-                                <input type="text" id="end_at" value="{{ $exam->end_at }}" name="end_at" class="datetime-picker form-control form-control-sm" required>
+                                <input type="text" id="end_at" value="{{ $exam->end_at }}" name="end_at" class="datetime-picker form-control form-control-sm">
                                 <div id="end_at_error" class="text-danger"></div>
+                            </div>
+
+                            <div class="form-group col-lg-3">
+                                <label>Result Publish</label>
+                                <select name="publish" id="publish" class="form-control form-control-sm" required>
+                                    <option value="No" @selected($exam->publish == 'No')>No</option>
+                                    <option value="Yes" @selected($exam->publish == 'Yes')>Yes</option>
+                                </select>
                             </div>
                         
                            
