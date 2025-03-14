@@ -177,12 +177,6 @@ public function dashboard()
     }
 
 
-public function notification(Request $request)
-{
-    $announcements = auth()->user()->announcement();
-
-    return view('student.notification', compact('announcements'));
-}
 
 }
 
