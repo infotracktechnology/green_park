@@ -64,12 +64,7 @@
                                         <input type="text" name="video_id" class="form-control form-control-sm" required>
                                     </div>
 
-                                    <!-- Video URLs -->
-                                    <div class="form-group col-lg-5">
-                                        <label for="video_url">Video URLs</label>
-                                        <input type="url" name="video_url"  class="form-control form-control-sm" required>
-                                    </div>
-
+                                   
                                     <!-- Start Date -->
                                     <div class="form-group col-lg-3">
                                         <label>Start Datetime</label>

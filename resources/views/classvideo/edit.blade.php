@@ -55,10 +55,7 @@
                                  <input type="text" name="video_id" class="form-control form-control-sm" value="{{ $classvideo->video_id }}" required>
                               </div>
 
-                              <div class="form-group col-lg-5">
-                                 <label for="video_url">Video URLs</label>
-                                 <input type="url" name="video_url" value="{{ $classvideo->video_url }}" class="form-control form-control-sm" required>
-                              </div>
+                             
 
                               <div class="form-group col-lg-3">
                                  <label>Start Datetime</label>

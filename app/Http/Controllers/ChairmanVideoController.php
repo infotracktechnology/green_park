@@ -29,7 +29,7 @@ class ChairmanVideoController extends Controller
     $chairmanvideos->coaching_type = implode(',', $request->coaching_type);
         $chairmanvideos->gender = $request->gender;
         $chairmanvideos->title = $request->title;
-        $chairmanvideos->link = $request->link;
+        $chairmanvideos->video_id = $request->video_id;
         if ($request->hasFile('attachment')) {
             $fileName = time() . '.' . $request->attachment->extension();
             $request->attachment->move(public_path('chairman/video'), $fileName);

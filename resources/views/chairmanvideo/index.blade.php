@@ -38,7 +38,7 @@
               <th>Coaching Type</th>
               <th>Gender</th>
               <th>Title</th>
-             <th>Link</th>
+             <th>Video Id</th>
               <th>Action</th>
             </tr>
       
@@ -59,7 +59,7 @@
                   <td>{{$chairmanvideo->coaching_type}}</td>
                   <td>{{$chairmanvideo->gender}}</td>
                   <td>{{$chairmanvideo->title}}</td>
-                 <td>{{$chairmanvideo->link}}</td>
+                 <td>{{$chairmanvideo->video_id}}</td>
                 </td> 
               <td>
                    <form action="{{ route('chairmanvideo.destroy', $chairmanvideo->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this video?')" class="d-inline">
