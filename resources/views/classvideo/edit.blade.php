@@ -1,5 +1,12 @@
 @extends('layouts.app')
 @section('title', 'Edit Class Video')
+
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+@endsection
+
 @section('main')
 <div class="main-content">
    <section class="section">
@@ -82,10 +89,6 @@
 </div>
 @endsection
 
-@section('css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
-@endsection
 
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
