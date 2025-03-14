@@ -116,7 +116,7 @@ class DownloadController extends Controller
 
     public function download(Student $student)
     {
-        $download = $student->downloads();
+        $download = auth('student')->user()->downloads();
         return view('student.download', compact('download'));
     }
      
