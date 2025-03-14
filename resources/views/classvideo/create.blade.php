@@ -32,7 +32,7 @@
                                     <!-- Subject -->
                                     <div class="form-group col-lg-4">
                                         <label>Subject</label>
-                                        <select name="subject" class="form-control" required>
+                                        <select name="subject" class="form-control form-control-sm" required>
                                             <option value="">Select Subject</option>
                                             <option value="physics">Physics</option>
                                             <option value="chemistry">Chemistry</option>
@@ -44,13 +44,13 @@
                                     <!-- Chapter -->
                                     <div class="form-group col-lg-4">
                                         <label>Chapter</label>
-                                        <input type="text" name="chapter" class="form-control" required>
+                                        <input type="text" name="chapter" class="form-control form-control-sm" required>
                                     </div>
 
                                     <!-- Period -->
                                     <div class="form-group col-lg-4">
                                         <label>Period</label>
-                                        <select name="period" class="form-control" required>
+                                        <select name="period" class="form-control form-control-sm" required>
                                             <option value="">Select Period</option>
                                             @for($i = 1; $i <= 6; $i++)
                                                 <option value="{{ $i }}">Period {{ $i }}</option>
@@ -61,25 +61,25 @@
                                     <!-- Video ID -->
                                     <div class="form-group col-lg-4">
                                         <label for="video">Video ID</label>
-                                        <input type="text" name="video_id" class="form-control" required>
+                                        <input type="text" name="video_id" class="form-control form-control-sm" required>
                                     </div>
 
                                     <!-- Video URLs -->
-                                    <div class="form-group col-lg-4">
+                                    <div class="form-group col-lg-5">
                                         <label for="video_url">Video URLs</label>
-                                        <textarea name="video_url" class="form-control" placeholder="Enter video URLs" required></textarea>
+                                        <input type="url" name="video_url"  class="form-control form-control-sm" required>
                                     </div>
 
                                     <!-- Start Date -->
-                                    <div class="form-group col-lg-4">
-                                        <label>Start Date</label>
-                                        <input type="text" id="start_at" name="start_at" class="datetime-picker form-control" required>
+                                    <div class="form-group col-lg-3">
+                                        <label>Start Datetime</label>
+                                        <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" required>
                                     </div>
 
                                     <!-- End Date -->
-                                    <div class="form-group col-lg-4">
-                                        <label>End Date</label>
-                                        <input type="text" id="end_at" name="end_at" class="datetime-picker form-control" required>
+                                    <div class="form-group col-lg-3">
+                                        <label>End Datetime</label>
+                                        <input type="text" id="end_at" name="end_at" class="datetime-picker form-control form-control-sm" required>
                                         <div id="end_at_error" class="text-danger"></div>
                                     </div>
 
@@ -98,10 +98,7 @@
 </div>
 @endsection
 
-@section('css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
-@endsection
+
 
 @section('js')
 <script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script>

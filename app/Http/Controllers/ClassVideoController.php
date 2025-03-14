@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ClassVideo;
+use App\Models\Student;
 
 class ClassVideoController extends Controller
 {
@@ -11,7 +12,7 @@ class ClassVideoController extends Controller
         $classvideos = ClassVideo::latest()->get();
         return view('classvideo.index', compact('classvideos'));
     }
-    // compact('videos')
+
     public function create()
     {
         return view('classvideo.create');
@@ -19,26 +20,16 @@ class ClassVideoController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'subject' => 'required|string',
-            'chapter' => 'required|string',
-            'period' => 'required|integer',
-            'video_id' => 'required|string',
-            'video_url' => 'required|string',
-            'start_at' => 'required|date',
-            'end_at' => 'required|date|after:start_at',
-        ]);
     
         try {
-            ClassVideo::create($validated);
+            ClassVideo::create($request->all());
             return redirect()->route('classvideo.index')->with('success', 'Class video added successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to add class video! ' . $e->getMessage());
         }
     }
     
-        public function destroy($id)
-    {
+        public function destroy($id){
         $video = ClassVideo::findOrFail($id);
         $video->delete();
 
@@ -48,27 +39,17 @@ class ClassVideoController extends Controller
 
 
 
-    public function edit($id)
-{
+    public function edit($id){
     $classvideo = ClassVideo::findOrFail($id);
     return view('classvideo.edit', compact('classvideo'));
 }
 
 public function update(Request $request, $id)
 {
-    $validated = $request->validate([
-        'subject' => 'required|string',
-        'chapter' => 'required|string',
-        'period' => 'required|integer',
-        'video_id' => 'required|string',
-        'video_url' => 'required|string',
-        'start_at' => 'required|date',
-        'end_at' => 'required|date|after:start_at',
-    ]);
-
+    
     try {
         $classvideo = ClassVideo::findOrFail($id);
-        $classvideo->update($validated);
+        $classvideo->update($request->all());
         return redirect()->route('classvideo.index')->with('success', 'Class video updated successfully!');
     } catch (\Exception $e) {
         return redirect()->back()->with('error', 'Failed to update class video! ' . $e->getMessage());
@@ -76,10 +57,13 @@ public function update(Request $request, $id)
 }
 
 
-    public function classvideo()
+    public function classvideo(Request $request,Student $student)
     {
-        $classvideos = ClassVideo::latest()->get(); // Fetch all class videos
-        return view('student.classvideo', compact('classvideos'));
+        $subject = $request->subject ?? '';
+        $classvideos = $student->classvideo($subject);
+        $classvideos = $classvideos->groupBy('period');
+        
+        return view('student.classvideo', compact('classvideos', 'subject'));
     }
 
 }
