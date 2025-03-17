@@ -95,6 +95,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
 Route::resource('discussionvideo', DiscussionVideoController::class);
 
+
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
 });
 

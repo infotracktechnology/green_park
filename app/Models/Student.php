@@ -79,6 +79,12 @@ class Student extends Authenticatable
     }
     
 
+    public function discussionvideos()
+    {
+        
+        return DiscussionVideo::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->first();
+    }
+
     private static function generatePassword($length = 8){
         $characters = 'ABCDFGHIJKMNQRSTXYZ0123456789';
         $password = '';
