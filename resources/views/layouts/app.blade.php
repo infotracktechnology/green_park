@@ -91,7 +91,7 @@
           <div class="sidebar-brand">
             <a href="#">
               <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" /> 
-              <span class="logo-name">Green Park</span>
+              <span class="logo-name">{{ env('APP_NAME') }}</span>
             </a>
           </div>
           <ul class="sidebar-menu">
@@ -120,6 +120,7 @@
                 <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
                 <li><a href="{{route('chairmanvideo.index')}}"  class="nav-link"> Chairman Video</a></li>
                 <li><a href="{{route('classvideo.index')}}"  class="nav-link"> Class Video</a></li>
+                <li><a href="{{route('revisionvideo.index')}}"  class="nav-link"> Revision Video</a></li>
                 <li><a href="{{route('discussionvideo.index')}}"  class="nav-link"> Discussion Video</a></li>
                 {{-- <li><a href="" class="nav-link">Class Video upload</a></li> --}}
 

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Class Videos')
+@section('title', 'Revision Video')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
@@ -28,72 +28,44 @@
                         <div class="card-body">
                          <div class="row">
                           <div class="col-md-8 col-sm-12 mb-3">
-                                    <h6 class="col-deep-purple">Class Videos</h6>
+                                    <h6 class="col-deep-purple">Revision Video Videos</h6>
                                 </div>
-                                <div class="col-md-2 col-sm-12 mb-3">
-                                    <a href="{{ route('classvideo.upload.form') }}" class="btn btn-primary btn-block">Class Video Upload</a>
-
-                                </div>
+                               
 
                                  <div class="col-md-2 col-sm-12 mb-3">
-                                    <a href="{{ route('classvideo.create') }}" class="btn btn-primary btn-block">Add Class Video</a>
+                                    <a href="{{ route('revisionvideo.create') }}" class="btn btn-primary btn-block">Revision Video Upload</a>
                                  </div>
                          </div>
-                                 <form method="post" class="my-3" id="myForm"  enctype="multipart/form-data">
-                                    @csrf
-                                    <h6 class="col-deep-purple">Class Videos Schedule</h6>
-                                    <div class="row">
-                                    <div class="form-group col-lg-3 mt-6">
-                                        <label>Start Datetime</label>
-                                        <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" required>
-                                    </div>
-
-                                    <!-- End Date -->
-                                    <div class="form-group col-lg-3">
-                                        <label>End Datetime</label>
-                                        <input type="text" id="end_at" name="end_at" class="datetime-picker form-control form-control-sm" required>
-                                        <div id="end_at_error" class="text-danger"></div>
-                                    </div>
-
-                                    <!-- Submit Button -->
-                                    <div class="form-group col-lg-3 ">
-                                        <button type="submit" class="btn btn-primary m-t-25">Update Schedule</button>
-                                    </div>
-                                </div>
-                                 </form>
+                               
                            
                             <div class="table-responsive">
                                 <table class="table table-striped table-sm" id="myTable">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" id="checkAll" /></th>
+                                            <th>#</th>
                                             <th>Subject</th>
                                             <th>Chapter</th>
-                                            <th>Period</th>
-                                            <th>Video Id</th>
-                                            <th>Start At</th>
-                                            <th>End At</th>
+                                            <th>Video Id</t>
+                                            <th>Expiry At</th>
                                             <th>Edit</th>
                                             <th>Delete</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($classvideos as $classvideo)
+                                        @foreach ($revisionvideos as $row)
                                         <tr>
-                                            <td><input type="checkbox" class='ids' name="ids[]" value="{{$classvideo->id}}" /></td>
-                                            <td>{{ $classvideo->subject }}</td>
-                                            <td>{{ $classvideo->chapter }}</td>
-                                            <td>{{ $classvideo->period }}</td>
-                                            <td>{{ $classvideo->video_id }}</td>
-                                            <td>{{ $classvideo->start_at }}</td>
-                                            <td>{{ $classvideo->end_at }}</td>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $row->subject }}</td>
+                                            <td>{{ $row->chapter }}</td>
+                                            <td>{{ $row->video_id }}</td>
+                                            <td>{{ $row->expire_at  }}</td>
                                             <td>
-                                                <a href="{{ route('classvideo.edit', $classvideo->id) }}" class="btn btn-primary">
+                                                <a href="{{ route('revisionvideo.edit', $row->id) }}" class="btn btn-primary">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             </td>
                                             <td>
-                                                <form action="{{ route('classvideo.destroy', $classvideo->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this video?');">
+                                                <form action="{{ route('revisionvideo.destroy', $row->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this video?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger">

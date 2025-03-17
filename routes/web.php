@@ -15,7 +15,7 @@ use App\Http\Controllers\ChairmanVideoController;
 use App\Http\Controllers\QuestionKeyController;
 use App\Http\Controllers\AnswerkeyController;
 use App\Http\Controllers\DownloadController;
-
+use App\Http\Controllers\RevisionVideoController;
 use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
 
@@ -91,9 +91,10 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('classvideo', ClassVideoController::class)->except(['show']);
     Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
     Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
-   
+    Route::resource('discussionvideo', DiscussionVideoController::class);
 
-Route::resource('discussionvideo', DiscussionVideoController::class);
+    Route::post('classvideo/schedule', [ClassVideoController::class, 'schedule'])->name('classvideo.schedule');
+    Route::resource('revisionvideo', RevisionVideoController::class);
 
 
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
@@ -124,5 +125,6 @@ Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download']
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
+Route::get('video/{id}', 'App\Http\Controllers\ChairmanVideoController@video')->name('video');
 
 

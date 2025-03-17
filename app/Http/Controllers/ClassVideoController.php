@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ClassVideo;
 use App\Models\Student;
-
+use App\Models\RevisionVideo;
 
 class ClassVideoController extends Controller
 {
@@ -60,10 +60,12 @@ public function update(Request $request, $id)
     public function classvideo(Request $request,Student $student)
     {
         $subject = $request->subject ?? 0;
+        $datetime = date('Y-m-d H:i:s');
         $classvideos = $student->classvideo($subject);
         $classvideos = $classvideos->groupBy('period');
+        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
         
-        return view('student.classvideo', compact('classvideos', 'subject'));
+        return view('student.classvideo', compact('classvideos', 'subject', 'revisionvideos'));
     }
 
     public function showUploadForm()
@@ -104,6 +106,15 @@ public function update(Request $request, $id)
         return redirect()->back()->with('error', 'No file selected for upload.');
     }
     
+    public function schedule(Request $request){
+        $ClassVideo = ClassVideo::whereIn('id', $request->ids)->update(['start_at' => $request->start_at, 'end_at' => $request->end_at]);
+        if($ClassVideo){
+            return response()->json(['status' => true, 'message' => 'Class video scheduled successfully.']);
+        }
+        else{
+            return response()->json(['status' => false, 'message' => 'Failed to schedule class video.']);
+        }
+    }
 
     
 }
