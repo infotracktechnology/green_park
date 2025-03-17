@@ -1,0 +1,100 @@
+@extends('layouts.app')
+@section('title', 'Edit Revision Video')
+
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+@endsection
+
+@section('main')
+<div class="main-content">
+   <section class="section">
+      <div class="section-body"> 
+          <div class="row">
+              <div class="col-12">
+                @if(session()->has('success'))
+                <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
+                @endif
+                
+                @if(session()->has('error'))
+                <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
+                @endif
+
+                  <div class="card card-primary" x-data="app">
+                     <form method="post" id="myForm" action="{{ route('revisionvideo.update', $video->id) }}" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="card-body">
+                           <div class="row">
+                              <div class="col-md-12 col-sm-12 mb-3">
+                                 <h6 class="col-deep-purple">Edit Revision Video</h6>
+                              </div>
+
+                              <div class="form-group col-lg-4">
+                                 <label>Subject</label>
+                                 <select name="subject" class="form-control form-control-sm" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="physics" {{ $video->subject == 'physics' ? 'selected' : '' }}>Physics</option>
+                                    <option value="chemistry" {{ $video->subject == 'chemistry' ? 'selected' : '' }}>Chemistry</option>
+                                    <option value="zoology" {{ $video->subject == 'zoology' ? 'selected' : '' }}>Zoology</option>
+                                    <option value="botany" {{ $video->subject == 'botany' ? 'selected' : '' }}>Botany</option>
+                                 </select>
+                              </div>
+
+                              <div class="form-group col-lg-4">
+                                 <label>Chapter</label>
+                                 <input type="text" name="chapter" class="form-control form-control-sm" value="{{ $video->chapter }}" required>
+                              </div>
+
+                             
+
+                              <div class="form-group col-lg-4">
+                                 <label for="video_id">Video ID</label>
+                                 <input type="text" name="video_id" class="form-control form-control-sm" value="{{ $video->video_id }}" required>
+                              </div>
+
+                             
+
+                              
+                              <div class="form-group col-lg-3">
+                                 <label>Expiry Datetime</label>
+                                 <input type="text" id="expire_at" name="expire_at" class="datetime-picker form-control form-control-sm" value="{{ $video->expire_at }}" required>
+                                 
+                              </div>
+
+                              <div class="form-group col-lg-12">
+                                 <button type="submit" class="btn btn-primary">Update Video</button>
+                              </div>
+                           </div>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+           </div>
+       </div>
+   </section>
+</div>
+@endsection
+
+
+@section('js')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
+<script>
+    flatpickr(".datetime-picker", {
+        enableTime: true,
+        allowInput: true,
+        dateFormat: "Y-m-d H:i",
+        plugins: [
+            new confirmDatePlugin({
+                confirmText: "OK",
+                showAlways: false,
+                theme: "light"
+            })
+        ]
+    });
+
+  
+</script>
+@endsection
