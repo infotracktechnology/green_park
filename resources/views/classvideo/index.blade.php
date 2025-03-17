@@ -39,7 +39,9 @@
                                     <a href="{{ route('classvideo.create') }}" class="btn btn-primary btn-block">Add Class Video</a>
                                  </div>
                          </div>
-                                 <form method="post" id="myForm" action="{{ route('classvideo.store') }}" enctype="multipart/form-data">
+                                 <form method="post" class="my-3" id="myForm"  enctype="multipart/form-data">
+                                    @csrf
+                                    <h6 class="col-deep-purple">Class Videos Schedule</h6>
                                     <div class="row">
                                     <div class="form-group col-lg-3 mt-6">
                                         <label>Start Datetime</label>
@@ -55,7 +57,7 @@
 
                                     <!-- Submit Button -->
                                     <div class="form-group col-lg-3 ">
-                                        <button type="submit" class="btn btn-primary">Update Schedule</button>
+                                        <button type="submit" class="btn btn-primary m-t-25">Update Schedule</button>
                                     </div>
                                 </div>
                                  </form>
@@ -147,6 +149,36 @@
                 this.checked = false;
             });
         }
-    })
+    });
+    
+
+    $("#myForm").submit(function(e) {
+        e.preventDefault();
+        if($('.ids:checked').length == 0) {
+            alert("Please select at least one video");
+            return false;
+        }
+        var formData = new FormData(this);
+        $('.ids:checked').each(function(index) {
+            formData.append(`ids[${index}]`, $(this).val());
+        });
+        
+        $.ajax({
+            url: "{{ route('classvideo.schedule') }}",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                    location.reload();
+                }
+            }
+        });
+    });
 </script>
 @endsection

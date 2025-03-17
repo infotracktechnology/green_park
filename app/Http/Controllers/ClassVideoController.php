@@ -104,6 +104,15 @@ public function update(Request $request, $id)
         return redirect()->back()->with('error', 'No file selected for upload.');
     }
     
+    public function schedule(Request $request){
+        $ClassVideo = ClassVideo::whereIn('id', $request->ids)->update(['start_at' => $request->start_at, 'end_at' => $request->end_at]);
+        if($ClassVideo){
+            return response()->json(['status' => true, 'message' => 'Class video scheduled successfully.']);
+        }
+        else{
+            return response()->json(['status' => false, 'message' => 'Failed to schedule class video.']);
+        }
+    }
 
     
 }
