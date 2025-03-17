@@ -120,12 +120,15 @@
                 <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
                 <li><a href="{{route('chairmanvideo.index')}}"  class="nav-link"> Chairman Video</a></li>
                 <li><a href="{{route('classvideo.index')}}"  class="nav-link"> Class Video</a></li>
+                <li><a href="{{route('discussionvideo.index')}}"  class="nav-link"> Discussion Video</a></li>
+                {{-- <li><a href="" class="nav-link">Class Video upload</a></li> --}}
+
                 <li><a href="{{route('examportion.index')}}"  class="nav-link"> Exam Portion</a></li>
                 <li><a href="{{route('questionkey.index')}}"  class="nav-link"> Question Key</a></li>
                 <li><a href="{{route('answerkey.index')}}"  class="nav-link"> Answer key</a></li>
                 <li><a href="{{ route('download.index') }}" class="nav-link">Downloads</a></li>
 
-                {{-- <li><a href="#"  class="nav-link"> Class Video</a></li> --}}
+             
               </ul>
             </li>
             <li class="dropdown">

@@ -17,7 +17,7 @@ use App\Http\Controllers\AnswerkeyController;
 use App\Http\Controllers\DownloadController;
 
 use App\Http\Controllers\ClassVideoController;
-
+use App\Http\Controllers\DiscussionVideoController;
 
 
 
@@ -87,14 +87,14 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::resource('download', DownloadController::class);
     Route::get('/download/download/{id}', [AnswerKeyController::class, 'download'])->name('download.download');
+    Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
+    Route::resource('classvideo', ClassVideoController::class)->except(['show']);
+    Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
+    Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
    
 
-    Route::resource('classvideo', ClassVideoController::class);
-    
-   
-    
-    Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
-    
+Route::resource('discussionvideo', DiscussionVideoController::class);
+
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
 });
 
