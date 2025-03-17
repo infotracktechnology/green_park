@@ -30,7 +30,7 @@
                                     </div>
 
                                     <div class="col-md-6 col-sm-12 mb-3">
-                                        <a href="{{ env('APP_URL').'template/classvideo.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Class Video Upload Template (Format)</a>
+                                        <a href="{{ env('APP_URL').'template/classvideoupload.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Class Video Upload Template (Format)</a>
                                        </div>
 
                                    <!-- Test ID Dropdown -->
