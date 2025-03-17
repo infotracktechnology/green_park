@@ -91,10 +91,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('classvideo', ClassVideoController::class)->except(['show']);
     Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
     Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
-   
+    Route::resource('discussionvideo', DiscussionVideoController::class);
 
-Route::resource('discussionvideo', DiscussionVideoController::class);
-
+    Route::post('classvideo/schedule', [ClassVideoController::class, 'schedule'])->name('classvideo.schedule');
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
 });
 

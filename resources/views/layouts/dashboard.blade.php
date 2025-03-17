@@ -127,7 +127,7 @@
             <div class="sidebar-brand">
                 <a href="#">
                     <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" />
-                    <span class="logo-name">Green Park</span>
+                    <span class="logo-name">{{ env('APP_NAME') }}</span>
                 </a>
             </div>
             <ul class="sidebar-menu">
