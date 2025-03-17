@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\ClassVideo;
 use App\Models\Student;
 
+
 class ClassVideoController extends Controller
 {
     public function index()
@@ -38,7 +39,6 @@ class ClassVideoController extends Controller
 
 
 
-
     public function edit($id){
     $classvideo = ClassVideo::findOrFail($id);
     return view('classvideo.edit', compact('classvideo'));
@@ -66,5 +66,46 @@ public function update(Request $request, $id)
         return view('student.classvideo', compact('classvideos', 'subject'));
     }
 
+    public function showUploadForm()
+    {
+        return view('classvideo.upload');
+    }
+    public function upload(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filePath = $file->getRealPath();
+    
+            // Open and read the CSV file
+            $csvData = array_map('str_getcsv', file($filePath));
+            $header = array_shift($csvData); // Extract headers
+    
+            foreach ($csvData as $row) {
+                $data = array_combine($header, $row);
+    
+                // $s_no = intval(trim($data['s_no'] ?? 0)); // Ensure integer value
+                $subject = trim($data['subject'] ?? 'Unknown');
+                $chapter = trim($data['chapter'] ?? 'Unknown');
+                $period = trim($data['period'] ?? '0'); // Period can still be a string or numeric
+                $video_id = trim($data['video_id'] ?? '0');
+    
+                ClassVideo::create([
+                   
+                    'subject' => $subject,
+                    'chapter' => $chapter,
+                    'period' => $period,
+                    'video_id' => $video_id,
+                ]);
+            }
+    
+            return redirect()->back()->with('success', 'Class videos uploaded successfully!');
+        }
+    
+        return redirect()->back()->with('error', 'No file selected for upload.');
+    }
+    
+
+    
 }
+
 
