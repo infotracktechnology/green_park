@@ -43,8 +43,8 @@
                         <th>Coaching Type</th>
                         <th>Part</th>
                         <th>Video Id</th> 
-                        <th> start_at</th>
-                        <th> end_at</th>  
+                        <th> Start At</th>
+                        <th> End At</th>  
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
