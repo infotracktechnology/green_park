@@ -28,7 +28,7 @@
                         <div class="card-body">
                          <div class="row">
                           <div class="col-md-8 col-sm-12 mb-3">
-                                    <h6 class="col-deep-purple">Revision Video Videos</h6>
+                                    <h6 class="col-deep-purple">Revision  Videos</h6>
                                 </div>
                                
 
