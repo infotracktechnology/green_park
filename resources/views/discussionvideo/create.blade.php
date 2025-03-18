@@ -52,6 +52,17 @@
                 <option value="12">12</option>
             </select>
         </div>
+
+        <div class="col-lg-4 form-group">
+            <label for="subject">Subject</label>
+            <select name="subject" id="subject" class="form-control form-control-sm" required>
+                <option value="">Select Subject</option>
+                <option value="physics">Physics</option>
+                <option value="chemistry">Chemistry</option>
+                <option value="botany">Botany</option>
+                <option value="zoology">Zoology</option>
+            </select>
+        </div>
  
         <div class="form-group col-lg-3">
             <label for="part">Part</label>
