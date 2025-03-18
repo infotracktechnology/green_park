@@ -177,7 +177,14 @@ public function dashboard()
     }
 
 
-
+    public function discussionvideo(Request $request,Student $student)
+    {
+        $subject = $request->subject ?? 0;
+        $discussionvideos = $student->discussionvideos($subject);
+        $discussionvideos = $discussionvideos->groupBy('part');
+        
+        return view('student.discussionvideo', compact('discussionvideos', 'subject'));
+    }
 }
 
 
