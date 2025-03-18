@@ -19,4 +19,5 @@ class Chairmanvideo extends Model
 		parent::boot();
     }
 
+
 }
