@@ -1,124 +1,98 @@
 @extends('layouts.app')
-@section('title', 'Hostel Edit')
+@section('title', 'Hostel')
 @section('main')
 <div class="main-content">
    <section class="section">
       <div class="section-body"> 
           <div class="row">
               <div class="col-12">
-                  <div class="card card-primary" x-data="app">
+                  <div class="card card-primary" x-data="hostelForm()">
                      <form method="post" id="myForm" action="{{ route('hostel.update', $hostel->id) }}" enctype="multipart/form-data">
-                        @csrf
                         @method('PUT')
+                        @csrf
                         <div class="card-body">
-                            <!-- Hostel Details -->
-                            <div class="row">
-                                <div class="col-md-12 col-sm-12 mb-3">
-                                    <h6 class="col-deep-purple">Update Hostel</h6>
-                                </div>
-                                <!-- Hostel Fields -->
-                                <div class="form-group col-lg-3">
-                                    <label>Branch</label>
-                                    <select name="branch_id" id="branch" class="form-control form-control-sm" required>
-                                        <option value="" disabled selected>-- Choose Branch --</option>
-                                        @foreach ($branches as $branch)
-                                            <option value="{{ $branch->id }}" @if($hostel->branch_id == $branch->id) selected @endif>{{ $branch->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-3">
-                                    <label>Name</label>
-                                    <input type="text" name="name" value="{{ $hostel->name }}" class="form-control form-control-sm" required>
-                                </div>
-
-                                <div class="form-group col-lg-3">
-                                    <label>Type</label>
-                                    <select name="type" id="type" class="form-control form-control-sm" required>
-                                        <option value="">Select</option>
-                                        <option value="Boys" @if($hostel->type == 'Boys') selected @endif>Boys</option>
-                                        <option value="Girls" @if($hostel->type == 'Girls') selected @endif>Girls</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group col-lg-3">
-                                    <label>Warden Name</label>
-                                    <select name="warden_name" id="staff" class="form-control form-control-sm" required>
-                                        <option value="" disabled selected>-- Choose Warden --</option>
-                                        @foreach ($staffs as $staff)
-                                            <option value="{{ $staff->name }}" @if($hostel->warden_name == $staff->name) selected @endif>{{ $staff->name }}</option>
-                                            {{-- <option value="{{ $staff->id }}" @if($hostel->warden_name == $staff->id) selected @endif>{{ $staff->name }}</option> --}}
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group col-lg-3">
-                                    <label>Room Type</label>
-                                    <select name="room_type" id="room_type" class="form-control form-control-sm" required>
-                                        <option value="">Select</option>
-                                        <option value="AC" @if($hostel->room_type == 'AC') selected @endif>AC</option>
-                                        <option value="Non AC" @if($hostel->room_type == 'Non AC') selected @endif>Non AC</option>
-                                    </select>
-                                </div>
-
-                                <!-- Room Details -->
-                                <div class="col-md-12 col-sm-12 mb-3">
-                                    <h6 class="col-deep-purple">Room Details</h6>
-                                    
-                                </div>
-                                <meta name="csrf-token" content="{{ csrf_token() }}">
-
-                                <div class="form-group col-lg-12">
-                                    <button style="margin-left: 10px;" type="button" id="addRoomBtn" class="btn btn-warning btn-sm"><i class="fa fa-plus"></i>ADD</button>
-                                </div>
-                                <div id="roomDetails">
-                                    @foreach ($hostel->rooms as $index => $room)
+                           <div class="row">
+                              <div class="col-md-12 col-sm-12 mb-3">
+                                 <h6 class="col-deep-purple">Update Hostel</h6>
+                              </div>
+                              <div class="form-group col-lg-3">
+                                 <label>Branch</label>
+                                 <select name="branch_id" id="branch" class="form-control form-control-sm" required>
+                                     <option value="" disabled selected>-- Choose Branch --</option>
+                                     @foreach ($branches as $branch)
+                                         <option value="{{ $branch->id }}" @selected($branch->id == $hostel->branch_id)>{{ $branch->name }}</option>
+                                     @endforeach
+                                 </select>
+                             </div>
+                             
+                              <div class="form-group col-lg-3">
+                                 <label>Name</label>
+                                 <input type="text" name="name" value="{{ $hostel->name }}" class="form-control form-control-sm" required>
+                              </div>
+                              <div class="form-group col-lg-3">
+                                 <label>Type</label>
+                                 <select name="type" id="type" class="form-control form-control-sm" required>
+                                    <option value="">Select</option>
+                                    <option value="Boys" @selected($hostel->type == 'Boys')>Boys</option>
+                                    <option value="Girls" @selected($hostel->type == 'Girls')>Girls</option>
+                                 </select>
+                              </div>
+                              <div class="form-group col-lg-3">
+                                 <label>Warden Name</label>
+                                 <select name="warden_name" id="staff" class="form-control form-control-sm" required>
+                                     <option value="" disabled selected>-- Choose Warden --</option>
+                                     @foreach ($staffs as $staff)
+                                         <option value="{{ $staff->name }}" @selected($staff->name == $hostel->warden_name)>{{ $staff->name }}</option>
+                                     @endforeach
+                                 </select>
+                             </div>
+                             
+                             <div class="form-group col-lg-3">
+                              <label>Room Type</label>
+                              <select name="room_type" class="form-control form-control-sm" >
+                                 <option value="">Select</option>
+                                 <option value="AC" @selected($hostel->room_type == 'AC')>AC</option>
+                                 <option value="Non AC" @selected($hostel->room_type == 'Non AC')>Non AC</option>
+                              </select>
+                           </div>
+                             
+                              <div class="col-md-12 col-sm-12 mb-3">
+                                 <h6 class="col-deep-purple">Room Details</h6>
+                              </div>
+                              <div class="col-md-12 col-sm-12 mb-3">
+                              <button type="button" class="btn btn-warning btn-sm" @click="addRoom"><i class="fa fa-plus"></i> Add Room</button>
+                              </div>
+                              <div id="roomDetails">
+                                 <template x-for="(room, index) in rooms" :key="index">
                                     <div style="margin-left: 10px;" class="row mb-4 room-row">
-                                        <div class="form-group col-lg-2">
-                                            <label>Block No</label>
-                                            <input type="text" name="rooms[{{ $index }}][block_no]" value="{{ $room->block_no }}" class="form-control form-control-sm" required>
-                                        </div>
-                                        <!-- Floor No -->
-                                        <div class="form-group col-lg-2">
-                                            <label>Floor No</label>
-                                            <input type="text" name="rooms[{{ $index }}][floor_no]" value="{{ $room->floor_no }}" class="form-control form-control-sm" required>
-                                        </div>
-
-                                        <!-- Room No -->
-                                        <div class="form-group col-lg-2">
-                                            <label>Room No</label>
-                                            <input type="text" name="rooms[{{ $index }}][room_no]" value="{{ $room->room_no }}" class="form-control form-control-sm" required>
-                                        </div>
-
-                                        
-
-                                        <!-- No of Beds -->
-                                        <div class="form-group col-lg-2">
-                                            <label>No of Beds</label>
-                                            <div class="d-flex align-items-center">
-                                            <input type="number" name="rooms[{{ $index }}][no_of_beds]" value="{{ $room->no_of_beds }}" class="form-control form-control-sm" required>
-                                            {{-- <button style="margin-left: 10px;" type="button" class="btn btn-danger btn-sm" onclick="deleteRoom(event);"><i class="fa fa-trash"></i></button> --}}
-                                        </div>
-                                        </div>
-
-                                        <!-- Cart No -->
-                                        <div class="form-group col-lg-2">
-                                            <label>Cart No</label>
-                                            <div class="d-flex align-items-center">
-                                            <input type="text" name="rooms[{{ $index }}][cart_no]" value="{{ $room->cart_no }}" class="form-control form-control-sm" required>
-                                        </div>
-                                        </div>
-
-                                        <!-- Hidden Room ID Field -->
-                                        <input type="hidden" name="rooms[{{ $index }}][id]" value="{{ $room->id }}">
+                                       <!-- Block No input has been removed -->
+                                       <div class="form-group col-lg-4">
+                                          <label>Floor</label>
+                                          <input type="text" x-model="room.floor" :name="`rooms[${index}][floor]`" class="form-control form-control-sm" required>
+                                       </div>
+                                       <div class="form-group col-lg-3">
+                                          <label>Room No</label>
+                                          <input type="text" x-model="room.room_no" :name="`rooms[${index}][room_no]`" class="form-control form-control-sm" required>
+                                       </div>
+                                       
+                                       <div class="form-group col-lg-2">
+                                          <label for="no_of_beds">No of Cots</label>
+                                          <div class="d-flex align-items-center">
+                                             <input type="number" x-model="room.no_of_cots" :name="`rooms[${index}][no_of_cots]`" class="form-control form-control-sm me-2" required>
+                                          </div>
+                                       </div>
+                                       <div class="form-group col-lg-2">
+                                         <template x-if="!room.id">
+                                             <button style="margin-top: 25px;" type="button" class="btn btn-warning btn-sm" @click="removeRoom(index)"><i class="fa fa-minus"></i></button>
+                                         </template>
+                                       </div>
                                     </div>
-                                    @endforeach
-                                </div>
-
-                                <div class="form-group col-lg-12">
-                                    
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </div>
+                                 </template>
+                              </div>
+                              <div class="form-group col-lg-12">
+                                 <button type="submit" class="btn btn-primary">Submit</button>
+                              </div>
+                           </div>
                         </div>
                      </form>
                   </div>
@@ -131,68 +105,24 @@
 
 @section('js')
 <script>
-     function deleteRoom(e){
-        if (e.target && e.target.classList.contains('btn-danger')) {
-            const roomRow = e.target.closest('.room-row');
-            roomRow.remove();
-        }
-    }
-
-
- document.addEventListener('DOMContentLoaded', function() {
-  const roomDetailsContainer = document.getElementById('roomDetails');
-  const addRoomBtn = document.getElementById('addRoomBtn');
-
-  addRoomBtn.addEventListener('click', function() {
-    const roomIndex = roomDetailsContainer.querySelectorAll('.room-row').length;
-    const newRoomRow = `
-      <div style="margin-left: 10px;" class="row mb-4 room-row" id="room-row-${roomIndex}">
-        <div class="form-group col-lg-2">
-          <label>Block No</label>
-          <input type="text" name="rooms[${roomIndex}][block_no]" class="form-control form-control-sm" required>
-        </div>
-        <div class="form-group col-lg-2">
-          <label>Floor No</label>
-          <input type="text" name="rooms[${roomIndex}][floor_no]" class="form-control form-control-sm" required>
-        </div>
-        <div class="form-group col-lg-2">
-          <label>Room No</label>
-          <input type="text" name="rooms[${roomIndex}][room_no]" class="form-control form-control-sm" required>
-        </div>
-        <div class="form-group col-lg-2">
-          <label>Room Type</label>
-          <select name="rooms[${roomIndex}][room_type]" class="form-control form-control-sm">
-            <option value="">Select</option>
-            <option value="AC">AC</option>
-            <option value="Non AC">Non AC</option>
-          </select>
-        </div>
-        <div class="form-group col-lg-2">
-          <label>No of Beds</label>
-          <div class="d-flex align-items-center">
-          <input type="number" name="rooms[${roomIndex}][no_of_beds]" class="form-control form-control-sm" required>
-           <button style="margin-left: 10px;" type="button" onclick="deleteRoom(event);" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-        </div>
-        
-    `;
-    roomDetailsContainer.insertAdjacentHTML('beforeend', newRoomRow);
-  });
-
- 
-
-});
-
+   function hostelForm() {
+      return {
+         rooms: [],
+         addRoom() {
+            this.rooms.push({ floor: '', room_no: '', no_of_cots: '' });
+         },
+         removeRoom(index) {
+            if(confirm('Are you sure you want to remove this room?')){
+                this.rooms.splice(index, 1);
+            }
+         },
+         init() {
+            this.rooms = @json($rooms);
+            console.log(this.rooms);
+            
+         }
+            
+      }
+   }
 </script>
-<script>
-    function City(state) {
-       if(!state) return;
-       $.get("{{ route('hostel.create') }}", {state: state}, function(data) {
-           var html = '<option value="">Select City</option>';
-           $.each(data, function(key, value) {
-               html += '<option value="' + value.District + '">' + value.District + '</option>';
-           });
-           $('#city').html(html);
-       });
-    }
- </script>
 @endsection
