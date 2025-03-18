@@ -168,6 +168,12 @@
                       <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Class Video</span>
                     </a>
                   </li>
+
+                  <li class="dropdown">
+                    <a href="{{ route('student.discussionvideo') }}" class="nav-link">
+                      <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Discussion Video</span>
+                    </a>
+                  </li>
                 @endif
                 <li class="dropdown">
                   <a href="{{ route('student.examportion') }}" class="nav-link">
