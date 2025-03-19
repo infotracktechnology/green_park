@@ -10,9 +10,9 @@
         <div class="row">
             <div class="col-md-6 col-lg-12 col-xl-8">
                 
-                @if(isset($chairmanvideo->link) && preg_match('/vimeo\.com\/(\d+)/', $chairmanvideo->link, $matches))
+                @if(isset($chairmanvideo->video_id))
     @php
-        $videoId = $matches[1] ?? null;
+        $videoId = $chairmanvideo->video_id ?? null;
     @endphp
     @if($videoId)
         <div class="card">

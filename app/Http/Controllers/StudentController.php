@@ -71,6 +71,7 @@ class StudentController extends Controller
         $data = $request->all();
         $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
         $data['ac_nonac'] = $data['ac_nonac'] ?? null;
+        $data['password']  = bcrypt($request->password_1);
 
         $student->update($data);
 
@@ -142,7 +143,7 @@ public function dashboard()
 }
     function marksheet(Request $request){
         $sid = auth()->user()->id;
-        $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid group by test_id order by b.updated_at desc limit 5");
+        $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
        return view('student.marksheet',compact('tests'));
     }
 
@@ -176,13 +177,14 @@ public function dashboard()
     }
 
 
-public function notification(Request $request)
-{
-    $announcements = auth()->user()->announcement();
-
-    return view('student.notification', compact('announcements'));
-}
-
+    public function discussionvideo(Request $request,Student $student)
+    {
+        $subject = $request->subject ?? 0;
+        $discussionvideos = $student->discussionvideos($subject);
+        $discussionvideos = $discussionvideos->groupBy('part');
+        
+        return view('student.discussionvideo', compact('discussionvideos', 'subject'));
+    }
 }
 
 

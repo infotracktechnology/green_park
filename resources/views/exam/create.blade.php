@@ -154,7 +154,7 @@
                                     <input type="number" min="1" name="zoo_start" id="zoologyStart" class="form-control form-control-sm" disabled>
                                 </div>
 
-                                <div class="col-lg-2 botany-inputs" style="display: none;">
+                                <div class="col-lg-2 zoology-inputs" style="display: none;">
                                     <label>Zoology End No</label>
                                     <input type="number" min="1" name="zoo_end" class="form-control form-control-sm" disabled>
                                 </div>
@@ -170,6 +170,15 @@
                                     <label>Total Questions</label>
                                     <input type="number" min="1" name="total_questions" id="total_questions" class="form-control form-control-sm" required>
                                 </div>
+
+                                <div class="form-group col-lg-3">
+                                    <label>Result Publish</label>
+                                    <select name="publish" id="publish" class="form-control form-control-sm" required>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </div>
+
                             </div>
                             
                                 <div class="form-group col-lg-12">

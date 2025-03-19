@@ -8,6 +8,8 @@ use App\Models\Branch;
 use App\Models\Chairmanvideo;
 use App\Models\Examportion;
 use App\Models\ExamAnswer;
+use App\Models\AnswerKey;
+use App\Models\QuestionKey;
 
 
 class Student extends Authenticatable
@@ -55,6 +57,34 @@ class Student extends Authenticatable
     {
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
     }
+
+    public function answerkey()
+    {
+        return AnswerKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->take(5)->get();
+    }
+
+    public function questionkey()
+    {
+        return QuestionKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->take(5)->get();
+    }
+
+    public function downloads()
+    {
+        return Download::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->get();
+    }
+
+    public function classvideo($subject = ''){
+        $datetime = date('Y-m-d H:i:s');
+        return ClassVideo::where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->get();
+    }
+    
+
+    public function discussionvideos($subject = '')
+    {
+        $datetime = date('Y-m-d H:i:s');
+        return DiscussionVideo::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->get();
+    }
+
     private static function generatePassword($length = 8){
         $characters = 'ABCDFGHIJKMNQRSTXYZ0123456789';
         $password = '';

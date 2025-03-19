@@ -26,10 +26,10 @@ class ChairmanVideoController extends Controller
     {
         $chairmanvideos = new Chairmanvideo();
         $chairmanvideos->branch_id = implode(',', $request->branch_id);
-    $chairmanvideos->coaching_type = implode(',', $request->coaching_type);
+         $chairmanvideos->coaching_type = implode(',', $request->coaching_type);
         $chairmanvideos->gender = $request->gender;
         $chairmanvideos->title = $request->title;
-        $chairmanvideos->link = $request->link;
+        $chairmanvideos->video_id = $request->video_id;
         if ($request->hasFile('attachment')) {
             $fileName = time() . '.' . $request->attachment->extension();
             $request->attachment->move(public_path('chairman/video'), $fileName);
@@ -41,6 +41,38 @@ class ChairmanVideoController extends Controller
         return redirect()->route('chairmanvideo.index')
             ->with('success', 'Chairman video created successfully.');
     }
+
+ public function edit(Request $request, Chairmanvideo $chairmanvideo)
+    {
+        $branches = Branch::all();
+        return view('chairmanvideo.edit', compact('chairmanvideo', 'branches'));
+ }
+ public function update(Request $request, $id)
+{
+    $chairmanvideo = Chairmanvideo::findOrFail($id);
+
+    $chairmanvideo->title = $request->title;
+    $chairmanvideo->video_id = $request->video_id;
+    $chairmanvideo->gender = $request->gender;
+    $chairmanvideo->coaching_type = implode(',', $request->coaching_type);
+    $chairmanvideo->branch_id = implode(',', $request->branch_id);
+
+    if ($request->hasFile('attachment')) {
+       
+        if ($chairmanvideo->attachment && file_exists(public_path($chairmanvideo->attachment))) {
+            unlink(public_path($chairmanvideo->attachment));
+        }
+
+        $fileName = time() . '.' . $request->attachment->extension();
+        $request->attachment->move(public_path('chairman/video'), $fileName);
+        $chairmanvideo->attachment = 'chairman/video/' . $fileName;
+    }
+
+  
+    $chairmanvideo->save();
+
+    return redirect()->route('chairmanvideo.index')->with('success', 'Video updated successfully!');
+}
     public function destroy(Request $request, Chairmanvideo $chairmanvideo)
     {
         $chairmanvideo->delete();

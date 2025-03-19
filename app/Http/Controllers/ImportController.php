@@ -24,11 +24,10 @@ class ImportController extends Controller
     {
         // Step 1: Validate the request
         $request->validate([
-            'branch' => 'required',
             'csv_file' => 'required|mimes:csv,txt|max:2048', // Only CSV files up to 2MB
         ]);
 
-        $branch = $request->branch;
+        $branch = $request->branch ?? '';
 
         // Step 2: Handle file upload
         if ($request->hasFile('csv_file')) {
@@ -41,17 +40,19 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
-                    $row = array_merge($row, ['campus' => $branch]);
+                    $row = array_map('ucwords', $row);
                    if(isset($row['id'])){
                     $student = Student::find($row['id']);
                     $student->update($row);
                    }
                    else{
+                    $row = array_merge($row, ['campus' => $branch]);
                     $student = Student::create($row);
                    }
                 }
-                return back()->with('success', 'CSV file uploaded and data saved successfully!');
+                
             }
+            return back()->with('success', 'CSV file uploaded and data saved successfully!');
         }
 
         return back()->with('error', 'No data found in the file or file upload failed.');

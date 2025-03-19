@@ -36,6 +36,13 @@
                                 <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $Student->student_name) }}" class="form-control form-control-sm alphabetsOnly" required>
                                
                             </div>
+
+
+                            <div class="form-group col-lg-3">
+                                <label>Password</label>
+                                 <input type="text" name="password_1" value="{{$Student->password_1}}" class="form-control form-control-sm" required>
+                            
+                             </div>
                             
 
         

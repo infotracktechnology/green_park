@@ -38,8 +38,9 @@
               <th>Coaching Type</th>
               <th>Gender</th>
               <th>Title</th>
-             <th>Link</th>
-              <th>Action</th>
+             <th>Video Id</th>
+             <th>Edit </th>
+              <th>Delete </th>
             </tr>
       
             </thead>
@@ -59,8 +60,13 @@
                   <td>{{$chairmanvideo->coaching_type}}</td>
                   <td>{{$chairmanvideo->gender}}</td>
                   <td>{{$chairmanvideo->title}}</td>
-                 <td>{{$chairmanvideo->link}}</td>
+                 <td>{{$chairmanvideo->video_id}}</td>
                 </td> 
+                <td>
+                    <a href="{{ route('chairmanvideo.edit', $chairmanvideo->id) }}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </td>
               <td>
                    <form action="{{ route('chairmanvideo.destroy', $chairmanvideo->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this video?')" class="d-inline">
                       @csrf

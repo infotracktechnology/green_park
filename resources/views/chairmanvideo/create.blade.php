@@ -87,8 +87,8 @@
                                 <input type="text" name="title" id="title" class="form-control form-control-sm" required>
                             </div>
                             <div class="form-group col-lg-4">
-                                <label for="link">Paste Video Link</label>
-                                <input type="text" name="link" id="link" class="form-control form-control-sm" required>
+                                <label for="link">Video ID</label>
+                                <input type="number" name="video_id" id="video_id" class="form-control form-control-sm" required>
                             </div>
                             <div class="form-group col-lg-4">
                                 <label for="attachment">Attachment</label>

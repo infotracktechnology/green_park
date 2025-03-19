@@ -127,7 +127,7 @@
             <div class="sidebar-brand">
                 <a href="#">
                     <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" />
-                    <span class="logo-name">Green Park</span>
+                    <span class="logo-name">{{ env('APP_NAME') }}</span>
                 </a>
             </div>
             <ul class="sidebar-menu">
@@ -164,8 +164,14 @@
                 </li>
                 @if (auth()->user()->coaching_type != 'Offline')
                   <li class="dropdown">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('student.classvideo') }}" class="nav-link">
                       <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Class Video</span>
+                    </a>
+                  </li>
+
+                  <li class="dropdown">
+                    <a href="{{ route('student.discussionvideo') }}" class="nav-link">
+                      <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Discussion Video</span>
                     </a>
                   </li>
                 @endif
@@ -180,17 +186,18 @@
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
-                    <i class="fas fa-question-circle" style="font-size: 20px; color: #2196f3;"></i><span>Question Papers</span>
+                  <a href="{{ route('student.questionKey') }}" class="nav-link">
+
+ <i class="fas fa-question-circle" style="font-size: 20px; color: #2196f3;"></i><span>Question Papers</span>
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
+                  <a href="{{ route('student.answerkey') }}" class="nav-link">
                     <i class="fas fa-key" style="font-size: 20px; color: #2196f3;"></i><span>Answer Key</span>
                   </a>
                 </li>
                 <li class="dropdown">
-                  <a href="#" class="nav-link">
+                  <a href="{{ route('student.download') }}" class="nav-link">
                     <i class="fas fa-download" style="font-size: 20px; color: #5daaf1;"></i><span>Downloads</span>
                   </a>
                 </li>
