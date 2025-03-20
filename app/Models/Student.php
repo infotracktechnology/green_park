@@ -29,11 +29,13 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
+            $maxid = self::max('student_id') ?? 0;
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
+            $model->student_id = $maxid + 1;
         });
         static::created(function ($model) {
-            $model->user_name = 'L' . $model->id;
+            $model->user_name = 'L' . $model->student_id;
             $model->save();
         });
     }
@@ -85,8 +87,8 @@ class Student extends Authenticatable
         return DiscussionVideo::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->get();
     }
 
-    private static function generatePassword($length = 8){
-        $characters = 'ABCDFGHIJKMNQRSTXYZ0123456789';
+    private static function generatePassword($length = 6){
+        $characters = 'ACFHJKMRXY23456789';
         $password = '';
         for ($i = 0; $i < $length; $i++) {
             $password .= $characters[random_int(0, strlen($characters) - 1)];

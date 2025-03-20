@@ -63,7 +63,7 @@
         <tbody>
           @foreach ($students as $student)
           <tr>
-            <td>{{$student->id}}</td>
+            <td>{{$student->student_id}}</td>
             <td>{{$student->campus}}</td>
             <td>{{$student->coaching_type}}</td>
             <td>{{$student->user_name}}</td>
