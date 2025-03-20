@@ -50,23 +50,19 @@ class HostelController extends Controller
             'room_type' => 'required|string',
         ]);
 
-        $hostel = Hostel::create($request->only([
-            'branch_id',
-            'name',
-            'type',
-            'warden_name',
-            'room_type'
-        ]));
+        $hostel = Hostel::create($request->only(['branch_id','name','type','warden_name','room_type']));
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $room) {
-                $hostel->rooms()->create([
-                    'block_no' => $room['block_no'],
-                    'floor_no' => $room['floor_no'],
+                for ($i=1; $i <= $room['no_of_cots'] ; $i++) { 
+                   $hostel->rooms()->create([
+                    'floor' => $room['floor'],
                     'room_no' => $room['room_no'],
-                    'no_of_beds' => $room['no_of_beds'],
-                    'cart_no' => $room['cart_no'],
-                ]);
+                    'no_of_cots' => $room['no_of_cots'],
+                    'cart_no' => "C".$i,
+                ]); 
+                }
+                
             }
         }
 
@@ -79,9 +75,8 @@ class HostelController extends Controller
         $hostel = Hostel::with('rooms')->findOrFail($id);
         $branches = Branch::all();
         $staffs = Staff::all();
-        // $districts = DB::table('district_list')->where('State', $hostel->state)->select('District')->distinct()->orderby('District')->get();
-        // $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get();
-        return view('hostel.edit', compact('hostel',  'branches', 'staffs'));
+        $rooms = HostelRoom::where('hostel_id', $id)->groupBy('room_no')->orderBy('id')->get()->toArray();
+        return view('hostel.edit', compact('hostel',  'branches', 'staffs', 'rooms'));
     }
 
     public function update(Request $request, $id)
@@ -103,16 +98,31 @@ class HostelController extends Controller
             'room_type'
         ]));
 
-        $hostel->rooms()->delete();
+        // $hostel->rooms()->delete();
+
         if ($request->has('rooms')) {
-            foreach ($request->rooms as $room) {
-                $hostel->rooms()->create([
-                    'block_no' => $room['block_no'],
-                    'floor_no' => $room['floor_no'],
-                    'room_no' => $room['room_no'],
-                    'no_of_beds' => $room['no_of_beds'],
-                    'cart_no' => $room['cart_no'],
-                ]);
+            foreach ($request->rooms as $row) {
+                for ($i=1; $i <= $room['no_of_cots'] ; $i++) { 
+                  $cart_no = "C".$i;
+                  $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $room['room_no'])->where('cart_no', $cart_no)->first();
+                  if($room){
+                    $room->update([
+                      'floor' => $room['floor'],
+                      'room_no' => $room['room_no'],
+                      'no_of_cots' => $room['no_of_cots'],
+                      'cart_no' => $cart_no,
+                  ]);
+                  }
+                  else{
+                    $hostel->rooms()->create([
+                      'floor' => $row['floor'],
+                      'room_no' => $row['room_no'],
+                      'no_of_cots' => $row['no_of_cots'],
+                      'cart_no' => $cart_no,
+                  ]);
+                  }
+                }
+                
             }
         }
 
@@ -122,27 +132,21 @@ class HostelController extends Controller
 
     public function destroy(Request $request, Hostel $hostel)
     {
-        DB::transaction(function () use ($hostel) {
-            $hostel->rooms()->each(function ($room) {
-                $room->delete();
-            });
-
-            $hostel->delete();
-        });
-
+        $hostel->delete();
+        $hostel->rooms()->delete();
         session()->flash('success', 'Hostel deleted successfully');
         return to_route('hostel.index');
     }
-    public function deleteRoom($id)
+
+    public function show(Request $request, Hostel $hostel)
     {
-        $room = HostelRoom::findOrFail($id);
+        $rooms = HostelRoom::where('hostel_id', $hostel->id)->selectRaw('room_no,floor,no_of_cots,group_concat(cart_no order by id) as cart_no')->groupBy('room_no')->orderBy('id')->get();
+        return view('hostel.show', compact('hostel', 'rooms'));
+    }
 
-        Log::info('Deleting room:', ['room' => $room]);
-
-        $room->delete();
-
-        Log::info('Room deleted successfully.', ['room_id' => $id]);
-
+    public function deleteRoom(Request $request)
+    {
+        $room = HostelRoom::where('room_no', $request->room_no)->where('hostel_id', $request->hostel_id)->delete();
         return redirect()->back()->with('success', 'Room deleted successfully.');
     }
 

@@ -39,13 +39,15 @@
   
         <tr role="row">
           <th>Branch</th>
-        <th>Hostel ID</th>
+          <th>Hostel ID</th>
           <th>Name</th>
           <th>Type</th>
           <th>Warden Name</th>
-        <th>Room Type</th>
+          <th>Room Type</th>
+          <th>Total Rooms</th>
+          <th>Room Details</th>
           <th>Edit</th>
-          {{-- <th>Action</th> --}}
+          <th>Delete</th>
         </tr>
   
         </thead>
@@ -59,12 +61,14 @@
             <td>{{$hostel->type}}</td>
             <td>{{$hostel->warden_name}}</td>
             <td>{{$hostel->room_type}}</td>
+            <td>{{$hostel->rooms->count()}}</td>
+            <td><a href="{{ route('hostel.show', $hostel->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a></td>
             <td>
               <a href="{{ route('hostel.edit', $hostel->id) }}" class="btn btn-warning text-white">
                  <i class="fas fa-edit"></i>
               </a>
            </td>
-           {{-- <td>
+           <td>
               <form action="{{ route('hostel.destroy', $hostel->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this hostel?')">
                  @csrf
                  @method('DELETE')
@@ -72,7 +76,7 @@
                     <i class="fas fa-trash"></i>
                  </button>
               </form>
-           </td> --}}
+           </td>
         </tr>
         @endforeach
           
