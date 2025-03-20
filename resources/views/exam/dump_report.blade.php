@@ -121,7 +121,7 @@
                                 </table>
                             </div>
                         </div>
-                        <form method="get"  action="{{ route('exam.report.dump') }}" enctype="multipart/form-data">
+                        <form method="get" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('exam.report.dump') }}" enctype="multipart/form-data">
                             <input type="hidden" name="test_name" value="{{ $test_name }}">
                             <div class="col-lg-12">
                                 <h6>Exam Publish</h6>

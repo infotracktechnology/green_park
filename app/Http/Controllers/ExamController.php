@@ -254,7 +254,7 @@ class ExamController extends Controller
         $reportData = DB::table('exam_answer as ea')
             ->join('exam as e', 'e.id', '=', 'ea.test_id')
             ->join('branch as b', 'b.id', '=', 'e.branch_id')
-            ->join('student as s', 's.id', '=', 'ea.student_id')
+            ->join('student as s', 's.student_id', '=', 'ea.student_id')
             ->select(
                 's.coaching_type',
                 'b.name as branch_name',
@@ -488,7 +488,7 @@ class ExamController extends Controller
         $test_ids = Exam::where('name', $test_name)->implode('id', ',');
         $test_ids = $test_ids != '' ? $test_ids : 0;
 
-        $results = DB::select("SELECT test_id,student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
+        $results = DB::select("SELECT test_id,a.student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.student_id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
         return view('exam.dump_report',compact('test_name','results','tests','test_ids'));
     }
 
@@ -511,7 +511,7 @@ class ExamController extends Controller
         $testIdsString = implode(',', $testIdsArray);
     
         $results = DB::table('exam_answer as a')
-            ->join('student as b', 'a.student_id', '=', 'b.id')
+            ->join('student as b', 'a.student_id', '=', 'b.student_id')
             ->join('branch as c', 'b.campus', '=', 'c.id')
             ->whereIn('a.test_id', $testIdsArray)
             ->select(
