@@ -153,7 +153,7 @@ class ExamController extends Controller
     function student_instruction(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
-        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->selectRaw('count(q_no) as total_question')->first();
+        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->selectRaw('count(q_no) as total_question')->first();
         if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
             return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
         }
@@ -163,7 +163,7 @@ class ExamController extends Controller
     function student_exam(Request $request, $test_id)
 {
     $exam = Exam::findOrFail(base64_decode($test_id));
-    $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->orderBy('updated_at', 'desc')->get();
+    $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
     $maxQuestions = $answers->first()->q_no ?? 0;
     $answers = $answers->keyBy('q_no');
     $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
@@ -176,10 +176,10 @@ class ExamController extends Controller
 }
  
     function Save(Request $request){
-        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
-        $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->first();
+        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->student_id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
+        $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
         if($answer){
-            DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->update($data);
+            DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
         }else{
             DB::table('exam_answer')->insert($data);
         }
@@ -190,7 +190,7 @@ class ExamController extends Controller
     public function clearLog(Request $request)
     {
         DB::table('clear_log')->insert([
-            'student_id' => auth()->user()->id,
+            'student_id' => auth()->user()->student_id,
             'test_id' => $request->input('test_id'),
             'q_no' => $request->input('q_no'),
             'action' => 'clear',
