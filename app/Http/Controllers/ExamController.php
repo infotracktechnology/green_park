@@ -153,7 +153,7 @@ class ExamController extends Controller
     function student_instruction(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
-        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->selectRaw('count(q_no) as total_question')->first();
+        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->selectRaw('count(q_no) as total_question')->first();
         if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
             return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
         }
@@ -163,7 +163,7 @@ class ExamController extends Controller
     function student_exam(Request $request, $test_id)
 {
     $exam = Exam::findOrFail(base64_decode($test_id));
-    $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->id)->orderBy('updated_at', 'desc')->get();
+    $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
     $maxQuestions = $answers->first()->q_no ?? 0;
     $answers = $answers->keyBy('q_no');
     $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
@@ -176,10 +176,10 @@ class ExamController extends Controller
 }
  
     function Save(Request $request){
-        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
-        $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->first();
+        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->student_id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
+        $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
         if($answer){
-            DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->id)->where('q_no', $request->q_no)->update($data);
+            DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
         }else{
             DB::table('exam_answer')->insert($data);
         }
@@ -190,7 +190,7 @@ class ExamController extends Controller
     public function clearLog(Request $request)
     {
         DB::table('clear_log')->insert([
-            'student_id' => auth()->user()->id,
+            'student_id' => auth()->user()->student_id,
             'test_id' => $request->input('test_id'),
             'q_no' => $request->input('q_no'),
             'action' => 'clear',
@@ -254,7 +254,7 @@ class ExamController extends Controller
         $reportData = DB::table('exam_answer as ea')
             ->join('exam as e', 'e.id', '=', 'ea.test_id')
             ->join('branch as b', 'b.id', '=', 'e.branch_id')
-            ->join('student as s', 's.id', '=', 'ea.student_id')
+            ->join('student as s', 's.student_id', '=', 'ea.student_id')
             ->select(
                 's.coaching_type',
                 'b.name as branch_name',
@@ -488,7 +488,7 @@ class ExamController extends Controller
         $test_ids = Exam::where('name', $test_name)->implode('id', ',');
         $test_ids = $test_ids != '' ? $test_ids : 0;
 
-        $results = DB::select("SELECT test_id,student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
+        $results = DB::select("SELECT test_id,a.student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.student_id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
         return view('exam.dump_report',compact('test_name','results','tests','test_ids'));
     }
 
@@ -511,7 +511,7 @@ class ExamController extends Controller
         $testIdsString = implode(',', $testIdsArray);
     
         $results = DB::table('exam_answer as a')
-            ->join('student as b', 'a.student_id', '=', 'b.id')
+            ->join('student as b', 'a.student_id', '=', 'b.student_id')
             ->join('branch as c', 'b.campus', '=', 'c.id')
             ->whereIn('a.test_id', $testIdsArray)
             ->select(

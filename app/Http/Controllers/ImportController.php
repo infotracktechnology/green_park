@@ -41,12 +41,12 @@ class ImportController extends Controller
             if (!empty($data)) {
                 foreach ($data as $row) {
                     $row = array_map('ucwords', $row);
-                   if(isset($row['id'])){
-                    $student = Student::find($row['id']);
+                   if(isset($row['student_id'])){
+                    $student = Student::find($row['student_id']);
                     $student->update($row);
                    }
                    else{
-                    $row = array_merge($row, ['campus' => $branch]);
+                    //$row = array_merge($row, ['campus' => $branch]);
                     $student = Student::create($row);
                    }
                 }
