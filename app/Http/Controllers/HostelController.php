@@ -101,7 +101,7 @@ class HostelController extends Controller
         // $hostel->rooms()->delete();
 
         if ($request->has('rooms')) {
-            foreach ($request->rooms as $room) {
+            foreach ($request->rooms as $row) {
                 for ($i=1; $i <= $room['no_of_cots'] ; $i++) { 
                   $cart_no = "C".$i;
                   $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $room['room_no'])->where('cart_no', $cart_no)->first();
@@ -115,9 +115,9 @@ class HostelController extends Controller
                   }
                   else{
                     $hostel->rooms()->create([
-                      'floor' => $room['floor'],
-                      'room_no' => $room['room_no'],
-                      'no_of_cots' => $room['no_of_cots'],
+                      'floor' => $row['floor'],
+                      'room_no' => $row['room_no'],
+                      'no_of_cots' => $row['no_of_cots'],
                       'cart_no' => $cart_no,
                   ]);
                   }

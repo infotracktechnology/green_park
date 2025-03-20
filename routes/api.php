@@ -71,5 +71,18 @@ Route::group(['prefix' => 'v2'], function () {
         $classvideos = $classvideos->groupBy('period');
         return response()->json($classvideos);
     });
+
+    Route::get('/discussionvideo/{subject}', function (Student $student, $subject) {
+        $discussionvideos = $student->discussionvideos($subject);
+        $discussionvideos = $discussionvideos->groupBy('part');
+        return response()->json($discussionvideos);
+    });
+
+
+    Route::get('revisionvideos/', function (Student $student, $subject) {
+        $datetime = date('Y-m-d H:i:s');
+        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
+        return response()->json($revisionvideos);
+    });
     
 });
