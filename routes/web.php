@@ -113,7 +113,7 @@ Route::get('answerkey',[AnswerkeyController::class, 'answerkey'])->name('student
 Route::get('questionkey', [QuestionKeyController::class, 'questionkey'])->name('student.questionKey');
 Route::get('download', [DownloadController::class, 'download'])->name('student.download');
 Route::get('classvideo', [ClassVideoController::class, 'classvideo'])->name('student.classvideo');
-
+Route::get('revisionvideo', [RevisionVideoController::class, 'revisionvideo'])->name('student.revisionvideo');
 Route::get('discussionvideo', [StudentController::class, 'discussionvideo'])->name('student.discussionvideo');
 Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
 Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
