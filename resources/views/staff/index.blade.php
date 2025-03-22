@@ -36,7 +36,7 @@
       <thead>
   
         <tr role="row">
-       <th>#</th>
+        <th>#</th>
         <th>Full Name</th>
         <th>Designation</th>
         <th>Department</th>
