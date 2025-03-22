@@ -88,6 +88,13 @@
         <ul class="navbar-nav navbar-right">
 
           <li class="nav-item dropdown">
+            <a href="#" class="nav-link nav-link-lg">
+                <span class="col-white" id="clock"></span>
+            </a>
+        </li>
+        
+
+          <li class="nav-item dropdown">
             <a href="#" class="nav-link nav-link-lg" id="exam-timer-container" style="display: none;">
                 <span style="font-size: 24px;">⏰</span> Exam starts in <span id="exam-timer" class="col-white"></span>
             </a>
@@ -181,6 +188,12 @@
                   </li>
 
                   <li class="dropdown">
+                    <a href="{{ route('student.revisionvideo') }}" class="nav-link">
+                      <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Revision Video</span>
+                    </a>
+                  </li>
+
+                  <li class="dropdown">
                     <a href="{{ route('student.discussionvideo') }}" class="nav-link">
                       <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Discussion Video</span>
                     </a>
@@ -233,6 +246,7 @@
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/easytimer.js/dist/easytimer.min.js"></script>
   <script>
     $(document).ready(function () {
       $('.select').each(function () {
@@ -295,6 +309,7 @@
     updateTimer(); // Run immediately on page load
 });
 
+<<<<<<< HEAD
 </script> --}}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -364,6 +379,23 @@
       event.stopPropagation(); // Allow form submission
     });
   });
+=======
+      const timer = new easytimer.Timer();
+  
+            function updateClock() {
+                const now = new Date();
+                const time = now.toLocaleTimeString(undefined, { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const date = now.toLocaleDateString('en-GB', {day: '2-digit',month: '2-digit',year: 'numeric'});
+                const formattedTime = `${date} ${time}`;
+                document.getElementById('clock').textContent = formattedTime;
+            }
+            
+            updateClock();
+            
+            timer.addEventListener('secondsUpdated', updateClock);
+            timer.start({ precision: 'seconds' });
+
+>>>>>>> 95d5bd8bc165b073be1b32a01bc5b1a17da44346
 </script>
 
   @yield('js')

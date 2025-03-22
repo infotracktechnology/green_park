@@ -60,12 +60,9 @@ public function update(Request $request, $id)
     public function classvideo(Request $request,Student $student)
     {
         $subject = $request->subject ?? 0;
-        $datetime = date('Y-m-d H:i:s');
         $classvideos = $student->classvideo($subject);
         $classvideos = $classvideos->groupBy('period');
-        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
-        
-        return view('student.classvideo', compact('classvideos', 'subject', 'revisionvideos'));
+        return view('student.classvideo', compact('classvideos', 'subject'));
     }
 
     public function showUploadForm()

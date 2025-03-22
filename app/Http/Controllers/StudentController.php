@@ -142,19 +142,19 @@ public function dashboard()
     return view('dashboards.studentdashboard', compact('examStartTime'));
 }
     function marksheet(Request $request){
-        $sid = auth()->user()->id;
+        $sid = auth()->user()->student_id;
         $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
        return view('student.marksheet',compact('tests'));
     }
 
     function mark_subject(Request $request, $test_id){
-        $sid = auth()->user()->id;
+        $sid = auth()->user()->student_id;
         $test = DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject FROM `exam_answer` where test_id=$test_id and student_id=$sid group by subject");
         return view('student.mark_subject',compact('test'));
         
     }
     function mark_download(Request $request, $test_id){
-        $sid = auth()->user()->id;
+        $sid = auth()->user()->student_id;
         $answers = DB::table('exam_answer')->where('test_id', $test_id)->where('student_id', $sid)->orderBy('q_no')->get();
         $answers = $answers->chunk(45);
         $exam = DB::table('exam')->where('id', $test_id)->selectRaw("name,id,DATE_FORMAT(start_at, '%d-%m-%Y')exam_date")->first();
