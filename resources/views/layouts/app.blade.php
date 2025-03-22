@@ -100,6 +100,10 @@
               <a href="{{ route('admin.home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
             </li>
             <li class="dropdown">
+              <a href="{{ route('academicyear.index') }}" class="nav-link"><i data-feather="calendar"></i><span>Academic Year</span></a>
+            </li>
+
+            <li class="dropdown">
               <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
             </li>
             <li class="dropdown">
