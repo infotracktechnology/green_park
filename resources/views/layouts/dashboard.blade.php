@@ -21,18 +21,18 @@
     .select2 {
       width: 100% !important;
     }
-
+  
     .error {
       color: red;
       font-weight: bold;
     }
-
+  
     .nav-link i {
       font-size: 18px;
       margin-right: 10px;
       color: #333;
     }
-
+  
     .notification-badge {
       display: inline-block;
       width: 20px;
@@ -48,9 +48,15 @@
       top: 10px;
       right: 15px;
     }
-
+  
     .hidden {
       display: none !important;
+    }
+  
+    /* Make the exam timer bold */
+    #exam-timer {
+      font-weight: bold;
+      font-size: 24px;
     }
   </style>
   @yield('css')
@@ -78,6 +84,7 @@
             </li>
           </ul>
         </div>
+   
         <ul class="navbar-nav navbar-right">
 
           <li class="nav-item dropdown">
@@ -85,6 +92,7 @@
                 <span style="font-size: 24px;">⏰</span> Exam starts in <span id="exam-timer" class="col-white"></span>
             </a>
         </li>
+
         
           <li class="dropdown dropdown-list-toggle">
             <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
@@ -121,8 +129,11 @@
             </form>
           </li>
         </ul>
+        
       </nav>
+      
       <div class="main-sidebar sidebar-style-2" id="sidebar" >
+        
         <aside id="sidebar-wrapper">
             <div class="sidebar-brand">
                 <a href="#">
@@ -188,7 +199,7 @@
                 <li class="dropdown">
                   <a href="{{ route('student.questionKey') }}" class="nav-link">
 
- <i class="fas fa-question-circle" style="font-size: 20px; color: #2196f3;"></i><span>Question Papers</span>
+                <i class="fas fa-question-circle" style="font-size: 20px; color: #2196f3;"></i><span>Question Papers</span>
                   </a>
                 </li>
                 <li class="dropdown">
@@ -243,7 +254,7 @@
     $(document).on('contextmenu', event => event.preventDefault());
     // $(document).on('mousedown', event => event.preventDefault());
   </script>
-  <script>
+  {{-- <script>
    
    document.addEventListener("DOMContentLoaded", function () {
     var examStartTime = "{{ $examStartTime ?? '' }}"; // Get exam start time from backend
@@ -284,6 +295,75 @@
     updateTimer(); // Run immediately on page load
 });
 
+</script> --}}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Fetch the updated exam start time from the backend on every page load
+    var examStartTime = "{{ $examStartTime ?? '' }}";
+
+    // Check if exam start time exists or get from localStorage
+    if (!examStartTime) {
+      examStartTime = localStorage.getItem('examStartTime');
+      if (!examStartTime) {
+        console.log("No upcoming exams.");
+        return;
+      }
+    }
+
+    localStorage.setItem('examStartTime', examStartTime);
+
+    var examStart = new Date(examStartTime).getTime();
+    var timerElement = document.getElementById('exam-timer');
+    var timerContainer = document.getElementById('exam-timer-container');
+
+      function updateTimer() {
+      var now = new Date().getTime();
+      var timeDiff = examStart - now;
+
+      if (timeDiff <= 0) {
+        timerElement.innerHTML = "Exam has started!";
+        timerContainer.style.display = "none";
+        clearInterval(timerInterval);
+        localStorage.removeItem('examStartTime');
+       window .location.reload( );
+   
+        return;
+      }
+
+      var hours = Math.floor(timeDiff / (1000 * 60 * 60));
+      var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+      var timeString = (hours > 0 ? hours + "h " : "") +
+                       (minutes > 0 ? minutes + "m " : "") +
+                       seconds + "s";
+
+      timerElement.innerHTML = timeString;
+      timerContainer.style.display = "inline";
+    }
+
+    var timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+
+    
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted) {
+        location.reload();
+      }
+    });
+
+    $(document).off('contextmenu');
+
+    $(document).off('mousedown');
+    $(document).on('click', 'a', function (event) {
+      event.stopPropagation(); 
+    });
+
+   
+    $('form').on('submit', function (event) {
+      event.stopPropagation(); // Allow form submission
+    });
+  });
 </script>
 
   @yield('js')
