@@ -31,6 +31,7 @@ class StaffProfileController extends Controller
         // Handle the file upload if a photo is provided
         $photoPath = null;
         $path='';
+        $children_details=[];
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->move('uploads/staff', $request->file('photo')->getClientOriginalName());
             $path = 'uploads/staff/'.$request->file('photo')->getClientOriginalName();
@@ -69,15 +70,11 @@ class StaffProfileController extends Controller
     
     public function update(Request $request, Staff $staff)
     {
-        $request->validate([
-            'name' => 'required|string',
-          
-        ]);
-    
-        // Prepare the data for update
+      
         $data = $request->except(['photo', 'children']);
     
             $path='';
+            $children_details=[];
             if ($request->hasFile('photo')) {
                 $photoPath = $request->file('photo')->move('uploads/staff', $request->file('photo')->getClientOriginalName());
                 $path = 'uploads/staff/'.$request->file('photo')->getClientOriginalName();
