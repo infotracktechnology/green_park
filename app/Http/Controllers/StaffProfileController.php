@@ -60,7 +60,7 @@ class StaffProfileController extends Controller
     
     public function edit(Request $request, Staff $staff)
     {
-        $districts = DB::table('district_list')->where('State', $staff->state)->distinct()->orderBy('District')->get();
+        $districts = DB::table('district_list')->where('State', $staff->state)->select('District')->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
     
         return view('staff.edit', compact('staff', 'districts', 'states'));

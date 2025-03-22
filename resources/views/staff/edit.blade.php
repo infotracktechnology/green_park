@@ -204,10 +204,10 @@
       <label>City</label>
       <select name="city" id="city" class="form-control form-control-sm">
           <option value="">Select City</option>
-          @if(!empty($cities))
-              @foreach ($cities as $city)
-                  <option value="{{ $city }}" {{ $staff->city == $city ? 'selected' : '' }}>
-                      {{ $city }}
+          @if(!empty($districts))
+              @foreach ($districts as $city)
+                  <option value="{{ $city->District }}" {{ $staff->city == $city->District ? 'selected' : '' }}>
+                      {{ $city->District }}
                   </option>
               @endforeach
           @endif
@@ -538,54 +538,14 @@ function showFileNamesAndPreviews(input, previewId) {
           $('#city').html(html);
       });
    }
+
+//    window.onload = function() {
+//      if ("{{ $staff->state }}") {
+//        City("{{ $staff->state }}");
+//      }
+//    };
 </script>
 
-<script>
-   function City(state) {
-     let citySelect = document.getElementById('city');
-     citySelect.innerHTML = '<option value="">Select City</option>'; // Clear previous cities
- 
-     if (state) {
-       fetch(`/get-cities/${state}`)
-         .then(response => response.json())
-         .then(data => {
-           data.forEach(city => {
-             let option = document.createElement('option');
-             option.value = city;
-             option.text = city;
-             if (city === "{{ $staff->city }}") { // Retain selected city
-               option.selected = true;
-             }
-             citySelect.appendChild(option);
-           });
-         })
-         .catch(error => console.error('Error loading cities:', error));
-     }
-   }
- 
-   // Call the function on page load to retain cities when editing
-   window.onload = function() {
-     if ("{{ $staff->state }}") {
-       City("{{ $staff->state }}");
-     }
-   };
- 
-   // Populate the city select element on page load
-   document.addEventListener('DOMContentLoaded', function() {
-     let citySelect = document.getElementById('city');
-     @if(!empty($cities))
-       @foreach ($cities as $city)
-         let option = document.createElement('option');
-         option.value = "{{ $city }}";
-         option.text = "{{ $city }}";
-         if ("{{ $staff->city }}" === "{{ $city }}") {
-           option.selected = true;
-         }
-         citySelect.appendChild(option);
-       @endforeach
-     @endif
-   });
- </script>
 
 <script>
    document.getElementById('dob').addEventListener('change', function () {
