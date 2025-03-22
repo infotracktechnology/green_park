@@ -43,7 +43,6 @@
         <th>Email</th>
         <th>Mobile No</th>
         <th>Gender</th>
-       
         <th>City</th>
         <th>State</th>
           <th>Pin Code</th>
