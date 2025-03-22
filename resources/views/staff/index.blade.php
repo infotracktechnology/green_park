@@ -36,14 +36,13 @@
       <thead>
   
         <tr role="row">
-        <th >Branch ID</th>
+        <th>#</th>
         <th>Full Name</th>
         <th>Designation</th>
         <th>Department</th>
         <th>Email</th>
         <th>Mobile No</th>
         <th>Gender</th>
-        <th>Branch</th>
         <th>City</th>
         <th>State</th>
           <th>Pin Code</th>
@@ -56,14 +55,14 @@
         <tbody>
           @foreach ($staff as $member)
           <tr>
-            <td>{{ $member->id }}</td>
+            <td>{{ $member->id}}</td>
             <td>{{ $member->name }}</td>
             <td>{{ $member->designation }}</td>
             <td>{{ $member->department }}</td>
             <td>{{ $member->email }}</td>
             <td>{{ $member->mob_no }}</td>
             <td>{{ $member->gender }}</td>
-            <td>{{ $member->branch }}</td>
+           
             <td>{{ $member->city }}</td>
             <td>{{ $member->state }}</td>
             <td>{{ $member->pincode }}</td>

@@ -174,7 +174,9 @@
                     <div class="alert alert-danger"><b>{{ session('error') }}</b></div>
                 @endif
             </div>
-        
+            
+           
+            
             {{-- <marquee behavior="scroll" direction="left" id="marquee" style="display: none;">
                 Exam starts in <span id="exam-timer"></span>
             </marquee> --}}
@@ -319,7 +321,7 @@
     </script> --}}
 
 
-    <script>
+    {{-- <script>
         document.addEventListener("DOMContentLoaded", function () {
     var examStartTime = "{{ $examStartTime ?? '' }}"; // Get exam start time from backend
 
@@ -362,7 +364,32 @@
     updateTimer(); // Run immediately on page load
 });
 
+        </script> --}}
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var examStartTime = "{{ $examStartTime ?? '' }}"; // Get exam start time from backend
+        
+                if (!examStartTime) {
+                    console.log("No upcoming exams.");
+                    return;
+                }
+        
+                var examStart = new Date(examStartTime).getTime();
+                var now = new Date().getTime();
+                var timeDiff = examStart - now;
+                var examAlert = document.getElementById('exam-alert');
+        
+                // Show alert if the exam has not yet started
+                if (timeDiff > 0) {
+                    examAlert.style.display = "block";
+                } else {
+                    examAlert.style.display = "none";
+                }
+            });
         </script>
+       
+        
 @endsection
 
 
