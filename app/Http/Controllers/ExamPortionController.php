@@ -7,6 +7,7 @@ use App\Models\Exam;
 use Illuminate\Http\Request;
 use App\Models\Examportion;
 use App\Models\Branch;
+use App\Models\AcademicYear;
 
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,7 @@ class ExamPortionController extends Controller
 {
     public function index()
     {
+        $academic_years = AcademicYear::all();
         $examportions = Examportion::all();
         $branches = Branch::all();
         $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
@@ -21,6 +23,8 @@ class ExamPortionController extends Controller
     }
     public function create()
     {
+
+        $academicyear = AcademicYear::all();
         $branches = Branch::all();
         return view('examportion.create', compact('branches'));
     }
@@ -29,6 +33,7 @@ class ExamPortionController extends Controller
         $data = $request->except('attachment');
         $data['branch_id'] = implode(',', $request->branch_id);
         $data['coaching_type'] = implode(',', $request->coaching_type);
+        $data['academic_year'] = $request->academic_year; 
         $attachment = $request->attachment;
         $filename = time().'.'.$attachment->getClientOriginalExtension();
         $file = $attachment->move('examportions', $filename);

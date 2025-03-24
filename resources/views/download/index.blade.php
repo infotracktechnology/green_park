@@ -41,6 +41,7 @@
                 <tr>
                     <th>#</th>
                     <th>Date</th>
+                    <th>Academic Year</th>
                     <th>Title</th>
                     <th>Branch</th>
                     <th>Coaching Type</th>
@@ -54,6 +55,7 @@
                                         <tr>
                                             <td>{{ $key + 1 }}</td>
                                             <td>{{ $download->created_at->format('d-m-Y') }}</td>
+                                            <td>{{ $download->academic_year }}</td>
                                             <td>{{ $download->title }}</td>
                                             <td>
                                                 @php

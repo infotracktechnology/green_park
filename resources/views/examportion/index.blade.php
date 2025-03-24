@@ -35,6 +35,7 @@
   
             <tr role="row">
             <th>Branch </th>
+            <th>Academic Year </th>
               <th>Coaching Type</th>
               <th>Title</th>
              <th>Attachment</th>
@@ -55,6 +56,7 @@
                     @endphp
                     {{ $branchNames }}
                 </td>
+                <td>{{$examportion->academic_year}}</td>
                   <td>{{$examportion->coaching_type}}</td>
                   <td>{{$examportion->title}}</td>
                  <td>{{$examportion->attachment}}</td>

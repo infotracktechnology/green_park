@@ -28,6 +28,5 @@ class AppServiceProvider extends ServiceProvider
     {
         $academicyear = AcademicYear::where('enable', 1)->get();
         View::share('academicyear', $academicyear);
-    
     }
 }

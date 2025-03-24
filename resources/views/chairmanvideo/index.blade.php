@@ -34,6 +34,7 @@
         <thead>
   
             <tr role="row">
+              <th>Academic Year </th>
             <th>Branch </th>
               <th>Coaching Type</th>
               <th>Gender</th>
@@ -47,7 +48,7 @@
            <tbody>
                 @foreach ($chairmanvideos as $chairmanvideo)
                 <tr>
-                  
+                  <td>{{$chairmanvideo->academic_year}}</td>
                   <td>
                     @php
                         $branchNames = collect(explode(',', $chairmanvideo->branch_id))

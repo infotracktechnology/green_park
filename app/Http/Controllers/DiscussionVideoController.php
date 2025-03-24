@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\DiscussionVideo;
 use App\Models\Branch;
+use App\Models\AcademicYear;
 
 class DiscussionVideoController extends Controller
 {
    
     public function index()
     {
+        $academic_years = AcademicYear::all();
         $discussionvideos = DiscussionVideo::all();
         return view('discussionvideo.index', compact('discussionvideos'));
     }
@@ -17,6 +19,7 @@ class DiscussionVideoController extends Controller
  
     public function create()
     {
+        $academicyear = AcademicYear::all();
         $branches = Branch::all();
         return view('discussionvideo.create' , compact('branches'));
     }
@@ -26,11 +29,14 @@ class DiscussionVideoController extends Controller
 {
     $request->validate([
         'branch' => 'required|array'
+        
     ]);
     $branches = implode(',', $request->branch);
     $coachingTypes = implode(',', $request->coaching_type);
+    $academic_year = $request->academic_year;
 
     $video = DiscussionVideo::create([
+        'academic_year' => $academic_year,
         'video_id' => $request->video_id,
         'branch' => $branches,
         'coaching_type' => $coachingTypes,
@@ -38,9 +44,9 @@ class DiscussionVideoController extends Controller
         'part' => $request->part,
         'start_at' => $request->start_at,
         'end_at' => $request->end_at,
+        
     ]);
 
-   
 
     return redirect()->route('discussionvideo.index')->with('success', 'Discussion video added successfully!');
 }
@@ -65,6 +71,7 @@ class DiscussionVideoController extends Controller
     
         $video = DiscussionVideo::findOrFail($id);
         $video->update([
+            'academic_year' => $request->academic_year,
             'part' => $request->part,
             'video_id' => $request->video_id,
             'subject' => $request->subject,
