@@ -44,6 +44,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
 
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
+    Route::post('staff/export', [App\Http\Controllers\StaffProfileController::class, 'export'])->name('staff.export');
+    Route::post('staff/import', [App\Http\Controllers\StaffProfileController::class, 'import'])->name('staff.import');
     Route::resource('student', 'App\Http\Controllers\StudentController');
     Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
 

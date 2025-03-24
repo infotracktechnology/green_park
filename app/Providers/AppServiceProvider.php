@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\Student;
 use Illuminate\Support\Facades\View;
 use App\Models\AcademicYear;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
