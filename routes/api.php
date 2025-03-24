@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\Chairmanvideo;
 use App\Models\Announcement;
 use App\Models\Examportion;
+use App\Models\RevisionVideo;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,7 +80,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
 
-    Route::get('revisionvideos/', function (Student $student, $subject) {
+    Route::get('revisionvideos/', function () {
         $datetime = date('Y-m-d H:i:s');
         $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
         return response()->json($revisionvideos);
