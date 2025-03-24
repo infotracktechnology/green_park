@@ -23,12 +23,22 @@
                                  <h6 class="col-deep-purple">Answer Key Details</h6>
                               </div>
                               
+                              <div class="form-group col-lg-3">
+                                <label for="academic_year">Academic Year</label>
+                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                                    <option value="">Select Academic Year</option>
+                                    @foreach ($academicyear as $row)
+                                        <option value="{{ $row->academic_year }}" {{ $answerKey->academic_year == $row->academic_year ? 'selected' : '' }}>{{ $row->academic_year }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
 
                               <div class="form-group col-lg-4">
                                 <label for="branch">Branch</label>
                                 <select name="branch[]" class="form-control select2 @error('branch') is-invalid @enderror" multiple required>
                                     @php
-                                        $selectedBranches = explode(',', $questionKey->branch); // Convert stored string to array
+                                        $selectedBranches = explode(',', $answerKey->branch); // Convert stored string to array
                                     @endphp
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}" 

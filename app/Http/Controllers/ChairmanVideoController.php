@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\AcademicYear;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use Illuminate\Http\Request;
@@ -12,6 +12,7 @@ class ChairmanVideoController extends Controller
 {
     public function index()
     {
+        $academic_years = AcademicYear::all();
         $chairmanvideos = Chairmanvideo::all();
         $branches = Branch::all();
         $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
@@ -25,6 +26,7 @@ class ChairmanVideoController extends Controller
     public function store(Request $request)
     {
         $chairmanvideos = new Chairmanvideo();
+        $chairmanvideos->academic_year = $request->academic_year;
         $chairmanvideos->branch_id = implode(',', $request->branch_id);
          $chairmanvideos->coaching_type = implode(',', $request->coaching_type);
         $chairmanvideos->gender = $request->gender;
@@ -50,7 +52,7 @@ class ChairmanVideoController extends Controller
  public function update(Request $request, $id)
 {
     $chairmanvideo = Chairmanvideo::findOrFail($id);
-
+    $chairmanvideo->academic_year = $request->academic_year;
     $chairmanvideo->title = $request->title;
     $chairmanvideo->video_id = $request->video_id;
     $chairmanvideo->gender = $request->gender;

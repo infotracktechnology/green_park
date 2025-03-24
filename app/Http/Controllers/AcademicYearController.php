@@ -48,7 +48,6 @@ class AcademicYearController extends Controller
     public function destroy(Request $request, AcademicYear $academicyear) {
         $academicyear->delete();
         session()->flash('success', 'Branch deleted successfully');
-        return to_route('branch.index');
-
+        return to_route('academicyear.index');
     }
 }

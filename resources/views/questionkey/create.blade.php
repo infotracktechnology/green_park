@@ -23,6 +23,17 @@
                               </div>
                     
 
+
+                              <div class="form-group col-lg-3">
+                                <label for="academic_year">Academic Year</label>
+                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                                    <option value="">Select Academic Year</option>
+                                    @foreach ($academicyear as $row)
+                                        <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
+                                    @endforeach
+                                </select>
+                            </div> 
+
                               <div class="form-group col-lg-4">
                                 <label for="branch">Branch</label>
                                 <select name="branch[]" class="form-control form-control-sm select2 @error('branch') is-invalid @enderror" multiple required>

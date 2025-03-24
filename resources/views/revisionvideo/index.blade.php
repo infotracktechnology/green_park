@@ -43,6 +43,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>Academic Year</th>
                                             <th>Subject</th>
                                             <th>Chapter</th>
                                             <th>Video Id</t>
@@ -55,6 +56,7 @@
                                         @foreach ($revisionvideos as $row)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $row->academic_year }}</td>
                                             <td>{{ $row->subject }}</td>
                                             <td>{{ $row->chapter }}</td>
                                             <td>{{ $row->video_id }}</td>

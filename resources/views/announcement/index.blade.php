@@ -35,6 +35,7 @@
       <thead>
   
         <tr role="row">
+          <th>Academic Year </th>
         <th>Branch </th>
           <th>Coaching Type</th>
           <th>Gender</th>
@@ -47,6 +48,9 @@
         <tbody>
           @foreach ($announcements as $announcement)
           <tr>
+          
+            <td>{{ $announcement->academic_year }}</td> 
+             
             <td>
                 @php
                     $branchNames = collect(explode(',', $announcement->branch))
