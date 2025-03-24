@@ -22,8 +22,12 @@
                     <div class="card-body">
 
                     <div class="row">
-                           <div class="col-md-12 col-sm-12 mb-3">
+                           <div class="col-md-6 col-sm-12 mb-3">
                             <h6 class="col-deep-purple">Class Videos</h6>
+                           </div>
+
+                           <div class="col-md-6 col-sm-12 mb-3">
+                            <h6 class="col-deep-purple">{{ now()->format('d/m/Y') }}</h6>
                            </div>
                         
                    
@@ -60,20 +64,20 @@
                     <div class="card card-info">
                         <div class="card-body">
                             <ul class="nav nav-pills" id="myTab3" role="tablist">
-                                @for($i = 1; $i <= 6; $i++)
+                                @foreach(isset($classvideos) ? $classvideos->keys()->all() : [] as $period)
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $i == 1 ? 'active' : '' }}" id="period{{ $i }}-tab" data-toggle="tab" href="#period{{ $i }}" role="tab"
-                                            aria-controls="period{{ $i }}" aria-selected="{{ $i == 1 ? 'true' : 'false' }}">
-                                            Period {{ $i }}
+                                        <a class="nav-link {{ $loop->first ? 'active' : '' }}" id="period{{ $period }}-tab" data-toggle="tab" href="#period{{ $period }}" role="tab"
+                                            aria-controls="period{{ $period }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                                            Period {{ $period }}
                                         </a>
                                     </li>
-                                @endfor
+                                @endforeach
                             </ul>
                             <div class="tab-content" id="myTabContent2">
-                                @for($i = 1; $i <= 6; $i++)
-                                <div class="tab-pane fade {{ $i == 1 ? 'show active' : '' }}" id="period{{ $i }}" role="tabpanel" aria-labelledby="period{{ $i }}-tab">
+                                @foreach(isset($classvideos) ? $classvideos->keys()->all() : [] as $period)
+                                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="period{{ $period }}" role="tabpanel" aria-labelledby="period{{ $period }}-tab">
 
-                                        @forelse(isset($classvideos[$i]) ? $classvideos[$i] : [] as $video)
+                                        @forelse(isset($classvideos[$period]) ? $classvideos[$period] : collect() as $video)
                                         <?php
                                         $videoId = $video->video_id ?? null;
                                         ?>
@@ -85,47 +89,16 @@
                                         title="video_20240822_142621"></iframe>
                                         <script src="https://player.vimeo.com/api/player.js"></script>
                                         @empty
-                                            <p>No videos for Period {{ $i }}.</p>
+                                            <p>No videos for Period {{ $period }}.</p>
                                         @endforelse
-                            </div>
-                                @endfor
+                                </div>
+                                @endforeach
                             </div>
                             </div>
                         </div>
                         @endif
 
-                        <div class="col-lg-12">
-                            <div class="card card-info">
-                                <div class="card-body">
-                                    <div class="col-md-12 col-sm-12 mb-3">
-                                        <h6 class="col-deep-purple">Revision Videos</h6>
-                                       </div>
-                                    
-                        <div class="table-responsive">
-                            <table class="table table-striped table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Subject</th>
-                                        <th>Chapter</th>
-                                        <th>Video</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($revisionvideos as $video)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $video->subject }}</td>
-                                        <td>{{ $video->chapter }}</td>
-                                        <td><a href="{{ route('video', $video->video_id) }}" target="_blank">Watch</a></td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>  
-                </div>
+                    
 
                     
                 </div>

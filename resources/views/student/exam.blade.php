@@ -39,7 +39,7 @@
             <form method="post" id="examForm" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="test_id" value="{{ $exam->id }}">
-                <input type="hidden" name="student_id" value="{{ auth()->user()->id }}">
+                <input type="hidden" name="student_id" value="{{ auth()->user()->student_id }}">
                 <div class="row exam-paper">
                     <div class="col-md-12">
                         <div class="alert alert-danger" role="alert"><p class="font-weight-bold">Exam automatically submitted you switched tabs or left the exam window.</p></div>

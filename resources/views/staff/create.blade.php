@@ -15,194 +15,456 @@
                         <div class="col-md-12 col-sm-12 mb-3">
                             <h6 class="col-deep-purple"> Staff Details</h6>
                         </div>
-
+                        <div class="form-group col-lg-12"><h6> Personal Details</h6> <hr style="border-bottom: 1px solid #ccc;"></div>
                         <div class="form-group col-lg-3">
                            <label>Name</label>
-                            <input type="text" name="name"  class="form-control form-control-sm text-capitalize" required>
+                            <input type="text" name="name"  class="form-control form-control-sm text-capitalize " required>
                        </div>
                       
                   
         
                  <div class="form-group col-lg-3">
-                    <label>Designation</label>
-                    <input type="text" name="designation" class="form-control form-control-sm text-capitalize" required>
-                 </div>
-
-                 <div class="form-group col-lg-3">
-                    <label>Department</label>
-                    <input type="text" name="department" class="form-control form-control-sm text-capitalize" required>
-                 </div>
-
-                 <!-- Contact Details -->
-                 <div class="form-group col-lg-3">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control form-control-sm @error('email') is-invalid @enderror" required>
-                    @error('email')
-                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                    @enderror
-                 </div>
-
-                 <div class="form-group col-lg-3">
-                    <label>Mobile No</label>
-                    <input type="text" name="mob_no" class="form-control form-control-sm @error('mob_no') is-invalid @enderror" required>
-                    @error('mob_no')
-                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                    @enderror
+                    <label>Staff School Initial</label>
+                    <input type="text" name="school_initial" class="form-control form-control-sm text-capitalize"  >
                  </div>
 
 
                  <div class="form-group col-lg-3">
-                  <label>Alternate Mobile No</label>
-                  <input type="text" name="alternate_mob_no" class="form-control form-control-sm @error('mob_no') is-invalid @enderror" required>
-                  @error('mob_no')
-                  <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                  @enderror
+                  <label>Staff Type </label>
+                  <select name="staff_type" class="form-control form-control-sm text-capitalize"  >
+                     <option value="">Select</option>
+                     <option value="board">Board</option>
+                     <option value="Neet">NEET</option>
+                     <option value="cbse">CBSE</option>
+                     <option value="Foundation">Foundation</option>
+                  </select>
                </div>
+
+
+
+
+               <div class="form-group col-lg-3">
+                  <label>Hostel/Days Scholar </label>
+                  <select name="hostel_dayscholar" class="form-control form-control-sm text-capitalize"  >
+                     <option value="">Select</option>
+                     <option value="hostel">Hostel</option>
+                     <option value="days scholar">Days Scholar</option>
+                     
+                  </select>
+               </div>
+
+
+
+
 
                  <div class="form-group col-lg-3">
                   <label>Gender</label>
-                  <select name="gender" class="form-control form-control-sm text-capitalize" required>
+                  <select name="gender" class="form-control form-control-sm text-capitalize"  >
                      <option value="">Select</option>
                      <option value="Male">Male</option>
                      <option value="Female">Female</option>
                      <option value="other">Other</option>
                   </select>
                </div>
+                 <div class="form-group col-lg-3">
+                  <label>Date of Birth</label>
+                  <input type="date" name="dob" id="dob" class="form-control form-control-sm"  >   
+              </div>
+              
+              <div class="form-group col-lg-3">
+                  <label>Age</label>
+                  <input type="text" name="age" id="age" class="form-control form-control-sm" >
+              </div>
+    
+              <div class="form-group col-lg-3">
+               <label>Marital Status</label>
+               <select name="marital_status" class="form-control form-control-sm" >
+                <option value="">Select</option>
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
+               </select>
+            </div>
+
+            <div class="form-group col-lg-3">
+               <label>Blood Group</label>
+               <select name="blood_group" class="form-control form-control-sm" >
+                   <option value="">Select Blood Group</option>
+                   <option value="A+">A+</option>
+                   <option value="A-">A-</option>
+                   <option value="B+">B+</option>
+                   <option value="B-">B-</option>
+                   <option value="AB+">AB+</option>
+                   <option value="AB-">AB-</option>
+                   <option value="O+">O+</option>
+                   <option value="O-">O-</option>
+               </select>
+           </div>
+
+           <div class="form-group col-lg-3">
+            <label>Department</label>
+            <input type="text" name="department" class="form-control form-control-sm text-capitalize" >
+         </div>
+
+
+         <div class="form-group col-lg-3">
+            <label>Qualifications</label>
+            <input type="text" name="qualifications" class="form-control form-control-sm text-capitalize" >
+         </div>
+
+
+
+         <div class="form-group col-lg-3">
+            <label>Nationality</label>
+            <select name="nationality" class="form-control form-control-sm" >
+                <option value="">Select Nationality</option>
+                <option value="Indian">Indian</option>
+                <option value="Foreign">Foreign</option>
+                <option value="NRI" >NRI</option>
+            </select>
+        </div>
+           
+
+        <div class="form-group col-lg-3">
+         <label>Religion</label>
+         <select name="religion" class="form-control form-control-sm" >
+             <option value="">Select Religion</option>
+             <option value="Hindu">Hindu</option>
+             <option value="Christian">Christian</option>
+             <option value="Muslim">Muslim</option>
+         </select>
+     </div>
+
+     <div class="form-group col-lg-3">
+      <label>Community</label>
+      <select name="community" class="form-control form-control-sm" >
+          <option value="">Select Community</option>
+          <option value="OC" >OC</option>
+          <option value="BC">BC</option>
+          <option value="BCM">BCM</option>
+          <option value="MBC">MBC</option>
+          <option value="SC">SC</option>
+          <option value="SCA">SCA</option>
+          <option value="ST">ST</option>
+      </select>
+  </div>
+
+  <div class="form-group col-lg-3">
+   <label>Caste & Sub-Caste</label>
+   <input type="text" name="caste" class="form-control form-control-sm text-capitalize" >
+</div>
+
+
+<div class="form-group col-lg-3">
+   <label>Mobile No</label>
+   <input type="text" name="mob_no" class="form-control form-control-sm @error('mob_no') is-invalid @enderror" >
+   @error('mob_no')
+   <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+   @enderror
+</div>
+
+
+<div class="form-group col-lg-3">
+ <label>Alternate Mobile No</label>
+ <input type="text" name="alternate_mob_no" class="form-control form-control-sm @error('mob_no') is-invalid @enderror" >
+ @error('mob_no')
+ <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+ @enderror
+</div>
+
+<div class="form-group col-lg-3">
+   <lable>Aadhaar Card No</lable>
+   <input type="text" name="aadhaar_no" class="form-control form-control-sm @error('aadhaar_no') is-invalid @enderror" >
+   @error('aadhaar_no')
+   <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+   @enderror
+</div>
+
+   <!-- Contact Details -->
+   <div class="form-group col-lg-3">
+      <label>Email</label>
+      <input type="email" name="email" class="form-control form-control-sm @error('email') is-invalid @enderror" >
+      @error('email')
+      <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+      @enderror
+   </div>
+
+
+
+
+
+   <div class="form-group col-lg-3">
+      <label>Address line 1</label>
+      <input type="text" name="address_line_1" class="form-control form-control-sm text-capitalize" >
+   </div>
+
+   <div class="form-group col-lg-3">
+      <label>Address line 2</label>
+      <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" >
+   </div>
+
+   <div class="form-group col-lg-3">
+      <label>State</label>
+     <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" >
+   <option value="">Select State</option>
+   @foreach ($states as $state)
+   <option value="{{$state->State}}">{{$state->State}}</option>
+   @endforeach
+ </select>
+   </div>
+
+     <div class="form-group col-lg-3">
+        <label>City</label>
+        <select name="city" id="city" class="form-control form-control-sm" >
+         <option value="">Select City</option>
+       </select>
+     </div>
+
+     
+
+     <div class="form-group col-lg-3">
+        <label>Pincode</label>
+        <input type="number" name="pincode" class="form-control form-control-sm" >
+     </div>
+
+     <div class="form-group col-lg-3">
+      <label>Photo</label>
+      <input type="file" name="photo" class="form-control form-control-sm" id="photo" onchange="showFileNameAndPreview(this, 'photoPreview')">
+      <!-- Show photo file name and preview -->
+      <div id="photoPreview" style="display:none;">
+          <span id="photoName"></span>
+          <br>
+          <img id="photoImage" src="" alt="Photo Preview" style="max-width: 100px; max-height: 100px; display:none;">
+      </div>
+   </div>
+
+   <div class="form-group col-lg-3">
+    <label>Biometric no</label>
+    <input type="text" name="biometric_no" class="form-control form-control-sm" >
+ </div>
+
+
+
+               <!-- Address -->
+                
+                 <div class="form-group col-lg-12"><h6> Parent & Spouse Details </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
+
+
 
                  <div class="form-group col-lg-3">
-                    <label>Branch</label>
-                    <input type="text" name="branch" class="form-control form-control-sm text-capitalize" required>
-                 </div>
-
-                 <!-- Address -->
-                 <div class="form-group col-lg-3">
-                  <label>Address line 1</label>
-                  <input type="text" name="address_line_1" class="form-control form-control-sm text-capitalize" required>
-               </div>
-
-               <div class="form-group col-lg-3">
-                  <label>Address line 2</label>
-                  <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" required>
-               </div>
-
-               <div class="form-group col-lg-3">
-                  <label>State</label>
-                 <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" required>
-               <option value="">Select State</option>
-               @foreach ($states as $state)
-               <option value="{{$state->State}}">{{$state->State}}</option>
-               @endforeach
-             </select>
-               </div>
-
-                 <div class="form-group col-lg-3">
-                    <label>City</label>
-                    <select name="city" id="city" class="form-control form-control-sm" required>
-                     <option value="">Select City</option>
-                   </select>
-                 </div>
-
+                  <label>Father Name</label>
+                   <input type="text" name="father_name"  class="form-control form-control-sm">
                  
+              </div>
+              <div class="form-group col-lg-3">
+               <label>Mother Name</label>
+                <input type="text" name="mother_name"  class="form-control form-control-sm" >
+              
+           </div>
 
-                 <div class="form-group col-lg-3">
-                    <label>Pincode</label>
-                    <input type="number" name="pincode" class="form-control form-control-sm" required>
-                 </div>
-                 <div class="form-group col-lg-12"><h6> Personal Details</h6> <hr style="border-bottom: 1px solid #ccc;"></div>
+
+           <div class="form-group col-lg-3">
+            <label>Spouse Name</label>
+             <input type="text" name="spouse_name"  class="form-control form-control-sm" >
+            
+        </div>
+
+
+        <div class="form-group col-lg-3">
+         <label>Spouse Mobile No</label>
+          <input type="number" name="spouse_ph_no"  class="form-control form-control-sm" >
+     </div>
+
+
+     <div class="form-group col-lg-3">
+      <label>Spouse Occupation</label>
+       <input type="text" name="spouse_occupation"  class="form-control form-control-sm" >
+  </div>
+
+              <div class="form-group col-lg-3">
+                  <label>Father/Mother Mobile No</label>
+                   <input type="text" name="father_ph_no"  class="form-control form-control-sm">
+                  
+              </div>
+
+
+            
+              <div class="form-group col-lg-12"><h6>Working School Details </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
+
+
+
                  <!-- Personal Details -->
                  <div class="form-group col-lg-3">
                     <label>Date of Joining</label>
-                    <input type="date" name="date_of_joining" class="form-control form-control-sm" required>
+                    <input type="date" name="date_of_joining" class="form-control form-control-sm" >
                  </div>
-
                  <div class="form-group col-lg-3">
-                    <label>Employment Type</label>
-                    <select name="employment_type" class="form-control form-control-sm" required>
-                     <option value="">Select</option>
-                       <option value="Full-Time">Full-Time</option>
-                       <option value="Part-Time">Part-Time</option>
-                       <option value="Contract">Contract</option>
-                    </select>
-                 </div>
-
-                 <div class="form-group col-lg-3">
-                    <label>Qualifications</label>
-                    <input type="text" name="qualifications" class="form-control form-control-sm text-capitalize" required>
-                 </div>
-
-                 <div class="form-group col-lg-3">
-                  <label>Blood Group</label>
-                  <select name="blood_group" class="form-control form-control-sm">
-                      <option value="">Select Blood Group</option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
+                  <label>Designation</label>
+                  <select name="designation" class="form-control form-control-sm" >
+                      <option value="">Select Designation</option>
+                      <option value="BT.ASST">BT.ASST</option>
+                      <option value="PG.ASST">PG.ASST</option>
+                      <option value="PET">PET</option>
+                      <option value="SS">SS</option>
+                      <option value="Others">Others</option>
                   </select>
               </div>
               
 
-                 <div class="form-group col-lg-3">
-                    <label>Marital Status</label>
-                    <select name="marital_status" class="form-control form-control-sm">
-                     <option value="">Select</option>
-                       <option value="Single">Single</option>
-                       <option value="Married">Married</option>
-                    </select>
-                 </div>
-                 
-                 <div class="form-group col-lg-12"><h6> Banking Details</h6> <hr style="border-bottom: 1px solid #ccc;"></div>
-                 <!-- Banking Details -->
-                 <div class="form-group col-lg-3">
-                    <label>Account Number</label>
-                    <input type="text" name="account_number" class="form-control form-control-sm" required>
-                 </div>
 
-                 <div class="form-group col-lg-3">
-                    <label>IFSC Code</label>
-                    <input type="text" name="ifsc_code" class="form-control form-control-sm" required>
-                 </div>
 
-                 <div class="form-group col-lg-3">
-                    <label>Bank Name</label>
-                    <input type="text" name="bank_name" class="form-control form-control-sm text-capitalize" required>
-                 </div>
+               <div class="form-group col-lg-3">
+                  <label>Experience in Years(GP)</label>
+                  <input type="number" name="experience" class="form-control form-control-sm" >
+               </div>
 
-               <!-- Upload Fields -->
+
+               <div class="form-group col-lg-3">
+                  <label>Class Handling Type</label>
+                  <select name="class_handling_type" class="form-control form-control-sm" >
+                      <option value="">Select Type</option>
+                      <option value="Class Handling">Class Handling</option>
+                      <option value="Free Staff">Free Staff</option>
+                      <option value="Others">Others</option>
+                  </select>
+              </div>
+              
+
+
+
+              <div class="form-group col-lg-3">
+               <label>Paper Correction</label>
+               <select name="paper_correction" class="form-control form-control-sm" >
+                   <option value="">Select Type</option>
+                   <option value="Yes">Yes</option>
+                   <option value="No">No</option>
+                   
+               </select>
+           </div>
+           
+
+
 <div class="form-group col-lg-3">
-   <label>Photo</label>
-   <input type="file" name="photo" class="form-control form-control-sm" id="photo" onchange="showFileNameAndPreview(this, 'photoPreview')">
-   <!-- Show photo file name and preview -->
-   <div id="photoPreview" style="display:none;">
-       <span id="photoName"></span>
-       <br>
-       <img id="photoImage" src="" alt="Photo Preview" style="max-width: 100px; max-height: 100px; display:none;">
-   </div>
+ <label>Handeling Class & Sec</label>
+ <input type="text" name="handeling_class" class="form-control form-control-sm" >
+</div>
+ 
+<div class="form-group col-lg-3">
+   <label>Name of the Previous School Worked</label>
+   <input type="text" name="previous_School" class="form-control form-control-sm" >
+  </div>
+   
+
+
+  <div class="form-group col-lg-12"><h6>Staff Childern'S Details(Note:If Studying in Our School ) </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
+
+ <div class="col-md-12 form-group mt-0">
+    <button type="button" class="btn btn-warning" id="addItemButton">
+        <i class="fa fa-plus"></i> Add More
+    </button>
 </div>
 
-<div class="form-group col-lg-3">
-   <label>Certificates</label>
-   <input type="file" name="experience_certificates[]" class="form-control form-control-sm" id="experience_certificates" multiple onchange="showFileNamesAndPreviews(this, 'certificatesPreview')">
-   
-   <div id="certificatesPreview" style="display:none;">
-       <ul id="certificatesList"></ul>
-   </div>
+
+<!-- Template for Cloning -->
+<div id="itemContainer"></div>
+
+<!-- Template for Cloning -->
+<template id="itemTemplate">
+    <div class="col-md-12 row mb-3 itemRow">
+        <div class="col-md-3 form-group">
+            <label class="col-blue">Children's Name</label>
+            <input type="text" name="children[][name]" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-2 form-group">
+            <label class="col-blue">Class</label>
+            <input type="text" name="children[][class]" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-2 form-group">
+            <label class="col-blue">Section</label>
+            <input type="text" name="children[][section]" class="form-control form-control-sm" />
+        </div>
+
+        <div class="col-md-1 form-group">
+            <button type="button" class="btn btn-danger mt-4 removeRow">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+
+
+
+      
+        <div class="form-group col-lg-12">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+         
+                      </div>
+                     
+          </div>
+                     </form>
+      </div>
+              </div>
+          </div>
+      </div>
+  
+     </section>
 </div>
-{{-- 
-<div class="form-group col-lg-3">
-   <label>ID Proof</label>
-   <input type="file" name="id_proof" class="form-control form-control-sm" id="id_proof" onchange="showFileNameAndPreview(this, 'idProofPreview')">
+@endsection
+
+@section('js')
+<script>
+   document.getElementById("addItemButton").addEventListener("click", function() {
+       const template = document.getElementById("itemTemplate").content.cloneNode(true);
+       const index = document.querySelectorAll(".itemRow").length;
+
+             // Update the names of the input fields with the current index
+       template.querySelector('[name="children[][name]"]').setAttribute("name", `children[${index}][name]`);
+       template.querySelector('[name="children[][class]"]').setAttribute("name", `children[${index}][class]`);
+       template.querySelector('[name="children[][section]"]').setAttribute("name", `children[${index}][section]`);
+
+       document.getElementById("itemContainer").appendChild(template);
+   });
    
-   <div id="idProofPreview" style="display:none;">
-       <span id="idProofName"></span>
-       <br>
-       <a id="idProofLink" href="#" target="_blank" style="display:none;">View ID Proof</a>
-   </div>
-</div> --}}
+   document.addEventListener("click", function(e) {
+       if (e.target.classList.contains("removeRow")) {
+           e.target.closest(".itemRow").remove();
+       }
+   });
+   
+   function collectChildrenData() {
+       const children = [];
+       const rows = document.querySelectorAll(".itemRow");
+       rows.forEach(row => {
+           const name = row.querySelector('[name="children_name[]"]').value;
+           const className = row.querySelector('[name="class[]"]').value;
+           const section = row.querySelector('[name="section[]"]').value;
+   
+           children.push({ name, class: className, section });
+       });
+
+
+
+       return JSON.stringify(children);
+   }
+   
+   function submitForm() {
+       const childrenDetails = collectChildrenData();
+       // Use AJAX to send the data to the server
+       fetch("/save-staff", {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify({ children_details: childrenDetails })
+       })
+       .then(response => response.json())
+       .then(data => console.log(data))
+       .catch(error => console.error("Error:", error));
+   }
+   </script>
+   
 
 <script>
    
@@ -264,28 +526,6 @@ function showFileNamesAndPreviews(input, previewId) {
 
 
 </script>
-
-
-      
-        <div class="form-group col-lg-12">
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-
-         
-                      </div>
-                     
-          </div>
-                     </form>
-      </div>
-              </div>
-          </div>
-      </div>
-  
-     </section>
-</div>
-@endsection
-
-@section('js')
 <script>
    function City(state) {
       if(!state) return;
@@ -298,5 +538,96 @@ function showFileNamesAndPreviews(input, previewId) {
       });
    }
 </script>
+<script>
+   document.getElementById('dob').addEventListener('change', function () {
+       const dob = new Date(this.value); // Get the selected date of birth
+       const today = new Date(); // Get the current date
+       
+       let age = today.getFullYear() - dob.getFullYear(); // Calculate the year difference
+       const monthDiff = today.getMonth() - dob.getMonth(); 
+       const dayDiff = today.getDate() - dob.getDate();
 
+       // Adjust the age if the birth date hasn't occurred yet this year
+       if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+           age--;
+       }
+
+       // Display the calculated age in the "Age" field
+       document.getElementById('age').value = age > 0 ? age : 0; // Ensure age is non-negative
+   });
+</script>
 @endsection
+
+
+
+
+
+
+
+
+{{-- 
+                 <div class="form-group col-lg-3">
+                    <label>Branch</label>
+                    <input type="text" name="branch" class="form-control form-control-sm text-capitalize" >
+                 </div> --}}
+
+   {{-- <div class="form-group col-lg-3">
+                    <label>Employment Type</label>
+                    <select name="employment_type" class="form-control form-control-sm" >
+                     <option value="">Select</option>
+                       <option value="Full-Time">Full-Time</option>
+                       <option value="Part-Time">Part-Time</option>
+                       <option value="Contract">Contract</option>
+                    </select>
+                 </div> --}}
+
+                 {{-- <div class="form-group col-lg-12"><h6> Banking Details</h6> <hr style="border-bottom: 1px solid #ccc;"></div>
+                 <!-- Banking Details -->
+                 <div class="form-group col-lg-3">
+                    <label>Account Number</label>
+                    <input type="text" name="account_number" class="form-control form-control-sm" >
+                 </div>
+
+                 <div class="form-group col-lg-3">
+                    <label>IFSC Code</label>
+                    <input type="text" name="ifsc_code" class="form-control form-control-sm" >
+                 </div>
+
+                 <div class="form-group col-lg-3">
+                    <label>Bank Name</label>
+                    <input type="text" name="bank_name" class="form-control form-control-sm text-capitalize" >
+                 </div> --}}
+
+               <!-- Upload Fields -->
+
+
+{{-- <div class="form-group col-lg-3">
+   <label>Certificates</label>
+   <input type="file" name="experience_certificates[]" class="form-control form-control-sm" id="experience_certificates" multiple onchange="showFileNamesAndPreviews(this, 'certificatesPreview')">
+   
+   <div id="certificatesPreview" style="display:none;">
+       <ul id="certificatesList"></ul>
+   </div>
+</div> --}}
+{{-- 
+<div class="form-group col-lg-3">
+   <label>ID Proof</label>
+   <input type="file" name="id_proof" class="form-control form-control-sm" id="id_proof" onchange="showFileNameAndPreview(this, 'idProofPreview')">
+   
+   <div id="idProofPreview" style="display:none;">
+       <span id="idProofName"></span>
+       <br>
+       <a id="idProofLink" href="#" target="_blank" style="display:none;">View ID Proof</a>
+   </div>
+</div> --}}
+
+
+
+
+
+
+
+
+
+
+

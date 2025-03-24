@@ -18,7 +18,7 @@ class ReportController extends Controller
             $testIds = Exam::where('name', $test_name)->pluck('id')->toArray();
             $testIds = $testIds != '' ? $testIds : 0;
             $section = $request->section;
-            $results = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.id')->join('branch as c', 'b.campus', '=', 'c.id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->select('a.test_id','a.student_id','a.mode as stmode',DB::raw('GROUP_CONCAT(DISTINCT a.subject) as subjects'),DB::raw('SUM(a.mark) as mark'),'b.student_name','c.name','b.coaching_type','b.gender','b.section','a.test_id')->groupBy('a.student_id')->orderBy('test_id')->orderBy('student_name')->get();
+            $results = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.student_id')->join('branch as c', 'b.campus', '=', 'c.id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->select('a.test_id','a.student_id','a.mode as stmode',DB::raw('GROUP_CONCAT(DISTINCT a.subject) as subjects'),DB::raw('SUM(a.mark) as mark'),'b.student_name','c.name','b.coaching_type','b.gender','b.section','a.test_id')->groupBy('a.student_id')->orderBy('test_id')->orderBy('student_name')->get();
             if(count($results) == 0) {
                 return back()->with('error', 'No data found');
             }
@@ -30,7 +30,7 @@ class ReportController extends Controller
             $testIds = Exam::where('name', $test_name)->pluck('id')->toArray();
             $testIds = $testIds != '' ? $testIds : 0;
             $section = $request->section;
-            $answers = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->selectRaw("a.*,b.section,b.student_name")->orderBy('test_id')->orderBy('student_name')->orderBy('q_no')->get();
+            $answers = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.student_id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->selectRaw("a.*,b.section,b.student_name")->orderBy('test_id')->orderBy('student_name')->orderBy('q_no')->get();
             if(count($answers) == 0) {
                 return back()->with('error', 'No data found');
             }

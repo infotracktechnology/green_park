@@ -53,7 +53,7 @@
                             <button type="submit" class="btn btn-primary btn-block">Submit</button>
                          </div>
                         </div>
-                        @if($test_name && $results)
+                        @if($test_name && count($results) > 0)
                         <div class="row m-t-20">
                             <div class="col-lg-12">
                                 <button class="btn btn-primary m-b-20" id="exportpdf"><i class="fa fa-download"></i> Export to PDF</button>
@@ -121,6 +121,22 @@
                                 </table>
                             </div>
                         </div>
+                        <form method="get" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('exam.report.dump') }}" enctype="multipart/form-data">
+                            <input type="hidden" name="test_name" value="{{ $test_name }}">
+                            <div class="col-lg-12">
+                                <h6>Exam Publish</h6>
+                            </div>
+                            <div class="form-group col-lg-3">
+                                <label>Result Publish</label>
+                                <select name="publish" id="publish" class="form-control form-control-sm" required>
+                                    <option value="No">No</option>
+                                    <option value="Yes">Yes</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-12">
+                                <button class="btn btn-primary m-b-20" type="Submit">Publish</button>
+                            </div>
+                        </form>
                         </div>
                         @else
                        

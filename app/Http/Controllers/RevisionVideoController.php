@@ -88,17 +88,11 @@ public function update(Request $request, $id)
 
     public function revisionvideo(Request $request,Student $student)
     {
-        
+        $datetime = date('Y-m-d H:i:s');
+        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
+        return view('student.revisionvideo', compact('revisionvideos'));
     }
 
-    // public function showUploadForm()
-    // {
-    //     return view('RevisionVideo.upload');
-    // }
-    // public function upload(Request $request)
-    // {
-    // }
-    
   
 
     
