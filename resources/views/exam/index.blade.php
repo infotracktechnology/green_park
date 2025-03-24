@@ -39,6 +39,7 @@
           <thead>
            <tr role="row">
             <th>Test ID</th>
+            <th>Academic Year</th>
             <th>Branch</th>
             <th>Coaching Type</th>
             <th>Name</th>
@@ -59,6 +60,7 @@
            @foreach ($tests as $test)
            <tr>
             <td>{{ $test->id }}</td>
+            <td>{{ $test->academic_year }}</td>
             <td>{{ $test->branch() }}</td>
             <td>{{ $test->coaching_type }}</td>
             <td>{{ $test->name }}</td>

@@ -36,7 +36,7 @@
                                    </div>
                                    <div class="col">
                                      <select name="start_year" id="start_year"  class="form-control form-control-sm" required>
-                                       @for($i = date('Y')-1; $i <= date('Y'); $i++)
+                                       @for($i = date('Y')-10; $i <= date('Y')+1; $i++)
                                        <option value="{{ $i }}">{{ $i }}</option>
                                        @endfor
                                      </select>
@@ -56,7 +56,7 @@
                                    </div>
                                    <div class="col">
                                     <select name="end_year" id="end_year"  class="form-control form-control-sm" required>
-                                       @for($i = date('Y')-1; $i <= date('Y'); $i++)
+                                       @for($i = date('Y')-10; $i <= date('Y')+1; $i++)
                                        <option value="{{ $i }}">{{ $i }}</option>
                                        @endfor
                                      </select>

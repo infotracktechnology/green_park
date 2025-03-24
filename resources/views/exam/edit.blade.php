@@ -25,7 +25,18 @@ $coaching_types = explode(',', $exam->coaching_type);
                                  <h6 class="col-deep-purple">Edit Test</h6>
                               </div>
 
-                              <div class="form-group col-lg-5">
+
+                              <div class="form-group col-lg-3">
+                                <label for="branch">Select Academic Year:</label>
+                                <select name="academic_year" id="academic_year" class="form-control form-control-sm">
+                                    <option value="">-- Choose  Academic Year--</option>
+                                    @foreach ($academicyear as $row)
+                                        <option value="{{ $row->academic_year }}" @selected($row->academic_year == $exam->academic_year)>{{ $row->academic_year }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                              <div class="form-group col-lg-4">
                                 <label>Branch</label>
                                 <select name="branch_id[]" class="select" multiple required>
                                     <option value="">Select Branch</option>
@@ -36,7 +47,7 @@ $coaching_types = explode(',', $exam->coaching_type);
                             </div>
     
 
-                              <div class="form-group col-lg-5">
+                              <div class="form-group col-lg-4">
                                  <label>Coaching Type</label>
 
                                  <select name="coaching_type[]" id="coaching_type" class="select" multiple required>
