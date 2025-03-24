@@ -99,8 +99,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('revisionvideo', RevisionVideoController::class);
     Route::resource('academicyear', App\Http\Controllers\AcademicYearController::class);
 
-
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
+    Route::resource('holiday', App\Http\Controllers\HolidayController::class);
 });
 
 #students routes
