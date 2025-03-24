@@ -57,6 +57,20 @@
                                 <h6 class="col-deep-purple">Edit Video</h6>
                              </div>
                              
+
+                             <div class="form-group col-lg-3">
+                                <label for="academic_year">Academic Year</label>
+                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                                    <option value="">Select Academic Year</option>
+                                    @foreach ($academicyear as $row)
+                                        <option value="{{ $row->academic_year }}" {{ $chairmanvideo->academic_year == $row->academic_year ? 'selected' : '' }}>{{ $row->academic_year }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+
+
+
                              <div class="form-group col-lg-4">
                                 <label for="branch_id">Branch</label>
                                 <select name="branch_id[]" id="branch_id" class="select2 form-control " multiple="multiple" required>

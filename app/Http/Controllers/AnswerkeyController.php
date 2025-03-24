@@ -6,17 +6,20 @@ use Illuminate\Http\Request;
 use App\Models\AnswerKey;
 use App\Models\Branch;
 use App\Models\Student;
+use App\Models\AcademicYear;
 
 class AnswerKeyController extends Controller
 {
     public function index()
     {
+        $academicYears = AcademicYear::all();
         $answerKeys = AnswerKey::latest()->get();
         return view('answerkey.index', compact('answerKeys'));
     }
 
     public function create()
     {
+        $academicYears = AcademicYear::all();
         $branches = Branch::all();
         return view('answerkey.create', compact('branches'));
     }
@@ -42,6 +45,7 @@ class AnswerKeyController extends Controller
 
         AnswerKey::create([
             'title' => $request->title,
+            'academic_year' => $request->academic_year,
             'branch' => $branchData,
             'coaching_type' => $coachingTypeData,
             'file_path' => $filePath,
@@ -86,6 +90,7 @@ class AnswerKeyController extends Controller
         $answerKey->title = $request->title;
         $answerKey->branch = implode(',', $request->branch);
         $answerKey->coaching_type = implode(',', $request->coaching_type);
+        $answerKey->academic_year = $request->academic_year;
         $answerKey->save();
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key updated successfully!');

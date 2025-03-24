@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Models\Download;
 use App\Models\Student;
+use App\Models\AcademicYear;
 
 
 class DownloadController extends Controller
@@ -13,12 +14,14 @@ class DownloadController extends Controller
 
     public function index() 
     { 
+        $academicyear = AcademicYear::all();
         $download = Download::latest()->get();
         return view('download.index',compact('download'));
     }
 
     public function create()
     {
+        $academicyear = AcademicYear::all();
         $branches = Branch::all();
         return view('download.create', compact('branches'));
     }
@@ -45,6 +48,7 @@ class DownloadController extends Controller
     
         Download::create([
             'title' => $request->title,
+            'academic_year' => $request->academic_year,
             'branch' => $branchData,
             'coaching_type' => $coachingTypeData,
             'file_path' => $filePath,
@@ -89,6 +93,7 @@ class DownloadController extends Controller
     
         // Convert arrays to comma-separated strings
         $download->title = $request->title;
+        $download->academic_year = $request->academic_year;
         $download->branch = implode(',', $request->branch);
         $download->coaching_type = implode(',', $request->coaching_type);
         $download->save();

@@ -5,17 +5,19 @@ use Illuminate\Http\Request;
 use App\Models\ClassVideo;
 use App\Models\Student;
 use App\Models\RevisionVideo;
+use App\Models\AcademicYear;
 
 class ClassVideoController extends Controller
 {
     public function index()
     {
+        $academic_years = AcademicYear::all();
         $classvideos = ClassVideo::latest()->get();
         return view('classvideo.index', compact('classvideos'));
     }
 
     public function create()
-    {
+    { 
         return view('classvideo.create');
     }
 
@@ -87,6 +89,7 @@ public function update(Request $request, $id)
                 $chapter = trim($data['chapter'] ?? 'Unknown');
                 $period = trim($data['period'] ?? '0'); // Period can still be a string or numeric
                 $video_id = trim($data['video_id'] ?? '0');
+                $academic_year = $request->academic_year;
     
                 ClassVideo::create([
                    
@@ -94,6 +97,7 @@ public function update(Request $request, $id)
                     'chapter' => $chapter,
                     'period' => $period,
                     'video_id' => $video_id,
+                    'academic_year' => $academic_year
                 ]);
             }
     

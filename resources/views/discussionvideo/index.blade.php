@@ -38,7 +38,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                    
+                        <th>Academic Year</th>
                         <th>Branch</th>
                         <th>Coaching Type</th>
                         <th>Subject</th>
@@ -54,7 +54,7 @@
                    @foreach ($discussionvideos as $discussionvideo)
                     <tr>
                         <td>{{ $discussionvideo->id }}</td>
-                       
+                       <td>{{ $discussionvideo->academic_year }}</td>
                         <td>
                             @php
                                 $branchNames = \App\Models\Branch::whereIn('id', explode(',', $discussionvideo->branch))->pluck('name')->toArray();

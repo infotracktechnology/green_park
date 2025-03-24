@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\DB;
@@ -12,10 +13,11 @@ class AnnouncementController extends Controller
 
     public function index(Request $request)
     {
+        $academic_years = AcademicYear::all();
         $announcements = Announcement::all();
         $branches = Branch::all();
         $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
-        return view('announcement.index', compact('announcements', 'branches', 'branchList'));
+        return view('announcement.index', compact('announcements', 'branches', 'branchList', 'academic_years'));
     }
     public function create()
     {
@@ -27,6 +29,7 @@ class AnnouncementController extends Controller
     public function store(Request $request)
 {
     $announcement = new Announcement();
+   $announcement->academic_year = $request->academic_year;
     $announcement->branch = implode(',', $request->branch);
     $announcement->coaching_type = implode(',', $request->coaching_type);
     $announcement->gender = $request->gender;
