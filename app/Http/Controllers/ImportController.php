@@ -41,7 +41,8 @@ class ImportController extends Controller
             if (!empty($data)) {
                 foreach ($data as $row) {
                     $row = array_map('ucwords', $row);
-                    $student = Student::where('student_id', $row['student_id'])->first();
+                    $student_id = $row['student_id'] ?? 0;
+                    $student = Student::where('student_id', $student_id)->first();
                    if($student){
                     $student->update($row);
                    }
