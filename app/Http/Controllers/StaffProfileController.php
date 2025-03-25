@@ -41,7 +41,7 @@ class StaffProfileController extends Controller
         // Save the staff details along with children details
         $staff = new Staff($request->except('children'));
         $staff->photo = $path;
-    
+        $childrenStudying = $request->has('children_studying') && $request->children_studying == 1 ? 1 : 0;
         // Convert children to JSON before saving
         if ($request->has('children')) {
             
@@ -49,6 +49,7 @@ class StaffProfileController extends Controller
                $children_details[] = ['name' => $child['name'], 'class' => $child['class'], 'section' => $child['section']];
            }
         }
+        $staff->children_studying = $childrenStudying; // Store 1 if Yes, 0 if No
         $staff->children_details =  $children_details;
     
         $staff->save();
@@ -88,6 +89,7 @@ class StaffProfileController extends Controller
                     $children_details[] = ['name' => $child['name'], 'class' => $child['class'], 'section' => $child['section']];
                 }
              }
+             $data['children_studying'] = $request->has('children_studying') && $request->children_studying == 1 ? 1 : 0;
              $data['children_details'] =  $children_details;
 
         $staff->update($data);
