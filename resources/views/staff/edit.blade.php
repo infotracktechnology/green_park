@@ -23,7 +23,10 @@
                        </div>
                       
                   
-        
+                       <div class="form-group col-lg-3">
+                        <label>Staff School Initial</label>
+                        <input type="text" name="school_initial" class="form-control form-control-sm text-capitalize" value="{{ $staff->school_initial }}" >
+                     </div>  
                        <div class="form-group col-lg-3">
                         <label>Staff Type</label>
                         <select name="staff_type" class="form-control form-control-sm text-capitalize" >
@@ -50,7 +53,7 @@
                             <option value="">Select</option>
                             <option value="Male" {{ $staff->gender == 'Male' ? 'selected' : '' }}>Male</option>
                             <option value="Female" {{ $staff->gender == 'Female' ? 'selected' : '' }}>Female</option>
-                            <option value="other" {{ $staff->gender == 'other' ? 'selected' : '' }}>Other</option>
+                           
                         </select>
                     </div>
                  <div class="form-group col-lg-3">
@@ -63,14 +66,7 @@
                   <input type="text" name="age" id="age" class="form-control form-control-sm" value="{{ $staff->age }}" >
               </div>
     
-              <div class="form-group col-lg-3">
-               <label>Marital Status</label>
-               <select name="marital_status" class="form-control form-control-sm" >
-                   <option value="">Select</option>
-                   <option value="Single" {{ $staff->marital_status == 'Single' ? 'selected' : '' }}>Single</option>
-                   <option value="Married" {{ $staff->marital_status == 'Married' ? 'selected' : '' }}>Married</option>
-               </select>
-           </div>
+             
            
            <div class="form-group col-lg-3">
                <label>Blood Group</label>
@@ -89,8 +85,16 @@
            
            <div class="form-group col-lg-3">
             <label>Department</label>
-            <input type="text" name="department" class="form-control form-control-sm text-capitalize" value="{{ $staff->department }}">
-         </div>
+            <select name="department" class="form-control form-control-sm">
+                <option value="">Select Department</option>
+                <option value="Physics" {{ $staff->department == 'Physics' ? 'selected' : '' }}>Physics</option>
+                <option value="Botany" {{ $staff->department == 'Botany' ? 'selected' : '' }}>Botany</option>
+                <option value="Zoology" {{ $staff->department == 'Zoology' ? 'selected' : '' }}>Zoology</option>
+                <option value="Mathematics" {{ $staff->department == 'Mathematics' ? 'selected' : '' }}>Mathematics</option>
+                <option value="Others" {{ $staff->department == 'Others' ? 'selected' : '' }}>Others</option>
+            </select>
+        </div>
+        
 
 
          <div class="form-group col-lg-3">
@@ -124,7 +128,7 @@
             <label>Community</label>
             <select name="community" class="form-control form-control-sm">
                 <option value="">Select Community</option>
-                <option value="OC" {{ $staff->community == 'OC' ? 'selected' : '' }}>OC</option>
+                <option value="OC" {{ $staff->community == 'General' ? 'selected' : '' }}>General</option>
                 <option value="BC" {{ $staff->community == 'BC' ? 'selected' : '' }}>BC</option>
                 <option value="BCM" {{ $staff->community == 'BCM' ? 'selected' : '' }}>BCM</option>
                 <option value="MBC" {{ $staff->community == 'MBC' ? 'selected' : '' }}>MBC</option>
@@ -236,51 +240,61 @@
 </div>
 
 
-               <!-- Address -->
-                
-                 <div class="form-group col-lg-12"><h6> Parent & Spouse Details </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
 
 
+<div class="form-group col-lg-3">
+    <label>Marital Status</label>
+    <select name="marital_status" class="form-control form-control-sm" onchange="toggleSpouseDetails(this.value)">
+        <option value="">Select</option>
+        <option value="Single" {{ $staff->marital_status == 'Single' ? 'selected' : '' }}>Single</option>
+        <option value="Married" {{ $staff->marital_status == 'Married' ? 'selected' : '' }}>Married</option>
+    </select>
+</div>
 
-                 <div class="form-group col-lg-3">
-                  <label>Father Name</label>
-                   <input type="text" name="father_name"  class="form-control form-control-sm" value="{{ $staff->father_name }}">
-                 
-              </div>
-              <div class="form-group col-lg-3">
-               <label>Mother Name</label>
-                <input type="text" name="mother_name"  class="form-control form-control-sm" value="{{ $staff->mother_name }}" >
-              
-           </div>
+<!-- Address -->
+<div class="form-group col-lg-12">
+    <h6>Parent & Spouse Details</h6>
+    <hr style="border-bottom: 1px solid #ccc;">
+</div>
 
+<div class="form-group col-lg-3">
+    <label>Father Name</label>
+    <input type="text" name="father_name" class="form-control form-control-sm" value="{{ $staff->father_name }}">
+</div>
 
-           <div class="form-group col-lg-3">
-            <label>Spouse Name</label>
-             <input type="text" name="spouse_name"  class="form-control form-control-sm" value=
-             
-             "{{ $staff->spouse_name }}">
-            
-        </div>
+<div class="form-group col-lg-3">
+    <label>Mother Name</label>
+    <input type="text" name="mother_name" class="form-control form-control-sm" value="{{ $staff->mother_name }}">
+</div>
 
+<div class="form-group col-lg-3">
+    <label>Father/Mother Mobile No</label>
+    <input type="text" name="father_ph_no" class="form-control form-control-sm" value="{{ $staff->father_ph_no }}">
+</div>
 
-        <div class="form-group col-lg-3">
-         <label>Spouse Mobile No</label>
-          <input type="number" name="spouse_ph_no"  class="form-control form-control-sm" value="{{ $staff->spouse_ph_no }}" >
-     </div>
+<!-- Spouse Details Section -->
+  
+<div class="form-group col-lg-12">
+    <div id="spouse-details" style="display: none;">
+     
+        <div class="row">
+    <div class="form-group col-lg-3">
+        <label>Spouse Name</label>
+        <input type="text" name="spouse_name" class="form-control form-control-sm" value="{{ $staff->spouse_name }}">
+    </div>
 
+    <div class="form-group col-lg-3">
+        <label>Spouse Mobile No</label>
+        <input type="number" name="spouse_ph_no" class="form-control form-control-sm" value="{{ $staff->spouse_ph_no }}">
+    </div>
 
-     <div class="form-group col-lg-3">
-      <label>Spouse Occupation</label>
-       <input type="text" name="spouse_occupation"  class="form-control form-control-sm" value="{{ $staff->spouse_occupation }}" >
-  </div>
+    <div class="form-group col-lg-3">
+        <label>Spouse Occupation</label>
+        <input type="text" name="spouse_occupation" class="form-control form-control-sm" value="{{ $staff->spouse_occupation }}">
+    </div>
+</div>
 
-              <div class="form-group col-lg-3">
-                  <label>Father/Mother Mobile No</label>
-                   <input type="text" name="father_ph_no"  class="form-control form-control-sm" value="{{ $staff->father_ph_no }}">
-                  
-              </div>
-
-
+</div></div>
             
               <div class="form-group col-lg-12"><h6>Working School Details </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
 
@@ -301,14 +315,21 @@
                     <option value="PET" {{ $staff->designation == 'PET' ? 'selected' : '' }}>PET</option>
                     <option value="SS" {{ $staff->designation == 'SS' ? 'selected' : '' }}>SS</option>
                     <option value="Others" {{ $staff->designation == 'Others' ? 'selected' : '' }}>Others</option>
+                    <option value="Neet Faculty" {{ $staff->designation == 'Neet Faculty' ? 'selected' : '' }}>Neet Faculty</option>
+                    <option value="Foundation Faculty" {{ $staff->designation == 'Foundation Faculty' ? 'selected' : '' }}>Foundation Faculty</option>
                   </select>
                 </div>
 
 
 
-               <div class="form-group col-lg-3">
-                  <label>Experience in Years(GP)</label>
-                  <input type="number" name="experience" class="form-control form-control-sm" value="{{ $staff->experience }}" >
+                <div class="form-group col-lg-3">
+                    <label>Experience in Years(GP)</label>
+                    <input type="number" name="experience" class="form-control form-control-sm"  value="{{ $staff->experience }}">
+                 </div>
+  
+                 <div class="form-group col-lg-3">
+                  <label>Experience in Month(GP)</label>
+                  <input type="number" name="experience_month" class="form-control form-control-sm" value="{{ $staff->experience_month }}">
                </div>
 
 
@@ -323,92 +344,84 @@
 </div>
 
 
-
-<div class="form-group col-lg-3">
-   <label>Paper Correction</label>
-   <select name="paper_correction" class="form-control form-control-sm" >
-     <option value="">Select Type</option>
-     <option value="Yes" {{ $staff->paper_correction == 'Yes' ? 'selected' : '' }}>Yes</option>
-     <option value="No" {{ $staff->paper_correction == 'No' ? 'selected' : '' }}>No</option>
-   </select>
- </div>
-           
-
-
-<div class="form-group col-lg-3">
- <label>Handeling Class & Sec</label>
- <input type="text" name="handeling_class" class="form-control form-control-sm" value="{{ $staff->handeling_class }}">
-</div>
- 
 <div class="form-group col-lg-3">
    <label>Name of the Previous School Worked</label>
    <input type="text" name="previous_School" class="form-control form-control-sm" value="{{ $staff->previous_school }}" >
   </div>
    
 
-
-  <div class="form-group col-lg-12"><h6>Staff Childern'S Details(Note:If Studying in Our School ) </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
-  <div class="col-md-12 form-group mt-0">
-   <button type="button" class="btn btn-warning" id="addItemButton">
-       <i class="fa fa-plus"></i> Add More
-   </button>
+  <div class="form-group col-lg-12">
+    <h6>Staff Children's Details (Note: If Studying in Our School)</h6>
+    <hr style="border-bottom: 1px solid #ccc;">
 </div>
 
-<!-- Children Container -->
-<div id="itemContainer">
-   @if(!empty($staff->children_details))
-       @foreach($staff->children_details as $child)
-           <div class="col-md-12 row mb-3 itemRow">
-               <div class="col-md-3 form-group">
-                   <label>Children's Name</label>
-                   <input type="text" name="children[{{ $loop->index }}][name]" class="form-control form-control-sm" value="{{ $child['name'] ?? '' }}" />
-               </div>
-
-               <div class="col-md-2 form-group">
-                   <label>Class</label>
-                   <input type="text" name="children[{{ $loop->index }}][class]" class="form-control form-control-sm" value="{{ $child['class'] ?? '' }}" />
-               </div>
-
-               <div class="col-md-2 form-group">
-                   <label>Section</label>
-                   <input type="text" name="children[{{ $loop->index }}][section]" class="form-control form-control-sm" value="{{ $child['section'] ?? '' }}" />
-               </div>
-
-               <div class="col-md-1 form-group">
-                   <button type="button" class="btn btn-danger mt-4 removeRow">
-                       <i class="fa fa-times"></i>
-                   </button>
-               </div>
-           </div>
-       @endforeach
-   @endif
+<!-- Checkbox to toggle visibility -->
+<div class="form-group col-lg-3">
+    <label>Children Studying in Our School?</label>
+    <div>
+        <input type="checkbox" id="childrenCheckbox" onchange="toggleChildrenDetails()" {{ $staff->children_studying == 1 ? 'checked' : '' }}>
+        <label for="childrenCheckbox">Yes</label>
+        <input type="hidden" id="childrenValue" name="children_studying" value="{{ $staff->children_studying }}">
+    </div>
 </div>
 
+<!-- Child details container (Initially hidden) -->
+<div id="childrenDetailsSection" style="display: {{ $staff->children_studying == 1 ? 'block' : 'none' }};">
+    <button type="button" id="addItemButton" class="btn btn-warning">Add children’s detail</button>
+    <div id="itemContainer">
+        @if(!empty($staff->children_details))
+            @foreach($staff->children_details as $index => $child)
+                <div class="col-md-12 row mb-3 itemRow">
+                    <div class="col-md-3 form-group">
+                        <label>Children's Name</label>
+                        <input type="text" name="children[{{ $index }}][name]" class="form-control form-control-sm" value="{{ old("children.$index.name", $child['name'] ?? '') }}" />
+                    </div>
+
+                    <div class="col-md-2 form-group">
+                        <label>Class</label>
+                        <input type="text" name="children[{{ $index }}][class]" class="form-control form-control-sm" value="{{ old("children.$index.class", $child['class'] ?? '') }}" />
+                    </div>
+
+                    <div class="col-md-2 form-group">
+                        <label>Section</label>
+                        <input type="text" name="children[{{ $index }}][section]" class="form-control form-control-sm" value="{{ old("children.$index.section", $child['section'] ?? '') }}" />
+                    </div>
+
+                    <div class="col-md-1 form-group">
+                        <button type="button" class="btn btn-danger mt-4 removeRow">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        @endif
+    </div>
+</div>
 
 <!-- Template for New Child -->
 <template id="itemTemplate">
-   <div class="col-md-12 row mb-3 itemRow">
-       <div class="col-md-3 form-group">
-           <label>Children's Name</label>
-           <input type="text" name="children[][name]" class="form-control form-control-sm" />
-       </div>
+    <div class="col-md-12 row mb-3 itemRow">
+        <div class="col-md-3 form-group">
+            <label>Children's Name</label>
+            <input type="text" name="children[][name]" class="form-control form-control-sm" />
+        </div>
 
-       <div class="col-md-2 form-group">
-           <label>Class</label>
-           <input type="text" name="children[][class]" class="form-control form-control-sm" />
-       </div>
+        <div class="col-md-2 form-group">
+            <label>Class</label>
+            <input type="text" name="children[][class]" class="form-control form-control-sm" />
+        </div>
 
-       <div class="col-md-2 form-group">
-           <label>Section</label>
-           <input type="text" name="children[][section]" class="form-control form-control-sm" />
-       </div>
+        <div class="col-md-2 form-group">
+            <label>Section</label>
+            <input type="text" name="children[][section]" class="form-control form-control-sm" />
+        </div>
 
-       <div class="col-md-1 form-group">
-           <button type="button" class="btn btn-danger mt-4 removeRow">
-               <i class="fa fa-times"></i>
-           </button>
-       </div>
-   </div>
+        <div class="col-md-1 form-group">
+            <button type="button" class="btn btn-danger mt-4 removeRow">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
 </template>
 
       
@@ -431,38 +444,82 @@
 @endsection
 
 @section('js')
+
 <script>
-   // Function to add a new child row
-   document.getElementById("addItemButton").addEventListener("click", function() {
-       const template = document.getElementById("itemTemplate").content.cloneNode(true);
-       const index = document.querySelectorAll(".itemRow").length;
+    function toggleSpouseDetails(status) {
+        const spouseDetails = document.getElementById('spouse-details');
+        spouseDetails.style.display = (status === 'Married') ? 'block' : 'none';
 
-       // Update the names of the input fields with the current index
-       template.querySelector('[name="children[][name]"]').setAttribute("name", `children[${index}][name]`);
-       template.querySelector('[name="children[][class]"]').setAttribute("name", `children[${index}][class]`);
-       template.querySelector('[name="children[][section]"]').setAttribute("name", `children[${index}][section]`);
+        if (status !== 'Married') {
+            ['spouse_name', 'spouse_ph_no', 'spouse_occupation'].forEach(name => 
+                document.querySelector(`[name="${name}"]`).value = ''
+            );
+        }
+    }
 
-       // Append the new row to the container
-       document.getElementById("itemContainer").appendChild(template);
-   });
+    document.addEventListener("DOMContentLoaded", () => 
+        toggleSpouseDetails(document.querySelector('select[name="marital_status"]').value)
+    );
+</script>
 
-   // Function to remove a child row
-   document.addEventListener("click", function(e) {
-       if (e.target.closest(".removeRow")) {
-           e.target.closest(".itemRow").remove();
-           reIndexRows(); // Re-index after removal
-       }
-   });
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    // Toggle children details section based on checkbox state
+    function toggleChildrenDetails() {
+        const childrenDetailsSection = document.getElementById("childrenDetailsSection");
+        const childrenValue = document.getElementById("childrenValue");
+        const checkbox = document.getElementById("childrenCheckbox");
 
-   // Re-index all child rows to maintain correct numbering
-   function reIndexRows() {
-       const rows = document.querySelectorAll(".itemRow");
-       rows.forEach((row, index) => {
-           row.querySelector('[name*="[name]"]').setAttribute("name", `children[${index}][name]`);
-           row.querySelector('[name*="[class]"]').setAttribute("name", `children[${index}][class]`);
-           row.querySelector('[name*="[section]"]').setAttribute("name", `children[${index}][section]`);
-       });
-   }
+        if (!childrenDetailsSection || !childrenValue || !checkbox) return;
+
+        childrenDetailsSection.style.display = checkbox.checked ? "block" : "none";
+        childrenValue.value = checkbox.checked ? "1" : "0";
+    }
+
+    // Attach event listener for the checkbox
+    let childrenCheckbox = document.getElementById("childrenCheckbox");
+    if (childrenCheckbox) {
+        childrenCheckbox.addEventListener("change", toggleChildrenDetails);
+        toggleChildrenDetails(); // Ensure correct initial state on page load
+    }
+
+    // Add new child row
+    let addItemButton = document.getElementById("addItemButton");
+    let itemContainer = document.getElementById("itemContainer");
+    let itemTemplate = document.getElementById("itemTemplate")?.content;
+
+    if (addItemButton && itemContainer && itemTemplate) {
+        addItemButton.addEventListener("click", function () {
+            let newItem = itemTemplate.cloneNode(true);
+
+            // Find and update input fields with the correct index
+            let index = document.querySelectorAll(".itemRow").length;
+            newItem.querySelector('[name="children[][name]"]').setAttribute("name", `children[${index}][name]`);
+            newItem.querySelector('[name="children[][class]"]').setAttribute("name", `children[${index}][class]`);
+            newItem.querySelector('[name="children[][section]"]').setAttribute("name", `children[${index}][section]`);
+
+            itemContainer.appendChild(newItem);
+        });
+    }
+
+    // Remove a child row and re-index remaining rows
+    document.addEventListener("click", function (e) {
+        if (e.target.closest(".removeRow")) {
+            e.target.closest(".itemRow").remove();
+            reIndexRows();
+        }
+    });
+
+    function reIndexRows() {
+        const rows = document.querySelectorAll(".itemRow");
+        rows.forEach((row, index) => {
+            row.querySelector('[name*="[name]"]').setAttribute("name", `children[${index}][name]`);
+            row.querySelector('[name*="[class]"]').setAttribute("name", `children[${index}][class]`);
+            row.querySelector('[name*="[section]"]').setAttribute("name", `children[${index}][section]`);
+        });
+    }
+});
+
 </script>
 
 
@@ -567,3 +624,18 @@ function showFileNamesAndPreviews(input, previewId) {
 </script>
 @endsection
 
+{{-- <div class="form-group col-lg-3">
+   <label>Paper Correction</label>
+   <select name="paper_correction" class="form-control form-control-sm" >
+     <option value="">Select Type</option>
+     <option value="Yes" {{ $staff->paper_correction == 'Yes' ? 'selected' : '' }}>Yes</option>
+     <option value="No" {{ $staff->paper_correction == 'No' ? 'selected' : '' }}>No</option>
+   </select>
+ </div>
+           
+
+
+<div class="form-group col-lg-3">
+ <label>Handeling Class & Sec</label>
+ <input type="text" name="handeling_class" class="form-control form-control-sm" value="{{ $staff->handeling_class }}">
+</div> --}}
