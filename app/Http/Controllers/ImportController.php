@@ -44,8 +44,10 @@ class ImportController extends Controller
                     $row = array_map(function($value) {
                         return is_string($value) ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
                     }, $row);
+                    
 
                     $student_id = $row['student_id'] ?? 0;
+                      
                     $student = Student::where('student_id', $student_id)->first();
                    if($student){
                     $student->update($row);
