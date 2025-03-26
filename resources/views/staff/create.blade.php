@@ -44,11 +44,11 @@
 
 
                <div class="form-group col-lg-3">
-                  <label>Hostel/Days Scholar </label>
+                  <label>Hostel/Dayscholar </label>
                   <select name="hostel_dayscholar" class="form-control form-control-sm text-capitalize"  >
                      <option value="">Select</option>
                      <option value="hostel">Hostel</option>
-                     <option value="days scholar">Days Scholar</option>
+                     <option value="Dayscholar">Dayscholar</option>
                      
                   </select>
                </div>

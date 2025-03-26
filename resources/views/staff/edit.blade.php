@@ -39,11 +39,11 @@
                     </div>
                     
                     <div class="form-group col-lg-3">
-                        <label>Hostel/Days Scholar</label>
+                        <label>Hostel/Dayscholar</label>
                         <select name="hostel_dayscholar" class="form-control form-control-sm text-capitalize" >
                             <option value="">Select</option>
                             <option value="hostel" {{ $staff->hostel_dayscholar == 'hostel' ? 'selected' : '' }}>Hostel</option>
-                            <option value="days scholar" {{ $staff->hostel_dayscholar == 'days scholar' ? 'selected' : '' }}>Days Scholar</option>
+                            <option value="Dayscholar" {{ $staff->hostel_dayscholar == 'Dayscholar' ? 'selected' : '' }}>Days Scholar</option>
                         </select>
                     </div>
                     
