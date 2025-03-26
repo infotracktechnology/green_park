@@ -39,11 +39,11 @@
                     </div>
                     
                     <div class="form-group col-lg-3">
-                        <label>Hostel/Days Scholar</label>
+                        <label>Hostel/Dayscholar</label>
                         <select name="hostel_dayscholar" class="form-control form-control-sm text-capitalize" >
                             <option value="">Select</option>
                             <option value="hostel" {{ $staff->hostel_dayscholar == 'hostel' ? 'selected' : '' }}>Hostel</option>
-                            <option value="days scholar" {{ $staff->hostel_dayscholar == 'days scholar' ? 'selected' : '' }}>Days Scholar</option>
+                            <option value="Dayscholar" {{ $staff->hostel_dayscholar == 'Dayscholar' ? 'selected' : '' }}>Days Scholar</option>
                         </select>
                     </div>
                     
@@ -85,9 +85,10 @@
            
            <div class="form-group col-lg-3">
             <label>Department</label>
-            <select name="department" class="form-control form-control-sm">
+            <select name="department" class="form-control form-control-sm" tyle="text-transform: uppercase;">
                 <option value="">Select Department</option>
                 <option value="Physics" {{ $staff->department == 'Physics' ? 'selected' : '' }}>Physics</option>
+                <option value="Chemistry" {{ $staff->department == 'Chemistry' ? 'selected' : '' }}>Chemistry</option>
                 <option value="Botany" {{ $staff->department == 'Botany' ? 'selected' : '' }}>Botany</option>
                 <option value="Zoology" {{ $staff->department == 'Zoology' ? 'selected' : '' }}>Zoology</option>
                 <option value="Mathematics" {{ $staff->department == 'Mathematics' ? 'selected' : '' }}>Mathematics</option>
@@ -192,7 +193,7 @@
       <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" value="{{ $staff->address_line_2 }}" >
    </div>
 
-   <div class="form-group col-lg-3">
+   {{-- <div class="form-group col-lg-3">
       <label>State</label>
       <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm">
           <option value="">Select State</option>
@@ -217,9 +218,17 @@
           @endif
       </select>
   </div>
-  
+   --}}
 
-     
+   <div class="form-group col-lg-3">
+    <label>State</label>
+    <input type="text" name="State" class="form-control form-control-sm" value="{{ $staff->state }}">
+ </div>
+
+ <div class="form-group col-lg-3">
+    <label>City</label>
+    <input type="text" name="city" class="form-control form-control-sm" value="{{ $staff->city }}" >
+ </div>
 
      <div class="form-group col-lg-3">
         <label>Pincode</label>

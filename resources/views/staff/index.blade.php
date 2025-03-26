@@ -17,10 +17,8 @@
             @endif
                  
         
-                <div class="card card-primary">
-  
+                    <div class="card card-primary">
                     <div class="card-body">
-  
                     <div class="row">
                     <div class="col-md-4 col-sm-12 mb-3">
                     <h6 class="col-deep-purple">Staff Details</h6>
@@ -41,8 +39,8 @@
                       <a href="{{ env('APP_URL').'template/staff_import.csv' }}" download class="btn btn-primary">Import Template File <i class="fa fa-download"></i></a>
                     </div>
                     </div>
-                    <div class="col-12">
-                    <div class="table-responsive">
+                <div class="col-12">
+              <div class="table-responsive">
       <table class="table table-striped table-sm " id="myTable">
   
       <thead>
@@ -50,6 +48,7 @@
         <tr role="row">
         <th>#</th>
         <th>Full Name</th>
+        <th>Staff School Initial</th>
         <th>Designation</th>
         <th>Department</th>
         <th>Email</th>
@@ -69,12 +68,12 @@
           <tr>
             <td>{{ $member->id}}</td>
             <td>{{ $member->name }}</td>
+            <td>{{ $member->school_initial }}</td>
             <td>{{ $member->designation }}</td>
-            <td>{{ $member->department }}</td>
+            <td>{{ strtoupper($member->department) }}</td>
             <td>{{ $member->email }}</td>
             <td>{{ $member->mob_no }}</td>
             <td>{{ $member->gender }}</td>
-           
             <td>{{ $member->city }}</td>
             <td>{{ $member->state }}</td>
             <td>{{ $member->pincode }}</td>
