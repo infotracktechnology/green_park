@@ -88,6 +88,7 @@
             <select name="department" class="form-control form-control-sm">
                 <option value="">Select Department</option>
                 <option value="Physics" {{ $staff->department == 'Physics' ? 'selected' : '' }}>Physics</option>
+                <option value="Chemistry" {{ $staff->department == 'Chemistry' ? 'selected' : '' }}>Chemistry</option>
                 <option value="Botany" {{ $staff->department == 'Botany' ? 'selected' : '' }}>Botany</option>
                 <option value="Zoology" {{ $staff->department == 'Zoology' ? 'selected' : '' }}>Zoology</option>
                 <option value="Mathematics" {{ $staff->department == 'Mathematics' ? 'selected' : '' }}>Mathematics</option>

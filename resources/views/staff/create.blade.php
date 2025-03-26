@@ -94,16 +94,16 @@
 
            <div class="form-group col-lg-3">
             <label>Department</label>
-           <select name="department" class="form-control form-control-sm" >
-               <option value="">Select Department</option>
-            <option value="Physics">Physics
-            </option>
-            <option value="Botany">Botany</option>
-            <option value="Zoology">Zoology</option>
-            <option value="Mathematics">Mathematics</option>
-            <option value="Others">Others</option>
-           </select>
-         </div>
+            <select name="department" class="form-control form-control-sm" style="text-transform: uppercase;">
+                <option value="">Select Department</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Botany">Botany</option>
+                <option value="Zoology">Zoology</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Others">Others</option>
+            </select>
+        </div>
 
 
          <div class="form-group col-lg-3">
