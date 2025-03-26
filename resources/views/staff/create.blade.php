@@ -199,7 +199,7 @@
       <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" >
    </div>
 
-   <div class="form-group col-lg-3">
+   {{-- <div class="form-group col-lg-3">
       <label>State</label>
      <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" >
    <option value="">Select State</option>
@@ -214,9 +214,20 @@
         <select name="city" id="city" class="form-control form-control-sm" >
          <option value="">Select City</option>
        </select>
+     </div> --}}
+
+     <div class="form-group col-lg-3">
+        <label>State</label>
+        <input type="text" name="state" class="form-control form-control-sm" >
      </div>
 
-     
+     <div class="form-group col-lg-3">
+        <label>City</label>
+        <input type="text" name="city" class="form-control form-control-sm" >
+     </div>
+
+
+
 
      <div class="form-group col-lg-3">
         <label>Pincode</label>
