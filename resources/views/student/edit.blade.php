@@ -15,12 +15,12 @@
                         <fieldset class="row">
                             <div class="form-group col-lg-3">
                                 <label>Admission Date</label>
-                                 <input type="date" name="admission_date" value="{{$Student->admission_date}}" class="form-control form-control-sm" required>
+                                 <input type="date" name="admission_date" value="{{$Student->admission_date}}" class="form-control form-control-sm" >
                             
                              </div>
                              <div class="form-group col-lg-3">
                                 <label for="branch_id">Campus</label>
-                                <select name="campus" class="form-control form-control-sm" id="campus-select" required>
+                                <select name="campus" class="form-control form-control-sm" id="campus-select" >
                                     <option value="" disabled selected>Select Campus</option>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}" @if($branch->id == $Student->campus) selected @endif>
@@ -33,14 +33,14 @@
                            
                             <div class="form-group col-lg-3">
                                 <label for="student_name">Student Name</label>
-                                <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $Student->student_name) }}" class="form-control form-control-sm alphabetsOnly" required>
+                                <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $Student->student_name) }}" class="form-control form-control-sm alphabetsOnly" >
                                
                             </div>
 
 
                             <div class="form-group col-lg-3">
                                 <label>Password</label>
-                                 <input type="text" name="password_1" value="{{$Student->password_1}}" class="form-control form-control-sm" required>
+                                 <input type="text" name="password_1" value="{{$Student->password_1}}" class="form-control form-control-sm" >
                             
                              </div>
                             
@@ -48,7 +48,7 @@
         
                            <div class="form-group col-lg-3">
                                <label>Coaching Type</label>
-                                <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" onchange="hostel(this.value)" required >
+                                <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" onchange="hostel(this.value)"  >
                                     <option value="">Select Coaching Type</option>
                                     <option value="Offline" @if($Student->coaching_type == 'Offline') selected @endif>Offline</option>
                                     <option value="Online Recorded" @if($Student->coaching_type == 'Online Recorded') selected @endif>Online Recorded</option>
@@ -64,13 +64,13 @@
                                 <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" >
                                     <option value="">Select Option</option>
                                     <option value="Hostel" @if($Student->hostel_dayscholar == 'Hostel') selected @endif>Hostel</option>
-                                    <option value="Day Scholar" @if($Student->hostel_dayscholar == 'Day Scholar') selected @endif>Day Scholar</option>
+                                    <option value="Dayscholar" @if($Student->hostel_dayscholar == 'Dayscholar') selected @endif>Dayscholar</option>
                                 </select>
                             </div>
 
                             <div class="form-group col-lg-3">
                                 <label>AC/Non AC</label>
-                                <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" required>
+                                <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" >
                                     <option value="">Select AC/Non AC</option>
                                     <option value="AC" @if($Student->ac_nonac == 'AC') selected @endif>AC</option>
                                     <option value="Non AC" @if($Student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
@@ -82,7 +82,7 @@
         
                             <div class="form-group col-lg-3">
                                 <label for="ph_no1">Mobile No 1</label>
-                                <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $Student->ph_no1) }}" class="form-control form-control-sm digits" required>
+                                <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $Student->ph_no1) }}" class="form-control form-control-sm digits" >
                               
                             </div>
                             
@@ -94,7 +94,7 @@
         
                             <div class="form-group col-lg-3">
                                 <label>Gender</label>
-                                <select name="gender" class="form-control form-control-sm" required >
+                                <select name="gender" class="form-control form-control-sm"  >
                                     <option value="">Select Gender</option>
                                     <option value="Male" @if($Student->gender == 'Male') selected @endif>Male</option>
                                     <option value="Female" @if($Student->gender == 'Female') selected @endif>Female</option>
@@ -111,7 +111,7 @@
                                     name="dob" 
                                     value="{{ $Student->dob }}" 
                                     class="form-control form-control-sm" 
-                                    required 
+                                     
                                     id="dobInput"
                                     onchange="calculateAge()">
                             </div>
@@ -123,7 +123,7 @@
                                     name="age" 
                                     value="{{ \Carbon\Carbon::parse($Student->dob)->age }}" 
                                     class="form-control form-control-sm" 
-                                    required 
+                                     
                                     id="ageInput" 
                                     readonly>
                             </div>
@@ -157,7 +157,7 @@
                 
                             {{-- <div class="form-group col-lg-3">
                                 <label>Admission Opted For</label>
-                                 <select name="admission_opted_for" class="form-control form-control-sm" required >
+                                 <select name="admission_opted_for" class="form-control form-control-sm"  >
                                      <option value="">Select Coaching Type</option>
                                      <option value="Online" @if($Student->admission_opted_for == 'Online') selected @endif>Online</option>
                                      <option value="Offline" @if($Student->admission_opted_for == 'Offline') selected @endif>Offline</option>
@@ -188,7 +188,7 @@
 {{--          
                              <div class="form-group col-lg-3">
                                 <label>Age</label>
-                                 <input type="number" name="age" value="{{$Student->age}}" class="form-control form-control-sm" required>
+                                 <input type="number" name="age" value="{{$Student->age}}" class="form-control form-control-sm" >
                             </div> --}}
         
         
@@ -209,7 +209,7 @@
                           
                                 <div class="form-group col-lg-3">
                                 <label>Nationality</label>
-                                <select name="nationality" class="form-control form-control-sm" required>
+                                <select name="nationality" class="form-control form-control-sm" >
                                     <option value="">Select Nationality</option>
                                     <option value="Indian" @if($Student->nationality == 'Indian') selected @endif>Indian</option>
                                     <option value="Foreign" @if($Student->nationality == 'Foreign') selected @endif>Foreign</option>
@@ -221,7 +221,7 @@
                      
                             <div class="form-group col-lg-3">
                                 <label>Religion</label>
-                                <select name="religion" class="form-control form-control-sm" required>
+                                <select name="religion" class="form-control form-control-sm" >
                                     <option value="">Select Religion</option>
                                     <option value="Hindu" @if($Student->religion == 'Hindu') selected @endif>Hindu</option>
                                     <option value="Christian" @if($Student->religion == 'Christian') selected @endif>Christian</option>
@@ -232,7 +232,7 @@
                 
                             <div class="form-group col-lg-3">
                                 <label>Community</label>
-                                <select name="community" class="form-control form-control-sm" required>
+                                <select name="community" class="form-control form-control-sm" >
                                     <option value="">Select Community</option>
                                     <option value="OC" @if($Student->community == 'OC') selected @endif>OC</option>
                                     <option value="BC" @if($Student->community == 'BC') selected @endif>BC</option>
@@ -265,22 +265,22 @@
                         <fieldset class="row">
                             <div class="form-group col-lg-3">
                                 <label>Door No</label>
-                                 <input type="text" name="door_no" value="{{$Student->door_no}}" class="form-control form-control-sm" required>
+                                 <input type="text" name="door_no" value="{{$Student->door_no}}" class="form-control form-control-sm" >
                             </div>
         
                             <div class="form-group col-lg-3">
                                 <label>Street Name</label>
-                                 <input type="text" name="street_name" value="{{$Student->street_name}}" class="form-control form-control-sm" required>
+                                 <input type="text" name="street_name" value="{{$Student->street_name}}" class="form-control form-control-sm" >
                             </div>
 
                             <div class="form-group col-lg-3">
                                 <label>City</label>
-                                 <input type="text" name="city" value="{{$Student->city}}" class="form-control form-control-sm" required>
+                                 <input type="text" name="city" value="{{$Student->city}}" class="form-control form-control-sm" >
                             </div>
 
                             <div class="form-group col-lg-3">
                                 <label>State</label>
-                               <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" required>
+                               <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" >
                              <option value="">Select State</option>
                              @foreach ($states as $state)
                              <option value="{{$state->State}}" @if($Student->state == $state->State) selected @endif>{{$state->State}}</option>
@@ -290,7 +290,7 @@
 
                              <div class="form-group col-lg-3">
                                 <label>District</label>
-                                <select name="district" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm" required>
+                                <select name="district" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm" >
                                     <option value="">Select City</option>
                                     @foreach ($districts as $city)
                                         <option value="{{ $city->District }}" @if($Student->district == $city->District) selected @endif>{{ $city->District }}</option>
@@ -307,7 +307,7 @@
         
                             <div class="form-group col-lg-3">
                                 <label>Pincode</label>
-                                 <input type="text" id="pincode" list="pincode_list" name="pincode" value="{{$Student->pincode}}" class="form-control form-control-sm" required>
+                                 <input type="text" id="pincode" list="pincode_list" name="pincode" value="{{$Student->pincode}}" class="form-control form-control-sm" >
                             </div>
         
                             <div class="form-group col-lg-3">
@@ -391,7 +391,7 @@
                         
                                 <div class="form-group col-lg-3">
                                     <label>Board of Study (X std)</label>
-                                    <select name="board_of_study_X_std" class="form-control form-control-sm" required>
+                                    <select name="board_of_study_X_std" class="form-control form-control-sm" >
                                         <option value="">Select Board</option>
                                         <option value="STATE BOARD" {{ $Student->board_of_study_X_std == 'STATE BOARD' ? 'selected' : '' }}>STATE BOARD</option>
                                         <option value="CBSE" {{ $Student->board_of_study_X_std == 'CBSE' ? 'selected' : '' }}>CBSE</option>
@@ -404,7 +404,7 @@
     
                             <div class="form-group col-lg-3">
                                 <label>Name of School (X std)</label>
-                                <input type="text" name="school_name_X_std" value="{{$Student->school_name_X_std}}" class="form-control form-control-sm" required>
+                                <input type="text" name="school_name_X_std" value="{{$Student->school_name_X_std}}" class="form-control form-control-sm" >
                             </div>
     
                             <div class="form-group col-lg-3">
@@ -431,17 +431,17 @@
     
                             <div class="form-group col-lg-3">
                                 <label>Name of School (XII std)</label>
-                                <input type="text" name="school_name_XII_std" value="{{$Student->school_name_XII_std}}" class="form-control form-control-sm" required>
+                                <input type="text" name="school_name_XII_std" value="{{$Student->school_name_XII_std}}" class="form-control form-control-sm" >
                             </div>
     
                             <div class="form-group col-lg-3">
                                 <label>District Name of the School (XII std)</label>
-                                <input type="text" name="district_name_school_XII_std" value="{{$Student->district_name_school_XII_std}}" class="form-control form-control-sm" required>
+                                <input type="text" name="district_name_school_XII_std" value="{{$Student->district_name_school_XII_std}}" class="form-control form-control-sm" >
                             </div>
     
                             <div class="form-group col-lg-3">
                                 <label>Total Marks Obtained in XII std</label>
-                                <input type="number" name="total_marks_XII_std" value="{{$Student->total_marks_XII_std}}" class="form-control form-control-sm" required>
+                                <input type="number" name="total_marks_XII_std" value="{{$Student->total_marks_XII_std}}" class="form-control form-control-sm" >
                             </div>
 
                             <div class="form-group col-lg-12">
@@ -456,7 +456,7 @@
                             
                             {{-- <div class="form-group col-lg-4">
                                 <label>Subject 1</label>
-                                <select name="S1" class="form-control form-control-sm" required>
+                                <select name="S1" class="form-control form-control-sm" >
                                     <option value="">Select Subject</option>
                                     <option value="ENGLISH" {{ $Student->S1 == 'ENGLISH' ? 'selected' : '' }}>English</option>
                                     <option value="PHYSICS" {{ $Student->S1 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
@@ -472,7 +472,7 @@
                                 <input type="text" name="S1" 
                                        value="{{ $Student->S1 ?? 'English' }}" 
                                        class="form-control form-control-sm" 
-                                       required readonly>
+                                        readonly>
                             </div>
                             
                             
@@ -480,22 +480,22 @@
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S1</label>
-                            <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}"  max="100" class="form-control form-control-sm" required>
+                            <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}"  max="100" class="form-control form-control-sm" >
                         </div>
 
                         {{-- <div class="form-group col-lg-4">
                             <label>Maximum Marks of S1</label>
-                            <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}" class="form-control form-control-sm" required>
+                            <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}" class="form-control form-control-sm" >
                         </div> --}}
 
       <div class="form-group col-lg-4">
     <label>Marks Obtained in S1</label>
-    <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$Student->S1_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+    <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$Student->S1_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
 
                         {{-- <div class="form-group col-lg-4">
                             <label>Subject 2</label>
-                            <select name="S2" class="form-control form-control-sm" required>
+                            <select name="S2" class="form-control form-control-sm" >
                                 <option value="">Select Subject</option>
                                 <option value="ENGLISH" {{ $Student->S2 == 'ENGLISH' ? 'selected' : '' }}>English</option>
                                 <option value="PHYSICS" {{ $Student->S2 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
@@ -508,22 +508,22 @@
 
                         <div class="form-group col-lg-4">
                             <label>Subject 2</label>
-                            <input type="text" name="S2" value="{{ $Student->S2 ?? 'Physics' }}" class="form-control form-control-sm" required readonly>
+                            <input type="text" name="S2" value="{{ $Student->S2 ?? 'Physics' }}" class="form-control form-control-sm"  readonly>
                             </div>
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S2</label>
-                            <input type="number" name="S2_max_marks" value="{{$Student->S2_max_marks}}" max="100" class="form-control form-control-sm" required>
+                            <input type="number" name="S2_max_marks" value="{{$Student->S2_max_marks}}" max="100" class="form-control form-control-sm" >
                         </div>
 
              <div class="form-group col-lg-4">
     <label>Marks Obtained in S2</label>
-    <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$Student->S2_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+    <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$Student->S2_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
 
                         {{-- <div class="form-group col-lg-4">
                             <label>Subject 3</label>
-                            <select name="S3" class="form-control form-control-sm" required>
+                            <select name="S3" class="form-control form-control-sm" >
                                 <option value="">Select Subject</option>
                                 <option value="ENGLISH" {{ $Student->S3 == 'ENGLISH' ? 'selected' : '' }}>English</option>
                                 <option value="PHYSICS" {{ $Student->S3 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
@@ -536,24 +536,24 @@
 
                         <div class="form-group col-lg-4">
                             <label>Subject 3</label>
-                            <input type="text" name="S3" value="{{ $Student->S3 ?? 'Chemistry' }}" class="form-control form-control-sm" required readonly>
+                            <input type="text" name="S3" value="{{ $Student->S3 ?? 'Chemistry' }}" class="form-control form-control-sm"  readonly>
                             </div>
                   
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S3</label>
-                            <input type="number" name="S3_max_marks" value="{{$Student->S3_max_marks}}"  max="100" class="form-control form-control-sm" required>
+                            <input type="number" name="S3_max_marks" value="{{$Student->S3_max_marks}}"  max="100" class="form-control form-control-sm" >
                         </div>
 
             <div class="form-group col-lg-4">
     <label>Marks Obtained in S3</label>
-    <input type="number" id="S3_obtained_mark" name="S3_obtained_mark" value="{{$Student->S3_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+    <input type="number" id="S3_obtained_mark" name="S3_obtained_mark" value="{{$Student->S3_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
 
 
                         {{-- <div class="form-group col-lg-4">
                             <label>Subject 4</label>
-                            <select name="S4" class="form-control form-control-sm" required>
+                            <select name="S4" class="form-control form-control-sm" >
                                 <option value="">Select Subject</option>
                                 <option value="ENGLISH" {{ $Student->S4 == 'ENGLISH' ? 'selected' : '' }}>English</option>
                                 <option value="PHYSICS" {{ $Student->S4 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
@@ -571,12 +571,12 @@
 
                         <div class="form-group col-lg-4">
                             <label>Maximum Marks of S4</label>
-                            <input type="number" name="S4_max_marks" value="{{$Student->S4_max_marks}}" max="100" class="form-control form-control-sm" required>
+                            <input type="number" name="S4_max_marks" value="{{$Student->S4_max_marks}}" max="100" class="form-control form-control-sm" >
                         </div>
 
                     <div class="form-group col-lg-4">
     <label>Marks Obtained in S4</label>
-    <input type="number" id="S4_obtained_mark" name="S4_obtained_mark" value="{{$Student->S4_obtained_mark}}" class="form-control form-control-sm" required oninput="calculateTotal()">
+    <input type="number" id="S4_obtained_mark" name="S4_obtained_mark" value="{{$Student->S4_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
 
 
