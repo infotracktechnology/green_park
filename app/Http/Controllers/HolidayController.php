@@ -120,7 +120,7 @@ class HolidayController extends Controller
 
         if($request->has('show')){
 
-            if(Holiday::isHoliday($request->date, $request->branch_id, $request->hostel, $request->gender, $request->section)){
+            if(Holiday::isHoliday($request->attendance_date, $request->branch_id, $request->hostel, $request->gender, $request->section)){
                 return redirect()->back()->with('error', 'Holiday already exists for this date!');
             }
 

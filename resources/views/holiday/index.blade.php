@@ -63,7 +63,7 @@
                     <td>{{ $key->section }}</td>
                     <td>{{ $key->name }}</td>
                     <td><span class="badge badge-warning">{{ $key->type }}</span></td>
-                    <td>{{ $key->type == 'Week Of' ? $key->date : $key->start_date . ' to ' . $key->end_date }}</td>
+                    <td>{{ $key->type == 'Week Of' ? $key->holiday_date : $key->start_date . ' to ' . $key->end_date }}</td>
                     
             
                     <td>
