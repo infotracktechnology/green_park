@@ -156,7 +156,7 @@ class HostelController extends Controller
         $branch = null;
         $hostels = [];
         $students = [];
-
+    
         if ($request->has('branch')) {
             $branch = $request->branch;
             $hostels = Hostel::where('branch_id', $branch)->get();
@@ -164,41 +164,51 @@ class HostelController extends Controller
                 ->where('hostel_dayscholar', 'Hostel')
                 ->get();
         }
-
+    
         if ($request->has('hostel_id')) {
-            $floors = HostelRoom::where('hostel_id', $request->hostel_id)
-                ->select('floor_no')
-                ->distinct()
-                ->get();
-
-            return response()->json($floors);
-        }
-
-
-        if ($request->has('type')) {
-            $rooms = HostelRoom::where('hostel_id', $request->hostel)
-                ->where('floor_no', $request->floor_no)
-                ->where('room_type', $request->type)
-                ->get();
+            $rooms = HostelRoom::where('hostel_id', $request->hostel_id)->get();
             return response()->json($rooms);
         }
-
+    
         return view('hostel.allocation', compact('branches', 'branch', 'hostels', 'students'));
     }
-
-   public function  storeAllocation(Request $request){
-
-    if ($request->student_ids) {
-        foreach ($request->student_ids as $student_id) {
-            $student = Student::find($student_id);
-            $student->hostel_id = $request->hostel;
-            $student->room_id = $request->room_id;
-                $student->save();
-            
+    public function storeAllocation(Request $request)
+    {
+        if (!$request->hasFile('file')) {
+            return redirect()->back()->with('error', 'No CSV file uploaded.');
         }
+
+        $csvFile = $request->file('file');
+        $filePath = $csvFile->getPathname();
+        $csvData = array_map('str_getcsv', file($filePath));
+
+        if (count($csvData) < 2) {
+            return redirect()->back()->with('error', 'CSV file is empty or has no valid data.');
+        }
+
+        $hostelId = $request->input('hostel');
+        $totalRooms = HostelRoom::where('hostel_id', $hostelId)->count();
+        $dataRowCount = count($csvData) - 1; // Subtract the header row
+
+        if ($dataRowCount > $totalRooms) {
+            return redirect()->back()->with('error', "The number of rows in the CSV file ($dataRowCount) exceeds the total number of rooms in the selected hostel ($totalRooms).");
+        }
+
+        foreach (array_slice($csvData, 1) as $row) {
+            // Assuming the CSV has columns in the order: student_id, room_no, cots_no
+            if (!isset($row[0])) {
+                return redirect()->back()->with('error', 'CSV file is missing student ID in one or more rows.');
+            }
+            $student = Student::firstOrNew(['id' => $row[0]]);
+            $student->hostel_id = $request->hostel;
+            $student->room_no = $row[1] ?? null;
+            $student->cots_no = $row[2] ?? null;
+            $student->save();
+        }
+
+        return redirect()->route('allocation.hostel')->with('success', 'Student details successfully updated.');
     }
-
-    return redirect()->route('allocation.hostel')->with('success', 'Student details successfully updated');
-
-   }
+       
 }
+    
+ 
