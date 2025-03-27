@@ -33,7 +33,7 @@
                                         <h6 class="col-deep-purple">Hostel Allocation</h6>
                                     </div>
                                     <div class="col-md-6 col-sm-12 mb-3 text-right">
-                                        <a href="{{ env('APP_URL').'template/classvideoupload.csv'}}" class="btn btn-primary">
+                                        <a href="{{ env('APP_URL').'template/hostelallocation.csv'}}" class="btn btn-primary">
                                             <i class="fa fa-download"></i> Hostel Allocation Upload Template (Format)
                                         </a>
                                     </div>
