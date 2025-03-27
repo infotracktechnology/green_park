@@ -82,7 +82,7 @@
 
                               <div class="form-group col-lg-3">
                                 <label for="date">Date</label>
-                                <input type="text" name="date" value="{{ $holiday->date }}" class="form-control form-control-sm date-picker" required>
+                                <input type="text" name="holiday_date" value="{{ $holiday->holiday_date }}" class="form-control form-control-sm date-picker" required>
                               </div>
 
                               
