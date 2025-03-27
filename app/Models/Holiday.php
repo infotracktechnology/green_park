@@ -19,7 +19,7 @@ class Holiday extends Model
     }
     public static function isHoliday($date = '', $branch_id = null, $hostel = null, $gender = null, $section = null){ 
         $date = empty($date) ? date('Y-m-d') : $date;
-        $week_of = self::where('date', $date)->where('branch_id', 'like', "%$branch_id%")->where('hostel', $hostel)->where('gender', $gender)->where('section','like' ,"%$section%")->first();
+        $week_of = self::where('attendance_date', $date)->where('branch_id', 'like', "%$branch_id%")->where('hostel', $hostel)->where('gender', $gender)->where('section','like' ,"%$section%")->first();
         if($week_of){ 
             return true; 
         }
