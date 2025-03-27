@@ -41,11 +41,13 @@
                 <tr>
                     <th>#</th>
                     <th>Academic Year</th>
-                    <th>Date</th>
+                    <th>Branch</th>
+                    <th>Hostel / Dayscholar</th>
+                    <th>Gender</th>
+                    <th>Section</th>
                     <th>Name</th>
-                    <th>Month</th>
-                    <th>Day</th>
                     <th>Holiday Type</th>
+                    <th>Holiday Date</th>
                     <th>Edit</th>
                     <th>Delete</th>
                 </tr>
@@ -55,18 +57,19 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $key->academic_year }}</td>
-                    <td>{{ $key->date }}</td>
+                    <td>{{ $key->branch() }}</td>
+                    <td>{{ $key->hostel }}</td>
+                    <td>{{ $key->gender }}</td>
+                    <td>{{ $key->section }}</td>
                     <td>{{ $key->name }}</td>
-                    <td>{{ date('F', strtotime($key->date)) }}</td>
-                    <td>{{ $key->day }}</td>
                     <td><span class="badge badge-warning">{{ $key->type }}</span></td>
+                    <td>{{ $key->type == 'Week Of' ? $key->holiday_date : $key->start_date . ' to ' . $key->end_date }}</td>
                     
+            
                     <td>
-                        @if(date('Y-m-d') <= $key->date)
                         <a href="{{ route('holiday.edit', $key->id) }}" class="btn btn-warning text-white">
                            <i class="fas fa-edit"></i>
                         </a>
-                        @endif
                      </td>
                      
                      <td>
