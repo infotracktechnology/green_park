@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('title', 'Holiday')
+@section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css"/>
+@endsection
+
 @section('main')
 <div class="main-content">
    <section class="section">
@@ -13,7 +18,7 @@
             @if(session()->has('error'))
                 <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
             @endif
-                  <div class="card card-primary" x-data="app">
+                  <div class="card card-primary">
                      <form method="post" id="myForm" action="{{ route('holiday.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
@@ -22,7 +27,7 @@
                                  <h6 class="col-deep-purple">Week of Holiday Details</h6>
                               </div>
                             
-                              <div class="form-group col-lg-3">
+                              <div class="form-group col-lg-2">
                                 <input type="hidden" name="name" value="Week Of Leave">
                                 <input type="hidden" name="type" value="Week Of">
                                     <label for="academic_year">Academic Year</label>
@@ -35,36 +40,53 @@
                               </div>
 
                             
-                              <div class="form-group col-lg-3">
-                                <label for="month">Month</label>
+                              <div class="form-group col-lg-5">
+                                <label for="branch">Branch</label>
                                 
-                                <select name="month" id="month"  class="form-control form-control-sm" required>
-                                    <option value="">Select Month</option>
-                                    @for($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}">{{ date('F', mktime(0, 0, 0, $i, 10)) }}</option>
-                                    @endfor
-                                  </select>
-                              </div>
-
-                              <div class="form-group col-lg-2">
-                                <label for="day">Day</label>
-                                <select name="day" id="day"  class="form-control form-control-sm" required>
-                                    <option value="">Select Day</option>
-                                    @foreach(['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] as $i => $day)
-                                    <option value="{{ $i }}">{{ $day }}</option>
+                                <select name="branch_id[]" id="branch_id"  class="select" multiple required>
+                                    <option value="">Select Multiple Branch</option>
+                                    @foreach ($branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
                                   </select>
                               </div>
 
-                              <div class="form-group col-lg-2">
-                                <label for="week_of">Week Of</label>
-                                <select name="week_of" id="week_of"  class="form-control form-control-sm" required>
-                                    <option value="">Select Week Of</option>
-                                    @for($i = 1; $i <= 5; $i++)
-                                    <option value="{{ $i }}">Week Of {{ $i }}</option>
-                                    @endfor
+
+                              <div class="form-group col-lg-3">
+                                <label for="hostel">Hostel / Dayscholar</label>
+                                <select name="hostel" id="hostel" onchange="getSection();" class="form-control form-control-sm" required>
+                                    <option value="">Select Option</option>
+                                    @foreach (['Hostel','Dayscholar'] as $row)
+                                        <option value="{{ $row }}">{{ $row }}</option>
+                                    @endforeach
                                   </select>
                               </div>
+
+
+
+                              <div class="form-group col-lg-2">
+                                <label for="gender">Gender</label>
+                                <select name="gender" id="gender" onchange="getSection();"  class="form-control form-control-sm" required>
+                                    <option value="">Select Gender</option>
+                                    @foreach (['Male','Female'] as $row)
+                                        <option value="{{ $row }}">{{ $row }}</option>
+                                    @endforeach
+                                  </select>
+                              </div>
+
+                              <div class="form-group col-lg-4">
+                                <label for="section">Section</label>
+                                <select name="section[]" id="section"  multiple required>
+                                    <option value="">Select Section</option>
+                                  </select>
+                              </div>
+
+                              <div class="form-group col-lg-3">
+                                <label for="date">Date</label>
+                                <input type="text" name="date" class="form-control form-control-sm date-picker" required>
+                              </div>
+
+                              
                               
                                 <div class="form-group col-lg-2">
                                         <button type="submit" class="btn btn-primary m-t-25">Submit</button>
@@ -78,7 +100,7 @@
 
 
 
-                        <div class="card card-info" x-data="app">
+                        <div class="card card-info">
                             <form method="post" id="myForm" action="{{ route('holiday.store') }}" enctype="multipart/form-data">
                                @csrf
                                <div class="card-body">
@@ -117,18 +139,17 @@
 
                                       
                                       <div class="form-group col-lg-2">
-                                        <label for="month">Start Date</label>
-                                        <input type="date" name="start_date" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}" class="form-control form-control-sm" required>
+                                        <label for="month">Start Date Time</label>
+                                        <input type="text" name="start_date" id="start_date" class="form-control form-control-sm datetime-picker" required>
                                       </div>
 
                                       <div class="form-group col-lg-2">
-                                        <label for="month">No of Days</label>
-                                        <select name="no_of_days" id="no_of_days"  class="form-control form-control-sm" required>
-                                            @for($i = 1; $i <= 20; $i++)
-                                            <option value="{{ $i }}">{{ $i }}</option>
-                                            @endfor
-                                          </select>
+                                        <label for="month">End Date Time</label>
+                                        <input type="text" name="end_date" id="end_date" class="form-control form-control-sm datetime-picker" required>
+                                        <div id="end_date_error" class="text-danger"></div>
                                       </div>
+
+                                      
                
                                 <div class="form-group col-lg-2">
                                     <button type="submit" class="btn btn-primary m-t-25">Submit</button>
@@ -149,6 +170,78 @@
 </div>
 @endsection
 
-@section('js')
 
+@section('js')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
+<script>
+     flatpickr(".datetime-picker", {
+        enableTime: true,
+        allowInput: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today",
+        plugins: [
+            new confirmDatePlugin({
+                confirmText: "OK",
+                showAlways: false,
+            })
+        ]
+    });
+
+    flatpickr(".date-picker", {
+        enableTime: false,
+        allowInput: true,
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        plugins: [
+            new confirmDatePlugin({
+                confirmText: "OK",
+                showAlways: false,
+            })
+        ]
+    });
+    const section_select = new TomSelect('#section', {
+          create: true,
+          placeholder: 'Select Multiple Section',
+          plugins: ['remove_button'],
+          sortField: { field: "text", direction: "asc" }
+    });
+
+    const branch = $('#branch_id');
+    const hostel = $('#hostel');
+    const gender = $('#gender');
+
+    $('#end_date').change(function() {
+        $('#end_at_error').text('');
+        const startTime = new Date($('#start_date').val());
+        const endTime = new Date($(this).val());
+        if (startTime >= endTime) {
+            $('#end_at_error').text('End time must be greater than start time.');
+            $(this).val('');
+        }
+    });
+
+    branch.change(function() {
+      hostel.val('');
+      gender.val('');
+      section_select.clear();
+      Object.keys(section_select.options).forEach(value => {
+        section_select.removeOption(value);
+    });
+    })
+
+    function getSection() {
+     Object.keys(section_select.options).forEach(value => {
+            section_select.removeOption(value);
+        });
+      $.get(`{{ route('holiday.create') }}?gender=${gender.val()}&branch=${branch.val()}&hostel=${hostel.val()}`, function(data) {
+        $.each(data, function(key, item) {
+          section_select.addOption({
+                    value: item.section,
+                    text: item.section
+          });
+        });
+      });
+    }
+</script>
 @endsection

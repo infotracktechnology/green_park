@@ -101,6 +101,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
     Route::resource('holiday', App\Http\Controllers\HolidayController::class);
+    Route::post('attendance/store', [App\Http\Controllers\HolidayController::class, 'attendance_store'])->name('attendance.store');
+    Route::get('/attendance', [App\Http\Controllers\HolidayController::class, 'attendance'])->name('attendance');
 });
 
 #students routes

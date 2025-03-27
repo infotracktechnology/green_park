@@ -159,6 +159,7 @@
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="save"></i><span>Attendance</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
+                <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
               </ul>
             </li>
 
