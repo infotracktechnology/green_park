@@ -13,7 +13,7 @@ use App\Models\Branch;
 use Illuminate\Support\Facades\Log;
 use App\Models\Staff;
 use App\Models\Student;
-
+use App\Http\Controllers\ImportController;
 
 class HostelController extends Controller
 {
@@ -59,7 +59,7 @@ class HostelController extends Controller
                     'floor' => $room['floor'],
                     'room_no' => $room['room_no'],
                     'no_of_cots' => $room['no_of_cots'],
-                    'cart_no' => "C".$i,
+                    'cart_no' => "C-".$i,
                 ]); 
                 }
                 
@@ -103,7 +103,7 @@ class HostelController extends Controller
         if ($request->has('rooms')) {
             foreach ($request->rooms as $row) {
                 for ($i=1; $i <= $room['no_of_cots'] ; $i++) { 
-                  $cart_no = "C".$i;
+                  $cart_no = "C-".$i;
                   $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $room['room_no'])->where('cart_no', $cart_no)->first();
                   if($room){
                     $room->update([
@@ -153,9 +153,7 @@ class HostelController extends Controller
     public function allocation(Request $request)
     {
         $branches = Branch::all();
-        $branch = null;
         $hostels = [];
-        $students = [];
     
         if ($request->has('branch')) {
             $branch = $request->branch;
@@ -164,49 +162,45 @@ class HostelController extends Controller
                 ->where('hostel_dayscholar', 'Hostel')
                 ->get();
         }
-    
+
         if ($request->has('hostel_id')) {
             $rooms = HostelRoom::where('hostel_id', $request->hostel_id)->get();
             return response()->json($rooms);
         }
-    
-        return view('hostel.allocation', compact('branches', 'branch', 'hostels', 'students'));
+
+        return view('hostel.allocation', compact('branches', 'hostels'));
     }
-    public function storeAllocation(Request $request)
+    public function storeAllocation(Request $request,ImportController $import)
     {
-        if (!$request->hasFile('file')) {
-            return redirect()->back()->with('error', 'No CSV file uploaded.');
-        }
-
+       
         $csvFile = $request->file('file');
-        $filePath = $csvFile->getPathname();
-        $csvData = array_map('str_getcsv', file($filePath));
+        $csvData = $import->parseCSV($csvFile->getRealPath());
 
-        if (count($csvData) < 2) {
-            return redirect()->back()->with('error', 'CSV file is empty or has no valid data.');
-        }
-
-        $hostelId = $request->input('hostel');
-        $totalRooms = HostelRoom::where('hostel_id', $hostelId)->count();
-        $dataRowCount = count($csvData) - 1; // Subtract the header row
+        $totalRooms = HostelRoom::where('hostel_id', $request->hostel)->count();
+        $dataRowCount = count($csvData) - 1;
 
         if ($dataRowCount > $totalRooms) {
             return redirect()->back()->with('error', "The number of rows in the CSV file ($dataRowCount) exceeds the total number of rooms in the selected hostel ($totalRooms).");
         }
+       
+       foreach ($csvData as $key => $row) {
+            $no = $key + 1;
 
-        foreach (array_slice($csvData, 1) as $row) {
-            // Assuming the CSV has columns in the order: student_id, room_no, cots_no
-            if (!isset($row[0])) {
-                return redirect()->back()->with('error', 'CSV file is missing student ID in one or more rows.');
+            if (!isset($row['stuid'])) {
+                return redirect()->back()->with('error', "CSV file is missing student ID ($no) row in one or more rows.");
             }
-            $student = Student::firstOrNew(['id' => $row[0]]);
-            $student->hostel_id = $request->hostel;
-            $student->room_no = $row[1] ?? null;
-            $student->cots_no = $row[2] ?? null;
-            $student->save();
-        }
 
-        return redirect()->route('allocation.hostel')->with('success', 'Student details successfully updated.');
+            $room  = HostelRoom::where('hostel_id', $request->hostel)->where('room_no', $row['room_no'])->where('cart_no', $row['cot_no'])->first();
+            if($room){
+                $stuid = $row['stuid'] ?? 0;
+                $student = Student::where('student_id', $stuid)->first();
+                if($student){
+                $student->update(['hostel_id' => $request->hostel,'room_no' => $row['room_no'], 'cots_no' => $row['cot_no'],'hostel_dayscholar' => 'Hostel']);
+                }
+            }
+       }
+
+        return redirect()->route('allocation.hostel')->with('success', 'Hostel Allocation Successfully Updated.');
     }
        
 }
