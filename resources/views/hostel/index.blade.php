@@ -44,7 +44,7 @@
           <th>Type</th>
           <th>Warden Name</th>
           <th>Room Type</th>
-          <th>Total Rooms</th>
+          <th>Total Cots</th>
           <th>Room Details</th>
           <th>Edit</th>
           <th>Delete</th>
