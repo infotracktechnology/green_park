@@ -72,7 +72,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($classvideos);
     });
 
-    Route::get('/subjects', function (Student $student) {
+   Route::get('/subjects', function (Student $student,$subjects) {
         $subjects = $student->subjects();
         return response()->json($subjects);
     });
