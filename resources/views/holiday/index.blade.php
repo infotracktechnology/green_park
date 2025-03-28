@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Question Key')
+@section('title', 'Holiday')
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
@@ -15,7 +15,7 @@
               @if(session()->has('success'))
               <div class="alert alert-success alert-dismissible fade show" role="alert">
                   {{ session('success') }}
-                 
+                  {{-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> --}}
               </div>
            @endif
                  
@@ -26,57 +26,54 @@
   
                     <div class="row">
                     <div class="col-md-10 col-sm-12 mb-3">
-                    <h6 class="col-deep-purple">Question Key </h6>
+                    <h6 class="col-deep-purple">Holiday </h6>
                     </div>
                     <div class="col-md-2 col-sm-12 mb-3">
-                      <a href="{{route('questionkey.create')}}" class="btn btn-primary btn-block">Add Question Key</a>
+                      <a href="{{route('holiday.create')}}" class="btn btn-primary btn-block">Add Holiday</a>
                     </div>
                     </div>
                     <div class="col-12">
                     <div class="table-responsive">
       <table class="table table-striped table-sm" id="myTable">
   
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Date</th>
-                <th>Academic Year</th>
-                <th>Title</th>
-                <th>Branches</th>
-                <th>Coaching Type</th>
-                <th>Attachment</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($questionKeys as $key)
+    
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Academic Year</th>
+                    <th>Branch</th>
+                    <th>Hostel / Dayscholar</th>
+                    <th>Gender</th>
+                    <th>Section</th>
+                    <th>Name</th>
+                    <th>Holiday Type</th>
+                    <th>Holiday Date</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($holidays as $key)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                  <td>{{ $key->created_at }}</td>
-
                     <td>{{ $key->academic_year }}</td>
-                    <td>{{ $key->title }}</td>
-                    <td>
-                        @php
-                            $branchNames = \App\Models\Branch::whereIn('id', explode(',', $key->branch))->pluck('name')->toArray();
-                        @endphp
-                        {{ implode(', ', $branchNames) }}
-                    </td>
+                    <td>{{ $key->branch() }}</td>
+                    <td>{{ $key->hostel }}</td>
+                    <td>{{ $key->gender }}</td>
+                    <td>{{ $key->section }}</td>
+                    <td>{{ $key->name }}</td>
+                    <td><span class="badge badge-warning">{{ $key->type }}</span></td>
+                    <td>{{ $key->type == 'Week Of' ? $key->holiday_date : $key->start_date . ' to ' . $key->end_date }}</td>
                     
-                    <td>{{ implode(', ', explode(',', $key->coaching_type)) }}</td>
-                    
+            
                     <td>
-                      <a href="{{ env('APP_URL').$key->file_path }}" class="btn btn-primary text-white" download><i class="fas fa-download"></i></a>
-                  </td>
-                    
-                    <td>
-                        <a href="{{ route('questionkey.edit', $key->id) }}" class="btn btn-warning text-white">
+                        <a href="{{ route('holiday.edit', $key->id) }}" class="btn btn-warning text-white">
                            <i class="fas fa-edit"></i>
                         </a>
                      </td>
+                     
                      <td>
-                        <form action="{{route('questionkey.destroy', $key->id)}}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
+                        <form action="{{route('holiday.destroy', $key->id)}}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
                            @csrf
                            @method('DELETE')
                            <button type="submit" class="btn btn-danger">
@@ -85,13 +82,10 @@
                         </form>
                      </td>
                 </tr>
-          
-           
+                @endforeach
+            </tbody>
+        </table>
         
-        @endforeach
-          
-        </tbody>
-      </table>
     </table>
                 </div>
             </div>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\QuestionKey;
 use App\Models\Branch;
 use App\Models\Student;
+use App\Models\AcademicYear;
 
 
 
@@ -13,7 +14,8 @@ class QuestionKeyController extends Controller
 {
     public function index()
     {
-        // $questionKeys = QuestionKey::all
+
+        $academicyear = AcademicYear::all();
         $questionKeys = QuestionKey::latest()->get();
         //$questionKeys = QuestionKey::orderBy('id', 'desc')->get();
         // dd($questionKeys->pluck('id', 'created_at'));
@@ -25,7 +27,7 @@ class QuestionKeyController extends Controller
     {
         // Get all branches
         $branches = Branch::all();
-        
+       
         // Pass the branches to the create view
         return view('questionkey.create', compact('branches'));
     }
@@ -46,9 +48,10 @@ class QuestionKeyController extends Controller
         // Convert array to comma-separated string (no quotes, just commas)
         $branchData = implode(',', $request->branch);
         $coachingTypeData = implode(',', $request->coaching_type);
-    
+   
         QuestionKey::create([
             'title' => $request->title,
+            'academic_year' => $request->academic_year,
             'branch' => $branchData,
             'coaching_type' => $coachingTypeData,
             'file_path' => $filePath,
@@ -94,6 +97,7 @@ class QuestionKeyController extends Controller
         $questionKey->title = $request->title;
         $questionKey->branch = implode(',', $request->branch);
         $questionKey->coaching_type = implode(',', $request->coaching_type);
+        $questionKey->academic_year = $request->academic_year;
         $questionKey->save();
     
         return redirect()->route('questionkey.index')->with('success', 'Question Key updated successfully!');

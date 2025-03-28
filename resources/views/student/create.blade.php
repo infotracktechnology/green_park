@@ -48,11 +48,11 @@
                         </div>
                         
                         <div class="form-group col-lg-3">
-                            <label>Hostel/Day Scholar</label>
+                            <label>Hostel/Dayscholar</label>
                             <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" required>
                                 <option value="">Select Option</option>
                                 <option value="Hostel">Hostel</option>
-                                <option value="Day Scholar">Day Scholar</option>
+                                <option value="Dayscholar">Dayscholar</option>
                             </select>
                         </div>
                         

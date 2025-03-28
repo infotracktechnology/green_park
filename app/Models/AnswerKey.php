@@ -8,7 +8,7 @@ class AnswerKey extends Model
 {
     use HasFactory;
     protected $table = 'answer_key';
-    protected $fillable = ['title', 'file_path', 'branch', 'coaching_type'];
+    protected $fillable = ['title', 'file_path', 'branch', 'coaching_type', 'academic_year'];
 
     // protected $casts = [
     //     'branch' => 'array',

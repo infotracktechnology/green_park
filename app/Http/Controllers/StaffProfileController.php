@@ -4,25 +4,31 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Staff;
+use App\Models\Branch;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ImportController;
 
 class StaffProfileController extends Controller
 {
 
     public function index(Request $request)
     {
+        $branches = Branch::all();
         $staff = Staff::all();
-        return view('staff.index', compact('staff'));
+        $staff = Staff::with('branch')->get();
+    return view('staff.index', compact('staff', 'branches'));
     }
     public function create(Request $request)
     {
+
+        $branches = DB::table('branch')->select('id', 'name')->get(); 
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         if($request->has('state')){
             $districts = DB::table('district_list')->where('State', $request->state)->select('District')->distinct()->orderBy('District')->get();
             return response()->json($districts);
         }
-        return view('staff.create', compact('states'));
+        return view('staff.create', compact('states' , 'branches'));
     }
     public function store(Request $request)
     {
@@ -40,7 +46,7 @@ class StaffProfileController extends Controller
         // Save the staff details along with children details
         $staff = new Staff($request->except('children'));
         $staff->photo = $path;
-    
+        $childrenStudying = $request->has('children_studying') && $request->children_studying == 1 ? 1 : 0;
         // Convert children to JSON before saving
         if ($request->has('children')) {
             
@@ -48,6 +54,7 @@ class StaffProfileController extends Controller
                $children_details[] = ['name' => $child['name'], 'class' => $child['class'], 'section' => $child['section']];
            }
         }
+        $staff->children_studying = $childrenStudying; // Store 1 if Yes, 0 if No
         $staff->children_details =  $children_details;
     
         $staff->save();
@@ -60,10 +67,12 @@ class StaffProfileController extends Controller
     
     public function edit(Request $request, Staff $staff)
     {
+
+        $branches = Branch::all();
         $districts = DB::table('district_list')->where('State', $staff->state)->select('District')->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
     
-        return view('staff.edit', compact('staff', 'districts', 'states'));
+        return view('staff.edit', compact('staff', 'districts', 'states' , 'branches'));
        
        
     }
@@ -87,6 +96,7 @@ class StaffProfileController extends Controller
                     $children_details[] = ['name' => $child['name'], 'class' => $child['class'], 'section' => $child['section']];
                 }
              }
+             $data['children_studying'] = $request->has('children_studying') && $request->children_studying == 1 ? 1 : 0;
              $data['children_details'] =  $children_details;
 
         $staff->update($data);
@@ -113,7 +123,38 @@ class StaffProfileController extends Controller
         return redirect()->route('staff.index')->with('success', 'Staff deleted successfully');
     }
 
-  
+    public function import(Request $request,ImportController $import){ 
+        if($request->hasFile('csv_file')) {
+            $file = $request->file('csv_file');
+            $filePath = $file->getRealPath();
+            $data = $import->parseCSV($filePath);
+            foreach ($data as $row) {
+                $row = array_map('ucwords', $row);
+                $id = $row['id'] ?? 0;
+                $staff = Staff::find($id);
+                if ($staff) {
+                    $staff->update($row);
+                }
+                else{
+                    Staff::create($row);
+                }
+            }
+        }
+        return redirect()->route('staff.index')->with('success', 'Staff imported successfully');
+    }
+
+
+    public function export(Request $request){
+        $staffs = Staff::selectRaw("id,name,school_initial,staff_type,hostel_dayscholar,gender,dob,age,marital_status,blood_group,department,qualifications,nationality,religion,community,caste,mob_no,alternate_mob_no,aadhaar_no,email,address_line_1,address_line_2,state,city,pincode,photo,biometric_no,father_name,mother_name,spouse_name,spouse_ph_no,spouse_occupation,father_ph_no,date_of_joining,designation,experience,class_handling_type,paper_correction,handeling_class,previous_school")->get()->toArray();
+        $file = fopen('staff_export.csv', 'w');
+        $headers = array_keys($staffs[0]);
+        fputcsv($file, $headers);
+        foreach ($staffs as $staff) {
+            fputcsv($file, $staff);
+        }
+        fclose($file);
+        return response()->download('staff_export.csv','staff_export.csv',['Content-Type: text/csv','Cache-Control'=>'no-cache, must-revalidate','Expires'=>'0']);
+    }
 
 
 

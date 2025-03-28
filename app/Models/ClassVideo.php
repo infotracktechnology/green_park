@@ -10,6 +10,7 @@ class ClassVideo extends Model
     protected $table = 'class_video';
 
     protected $fillable = [
+        'academic_year',
         'subject',
         'chapter',
         'period',

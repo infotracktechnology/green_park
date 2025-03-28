@@ -40,15 +40,23 @@
                   </select>
                </div>
 
-
+               <div class="form-group col-lg-3">
+                <label for="branch">Branch</label>
+                <select name="branch_id" id="branch" class="form-control form-control-sm" required>
+                    <option value="">Select Branch</option>
+                    @foreach ($branches as $branch)
+                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
 
                <div class="form-group col-lg-3">
-                  <label>Hostel/Days Scholar </label>
+                  <label>Hostel/Dayscholar </label>
                   <select name="hostel_dayscholar" class="form-control form-control-sm text-capitalize"  >
                      <option value="">Select</option>
                      <option value="hostel">Hostel</option>
-                     <option value="days scholar">Days Scholar</option>
+                     <option value="Dayscholar">Dayscholar</option>
                      
                   </select>
                </div>
@@ -63,7 +71,7 @@
                      <option value="">Select</option>
                      <option value="Male">Male</option>
                      <option value="Female">Female</option>
-                     <option value="other">Other</option>
+                    
                   </select>
                </div>
                  <div class="form-group col-lg-3">
@@ -76,14 +84,6 @@
                   <input type="text" name="age" id="age" class="form-control form-control-sm" >
               </div>
     
-              <div class="form-group col-lg-3">
-               <label>Marital Status</label>
-               <select name="marital_status" class="form-control form-control-sm" >
-                <option value="">Select</option>
-                  <option value="Single">Single</option>
-                  <option value="Married">Married</option>
-               </select>
-            </div>
 
             <div class="form-group col-lg-3">
                <label>Blood Group</label>
@@ -102,8 +102,16 @@
 
            <div class="form-group col-lg-3">
             <label>Department</label>
-            <input type="text" name="department" class="form-control form-control-sm text-capitalize" >
-         </div>
+            <select name="department" class="form-control form-control-sm" style="text-transform: uppercase;">
+                <option value="">Select Department</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Botany">Botany</option>
+                <option value="Zoology">Zoology</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Others">Others</option>
+            </select>
+        </div>
 
 
          <div class="form-group col-lg-3">
@@ -138,7 +146,7 @@
       <label>Community</label>
       <select name="community" class="form-control form-control-sm" >
           <option value="">Select Community</option>
-          <option value="OC" >OC</option>
+          <option value="General" >General</option>
           <option value="BC">BC</option>
           <option value="BCM">BCM</option>
           <option value="MBC">MBC</option>
@@ -182,10 +190,7 @@
    <!-- Contact Details -->
    <div class="form-group col-lg-3">
       <label>Email</label>
-      <input type="email" name="email" class="form-control form-control-sm @error('email') is-invalid @enderror" >
-      @error('email')
-      <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-      @enderror
+      <input type="email" name="email" class="form-control form-control-sm">
    </div>
 
 
@@ -202,7 +207,7 @@
       <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" >
    </div>
 
-   <div class="form-group col-lg-3">
+   {{-- <div class="form-group col-lg-3">
       <label>State</label>
      <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" >
    <option value="">Select State</option>
@@ -217,9 +222,20 @@
         <select name="city" id="city" class="form-control form-control-sm" >
          <option value="">Select City</option>
        </select>
+     </div> --}}
+
+     <div class="form-group col-lg-3">
+        <label>State</label>
+        <input type="text" name="state" class="form-control form-control-sm" >
      </div>
 
-     
+     <div class="form-group col-lg-3">
+        <label>City</label>
+        <input type="text" name="city" class="form-control form-control-sm" >
+     </div>
+
+
+
 
      <div class="form-group col-lg-3">
         <label>Pincode</label>
@@ -243,12 +259,18 @@
  </div>
 
 
+ <div class="form-group col-lg-3">
+    <label>Marital Status</label>
+    <select name="marital_status" class="form-control form-control-sm"  onchange="toggleSpouseDetails(this.value)">
+     <option value="">Select</option>
+       <option value="Single">Single</option>
+       <option value="Married">Married</option>
+    </select>
+ </div>
 
-               <!-- Address -->
+              
                 
                  <div class="form-group col-lg-12"><h6> Parent & Spouse Details </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
-
-
 
                  <div class="form-group col-lg-3">
                   <label>Father Name</label>
@@ -261,36 +283,39 @@
               
            </div>
 
-
            <div class="form-group col-lg-3">
-            <label>Spouse Name</label>
-             <input type="text" name="spouse_name"  class="form-control form-control-sm" >
+            <label>Father/Mother Mobile No</label>
+             <input type="text" name="father_ph_no"  class="form-control form-control-sm">
             
         </div>
+    
 
+         
+        <div class="form-group col-lg-12">
+            <div id="spouse-details" style="display: none;">
+             
+                <div class="row">
+                    <div class="form-group col-lg-3">
+                        <label>Spouse Name</label>
+                        <input type="text" name="spouse_name" class="form-control form-control-sm">
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <label>Spouse Mobile No</label>
+                        <input type="number" name="spouse_ph_no" class="form-control form-control-sm">
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <label>Spouse Occupation</label>
+                        <input type="text" name="spouse_occupation" class="form-control form-control-sm">
+                    </div>
+                </div>
+            </div>
+        </div>
+   
 
-        <div class="form-group col-lg-3">
-         <label>Spouse Mobile No</label>
-          <input type="number" name="spouse_ph_no"  class="form-control form-control-sm" >
-     </div>
-
-
-     <div class="form-group col-lg-3">
-      <label>Spouse Occupation</label>
-       <input type="text" name="spouse_occupation"  class="form-control form-control-sm" >
-  </div>
-
-              <div class="form-group col-lg-3">
-                  <label>Father/Mother Mobile No</label>
-                   <input type="text" name="father_ph_no"  class="form-control form-control-sm">
-                  
-              </div>
 
 
             
               <div class="form-group col-lg-12"><h6>Working School Details </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
-
-
 
                  <!-- Personal Details -->
                  <div class="form-group col-lg-3">
@@ -305,6 +330,8 @@
                       <option value="PG.ASST">PG.ASST</option>
                       <option value="PET">PET</option>
                       <option value="SS">SS</option>
+                      <option value="Neet Faculty">Neet Faculty</option>
+                      <option value="Foundation Faculty">Foundation Faculty</option>
                       <option value="Others">Others</option>
                   </select>
               </div>
@@ -317,6 +344,11 @@
                   <input type="number" name="experience" class="form-control form-control-sm" >
                </div>
 
+               <div class="form-group col-lg-3">
+                <label>Experience in Month(GP)</label>
+                <input type="number" name="experience_month" class="form-control form-control-sm" >
+             </div>
+
 
                <div class="form-group col-lg-3">
                   <label>Class Handling Type</label>
@@ -327,72 +359,67 @@
                       <option value="Others">Others</option>
                   </select>
               </div>
-              
-
-
 
               <div class="form-group col-lg-3">
-               <label>Paper Correction</label>
-               <select name="paper_correction" class="form-control form-control-sm" >
-                   <option value="">Select Type</option>
-                   <option value="Yes">Yes</option>
-                   <option value="No">No</option>
-                   
-               </select>
-           </div>
+                <label>Name of the Previous School Worked</label>
+                <input type="text" name="previous_School" class="form-control form-control-sm" >
+               </div>
            
+       
+                 
 
-
-<div class="form-group col-lg-3">
- <label>Handeling Class & Sec</label>
- <input type="text" name="handeling_class" class="form-control form-control-sm" >
-</div>
- 
-<div class="form-group col-lg-3">
-   <label>Name of the Previous School Worked</label>
-   <input type="text" name="previous_School" class="form-control form-control-sm" >
-  </div>
-   
-
-
-  <div class="form-group col-lg-12"><h6>Staff Childern'S Details(Note:If Studying in Our School ) </h6> <hr style="border-bottom: 1px solid #ccc;"></div>
-
- <div class="col-md-12 form-group mt-0">
-    <button type="button" class="btn btn-warning" id="addItemButton">
-        <i class="fa fa-plus"></i> Add More
-    </button>
-</div>
-
-
-<!-- Template for Cloning -->
-<div id="itemContainer"></div>
-
-<!-- Template for Cloning -->
-<template id="itemTemplate">
-    <div class="col-md-12 row mb-3 itemRow">
-        <div class="col-md-3 form-group">
-            <label class="col-blue">Children's Name</label>
-            <input type="text" name="children[][name]" class="form-control form-control-sm" />
-        </div>
-
-        <div class="col-md-2 form-group">
-            <label class="col-blue">Class</label>
-            <input type="text" name="children[][class]" class="form-control form-control-sm" />
-        </div>
-
-        <div class="col-md-2 form-group">
-            <label class="col-blue">Section</label>
-            <input type="text" name="children[][section]" class="form-control form-control-sm" />
-        </div>
-
-        <div class="col-md-1 form-group">
-            <button type="button" class="btn btn-danger mt-4 removeRow">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-</template>
-
+               <div class="form-group col-lg-12">
+                <h6>Staff Children's Details (Note: If Studying in Our School)</h6>
+                <hr style="border-bottom: 1px solid #ccc;">
+            </div>
+            
+            <!-- Checkbox to toggle visibility -->
+            <div class="form-group col-lg-3">
+                <label>Children Studying in Our School?</label>
+                <div>
+                    <input type="checkbox" id="childrenCheckbox" onchange="toggleChildrenDetails()">
+                    <label for="childrenCheckbox">Yes</label>
+                    <input type="hidden" id="childrenValue" name="children_studying" value="0">
+                </div>
+            </div>
+            
+            <!-- Child details container (Initially hidden) -->
+            <div id="childrenDetailsSection" style="display: none;">
+                <button type="button" id="addItemButton" class="btn btn-warning">Add children’s detail</button>
+                <div id="itemContainer"></div>
+            </div>
+            
+            <!-- Template for Cloning -->
+            <template id="itemTemplate">
+                <div class="col-md-12 row mb-3 itemRow">
+                    <div class="col-lg-4 form-group">
+                        <label class="col-blue">Children's Name</label>
+                        <input type="text" name="children[][name]" class="form-control form-control-sm" />
+                    </div>
+            
+                    <div class="col-md-3 form-group">
+                        <label class="col-blue">Class</label>
+                        <input type="text" name="children[][class]" class="form-control form-control-sm" />
+                    </div>
+            
+                    <div class="col-md-3 form-group">
+                        <label class="col-blue">Section</label>
+                        <input type="text" name="children[][section]" class="form-control form-control-sm" />
+                    </div>
+            
+                    <div class="col-md-1 form-group">
+                        <button type="button" class="btn btn-danger mt-4 removeRow">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+            
+            
+            
+        
+        <!-- JavaScript -->
+       
 
 
 
@@ -416,55 +443,95 @@
 @endsection
 
 @section('js')
+
+
 <script>
-   document.getElementById("addItemButton").addEventListener("click", function() {
-       const template = document.getElementById("itemTemplate").content.cloneNode(true);
-       const index = document.querySelectorAll(".itemRow").length;
+    function toggleSpouseDetails(status) {
+        const spouseDetails = document.getElementById('spouse-details');
+        spouseDetails.style.display = (status === 'Married') ? 'block' : 'none';
 
-             // Update the names of the input fields with the current index
-       template.querySelector('[name="children[][name]"]').setAttribute("name", `children[${index}][name]`);
-       template.querySelector('[name="children[][class]"]').setAttribute("name", `children[${index}][class]`);
-       template.querySelector('[name="children[][section]"]').setAttribute("name", `children[${index}][section]`);
+        if (status !== 'Married') {
+            ['spouse_name', 'spouse_ph_no', 'spouse_occupation'].forEach(name => 
+                document.querySelector(`[name="${name}"]`).value = ''
+            );
+        }
+    }
 
-       document.getElementById("itemContainer").appendChild(template);
-   });
-   
-   document.addEventListener("click", function(e) {
-       if (e.target.classList.contains("removeRow")) {
-           e.target.closest(".itemRow").remove();
-       }
-   });
-   
-   function collectChildrenData() {
-       const children = [];
-       const rows = document.querySelectorAll(".itemRow");
-       rows.forEach(row => {
-           const name = row.querySelector('[name="children_name[]"]').value;
-           const className = row.querySelector('[name="class[]"]').value;
-           const section = row.querySelector('[name="section[]"]').value;
-   
-           children.push({ name, class: className, section });
-       });
+    document.addEventListener("DOMContentLoaded", () => 
+        toggleSpouseDetails(document.querySelector('select[name="marital_status"]').value)
+    );
+</script>
 
+<script>
+    function toggleChildrenDetails() {
+        const checkbox = document.getElementById('childrenCheckbox');
+        const childrenValue = document.getElementById('childrenValue');
+        const childrenDetailsSection = document.getElementById('childrenDetailsSection');
+        const itemContainer = document.getElementById('itemContainer');
 
+        if (checkbox.checked) {
+            childrenDetailsSection.style.display = 'block';
+            childrenValue.value = "1"; // Set to 1 when checked
+        } else {
+            childrenDetailsSection.style.display = 'none';
+            childrenValue.value = "0"; // Set to 0 when unchecked
+            itemContainer.innerHTML = ''; // Clear all added fields
+        }
+    }
 
-       return JSON.stringify(children);
-   }
-   
-   function submitForm() {
-       const childrenDetails = collectChildrenData();
-       // Use AJAX to send the data to the server
-       fetch("/save-staff", {
-           method: "POST",
-           headers: { "Content-Type": "application/json" },
-           body: JSON.stringify({ children_details: childrenDetails })
-       })
-       .then(response => response.json())
-       .then(data => console.log(data))
-       .catch(error => console.error("Error:", error));
-   }
-   </script>
-   
+    document.getElementById("addItemButton").addEventListener("click", function() {
+        const template = document.getElementById("itemTemplate").content.cloneNode(true);
+        const index = document.querySelectorAll(".itemRow").length;
+
+        // Update the names of the input fields with the current index
+        template.querySelector('[name="children[][name]"]').setAttribute("name", `children[${index}][name]`);
+        template.querySelector('[name="children[][class]"]').setAttribute("name", `children[${index}][class]`);
+        template.querySelector('[name="children[][section]"]').setAttribute("name", `children[${index}][section]`);
+
+        // Add event listener for remove button
+        template.querySelector(".removeRow").addEventListener("click", function() {
+            this.closest(".itemRow").remove();
+        });
+
+        // Append the new item to the container
+        document.getElementById("itemContainer").appendChild(template);
+    });
+
+    // Collect children data as JSON
+    function collectChildrenData() {
+        const children = [];
+        const rows = document.querySelectorAll(".itemRow");
+
+        rows.forEach(row => {
+            const name = row.querySelector('input[name*="[name]"]').value;
+            const className = row.querySelector('input[name*="[class]"]').value;
+            const section = row.querySelector('input[name*="[section]"]').value;
+
+            children.push({ name, class: className, section });
+        });
+
+        return children;
+    }
+
+    // Submit form data
+    function submitForm() {
+        const childrenDetails = collectChildrenData();
+        const childrenStudying = document.getElementById("childrenValue").value;
+
+        // Use AJAX to send the data to the server
+        fetch("/save-staff", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                children_studying: childrenStudying, 
+                children_details: childrenDetails 
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log("Success:", data))
+        .catch(error => console.error("Error:", error));
+    }
+</script>
 
 <script>
    
@@ -563,6 +630,81 @@ function showFileNamesAndPreviews(input, previewId) {
 
 
 
+
+
+
+
+
+
+
+
+{{-- <script>
+   document.getElementById("addItemButton").addEventListener("click", function() {
+       const template = document.getElementById("itemTemplate").content.cloneNode(true);
+       const index = document.querySelectorAll(".itemRow").length;
+
+             // Update the names of the input fields with the current index
+       template.querySelector('[name="children[][name]"]').setAttribute("name", `children[${index}][name]`);
+       template.querySelector('[name="children[][class]"]').setAttribute("name", `children[${index}][class]`);
+       template.querySelector('[name="children[][section]"]').setAttribute("name", `children[${index}][section]`);
+
+       document.getElementById("itemContainer").appendChild(template);
+   });
+   
+   document.addEventListener("click", function(e) {
+       if (e.target.classList.contains("removeRow")) {
+           e.target.closest(".itemRow").remove();
+       }
+   });
+   
+   function collectChildrenData() {
+       const children = [];
+       const rows = document.querySelectorAll(".itemRow");
+       rows.forEach(row => {
+           const name = row.querySelector('[name="children_name[]"]').value;
+           const className = row.querySelector('[name="class[]"]').value;
+           const section = row.querySelector('[name="section[]"]').value;
+   
+           children.push({ name, class: className, section });
+       });
+
+
+
+       return JSON.stringify(children);
+   }
+   
+   function submitForm() {
+       const childrenDetails = collectChildrenData();
+       // Use AJAX to send the data to the server
+       fetch("/save-staff", {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify({ children_details: childrenDetails })
+       })
+       .then(response => response.json())
+       .then(data => console.log(data))
+       .catch(error => console.error("Error:", error));
+   }
+   </script> --}}
+
+
+  {{-- <div class="form-group col-lg-3">
+               <label>Paper Correction</label>
+               <select name="paper_correction" class="form-control form-control-sm" >
+                   <option value="">Select Type</option>
+                   <option value="Yes">Yes</option>
+                   <option value="No">No</option>
+                   
+               </select>
+           </div> --}}
+           
+
+{{-- 
+<div class="form-group col-lg-3">
+ <label>Handeling Class & Sec</label>
+ <input type="text" name="handeling_class" class="form-control form-control-sm" >
+</div> --}}
+ 
 
 
 {{-- 

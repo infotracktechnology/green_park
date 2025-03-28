@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Student;
 use Illuminate\Support\Facades\View;
+use App\Models\AcademicYear;
+use App\Models\Branch;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-    
+        $academicyear = AcademicYear::orderBy('id', 'desc')->get();
+        $branchs = Branch::all();
+        View::share('academicyear', $academicyear);
+        View::share('branches', $branchs);
     }
 }

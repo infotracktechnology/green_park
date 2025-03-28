@@ -40,7 +40,8 @@
       <thead>
   
         <tr role="row">
-          <th>Student ID</th>          
+          <th>Student ID</th>       
+          <th>Academic Year</th>   
           {{-- <th>SET</th> --}}
           <th>Campus</th>
           <th>Coaching Type</th>
@@ -64,6 +65,7 @@
           @foreach ($students as $student)
           <tr>
             <td>{{$student->student_id}}</td>
+            <td>{{$student->academic_year}}</td>
             <td>{{$student->campus}}</td>
             <td>{{$student->coaching_type}}</td>
             <td>{{$student->user_name}}</td>

@@ -44,6 +44,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
 
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
+    Route::post('staff/export', [App\Http\Controllers\StaffProfileController::class, 'export'])->name('staff.export');
+    Route::post('staff/import', [App\Http\Controllers\StaffProfileController::class, 'import'])->name('staff.import');
     Route::resource('student', 'App\Http\Controllers\StudentController');
     Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
 
@@ -97,8 +99,10 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('revisionvideo', RevisionVideoController::class);
     Route::resource('academicyear', App\Http\Controllers\AcademicYearController::class);
 
-
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
+    Route::resource('holiday', App\Http\Controllers\HolidayController::class);
+    Route::post('attendance/store', [App\Http\Controllers\HolidayController::class, 'attendance_store'])->name('attendance.store');
+    Route::get('/attendance', [App\Http\Controllers\HolidayController::class, 'attendance'])->name('attendance');
 });
 
 #students routes

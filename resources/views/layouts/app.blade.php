@@ -156,6 +156,14 @@
             </li>
 
             <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="save"></i><span>Attendance</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
+                <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('report.section_exam') }}" class="nav-link">Exam Section Wise</a></li>

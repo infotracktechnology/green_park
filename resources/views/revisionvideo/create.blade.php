@@ -41,7 +41,15 @@
                                         <a href="{{ env('APP_URL').'template/revisionvideo.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Revision Video Upload Template (Format)</a>
                                     </div>
 
-                                  
+                                    <div class="form-group col-lg-3">
+                                        <label for="academic_year">Academic Year</label>
+                                        <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                                            <option value="">Select Academic Year</option>
+                                            @foreach ($academicyear as $row)
+                                                <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                    <div class="form-group col-lg-3">
                                       <label>upload File</label>
                                       <input type="file" name="file" class="form-control form-control-sm" required>

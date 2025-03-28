@@ -41,6 +41,7 @@
                 <tr>
                     <th>#</th>
                     <th>Date</th>
+                    <th>Academic Year</th>
                     <th>Title</th>
                     <th>Branch</th>
                     <th>Coaching Type</th>
@@ -54,6 +55,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $key->created_at }}</td>
+                    <td>{{ $key->academic_year }}</td>
                     <td>{{ $key->title }}</td>
                     <td>
                         @php

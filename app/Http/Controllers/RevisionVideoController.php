@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RevisionVideo;
 use App\Models\Student;
+use App\Models\AcademicYear;
 use App\Http\Controllers\ImportController;
 
 
@@ -11,6 +12,7 @@ class RevisionVideoController extends Controller
 {
     public function index()
     {
+        $academic_years = AcademicYear::all();
         $revisionvideos = RevisionVideo::latest()->get();
         return view('revisionvideo.index', compact('revisionvideos'));
     }
@@ -38,12 +40,14 @@ class RevisionVideoController extends Controller
                 $chapter = trim($data['chapter'] ?? 'Unknown');
                 $expire_at = $request->expire_at;
                 $video_id = trim($data['video_id'] ?? '0');
+                $academic_year = $request->academic_year;
     
                 RevisionVideo::create([
                     'subject' => $subject,
                     'chapter' => $chapter,
                     'expire_at' => $expire_at,
                     'video_id' => $video_id,
+                    'academic_year' => $academic_year,
                 ]);
             }
     

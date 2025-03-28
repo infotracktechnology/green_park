@@ -67,6 +67,7 @@
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox" id="checkAll" /></th>
+                                            <th>Academic Year</th>
                                             <th>Subject</th>
                                             <th>Chapter</th>
                                             <th>Period</th>
@@ -81,6 +82,7 @@
                                         @foreach ($classvideos as $classvideo)
                                         <tr>
                                             <td><input type="checkbox" class='ids' name="ids[]" value="{{$classvideo->id}}" /></td>
+                                            <td>{{$classvideo->academic_year}}</td>
                                             <td>{{ $classvideo->subject }}</td>
                                             <td>{{ $classvideo->chapter }}</td>
                                             <td>{{ $classvideo->period }}</td>

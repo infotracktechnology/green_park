@@ -28,7 +28,7 @@ class ImportController extends Controller
         ]);
 
         $branch = $request->branch ?? '';
-
+        $academic_year = $request->academic_year ?? '';
         // Step 2: Handle file upload
         if ($request->hasFile('csv_file')) {
             $file = $request->file('csv_file');
@@ -40,13 +40,20 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
-                    $row = array_map('ucwords', $row);
-                   if(isset($row['student_id'])){
-                    $student = Student::find($row['student_id']);
+                    
+                    $row = array_map(function($value) {
+                        return is_string($value) ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
+                    }, $row);
+                    
+
+                    $student_id = $row['student_id'] ?? 0;
+                      
+                    $student = Student::where('student_id', $student_id)->first();
+                   if($student){
                     $student->update($row);
                    }
                    else{
-                    //$row = array_merge($row, ['campus' => $branch]);
+                    $row = array_merge($row, ['campus' => $branch, 'academic_year' =>$academic_year]);
                     $student = Student::create($row);
                    }
                 }
