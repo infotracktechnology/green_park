@@ -76,11 +76,6 @@ Route::group(['prefix' => 'v2'], function () {
         $subjects = ['physics', 'chemistry', 'botany', 'zoology'];
         return response()->json($subjects);
     });
-
-    Route::get('classvideos/period', function (Student $student) {
-        $classvideos = $student->classvideo()->select('period')->distinct()->get();
-        return response()->json($classvideos->pluck('period')->all());
-    });
  
 
     Route::get('/discussionvideo/{subject}', function (Student $student, $subject) {
