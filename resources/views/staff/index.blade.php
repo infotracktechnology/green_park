@@ -50,6 +50,7 @@
         <th>Full Name</th>
         <th>Staff School Initial</th>
         <th>Designation</th>
+        <th>Branch</th>
         <th>Department</th>
         <th>Email</th>
         <th>Mobile No</th>
@@ -69,7 +70,9 @@
             <td>{{ $member->id}}</td>
             <td>{{ $member->name }}</td>
             <td>{{ $member->school_initial }}</td>
+            
             <td>{{ $member->designation }}</td>
+            <td>{{ $member->branch?->name ?? 'N/A' }}</td>
             <td>{{ strtoupper($member->department) }}</td>
             <td>{{ $member->email }}</td>
             <td>{{ $member->mob_no }}</td>

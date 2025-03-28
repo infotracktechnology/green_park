@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Staff;
+use App\Models\Branch;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ImportController;
@@ -13,17 +14,21 @@ class StaffProfileController extends Controller
 
     public function index(Request $request)
     {
+        $branches = Branch::all();
         $staff = Staff::all();
-        return view('staff.index', compact('staff'));
+        $staff = Staff::with('branch')->get();
+    return view('staff.index', compact('staff', 'branches'));
     }
     public function create(Request $request)
     {
+
+        $branches = DB::table('branch')->select('id', 'name')->get(); 
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         if($request->has('state')){
             $districts = DB::table('district_list')->where('State', $request->state)->select('District')->distinct()->orderBy('District')->get();
             return response()->json($districts);
         }
-        return view('staff.create', compact('states'));
+        return view('staff.create', compact('states' , 'branches'));
     }
     public function store(Request $request)
     {
@@ -62,10 +67,12 @@ class StaffProfileController extends Controller
     
     public function edit(Request $request, Staff $staff)
     {
+
+        $branches = Branch::all();
         $districts = DB::table('district_list')->where('State', $staff->state)->select('District')->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
     
-        return view('staff.edit', compact('staff', 'districts', 'states'));
+        return view('staff.edit', compact('staff', 'districts', 'states' , 'branches'));
        
        
     }
