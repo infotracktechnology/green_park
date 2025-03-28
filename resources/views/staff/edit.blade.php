@@ -38,6 +38,23 @@
                         </select>
                     </div>
                     
+
+
+                    <div class="form-group col-lg-3">
+                        <label for="branch">Branch</label>
+                        <select name="branch_id" id="branch" class="form-control form-control-sm" required>
+                            <option value="">Select Branch</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}" @if($branch->id == $staff->branch_id) selected @endif>
+                                    {{ $branch->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+
+
+
                     <div class="form-group col-lg-3">
                         <label>Hostel/Dayscholar</label>
                         <select name="hostel_dayscholar" class="form-control form-control-sm text-capitalize" >
