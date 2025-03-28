@@ -18,6 +18,12 @@ class Staff extends Model
         'children_details' => 'json',
     ];
 	
+
+	public function branch()
+	{
+		return $this->belongsTo(Branch::class, 'branch_id'); // Ensure 'branch_id' is the correct foreign key
+	}
+
 	public static function boot()
 	{
 		parent::boot();
