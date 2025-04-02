@@ -41,7 +41,7 @@
                         <div class="form-group col-lg-2">
                                 <label for="academic_year">Academic Year</label>
                                 <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
-                                    <option value="">Select Academic Year</option>
+                                    {{-- <option value="">Select Academic Year</option> --}}
                                     @foreach ($academicyear as $row)
                                         <option value="{{ $row->academic_year }}" @selected(request('academic_year') == $row->academic_year)>{{ $row->academic_year }}</option>
                                     @endforeach
@@ -120,9 +120,9 @@
                      <form action="{{ route('attendance.store') }}" method="post" enctype="multipart/form-data">
                      @csrf
                     <div class="row">
-                        <div class="col-md-12 col-sm-12 mt-3">
+                        {{-- <div class="col-md-12 col-sm-12 mt-3">
                             <input type="checkbox" id="present" /> Prsent All
-                        </div>
+                        </div> --}}
 
             <div class="col-md-12 col-sm-12 mb-3">
                     <div class="table-responsive">
@@ -155,7 +155,7 @@
                    <td>{{ $row->coaching_type }}</td>
                    <td>{{ $row->section }}</td>
                    <td>
-                    <input type="radio" name="status[{{ $loop->iteration }}]" value="P" class="present" required> <label>P</label>
+                    <input type="radio" name="status[{{ $loop->iteration }}]" value="P" class="present" required checked> <label>P</label>
                     <input type="radio" name="status[{{ $loop->iteration }}]" value="A" class="absent" required> <label>A</label>
                    </td>
                </tr>
