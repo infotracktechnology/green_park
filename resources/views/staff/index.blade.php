@@ -55,11 +55,10 @@
         <th>Email</th>
         <th>Mobile No</th>
         <th>Gender</th>
-        <th>City</th>
-        <th>State</th>
-          <th>Pin Code</th>
-         <th>Edit </th>
-          <th>Action</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Edit </th>
+        <th>Action</th>
         </tr>
   
         </thead>
@@ -77,9 +76,8 @@
             <td>{{ $member->email }}</td>
             <td>{{ $member->mob_no }}</td>
             <td>{{ $member->gender }}</td>
-            <td>{{ $member->city }}</td>
-            <td>{{ $member->state }}</td>
-            <td>{{ $member->pincode }}</td>
+            <td>{{ $member->username }}</td>
+            <td>{{ $member->password1 }}</td>
            
           
             <td>

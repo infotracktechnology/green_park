@@ -4,7 +4,7 @@
  <div class="main-content">
     <section class="section">
     <div class="row ">
-        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="col-xl-4 col-sm-12">
           <div class="card card-primary">
             <div class="card-statistic-4">
               <div class="align-items-center justify-content-between">
@@ -25,6 +25,24 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="col-xl-8 col-sm-12">
+          <form action="{{ route('admin.home') }}" method="get">
+          <div class="row m-t-40">
+            <div class="form-group col-lg-4">
+              <label for="academic_year">Academic Year</label>
+              <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                  <option value="">Select Current Academic Year</option>
+                  @foreach ($academicyear as $row)
+                      <option value="{{ $row->academic_year }}" @selected($row->academic_year == session('academic_year'))>{{ $row->academic_year }}</option>
+                  @endforeach
+              </select>
+          </div>
+          <div class="form-group col-lg-8">
+            <button type="submit" class="btn btn-primary m-t-25" id="update_academic_year">Update Academic Year</button>
+          </div>
+        </div>
+        </form>
         </div>
         {{-- <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="card">
