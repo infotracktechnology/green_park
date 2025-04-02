@@ -39,8 +39,12 @@ Route::group(['prefix' => 'v2'], function () {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
-    Route::get('/announcements', function (Request $request,Student $student) {
-        $announcements = $student->announcement();
+    Route::get('/announcements', function (Request $request) {
+        $announcements = Announcement::all()->map(function ($announcement) {
+            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
+            return $announcement;
+        });
+    
         return response()->json($announcements);
     });
     Route::get('/examportion', function (Request $request,Student $student) {
