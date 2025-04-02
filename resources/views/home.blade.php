@@ -33,8 +33,8 @@
               <label for="academic_year">Academic Year</label>
               <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
                   <option value="">Select Current Academic Year</option>
-                  @foreach ($academicyear as $row)
-                      <option value="{{ $row->academic_year }}" @selected($row->academic_year == session('academic_year'))>{{ $row->academic_year }}</option>
+                  @foreach (\App\Models\AcademicYear::all() as $row)
+                      <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
                   @endforeach
               </select>
           </div>
