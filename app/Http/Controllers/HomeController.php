@@ -15,7 +15,7 @@ class HomeController extends Controller
 
         if($request->has('academic_year')) {
             AcademicYear::update(['active' => 0]);
-            AcademicYear::where('id', $request->academic_year)->update(['active' => 1]);
+            AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
         }       
        
         return view('home', compact('activeUsersCount'));
