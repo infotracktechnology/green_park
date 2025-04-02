@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $academicyear = AcademicYear::orderBy('id', 'desc')->get();
+        $academicyear = AcademicYear::where('active', 1)->first();
         $branchs = Branch::all();
         View::share('academicyear', $academicyear);
         View::share('branches', $branchs);
