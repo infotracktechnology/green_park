@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Section Shuffle')
+@section('title', 'Hostel Allocation')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
@@ -49,7 +49,7 @@
                                                     <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
                                                         <option value="">Select Academic Year</option>
                                                         @foreach ($academicyear as $row)
-                                                            <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
+                                                            <option value="{{ $row->academic_year }}" @selected($row->academic_year == request('academic_year'))>{{ $row->academic_year }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -57,13 +57,15 @@
 
                                                 <div class=" form-group col-3">
                                                     <label>Branch</label>
-                                                    <select name="branch" id="branch" class="form-control form-control-sm" onchange="window.location.href = `{{ route('allocation.hostel') }}?branch=${this.value}`" required>
+                                                    <select name="branch" id="branch" class="form-control form-control-sm" onchange="location.href = `{{ route('allocation.hostel') }}?branch=${this.value}&academic_year=${document.getElementById('academic_year').value}`" required>
                                                         <option value="" disabled selected>Choose Branch</option>
                                                         @foreach ($branches as $row)
-                                                            <option value="{{ $row->id }}" @if($row->id == $branch) selected @endif>{{ $row->name }}</option>
+                                                            <option value="{{ $row->id }}" @selected($row->id == request('branch'))>{{ $row->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
+
+                                                
                                                 <div class="form-group  col-3">
                                                     <label>Hostel</label>
                                                     <select name="hostel" id="hostel" class="form-control form-control-sm" onchange="updateTotalRooms(this.value)" required>
@@ -83,7 +85,7 @@
 
                                                 <div class="form-group col-3">
                                                     <label>Upload File</label>
-                                                    <input type="file" name="file" id="file" class="form-control form-control-sm" required>
+                                                    <input type="file" name="file" id="file" accept=".csv" class="form-control form-control-sm" required>
                                                 </div>
 
                                                 <div class="form-group col-lg-12">
@@ -136,6 +138,14 @@
 
     $('#hostel').on('change', function() {
         updateTotalRooms(this.value);
+    });
+
+    $('#file').on('change', function() {
+        var file = this.files[0];
+        if (file.type !== 'text/csv') {
+            alert('Please select a CSV file.');
+            this.value = '';
+        }
     });
 </script>
 

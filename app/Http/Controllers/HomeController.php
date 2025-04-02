@@ -1,18 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Student;
 
+use App\Models\AcademicYear;
+use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+//use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $activeUsersCount = Student::where('active', 1)->count();
 
-        
-
+        if($request->has('academic_year')) {
+            DB::table('academic_year')->update(['active' => 0]);
+            AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
+        }       
+       
         return view('home', compact('activeUsersCount'));
     }
 

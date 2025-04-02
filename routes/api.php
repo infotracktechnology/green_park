@@ -39,8 +39,12 @@ Route::group(['prefix' => 'v2'], function () {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
-    Route::get('/announcements', function (Request $request,Student $student) {
-        $announcements = $student->announcement();
+    Route::get('/announcements', function (Request $request) {
+        $announcements = Announcement::all()->map(function ($announcement) {
+            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
+            return $announcement;
+        });
+    
         return response()->json($announcements);
     });
     Route::get('/examportion', function (Request $request,Student $student) {
@@ -67,11 +71,16 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($downloads);
     });
 
-    Route::get('/classvideos/{subject}', function (Student $student, $subject) {
-        $classvideos = $student->classvideo($subject);
-        $classvideos = $classvideos->groupBy('period');
+    Route::get('/classvideos/{subject}/{period}', function (Student $student, $subject, $period) {
+        $classvideos = $student->classvideo($subject)->where('period', $period);
         return response()->json($classvideos);
     });
+
+    Route::get('/classvideos/subject', function (Student $student) {
+        $subjects = ['physics', 'chemistry', 'botany', 'zoology'];
+        return response()->json($subjects);
+    });
+ 
 
     Route::get('/discussionvideo/{subject}', function (Student $student, $subject) {
         $discussionvideos = $student->discussionvideos($subject);
