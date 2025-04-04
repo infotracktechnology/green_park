@@ -48,7 +48,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card card-primary" x-data="app">
-                        <form method="post" id="myForm" action="{{ route('announcement.store') }}" enctype="multipart-form-data">
+                        <form method="post" id="myForm" action="{{ route('announcement.store') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
@@ -120,7 +120,7 @@
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <label for="attachment">Attachment</label>
-                                        <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" onchange="saveAs('assets/attachments', this)">
+                                        <input type="file" name="attachment" id="attachment" class="form-control form-control-sm">
                                     </div>
 
                                     <div class="form-group col-lg-12">
