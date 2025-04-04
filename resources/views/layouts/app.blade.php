@@ -164,6 +164,10 @@
             </li>
 
             <li class="dropdown">
+              <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
+            </li>
+
+            <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('report.section_exam') }}" class="nav-link">Exam Section Wise</a></li>
