@@ -298,7 +298,7 @@
     updateTimer(); // Run immediately on page load
 });
 
-      const timer = new easytimer.Timer();
+      const timetimer = new easytimer.Timer();
   
             function updateClock() {
                 const now = new Date();
@@ -310,8 +310,8 @@
             
             updateClock();
             
-            timer.addEventListener('secondsUpdated', updateClock);
-            timer.start({ precision: 'seconds' });
+            timetimer.addEventListener('secondsUpdated', updateClock);
+            timetimer.start({ precision: 'seconds' });
 
 </script>
 
