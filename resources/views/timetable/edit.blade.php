@@ -17,18 +17,18 @@
                            <div class="row">
 
                               <div class="col-md-12 col-sm-12 mb-3">
-                                 <h6 class="col-deep-purple">Assign Sections to TimeTable</h6>
+                                 <h6 class="col-deep-purple">Assign Subject to TimeTable</h6>
                               </div>
 
-                              <div class="form-group m-b-10 col-lg-6">
+                              {{-- <div class="form-group m-b-10 col-lg-6">
                                 <label for="academic_year">Sections</label>
-                                <select name="section[]" id="section" class="select" multiple required>
-                                  <option value="">Select Multiple Section</option>
+                                <select name="section" id="section" class="form-control form-control-sm" onchange="location.href=`{{ route('timetable.edit', $timetable->id) }}?section=${this.value}}`"  required>
+                                  <option value="">Select Section</option>
                                     @foreach ($sections as $row)
-                                        <option value="{{ $row->section }}" @selected(in_array($row->section,explode(',', $timetable->section)))>{{ $row->section }}</option>
+                                        <option value="{{ $row->section }}">{{ $row->section }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> --}}
 
                               {{-- <div class="col-md-12 col-sm-12 mb-3">
                                 <ul class="nav nav-pills" id="myTab3" role="tablist">
@@ -100,6 +100,8 @@
    </section>
 </div>
 @endsection
+
+
 
 @section('js')
 <script>
