@@ -14,7 +14,12 @@ class TimetableController extends Controller
     public function index(Request $request)
     {
         $timetables = Timetable::all();
-        return view('timetable.index', compact('timetables'));
+        $sections = DB::table('student')->distinct()->select('section')->get();
+        if($request->has('section')) {
+            $timetables = Timetable::find($request->id)->update(['section' => implode(',', $request->section)]);
+            return to_route('timetable.index')->with('success', 'Timetable Assigned Section successfully');
+        }
+        return view('timetable.index', compact('timetables', 'sections'));
     }
 
     public function create(Request $request)
@@ -81,7 +86,7 @@ class TimetableController extends Controller
         $structure[$request->day[$key]][$request->index[$key]]['subject'] = $subject;
        }
        $timetable->structure = $structure;
-       $timetable->section = implode(',', $request->section);
+       //$timetable->section = implode(',', $request->section);
        $timetable->save();
 
        return to_route('timetable.index')->with('success', 'Timetable updated successfully');

@@ -56,7 +56,7 @@
             <td>{{$loop->iteration}}</td>
             <td>{{$timetable->academic_year}}</td>
             <td>{{$timetable->name}}</td>
-            <td>{{$timetable->section}}</td>
+            <td><button type="button" class="btn btn-primary assign" data-toggle="modal" data-target="#assignSection" data-id="{{$timetable->id}}" data-section="{{ json_encode(explode(',', $timetable->section)) }}"><i class="fas fa-edit"></i> Assign Section</button><br> {{$timetable->section}}</td>
             <td>{{$timetable->start_time}}</td>
             <td>
               <a href="{{ route('timetable.edit', $timetable->id) }}" class="btn btn-primary">
@@ -93,6 +93,36 @@
 
    </section>
 </div>
+
+<div class="modal fade" id="assignSection">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Assign Section</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ route('timetable.index') }}" id="assignForm" method="get" enctype="multipart/form-data">
+          <div class="row">
+          <div class="form-group col-12">
+            <label for="branch">Sections</label>
+            <input type="hidden" name="id" id="assign_id">
+            @foreach ($sections as $row)
+            <input type="checkbox" name="section[]" value="{{$row->section}}"> {{$row->section}}
+           @endforeach
+          </div>
+        
+            <div class="form-group col-12">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('js')
@@ -106,6 +136,24 @@
 
   });
 
+$(".assign").click(function(){
+  var id = $(this).data('id');
+  var section = $(this).data('section');
+  $('input:checkbox').prop('checked', false);
+  $.each(section, function(index, value){
+    $('input:checkbox[value="'+value+'"]').prop('checked', true);
+  })
+  $("#assign_id").val(id);
+  $("#assignSection").modal('show');
+});
+// $("#assignForm").on('submit', function(e){
+//   e.preventDefault();
+//     if($('input:checkbox').length == 0) {
+//         alert("Please select at least one section");
+//     } else {
+//         this.submit();
+//     }
+// });
 </script>
 
 @endsection
