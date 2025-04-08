@@ -132,7 +132,8 @@
                 <li><a href="{{route('questionkey.index')}}"  class="nav-link"> Question Key</a></li>
                 <li><a href="{{route('answerkey.index')}}"  class="nav-link"> Answer key</a></li>
                 <li><a href="{{ route('download.index') }}" class="nav-link">Downloads</a></li>
-
+                <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
+                <li><a href="{{ route('achievement.index') }}" class="nav-link">NEET Achievement</a></li>
              
               </ul>
             </li>

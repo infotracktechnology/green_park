@@ -214,6 +214,11 @@
                     <i class="fas fa-download" style="font-size: 20px; color: #5daaf1;"></i><span>Downloads</span>
                   </a>
                 </li>
+                <li class="dropdown">
+                  <a href="{{ route('student.worksheet') }}" class="nav-link">
+                    <i class="fas fa-file" style="font-size: 20px; color: #5daaf1;"></i><span>Worksheet</span>
+                  </a>
+                </li>
               @endif
             </ul>
           
