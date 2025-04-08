@@ -49,7 +49,6 @@
             <th>End Time</th>
             <th>status</th>
             <th>Test attend</th>
-            <th>Result Publish</th>
             <th>Perview</th>
             <th>Edit</th>
             <th>Action</th>
@@ -73,7 +72,7 @@
           </td>
             <td>{{ $test->student_count }}</td>
 
-            <td><span class="badge badge-{{ $test->publish == 'Yes' ? 'success' : 'danger' }}">{{ $test->publish }}</span></td>
+            
           
             <td>
               <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>

@@ -133,38 +133,34 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="text/javascript">
+        // Generate PDF as soon as page loads and all resources are ready
         window.onload = function() {
+            generateAndDownloadPDF();
+        };
+        
+        function generateAndDownloadPDF() {
             var printContainer = document.getElementById('print-container');
             
             var opt = {
                 margin: [0.5, 0, 0.5, 0], // Top, left, bottom, right margins in inches
                 filename: "{{ $section }} - mark_sheet.pdf",
-                image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    scrollY: 0
-                },
                 jsPDF: { 
                     unit: 'in', 
                     format: 'letter', 
                     orientation: 'portrait' 
                 },
-                pagebreak: { 
-                    mode: ['avoid-all', 'css', 'legacy'],
-                    before: '.page-break',
-                    avoid: ['tr', 'td']
-                }
             };
             
-            // Create worker
-            var worker = html2pdf()
+            // Create worker and trigger download
+            html2pdf()
                 .from(printContainer)
                 .set(opt)
                 .save()
                 .then(function() {
+                    console.log('PDF generated and download started');
+                    // You can remove the alert if you don't want the popup
                     alert('Report successfully generated');
+                    //window.close();
                     // Uncomment the line below if you want to redirect after PDF generation
                     // location.href = "{{ route('report.section_exam') }}";
                 })
@@ -172,7 +168,7 @@
                     console.error('Error generating PDF:', error);
                     alert('There was an error generating the PDF. Please try again.');
                 });
-        };
+        }
     </script>
 </body>
 </html>
