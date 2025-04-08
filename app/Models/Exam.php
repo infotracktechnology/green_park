@@ -18,6 +18,7 @@ class Exam extends Model
         'end_at' => 'datetime',
     ];
 
+
     function branch()
     {
         if(strpos($this->branch_id, ',')){
