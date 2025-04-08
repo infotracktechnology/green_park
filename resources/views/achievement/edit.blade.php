@@ -5,7 +5,43 @@
 <link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}">
 @endsection
+<style>
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #6777ef; 
+        color: #fff; 
+        border: none; 
+        padding: 5px 10px; 
+        margin: 5px 5px 0 0; 
+        border-radius: 3px; 
+    }
 
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        display: none; 
+    }
+
+    .select2-container--default .select2-selection--single {
+        border-color: #6777ef;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #6777ef transparent transparent transparent;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #6777ef;
+        color: #fff;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #6777ef;
+        min-height: 38px;
+        padding: 0;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+        padding: 0 5px;
+    }
+</style>
 @section('main')
 <div class="main-content">
     <section class="section">
