@@ -15,6 +15,8 @@ use App\Http\Controllers\ChairmanVideoController;
 use App\Http\Controllers\QuestionKeyController;
 use App\Http\Controllers\AnswerkeyController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\WorksheetController;
+use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\RevisionVideoController;
 use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
@@ -89,6 +91,10 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::resource('download', DownloadController::class);
     Route::get('/download/download/{id}', [AnswerKeyController::class, 'download'])->name('download.download');
+    Route::resource('worksheet', WorksheetController::class);
+    Route::get('/worksheet/download/{id}', [WorksheetController::class, 'download'])->name('worksheet.download');
+
+    Route::resource('achievement', AchievementController::class);
     Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
     Route::resource('classvideo', ClassVideoController::class)->except(['show']);
     Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
@@ -118,6 +124,7 @@ Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('s
 Route::get('answerkey',[AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
 Route::get('questionkey', [QuestionKeyController::class, 'questionkey'])->name('student.questionKey');
 Route::get('download', [DownloadController::class, 'download'])->name('student.download');
+Route::get('worksheet', [WorksheetController::class, 'worksheet'])->name('student.worksheet');
 Route::get('classvideo', [ClassVideoController::class, 'classvideo'])->name('student.classvideo');
 Route::get('revisionvideo', [RevisionVideoController::class, 'revisionvideo'])->name('student.revisionvideo');
 Route::get('discussionvideo', [StudentController::class, 'discussionvideo'])->name('student.discussionvideo');
