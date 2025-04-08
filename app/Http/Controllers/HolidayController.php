@@ -114,6 +114,7 @@ class HolidayController extends Controller
     public function attendance(Request $request){
         $sections = [];
         $students = [];
+        $attendances = [];
         if($request->has('hostel')){
             $sections = Student::where('gender', $request->gender)->whereIn('campus', explode(',', $request->branch_id))->where('hostel_dayscholar', $request->hostel)->select('section')->distinct()->get();
         }
@@ -124,19 +125,21 @@ class HolidayController extends Controller
                 return redirect()->back()->with('error', 'Holiday already exists for this date!');
             }
 
-            $attendance = DB::table('attendance')->where('attendance_date', $request->attendance_date)->where('timing', $request->attendance_timing)->where('section', $request->section)->first();
+        $attendances = DB::table('attendance')->where('attendance_date', $request->attendance_date)->where('timing', $request->attendance_timing)->where('branch_id', $request->branch_id)->where('section', $request->section)->get()->keyBy('student_id');
+            $students = Student::where('gender', $request->gender)->whereIn('campus', explode(',', $request->branch_id))->where('hostel_dayscholar', $request->hostel)->where('section', $request->section)->get();
 
-            if($attendance){
-                return redirect()->back()->with('error', 'Attendance records already exists for this date and timing!');
+            if($attendances){
+                return view('holiday.attendance', compact('sections', 'students', 'attendances'));
             }
 
             $students = Student::where('gender', $request->gender)->whereIn('campus', explode(',', $request->branch_id))->where('hostel_dayscholar', $request->hostel)->where('section', $request->section)->get();
         }
 
-        return view('holiday.attendance', compact('sections', 'students'));
+        return view('holiday.attendance', compact('sections', 'students', 'attendances'));
     }
 
     public function attendance_store(Request $request){
+        $attendances = DB::table('attendance')->where('attendance_date', $request->attendance_date)->where('timing', $request->attendance_timing)->where('branch_id', $request->branch_id)->where('section', $request->section)->delete();
         $data = collect($request->status)->map(function ($status, $key) use ($request) {
             return [
                 'attendance_date' => $request->attendance_date,

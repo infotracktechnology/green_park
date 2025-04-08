@@ -50,7 +50,7 @@
 
                         <div class="form-group col-lg-2">
                             <label for="date">Attendance Date</label>
-                            <input type="text" value="{{ request('attendance_date')  }}" name="attendance_date" class="form-control form-control-sm date-picker" required>
+                            <input type="text" value="{{ request('attendance_date') ?? date('Y-m-d')  }}" name="attendance_date" class="form-control form-control-sm date-picker" required>
                           </div>
 
                           
@@ -198,7 +198,7 @@
         enableTime: false,
         allowInput: true,
         dateFormat: "Y-m-d",
-        minDate: "today",
+        maxDate: "today",
         plugins: [
             new confirmDatePlugin({
                 confirmText: "OK",

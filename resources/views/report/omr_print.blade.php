@@ -182,18 +182,21 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="text/javascript">
+    window.onload = function() {
+            generateAndDownloadPDF();
+        };
+        function generateAndDownloadPDF() {
         var printContainer = document.getElementById('print-container');
         var opt = {
             margin: [0, 0, 0, 0],
             filename: "{{ $section }} - omr_print.pdf",
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
         };
         html2pdf().set(opt).from(printContainer).save().then(function(){
             alert('Report successfully generated');
             //location.href = "{{ route('report.section_exam') }}";
         });
+    }
     </script>
 </body>
 </html>
