@@ -49,13 +49,13 @@
 
         <div class="form-group col-lg-3">
             <label>In Time</label>
-            <input type="datetime-local" name="in_time"  class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d\TH:i') }}"  required>
+            <input type="text" name="in_time"  class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d H:i') }}"  required>
         </div>
         
 
         <div class="form-group col-lg-3">
             <label>Out Time</label>
-            <input type="datetime-local" name="out_time" class="datetime-picker form-control form-control-sm">
+            <input type="text" name="out_time" class="datetime-picker form-control form-control-sm">
         </div>
 
         <div class="form-group col-lg-3">
@@ -86,7 +86,7 @@
         enableTime: true,
         allowInput: true,
         dateFormat: "Y-m-d H:i",
-        maxDate: new Date(),
+        maxDate: "today",
         plugins: [
             new confirmDatePlugin({
                 confirmText: "OK",
