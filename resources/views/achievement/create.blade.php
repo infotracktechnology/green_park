@@ -3,6 +3,7 @@
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}">
+
 <style>
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #6777ef; 

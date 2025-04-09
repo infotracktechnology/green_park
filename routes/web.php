@@ -20,6 +20,7 @@ use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\RevisionVideoController;
 use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
+use App\Http\Controllers\SickRoomEntryController;
 
 
 
@@ -62,7 +63,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
     Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');
     Route::post('allocation/hostel', 'App\Http\Controllers\HostelController@storeAllocation')->name('allocation.store');
-  
+    Route::resource('sickroom', SickRoomEntryController::class);
+    Route::put('sickroom/{id}', [SickRoomEntryController::class, 'update'])->name('sickroom.update');
+
     Route::resource('exam', 'App\Http\Controllers\ExamController');
 
     Route::resource('chairmanvideo', 'App\Http\Controllers\ChairmanVideoController');
