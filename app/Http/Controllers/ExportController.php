@@ -10,10 +10,8 @@ class ExportController extends Controller
 {
   function student_export(Request $request)
   {
-    if ($request->has('category')) {
-
-      $columns = explode(',', $request->category);
-      $students = Student::select($columns)->get()->toArray();
+    if ($request->has('fields')) {
+      $students = Student::select($request->fields)->get()->toArray();
 
       // Write data to CSV
       $file = fopen('student_export.csv', 'w');
