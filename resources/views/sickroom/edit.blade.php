@@ -27,7 +27,7 @@
 
         <div class="form-group col-lg-3">
             <label>Section</label>
-            <select name="section" id="section" class="form-control" required>
+            <select name="section" id="section" class="form-control form-control-sm" required>
                 <option value="">Select Section</option>
                 @foreach($sections as $section)
                     <option value="{{ $section }}" {{ $sickroom->section == $section ? 'selected' : '' }}>{{ $section }}</option>
@@ -49,13 +49,13 @@
 
         <div class="form-group col-lg-3">
             <label>In Time</label>
-            <input type="datetime-local" id="in_time" name="in_time" class="datetime-picker form-control form-control-sm" 
-                   value="{{ date('Y-m-d\TH:i', strtotime($sickroom->in_time)) }}" required>
+            <input type="text" id="in_time" name="in_time" class="datetime-picker form-control form-control-sm" value="{{ $sickroom->in_time }}" required>
         </div>
         
         <div class="form-group col-lg-3">
             <label>Out Time</label>
-            <input type="datetime-local" name="out_time" class="datetime-picker form-control form-control-sm" value="{{ date('Y-m-d\TH:i', strtotime($sickroom->out_time)) }}">
+            <input type="text" name="out_time" class="datetime-picker form-control form-control-sm" value="{{ $sickroom->out_time  }}" id="out_time">
+            <span id="out_time_error" class="text-danger"></span>
         </div>
         
         <div class="form-group col-lg-3">
@@ -86,7 +86,7 @@
         enableTime: true,
         allowInput: true,
         dateFormat: "Y-m-d H:i",
-        maxDate: new Date(),
+        maxDate: "today",
         plugins: [
             new confirmDatePlugin({
                 confirmText: "OK",
