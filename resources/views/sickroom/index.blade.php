@@ -51,7 +51,7 @@
             @foreach($entries as $entry)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $entry->class }}</td>
+                    <td>{{ $entry->student_class }}</td>
                     <td>{{ $entry->section }}</td>
                     <td>{{ $entry->room_no }}</td>
                     <td>{{ $entry->student_id }}</td>
