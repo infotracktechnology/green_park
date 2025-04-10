@@ -22,7 +22,7 @@
    
         <div class="form-group col-lg-3">
             <label>Class</label>
-            <input type="text" name="class" value="{{ old('class', $sickroom->class) }}" class="form-control form-control-sm" required>
+            <input type="text" name="student_class" value="{{ old('student_class', $sickroom->student_class) }}" class="form-control form-control-sm" required>
          </div>
 
         <div class="form-group col-lg-3">
