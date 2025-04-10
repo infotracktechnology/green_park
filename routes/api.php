@@ -7,6 +7,7 @@ use App\Models\Chairmanvideo;
 use App\Models\Announcement;
 use App\Models\Examportion;
 use App\Models\RevisionVideo;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +95,17 @@ Route::group(['prefix' => 'v2'], function () {
         $datetime = date('Y-m-d H:i:s');
         $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
         return response()->json($revisionvideos);
+    });
+
+    Route::get('/student/magic-login/{id}/{token}', function ($id, $token) {
+        $student = \App\Models\Student::findOrFail($id);
+        
+        if ($token !== sha1($student->user_name . 'secret-key')) {
+            abort(403);
+        }
+    
+        Auth::guard('student')->login($student);
+        return redirect()->route('student.instruction', base64_encode(request('exam_id')));
     });
     
 });
