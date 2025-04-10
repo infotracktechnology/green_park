@@ -97,15 +97,22 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($revisionvideos);
     });
 
-    Route::get('/student/magic-login/{id}/{token}', function ($id, $token) {
-        $student = \App\Models\Student::findOrFail($id);
-        
-        if ($token !== sha1($student->user_name . 'secret-key')) {
-            abort(403);
+    Route::get('/api/v2/student/magic-login/{id}/{token}', function ($id, $token) {
+        $student = Student::findOrFail($id);
+ 
+        $expectedToken = sha1($student->user_name . 'my-secret-key');
+    
+        if ($token !== $expectedToken) {
+            abort(403, 'Unauthorized link');
         }
     
         Auth::guard('student')->login($student);
-        return redirect()->route('student.instruction', base64_encode(request('exam_id')));
+   
+        $student->active = 1;
+        $student->save();
+ 
+        $examId = request()->query('exam_id');
+        return redirect()->route('student.instruction', $examId);
     });
     
 });
