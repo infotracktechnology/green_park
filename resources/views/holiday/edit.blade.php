@@ -182,6 +182,7 @@
         enableTime: true,
         allowInput: true,
         dateFormat: "Y-m-d H:i",
+      
         minDate: "today",
         plugins: [
             new confirmDatePlugin({

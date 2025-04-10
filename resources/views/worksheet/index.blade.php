@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Download')
+@section('title', 'Worksheet')
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
@@ -26,10 +26,10 @@
   
                     <div class="row">
                     <div class="col-md-10 col-sm-12 mb-3">
-                    <h6 class="col-deep-purple">Answer Key </h6>
+                    <h6 class="col-deep-purple">Worksheet</h6>
                     </div>
                     <div class="col-md-2 col-sm-12 mb-3">
-                      <a href="{{route('worksheet.create')}}" class="btn btn-primary btn-block">Add Download</a>
+                      <a href="{{route('worksheet.create')}}" class="btn btn-primary btn-block">Add Worksheet </a>
                     </div>
                     </div>
                     <div class="col-12">
