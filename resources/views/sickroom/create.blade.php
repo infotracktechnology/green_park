@@ -26,7 +26,7 @@
 
         <div class="form-group col-lg-3">
             <label>Section</label>
-            <select name="section" id="section" class="form-control" required>
+            <select name="section" id="section" class="form-control form-control-sm" required>
                 <option value="">Select Section</option>
                 @foreach($sections as $section)
                     <option value="{{ $section }}">{{ $section }}</option>
