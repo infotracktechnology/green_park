@@ -18,9 +18,9 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $students = DB::table('student')
-            ->join('branch', 'student.campus', '=', 'branch.id')
+        $students = Student::join('branch', 'student.campus', '=', 'branch.id')
             ->select('student.*', 'branch.name as campus')
+            ->where('student.academic_year', $this->academic_year)
             ->get();
         return view('student.index', compact('students'));
     }

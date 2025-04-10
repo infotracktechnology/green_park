@@ -25,7 +25,7 @@
                               <div class="form-group col-lg-3">
                                 <label for="branch">Select Academic Year:</label>
                                 <select name="academic_year" id="academic_year" class="form-control form-control-sm">
-                                    <option value="">-- Choose  Academic Year--</option>
+                                    {{-- <option value="">-- Choose  Academic Year--</option> --}}
                                     @foreach ($academicyear as $row)
                                         <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
                                     @endforeach

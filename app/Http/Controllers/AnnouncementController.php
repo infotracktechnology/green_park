@@ -29,26 +29,24 @@ class AnnouncementController extends Controller
     public function store(Request $request)
 {
     $announcement = new Announcement();
-   $announcement->academic_year = $request->academic_year;
+    $announcement->academic_year = $request->academic_year;
     $announcement->branch = implode(',', $request->branch);
     $announcement->coaching_type = implode(',', $request->coaching_type);
     $announcement->gender = $request->gender;
     $announcement->title = $request->title;
     $announcement->content = $request->content;
 
-    if ($request->hasFile('attachment')) {
+    if ($request->has('attachment')) {
         $fileName = time() . '.' . $request->attachment->extension();
         $request->attachment->move(public_path('assets/attachments'), $fileName);
         $announcement->attachment = 'assets/attachments/' . $fileName;
     } else {
         $announcement->attachment = null;
     }
-
     $announcement->category = in_array('Offline', $request->coaching_type) ? $request->category : null;
-
     $announcement->save();
-    
-    return to_route('announcement.index');
+
+    return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
 
     

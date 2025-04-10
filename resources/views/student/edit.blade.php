@@ -769,7 +769,7 @@
 });
 
 
-
+$('.steps ul li').addClass('done').removeClass('disabled');
     'use strict';
 
     // Real-time input validation

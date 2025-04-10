@@ -210,32 +210,16 @@
       <input type="text" name="address_line_2" class="form-control form-control-sm text-capitalize" value="{{ $staff->address_line_2 }}" >
    </div>
 
-   {{-- <div class="form-group col-lg-3">
-      <label>State</label>
-      <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm">
-          <option value="">Select State</option>
-          @foreach ($states as $state)
-              <option value="{{ $state->State }}" {{ $staff->state == $state->State ? 'selected' : '' }}>
-                  {{ $state->State }}
-              </option>
-          @endforeach
-      </select>
-  </div>
-  
-  <div class="form-group col-lg-3">
-      <label>City</label>
-      <select name="city" id="city" class="form-control form-control-sm">
-          <option value="">Select City</option>
-          @if(!empty($districts))
-              @foreach ($districts as $city)
-                  <option value="{{ $city->District }}" {{ $staff->city == $city->District ? 'selected' : '' }}>
-                      {{ $city->District }}
-                  </option>
-              @endforeach
-          @endif
-      </select>
-  </div>
-   --}}
+   <div class="form-group col-lg-3">
+    <label>Username</label>
+    <input type="text" name="username" class="form-control form-control-sm" value="{{ $staff->username }}">
+</div>
+
+<div class="form-group col-lg-3">
+    <label>Password</label>
+    <input type="text" name="password1" class="form-control form-control-sm" value="{{ $staff->password1 }}">
+</div>
+
 
    <div class="form-group col-lg-3">
     <label>State</label>

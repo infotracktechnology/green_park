@@ -14,6 +14,12 @@ class ReportController extends Controller
         $sections = DB::table('student')->select('section')->distinct()->orderBy('section')->get();
         $tests = Exam::groupBy('name')->get();
         $test_name = $request->test_name ?? 0;
+
+        if($request->has('publish')) {
+            $testIds = Exam::where('name', $test_name)->update(['publish' => $request->publish]);
+            return view('report.section_exam', compact('sections', 'tests', 'test_name'));
+        }
+
         if($request->query('type') == 'overall') {
             $testIds = Exam::where('name', $test_name)->pluck('id')->toArray();
             $testIds = $testIds != '' ? $testIds : 0;

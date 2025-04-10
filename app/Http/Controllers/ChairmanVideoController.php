@@ -89,6 +89,7 @@ class ChairmanVideoController extends Controller
     }
 
     public function video(Request $request, $id){
+        $id = base64_decode($id);
         return view('layouts.video', compact('id'));
     }
 }

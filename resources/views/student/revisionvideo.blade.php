@@ -34,7 +34,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $video->subject }}</td>
                                         <td>{{ $video->chapter }}</td>
-                                        <td><a href="{{ route('video', $video->video_id) }}" target="_blank">Watch</a></td>
+                                        <td><a href="{{ route('video', base64_encode($video->video_id)) }}" target="_blank">Watch</a></td>
                                     </tr>
                                     @endforeach
                                 </tbody>

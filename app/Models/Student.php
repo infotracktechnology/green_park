@@ -10,10 +10,12 @@ use App\Models\Examportion;
 use App\Models\ExamAnswer;
 use App\Models\AnswerKey;
 use App\Models\QuestionKey;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class Student extends Authenticatable
 {
+    use SoftDeletes;
     public $table = 'student';
 
     protected $guarded = [];
@@ -55,7 +57,7 @@ class Student extends Authenticatable
     }
     function examportion()
     {
-        return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->first();
+        return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%");
     }
 
     public function answerkey()
@@ -72,6 +74,13 @@ class Student extends Authenticatable
     {
         return Download::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->get();
     }
+
+    public function worksheet()
+    {
+        return Worksheet::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->get();
+    }
+
+
 
     public function classvideo($subject = ''){
         $datetime = date('Y-m-d H:i:s');

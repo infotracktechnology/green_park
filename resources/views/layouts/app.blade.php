@@ -132,7 +132,8 @@
                 <li><a href="{{route('questionkey.index')}}"  class="nav-link"> Question Key</a></li>
                 <li><a href="{{route('answerkey.index')}}"  class="nav-link"> Answer key</a></li>
                 <li><a href="{{ route('download.index') }}" class="nav-link">Downloads</a></li>
-
+                <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
+                <li><a href="{{ route('achievement.index') }}" class="nav-link">NEET Achievement</a></li>
              
               </ul>
             </li>
@@ -152,6 +153,8 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
                 <li><a  href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
+                <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
+
               </ul>
             </li>
 
@@ -161,6 +164,10 @@
                 <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
                 <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
               </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
             </li>
 
             <li class="dropdown">

@@ -214,6 +214,11 @@
                     <i class="fas fa-download" style="font-size: 20px; color: #5daaf1;"></i><span>Downloads</span>
                   </a>
                 </li>
+                <li class="dropdown">
+                  <a href="{{ route('student.worksheet') }}" class="nav-link">
+                    <i class="fas fa-file" style="font-size: 20px; color: #5daaf1;"></i><span>Worksheet</span>
+                  </a>
+                </li>
               @endif
             </ul>
           
@@ -298,7 +303,7 @@
     updateTimer(); // Run immediately on page load
 });
 
-      const timer = new easytimer.Timer();
+      const timetimer = new easytimer.Timer();
   
             function updateClock() {
                 const now = new Date();
@@ -310,8 +315,8 @@
             
             updateClock();
             
-            timer.addEventListener('secondsUpdated', updateClock);
-            timer.start({ precision: 'seconds' });
+            timetimer.addEventListener('secondsUpdated', updateClock);
+            timetimer.start({ precision: 'seconds' });
 
 </script>
 
