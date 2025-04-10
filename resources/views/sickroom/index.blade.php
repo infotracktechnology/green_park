@@ -38,8 +38,9 @@
                 <th>#</th>
                 <th>Class</th>
                 <th>Section</th>
-                <th>Student ID</th> 
+               
                 <th>Room No</th>
+                <th>Student ID</th> 
                 <th>In Time</th>
                 <th>Out Time</th>
                 <th>Reason</th>
