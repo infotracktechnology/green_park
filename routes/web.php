@@ -138,6 +138,25 @@ Route::post('/exam/save', 'App\Http\Controllers\ExamController@Save')->name('exa
 Route::get('marksheet',[StudentController::class, 'marksheet'])->name('student.marksheet');
 Route::get('mark/subject/{test_id}',[StudentController::class, 'mark_subject'])->name('student.mark_subject');
 Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download'])->name('student.mark_download');
+
+Route::get('/student/magic-login/{id}/{token}', function ($id, $token) {
+    $student = \App\Models\Student::findOrFail($id);
+    $expectedToken = sha1($student->user_name . 'my-secret-key');
+
+    if ($token !== $expectedToken) {
+        abort(403, 'Unauthorized link');
+    }
+
+    Auth::guard('student')->login($student);
+    $student->active = 1;
+    $student->save();
+
+    $examId = request('exam_id');
+
+    return redirect()->route('student.instruction', $examId);
+});
+
+
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
