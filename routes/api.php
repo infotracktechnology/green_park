@@ -97,5 +97,15 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($revisionvideos);
     });
 
+    Route::get('/worksheet', function (Request $request, Student $student) {
+        $worksheet = $student->worksheet();
+        return response()->json($worksheet);
+    });
+
+    Route::get('/achievements', function (Request $request, Student $student) {
+        $achievements = $student->achievements();
+        return response()->json($achievements);
+    });
+
 
 });
