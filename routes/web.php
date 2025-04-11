@@ -23,6 +23,7 @@ use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\DB;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -152,3 +153,12 @@ Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_na
         return redirect()->back()->with('error', 'Invalid username or password.');
     }
 });
+
+Route::get('/test/{student_id}', function ($student_id) {
+    $testId = DB::table('exam')
+                ->join('exam_answer', 'exam.id', '=', 'exam_answer.test_id')
+                ->where('exam_answer.student_id', $student_id)
+                ->value('exam.id');
+    return response()->json(['test_id' => base64_encode($testId)]);
+});
+
