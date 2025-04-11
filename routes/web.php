@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LogoutController;
@@ -21,10 +22,7 @@ use App\Http\Controllers\RevisionVideoController;
 use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
-
-
-
-
+use GuzzleHttp\Psr7\Request;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -84,14 +82,14 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('answerkey/exam', [ExamController::class, 'answerKey'])->name('exam.answerkey');
     Route::post('answerkey/exam', [ExamController::class, 'uploadAnswerKey'])->name('exam.answerkey.upload');
     Route::get('exam/report/dump', 'App\Http\Controllers\ExamController@Dump_Report')->name('exam.report.dump');
-    
+
     Route::delete('answerkey/delete/{id}/{test_id}', [App\Http\Controllers\ExamController::class, 'deleteAnswerKey'])->name('answerkey.delete');
-    
+
     Route::delete('offline/delete/{id}/{test_id}', [App\Http\Controllers\ExamController::class, 'deleteOfflineKey'])->name('offline.delete');
 
     Route::resource('questionkey', QuestionKeyController::class);
     Route::get('/questionkey/download/{id}', [QuestionKeyController::class, 'download'])->name('questionkey.download');
-    
+
     Route::resource('answerkey', AnswerKeyController::class);
     Route::get('/answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
 
@@ -121,29 +119,36 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 #students routes
 
 Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function () {
-Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentdashboard');
-Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
-Route::get('home',[StudentController::class, 'home'])->name('student.home');
-Route::get('notification',[AnnouncementController::class, 'notification'])->name('student.notification');
-Route::get('chairmanvideo',[ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
-Route::get('examportion',[ExamPortionController::class, 'examportion'])->name('student.examportion');
-Route::get('answerkey',[AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
-Route::get('questionkey', [QuestionKeyController::class, 'questionkey'])->name('student.questionKey');
-Route::get('download', [DownloadController::class, 'download'])->name('student.download');
-Route::get('worksheet', [WorksheetController::class, 'worksheet'])->name('student.worksheet');
-Route::get('classvideo', [ClassVideoController::class, 'classvideo'])->name('student.classvideo');
-Route::get('revisionvideo', [RevisionVideoController::class, 'revisionvideo'])->name('student.revisionvideo');
-Route::get('discussionvideo', [StudentController::class, 'discussionvideo'])->name('student.discussionvideo');
-Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
-Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
-Route::post('/exam/clearlog', 'App\Http\Controllers\ExamController@clearlog')->name('exam.clearlog');
-Route::post('/exam/save', 'App\Http\Controllers\ExamController@Save')->name('exam.save');
-Route::get('marksheet',[StudentController::class, 'marksheet'])->name('student.marksheet');
-Route::get('mark/subject/{test_id}',[StudentController::class, 'mark_subject'])->name('student.mark_subject');
-Route::get('mark/download/{test_id}',[StudentController::class, 'mark_download'])->name('student.mark_download');
+    Route::get('dashboard', [StudentController::class, 'dashboard'])->name('studentdashboard');
+    Route::get('profile', [StudentController::class, 'profile'])->name('student.profile');
+    Route::get('home', [StudentController::class, 'home'])->name('student.home');
+    Route::get('notification', [AnnouncementController::class, 'notification'])->name('student.notification');
+    Route::get('chairmanvideo', [ChairmanVideoController::class, 'chairmanvideo'])->name('student.chairmanvideo');
+    Route::get('examportion', [ExamPortionController::class, 'examportion'])->name('student.examportion');
+    Route::get('answerkey', [AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
+    Route::get('questionkey', [QuestionKeyController::class, 'questionkey'])->name('student.questionKey');
+    Route::get('download', [DownloadController::class, 'download'])->name('student.download');
+    Route::get('worksheet', [WorksheetController::class, 'worksheet'])->name('student.worksheet');
+    Route::get('classvideo', [ClassVideoController::class, 'classvideo'])->name('student.classvideo');
+    Route::get('revisionvideo', [RevisionVideoController::class, 'revisionvideo'])->name('student.revisionvideo');
+    Route::get('discussionvideo', [StudentController::class, 'discussionvideo'])->name('student.discussionvideo');
+    Route::get('instruction/{test_id}', 'App\Http\Controllers\ExamController@student_instruction')->name('student.instruction');
+    Route::get('exam/{test_id}', 'App\Http\Controllers\ExamController@student_exam')->name('student.exam');
+    Route::post('/exam/clearlog', 'App\Http\Controllers\ExamController@clearlog')->name('exam.clearlog');
+    Route::post('/exam/save', 'App\Http\Controllers\ExamController@Save')->name('exam.save');
+    Route::get('marksheet', [StudentController::class, 'marksheet'])->name('student.marksheet');
+    Route::get('mark/subject/{test_id}', [StudentController::class, 'mark_subject'])->name('student.mark_subject');
+    Route::get('mark/download/{test_id}', [StudentController::class, 'mark_download'])->name('student.mark_download');
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
 Route::get('video/{id}', 'App\Http\Controllers\ChairmanVideoController@video')->name('video');
 
 
+Route::post('/student/login/{examId}', function (Request $request, $user_name, $password, $examId) {
+    if (Auth::guard('student')->attempt(['user_name' => $user_name, 'password' => $password])) {
+        return redirect()->route('student.instruction', $examId);
+    } else {
+        return redirect()->back()->with('error', 'Invalid username or password.');
+    }
+});

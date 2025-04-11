@@ -80,6 +80,11 @@ class Student extends Authenticatable
         return Worksheet::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->get();
     }
 
+    public function achievements()
+    {
+        return Achievement::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->latest()->get();
+    }
+
 
 
     public function classvideo($subject = ''){
@@ -102,6 +107,7 @@ class Student extends Authenticatable
         }
         return $password;
     }
+
    
    
 }
