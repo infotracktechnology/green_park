@@ -28,7 +28,7 @@ Route::group(['prefix' => 'v2'], function () {
     Route::post('/login',  function (Request $request) {
         $student = Student::where('user_name', $request->username)->where('password_1', $request->password)->first();
         if ($student) {
-            return response()->json(['message' => 'Login successful', 'student_id' => $student->id], 200);
+            return response()->json(['message' => 'Login successful', 'student_id' => $student->student_id], 200);
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
     });
