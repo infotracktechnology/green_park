@@ -145,9 +145,9 @@ Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name(
 Route::get('video/{id}', 'App\Http\Controllers\ChairmanVideoController@video')->name('video');
 
 
-Route::post('/student/login/{examId}', function (Request $request, $user_name, $password, $examId) {
+Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_name, $password, $test_id) {
     if (Auth::guard('student')->attempt(['user_name' => $user_name, 'password' => $password])) {
-        return redirect()->route('student.instruction', $examId);
+        return redirect()->route('student.instruction', ['test_id' => $test_id]);
     } else {
         return redirect()->back()->with('error', 'Invalid username or password.');
     }
