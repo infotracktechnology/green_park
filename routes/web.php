@@ -57,6 +57,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('export/student', 'App\Http\Controllers\ExportController@student_export')->name('export.student');
 
 
+    Route::get('/hostel-attendance', [HostelController::class, 'attendanceEntry'])->name('hostelattendance');
+    Route::post('/hostel-attendance/store', [HostelController::class, 'storeAttendance'])->name('hostelattendance.store');
+
     Route::get('section/student', 'App\Http\Controllers\StudentController@section')->name('section.student');
     Route::post('section/student', 'App\Http\Controllers\StudentController@update_section')->name('section.update');
     Route::get('allocation/hostel', 'App\Http\Controllers\HostelController@allocation')->name('allocation.hostel');

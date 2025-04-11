@@ -66,7 +66,7 @@
                     </td>
                     
                     <td>
-                        <form action="{{ route('sickroom.destroy', $entry->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
+                        <form action="{{ route('sickroom.destroy', $entry->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this Entry?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">
