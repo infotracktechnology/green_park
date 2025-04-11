@@ -156,9 +156,18 @@ Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_na
 
 Route::get('/test/{student_id}', function ($student_id) {
     $testId = DB::table('exam')
-                ->join('exam_answer', 'exam.id', '=', 'exam_answer.test_id')
-                ->where('exam_answer.student_id', $student_id)
-                ->value('exam.id');
+        ->join('student', function ($join) {
+            $join->whereRaw("FIND_IN_SET(student.campus, exam.branch_id)")
+                 ->whereRaw("FIND_IN_SET(student.coaching_type, exam.coaching_type)");
+        })
+        ->where('student.student_id', $student_id)
+        ->where('exam.start_at', '<=', now())
+        ->where('exam.end_at', '>=', now()) 
+        ->select('exam.id')
+        ->value('id');
+
     return response()->json(['test_id' => base64_encode($testId)]);
 });
+
+
 
