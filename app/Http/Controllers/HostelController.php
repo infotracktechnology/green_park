@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Staff;
 use App\Models\Student;
 use App\Http\Controllers\ImportController;
+use App\Models\HostelAttendance;
 
 class HostelController extends Controller
 {
@@ -202,7 +203,54 @@ class HostelController extends Controller
 
         return redirect()->route('allocation.hostel')->with('success', 'Hostel Allocation Successfully Updated.');
     }
-       
+    
+
+
+    public function attendanceEntry(Request $request)
+    {
+        $hostels = DB::table('hostel')->select('id', 'branch_id', 'name')->get();
+        $rooms = DB::table('hostel_rooms')->select('hostel_id', 'room_no')->distinct()->get();
+        $students = [];
+        $attendances = [];
+        $branches = DB::table('branch')->select('id', 'name')->get();
+        $academicyear = DB::table('student')->select('academic_year')->distinct()->get();
+    
+        if ($request->has('show')) {
+            $students = Student::where('academic_year', $request->academic_year)
+                ->where('hostel_id', $request->hostel)
+                ->where('room_no', $request->room_no)
+                ->select('student_id', 'student_name', 'academic_year', 'coaching_type')
+                ->get();
+        }
+    
+        return view('hostel.hostelattendance', compact(
+             'hostels', 'rooms', 'students', 'attendances', 'branches', 'academicyear'
+        ));
+    }
+    
+  
+    public function storeAttendance(Request $request)
+    {
+    
+    HostelAttendance::where('attendance_date', $request->attendance_date)->where('timing', $request->timing)->where('hostel', $request->hostel)->where('room_no', $request->room_no)->delete();
+
+        foreach ($request->student_id as $key => $student_id) {
+            $status = $request->status[$key] ?? 'A';
+            HostelAttendance::create([
+                'academic_year'    => $request->academic_year,
+                'branch_id'        => $request->branch_id,
+                'attendance_date'  => $request->attendance_date,
+                'timing'           => $request->timing,
+                'student_id'       => $student_id,
+                'hostel'           => $request->hostel,
+                'room_no'          => $request->room_no,
+                'status'           => $status,
+            ]);
+        }
+    
+        return redirect()->route('hostelattendance')->with('success', 'Attendance saved successfully.');
+    }
+
 }
     
  

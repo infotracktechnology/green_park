@@ -110,26 +110,28 @@
 
 <script>
     const allStudents = @json($students);
-    const selectedSection = "{{ $sickroom->section }}";
-    const selectedStudentId = "{{ $sickroom->student_id }}";
+    const selectedSection = "{{ $sickroom->section ?? '' }}";
+    const selectedStudentId = "{{ $sickroom->student_id ?? '' }}";
+    const isEdit = {{ isset($sickroom) ? 'true' : 'false' }};
 
     const sectionDropdown = document.getElementById('section');
     const studentDropdown = document.getElementById('student_id');
 
     function populateStudents(section) {
-        studentDropdown.innerHTML = '<option value="">Select Student ID</option>';
+        studentDropdown.innerHTML = '<option value="">Select Student</option>';
         const filtered = allStudents.filter(s => s.section === section);
 
         filtered.forEach(student => {
             const option = document.createElement('option');
             option.value = student.student_id;
-            option.text = `${student.student_id} - ${student.user_name}`;
+            option.text = `${student.student_name} (${student.user_name})`; // always this format
             if (student.student_id == selectedStudentId) {
                 option.selected = true;
             }
             studentDropdown.appendChild(option);
         });
     }
+
     if (selectedSection) {
         populateStudents(selectedSection);
     }
@@ -138,7 +140,6 @@
         populateStudents(this.value);
     });
 </script>
-
 
 @endsection
 
