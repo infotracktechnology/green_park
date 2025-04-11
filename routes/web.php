@@ -24,6 +24,8 @@ use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Student;
+use App\Models\Exam;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -155,18 +157,12 @@ Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_na
 });
 
 Route::get('/test/{student_id}', function ($student_id) {
-    $testId = DB::table('exam')
-        ->join('student', function ($join) {
-            $join->whereRaw("FIND_IN_SET(student.campus, exam.branch_id)")
-                 ->whereRaw("FIND_IN_SET(student.coaching_type, exam.coaching_type)");
-        })
-        ->where('student.student_id', $student_id)
-        ->where('exam.start_at', '<=', now())
-        ->where('exam.end_at', '>=', now()) 
-        ->select('exam.id')
-        ->value('id');
-
-    return response()->json(['test_id' => base64_encode($testId)]);
+    $student = Student::where('student_id', $student_id)->first();
+    if (!$student) {
+        return response()->json(['error' => 'Student not found'], 404);
+    }
+    $exam = Exam::getOngoingExams($student->coaching_type, $student->campus);
+    return response()->json(['test_id' => base64_encode($exam->id ?? '')]);
 });
 
 
