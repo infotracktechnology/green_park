@@ -98,7 +98,20 @@ public function update(Request $request, $id)
     }
 
   
+    public function bulkDelete(Request $request)
+{
+    $ids = explode(",", $request->ids);
 
+    if (empty($ids)) {
+        return response()->json(['message' => 'No videos selected'], 400);
+    }
+
+    RevisionVideo::whereIn('id', $ids)->delete();
+
+    return response()->json(['message' => 'Selected videos deleted successfully!'], 200);
+}
+
+    
     
 }
 

@@ -38,8 +38,9 @@
                 <th>#</th>
                 <th>Class</th>
                 <th>Section</th>
-                <th>Student ID</th> 
+               
                 <th>Room No</th>
+                <th>Student ID</th> 
                 <th>In Time</th>
                 <th>Out Time</th>
                 <th>Reason</th>
@@ -51,7 +52,7 @@
             @foreach($entries as $entry)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $entry->class }}</td>
+                    <td>{{ $entry->student_class }}</td>
                     <td>{{ $entry->section }}</td>
                     <td>{{ $entry->room_no }}</td>
                     <td>{{ $entry->student_id }}</td>
@@ -65,7 +66,7 @@
                     </td>
                     
                     <td>
-                        <form action="{{ route('sickroom.destroy', $entry->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
+                        <form action="{{ route('sickroom.destroy', $entry->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this Entry?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">

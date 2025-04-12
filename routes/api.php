@@ -7,7 +7,8 @@ use App\Models\Chairmanvideo;
 use App\Models\Announcement;
 use App\Models\Examportion;
 use App\Models\RevisionVideo;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -31,11 +32,11 @@ Route::group(['prefix' => 'v2'], function () {
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
     });
-    Route::get('/student_profile/{student_id}',  function (Request $request, $student_id) {
-        $student = Student::findorFail($student_id);
+    Route::get('/student_profile/{student_id}',  function (Student $student, $student_id) {
+        $student = Student::where('id', $student_id)->first();
         return response()->json($student);
     });
-    Route::get('/chairmanvideo',  function (Request $request,Student $student) {
+    Route::get('/chairmanvideo',  function (Request $request, Student $student) {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
@@ -44,11 +45,11 @@ Route::group(['prefix' => 'v2'], function () {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
             return $announcement;
         });
-    
+
         return response()->json($announcements);
     });
-    Route::get('/examportion', function (Request $request,Student $student) {
-        $examportion = $student->examportion();
+    Route::get('/examportion', function (Request $request, Student $student) {
+        $examportion = $student->examportion()->get();
         return response()->json($examportion);
     });
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
@@ -57,17 +58,17 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($results);
     });
 
-    Route::get('/questionkey', function (Request $request,Student $student) {
+    Route::get('/questionkey', function (Request $request, Student $student) {
         $questionkey = $student->questionkey();
         return response()->json($questionkey);
     });
 
-    Route::get('/answerkey', function (Request $request,Student $student) {
+    Route::get('/answerkey', function (Request $request, Student $student) {
         $answerkey = $student->answerkey();
         return response()->json($answerkey);
     });
 
-    Route::get('/downloads', function (Request $request,Student $student) {
+    Route::get('/downloads', function (Request $request, Student $student) {
         $downloads = $student->downloads();
         return response()->json($downloads);
     });
@@ -81,7 +82,7 @@ Route::group(['prefix' => 'v2'], function () {
         $subjects = ['physics', 'chemistry', 'botany', 'zoology'];
         return response()->json($subjects);
     });
- 
+
 
     Route::get('/discussionvideo/{subject}', function (Student $student, $subject) {
         $discussionvideos = $student->discussionvideos($subject);
@@ -95,5 +96,16 @@ Route::group(['prefix' => 'v2'], function () {
         $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
         return response()->json($revisionvideos);
     });
-    
+
+    Route::get('/worksheet', function (Request $request, Student $student) {
+        $worksheet = $student->worksheet();
+        return response()->json($worksheet);
+    });
+
+    Route::get('/achievements', function (Request $request, Student $student) {
+        $achievements = $student->achievements();
+        return response()->json($achievements);
+    });
+
+
 });
