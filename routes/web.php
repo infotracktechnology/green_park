@@ -156,8 +156,8 @@ Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_na
     }
 });
 
-Route::get('/test/{student_id}', function ($student_id) {
-    $student = Student::where('student_id', $student_id)->first();
+Route::get('/test/{id}', function ($student_id) {
+    $student = Student::where('id', $student_id)->first();
     if (!$student) {
         return response()->json(['error' => 'Student not found'], 404);
     }
