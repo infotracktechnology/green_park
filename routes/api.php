@@ -33,7 +33,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json(['message' => 'Invalid credentials'], 401);
     });
     Route::get('/student_profile/{student_id}',  function (Student $student, $student_id) {
-        $student = Student::where('student_id', $student_id)->first();
+        $student = Student::where('id', $student_id)->first();
         return response()->json($student);
     });
     Route::get('/chairmanvideo',  function (Request $request, Student $student) {
@@ -49,7 +49,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($announcements);
     });
     Route::get('/examportion', function (Request $request, Student $student) {
-        $examportion = $student->examportion();
+        $examportion = $student->examportion()->get();
         return response()->json($examportion);
     });
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
