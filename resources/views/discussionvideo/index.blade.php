@@ -145,21 +145,23 @@
         if (selectedIds.length > 0) {
             if (confirm("Are you sure you want to delete the selected videos?")) {
                 $.ajax({
-                    url: "{{ route('discussionvideo.bulkDelete') }}",
-                    type: "DELETE",
-                    data: {
-                        ids: selectedIds.join(","),
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        sessionStorage.setItem('successMessage', 'Selected videos deleted successfully!');
-                        location.reload();
-                    },
-                    error: function(xhr, status, error) {
-                        alert('An error occurred while deleting the videos.');
-                        console.log(xhr.responseText);
-                    }
-                });
+    url: "{{ route('discussionvideo.bulkDelete') }}",
+    type: "POST", 
+    data: {
+        _token: "{{ csrf_token() }}",
+        _method: "DELETE",
+        ids: selectedIds.join(",")
+    },
+    success: function(response) {
+        sessionStorage.setItem('successMessage', 'Selected videos deleted successfully!');
+        location.reload();
+    },
+    error: function(xhr, status, error) {
+        alert('An error occurred while deleting the videos.');
+        console.log(xhr.responseText);
+    }
+});
+
             }
         } else {
             alert("Please select at least one video to delete.");
