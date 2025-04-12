@@ -49,7 +49,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($announcements);
     });
     Route::get('/examportion', function (Request $request, Student $student) {
-        $examportion = $student->examportion();
+        $examportion = $student->examportion()->get();
         return response()->json($examportion);
     });
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
