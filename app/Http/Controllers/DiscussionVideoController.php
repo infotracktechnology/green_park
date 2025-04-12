@@ -92,4 +92,22 @@ class DiscussionVideoController extends Controller
 
         return redirect()->route('discussionvideo.index')->with('success', 'Discussion video deleted successfully!');
     }
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->ids; // Retrieve the selected IDs
+    
+        // Check if IDs are provided and not empty
+        if (!$ids) {
+            return response()->json(['message' => 'No videos selected'], 400);
+        }
+    
+        // Convert the comma-separated string of IDs into an array and delete the videos
+        DiscussionVideo::whereIn('id', explode(",", $ids))->delete();
+    
+        return response()->json(['message' => 'Selected discussion videos deleted successfully!'], 200);
+    }
+    
+    
+    
+
 }
