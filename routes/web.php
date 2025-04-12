@@ -23,6 +23,9 @@ use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Student;
+use App\Models\Exam;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -145,10 +148,22 @@ Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name(
 Route::get('video/{id}', 'App\Http\Controllers\ChairmanVideoController@video')->name('video');
 
 
-Route::post('/student/login/{examId}', function (Request $request, $user_name, $password, $examId) {
+Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_name, $password, $test_id) {
     if (Auth::guard('student')->attempt(['user_name' => $user_name, 'password' => $password])) {
-        return redirect()->route('student.instruction', $examId);
+        return redirect()->route('student.instruction', ['test_id' => $test_id]);
     } else {
         return redirect()->back()->with('error', 'Invalid username or password.');
     }
 });
+
+Route::get('/test/{id}', function ($student_id) {
+    $student = Student::where('id', $student_id)->first();
+    if (!$student) {
+        return response()->json(['error' => 'Student not found'], 404);
+    }
+    $exam = Exam::getOngoingExams($student->coaching_type, $student->campus);
+    return response()->json(['test_id' => base64_encode($exam->id ?? '')]);
+});
+
+
+
