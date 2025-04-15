@@ -9,64 +9,81 @@
           <div class="row">
               <div class="col-12">
                   <div class="card card-primary" x-data="app">
-                     <form method="post" id="myForm" action="{{ route('timetable.update', $timetable->id) }}" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
+                  
+                       
                         <div class="card-body">
-                           
+                          <form method="get" action="{{ route('timetable.edit', $timetable->id) }}">
                            <div class="row">
+                            
 
                               <div class="col-md-12 col-sm-12 mb-3">
                                  <h6 class="col-deep-purple">Assign Subject to TimeTable</h6>
                               </div>
 
-                              {{-- <div class="form-group m-b-10 col-lg-6">
-                                <label for="academic_year">Sections</label>
-                                <select name="section" id="section" class="form-control form-control-sm" onchange="location.href=`{{ route('timetable.edit', $timetable->id) }}?section=${this.value}}`"  required>
-                                  <option value="">Select Section</option>
-                                    @foreach ($sections as $row)
-                                        <option value="{{ $row->section }}">{{ $row->section }}</option>
+                             
+
+                              <div class="form-group col-lg-4">
+                                <label for="branch">Branch</label>
+                                <select name="branch_id" id="branch_id"  class="form-control form-control-sm"  required>
+                                  <option value="">Select  Branch</option>
+                                    @foreach ($branches as $branch)
+                                              <option value="{{ $branch->id }}" @selected($branch->id == request('branch_id'))>{{ $branch->name }}</option>
                                     @endforeach
-                                </select>
-                            </div> --}}
+                                  </select>
+                              </div>
+                    
+                        
+                              <div class="form-group col-lg-4">
+                                <label for="coaching_type">Coaching Type</label>
+                                <select name="coaching_type" id="coaching_type"  class="form-control form-control-sm"  required>
+                                  <option value="">Select  Coaching Type</option>
+                                    @foreach (\App\Models\Student::select('coaching_type')->distinct()->get() as $row)
+                                              <option value="{{ $row->coaching_type }}" @selected($row->coaching_type == request('coaching_type'))>{{ $row->coaching_type }}</option>
+                                    @endforeach
+                                  </select>
+                              </div>
+                    
+                        
+                      <div class="form-group col-4">
+                        <label for="branch">Sections</label>
+                        <select name="section" id="section"  class="form-control form-control-sm"  required>
+                          <option value="">Select  Section</option>
+                            @foreach ($sections as $section)
+                                      <option value="{{ $section->section }}" @selected($section->section == request('section'))>{{ $section->section }}</option>
+                            @endforeach
+                        </select>
+                      </div>
 
-                              {{-- <div class="col-md-12 col-sm-12 mb-3">
-                                <ul class="nav nav-pills" id="myTab3" role="tablist">
-                                  @foreach($timetable->structure  as $index => $day)
-                                  <li class="nav-item">
-                                    <a class="nav-link {{ $loop->first ? 'active' : '' }}" id="{{$index}}-tab" data-toggle="tab" href="#{{$index}}" role="tab" aria-controls="{{$index}}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                                       {{ $index }}
-                                    </a>
-                                </li>
-                                  @endforeach
-                                </ul>
-                                <div class="tab-content" id="myTabContent2">
-                                  @foreach($timetable->structure  as $index => $day)
-                                  <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="{{$index}}" role="tabpanel" aria-labelledby="{{$index}}-tab">
-                                  
-                                  </div>
-                                  @endforeach
-                                </div>
-                              </div> --}}
-
+                      <div class="form-group col-12">
+                        <button type="submit" name="show"  class="btn btn-primary">Get TimeTable</button>
+                      </div>
+                           </div>
+                          </form>
+                            
+                      @if($periods)
+                      <form method="post" id="myForm" action="{{ route('timetable.update', $timetable->id) }}" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="assign_id" value="{{ $periods->id }}">
+                       <div class="row">
                               <div class="col-md-12 col-sm-12 mb-3">
                                 <div class="table-responsive">
                                   <table class="table table-bordered">
                                     <thead>
                                       <tr>
                                         <th>Day</th>
-                                        @foreach(collect($timetable->structure)->first() as $data)
+                                        @foreach(collect($periods->periods)->first() as $data)
                                         <th>{{ $data['period'] }}</th>
                                         @endforeach
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      @foreach($timetable->structure as $day => $structure)
+                                      @foreach($periods->periods as $day => $structure)
                                       <tr>
                                         <td>{{ $day }}</td>
                                         @foreach($structure as $index => $data)
                                         <td>
-                                          @if($data['type'] == 'academic')
+                                          @if($data['period'] != "break")
                                           <input type="hidden" name="index[]" value="{{ $index }}">
                                           <input type="hidden" name="day[]" value="{{ $day }}">
                                           <select name="subject[]" class="form-control form-control-sm">
@@ -85,14 +102,19 @@
                                 </div>
                               </div>
 
+
                             
                               <div class="form-group col-lg-12">
                                  <button type="submit" class="btn btn-primary">Update</button>
                               </div>
-
+                  
                            </div>
+                          </form>
+                           @else
+                           <p class="text-danger">No Periods Found</p>
+                           @endif
                         </div>
-                     </form>
+                     
                   </div>
               </div>
           </div>
@@ -105,15 +127,14 @@
 
 @section('js')
 <script>
-//   function City(state) {
-//      if (!state) return;
-//      $.get("{{ route('staff.create') }}", {state: state}, function(data) {
-//          let html = '<option value="">Select City</option>';
-//          $.each(data, function(key, value) {
-//              html += '<option value="' + value.District + '">' + value.District + '</option>';
-//          });
-//          $('#city').html(html);
-//      });
-//   }
+ $("#branch_id").change(function(){
+    $("#coaching_type").val('');
+  });
+
+  $("#coaching_type").change(function(){
+    var coaching_type = $(this).val();
+    var branch_id = $("#branch_id").val();
+    location.href = `{{ route('timetable.edit',$timetable->id) }}?coaching_type=${coaching_type}&branch_id=${branch_id}`;
+  });
 </script>
 @endsection

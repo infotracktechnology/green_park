@@ -80,7 +80,7 @@
                                       <ul style="list-style: none; padding-left: 0;margin-bottom: 0px;">
                                           <li>{{ auth()->user()->door_no }}, {{ auth()->user()->street_name }}, {{ auth()->user()->city }}, {{ auth()->user()->state }} - {{ auth()->user()->pincode }}</li>
                                       </ul>
-                                      <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Hostel Type :</strong> {{ auth()->user()->hostel_dayscholar }} - {{ auth()->user()->ac_nonac }}</p>
+                                    
                                   </div>
                                  
                           </div>
@@ -146,6 +146,7 @@
                                      <td class="details-value">: {{ auth()->user()->S3_obtained_mark }}</td>
                                    </tr>
                                  </table>
+                                 <p style="margin-bottom: 0px;"><strong style="color: #2196f3;">Hostel Type :</strong> {{ auth()->user()->hostel_dayscholar }} - {{ auth()->user()->ac_nonac }}</p>
                                 </div>
                                 
                               </div>
