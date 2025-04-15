@@ -28,7 +28,7 @@ class TimetableController extends Controller
                     ];
                 }, $section);
         }
-        
+
         $assign = collect($request->section)->map(function ($section, $key) use ($periods, $request) { 
             return [
                 'branch_id' => $request->branch_id,
@@ -104,26 +104,33 @@ class TimetableController extends Controller
     
 
     public function edit(Request $request, Timetable $timetable) {
-        $sections = DB::table('student')->distinct()->select('section')->get();
-        return view('timetable.edit', compact('timetable', 'sections'));
+        $periods=[];
+        $sections = [];
+        if($request->has('coaching_type') && $request->has('branch_id')){
+            $sections = DB::table('student')->where('campus', $request->branch_id)->where('coaching_type', $request->coaching_type)->distinct()->select('section')->get();
+        }
+        if($request->has('show')) {
+            $periods = TimetableAssign::where('coaching_type', $request->coaching_type)->where('branch_id', $request->branch_id)->where('section', $request->section)->first();
+        }
+        return view('timetable.edit', compact('timetable', 'periods', 'sections'));
     }
     
 
     public function update(Request $request, Timetable $timetable) {
-        $structure = $timetable->structure;
-       foreach($request->subject as $key => $subject) {
-        $structure[$request->day[$key]][$request->index[$key]]['subject'] = $subject;
-       }
-       $timetable->structure = $structure;
-       //$timetable->section = implode(',', $request->section);
-       $timetable->save();
-
-       return to_route('timetable.index')->with('success', 'Timetable updated successfully');
+        $timetable_assign = TimetableAssign::find($request->assign_id);
+        $structure =  $timetable_assign->periods;
+        foreach($request->subject as $key => $subject) {
+            $structure[$request->day[$key]][$request->index[$key]]['subject'] = $subject;
+        }
+        $timetable_assign->periods = $structure;
+        $timetable_assign->save();
+        return to_route('timetable.index')->with('success', 'Timetable updated successfully');
 
     }
 
     public function destroy(Request $request, timetable $timetable) {
         $timetable->delete();
+        $timetable->assign()->delete();
         session()->flash('success', 'Timetable deleted successfully');
         return to_route('timetable.index');
     }
