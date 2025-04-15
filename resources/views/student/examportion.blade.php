@@ -23,7 +23,7 @@
                       <tr>
                         <th>Attachment</th>
                         <td>
-                          <a href="{{ env('APP_URL') }}{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
+                          <a href="{{ env('APP_URL') }}public/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
                             <i class="fas fa-paperclip"></i> Attachment
                         </a>
                         </td>
