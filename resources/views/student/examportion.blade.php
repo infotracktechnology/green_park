@@ -23,9 +23,9 @@
                       <tr>
                         <th>Attachment</th>
                         <td>
-                          <a href="/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
-                            <i class="fas fa-paperclip"></i> Download
-                          </a>
+                          <a href="{{ env('APP_URL') }}{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-paperclip"></i> Attachment
+                        </a>
                         </td>
                       </tr>
                     </table>
