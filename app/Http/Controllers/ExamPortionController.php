@@ -34,12 +34,15 @@ class ExamPortionController extends Controller
         $data['branch_id'] = implode(',', $request->branch_id);
         $data['coaching_type'] = implode(',', $request->coaching_type);
         $data['academic_year'] = $request->academic_year; 
-        $attachment = $request->attachment;
-        $filename = time().'.'.$attachment->getClientOriginalExtension();
-        $file = $attachment->move('examportions', $filename);
-        $data['attachment'] = 'examportions/'.$filename;
+        if ($request->has('attachment')) {
+            $fileName = time() . '.' . $request->attachment->extension();
+            $request->attachment->move(public_path('assets/attachments'), $fileName);
+            $data['attachment'] = 'assets/attachments/' . $fileName;
+        } else {
+            $data['attachment'] = null;
+        }
         Examportion::create($data);
-        return to_route('examportion.index');
+        return to_route('examportion.index')->with('success', 'Examportion created successfully');
     }
     public function destroy(Request $request, Examportion $examportion)
     {
@@ -49,7 +52,7 @@ class ExamPortionController extends Controller
     }
     public function examportion(Request $request)
     {
-        $examportion = auth()->user()->examportion()->latest()->first();
+        $examportion = Examportion::latest()->first();
        
         return view('student.examportion', compact('examportion'));
     }
