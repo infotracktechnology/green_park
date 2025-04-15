@@ -11,8 +11,6 @@ class DiscussionVideo extends Model
     protected $table = 'discussion_video';
 
     protected $guarded = [];
-  
-    
 
     
 }

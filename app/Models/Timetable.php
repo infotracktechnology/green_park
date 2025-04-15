@@ -17,4 +17,8 @@ class Timetable extends Model
         'structure' => 'json',
     ];
 
+    public function assign(){
+        return $this->hasMany(TimetableAssign::class, 'timetableid', 'id');
+    }
+
 }

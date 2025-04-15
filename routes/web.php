@@ -22,6 +22,7 @@ use App\Http\Controllers\RevisionVideoController;
 use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
+
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Student;
@@ -106,10 +107,17 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('classvideo', ClassVideoController::class)->except(['show']);
     Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
     Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
+  
+    Route::delete('/discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
     Route::resource('discussionvideo', DiscussionVideoController::class);
 
     Route::post('classvideo/schedule', [ClassVideoController::class, 'schedule'])->name('classvideo.schedule');
+   
+    Route::delete('/revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
     Route::resource('revisionvideo', RevisionVideoController::class);
+
+
+
     Route::resource('academicyear', App\Http\Controllers\AcademicYearController::class);
 
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');

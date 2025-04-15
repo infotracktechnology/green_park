@@ -29,6 +29,9 @@
                          <div class="row">
                           <div class="col-md-8 col-sm-12 mb-3">
                                     <h6 class="col-deep-purple">Revision  Videos</h6>
+                                    <button type="button" class="btn btn-danger mt-3" id="deleteSelected">
+                                        <i class="fas fa-trash"></i> Delete Selected
+                                    </button>
                                 </div>
                                
 
@@ -42,6 +45,7 @@
                                 <table class="table table-striped table-sm" id="myTable">
                                     <thead>
                                         <tr>
+                                            <th><input type="checkbox" id="selectAllRevision"></th>
                                             <th>#</th>
                                             <th>Academic Year</th>
                                             <th>Subject</th>
@@ -55,6 +59,8 @@
                                     <tbody>
                                         @foreach ($revisionvideos as $row)
                                         <tr>
+                                            <td><input type="checkbox" class="checked_ids_revision" name="ids[]" value="{{ $row->id }}"></td>
+
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $row->academic_year }}</td>
                                             <td>{{ $row->subject }}</td>
@@ -96,9 +102,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#myTable').DataTable();
-    });
+   
 
     flatpickr(".datetime-picker", {
         enableTime: true,
@@ -155,4 +159,64 @@
         });
     });
 </script>
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').DataTable();
+        $('#selectAllRevision').click(function () {
+            $('.checked_ids_revision').prop('checked', this.checked);
+        });
+        if (sessionStorage.getItem('successMessage')) {
+            let message = sessionStorage.getItem('successMessage');
+            $('.section-body').prepend(`
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `);
+            sessionStorage.removeItem('successMessage');
+        }
+
+        $('#deleteSelected').click(function (e) {
+            e.preventDefault();
+
+            let selectedIds = [];
+            $('input:checkbox[name="ids[]"]:checked').each(function () {
+                selectedIds.push($(this).val());
+            });
+
+            if (selectedIds.length === 0) {
+                alert("Please select at least one video to delete.");
+                return;
+            }
+
+            if (!confirm("Are you sure you want to delete the selected videos?")) {
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('revisionvideo.bulkDelete') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    _method: "DELETE",
+                    ids: selectedIds.join(",")
+                },
+                success: function (response) {
+                    sessionStorage.setItem('successMessage', response.message || 'Selected videos deleted successfully!');
+                    location.reload();
+                },
+                error: function (xhr) {
+                    alert('An error occurred while deleting the videos.');
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
 @endsection
+
+

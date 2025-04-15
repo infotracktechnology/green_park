@@ -56,7 +56,7 @@
             <td>{{$loop->iteration}}</td>
             <td>{{$timetable->academic_year}}</td>
             <td>{{$timetable->name}}</td>
-            <td><button type="button" class="btn btn-primary assign" data-toggle="modal" data-target="#assignSection" data-id="{{$timetable->id}}" data-section="{{ json_encode(explode(',', $timetable->section)) }}"><i class="fas fa-edit"></i> Assign Section</button><br> {{$timetable->section}}</td>
+            <td><button type="button" class="btn btn-primary assign" data-toggle="modal" data-target="#assignSection" data-id="{{$timetable->id}}"><i class="fas fa-edit"></i> Assign Section</button><br> {{$timetable->assign->pluck('section')->implode(', ')}}</td>
             <td>{{$timetable->start_time}}</td>
             <td>
               <a href="{{ route('timetable.edit', $timetable->id) }}" class="btn btn-primary">
@@ -106,16 +106,39 @@
       <div class="modal-body">
         <form action="{{ route('timetable.index') }}" id="assignForm" method="get" enctype="multipart/form-data">
           <div class="row">
+
+              <div class="form-group col-lg-12">
+                    <label for="branch">Branch</label>
+                    <select name="branch_id" id="branch_id"  class="form-control form-control-sm"  required>
+                      <option value="">Select  Branch</option>
+                        @foreach ($branches as $branch)
+                                  <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                        @endforeach
+                      </select>
+                  </div>
+        
+            
+                  <div class="form-group col-lg-12">
+                    <label for="coaching_type">Coaching Type</label>
+                    <select name="coaching_type" id="coaching_type"  class="form-control form-control-sm"  required>
+                      <option value="">Select  Coaching Type</option>
+                        @foreach (\App\Models\Student::select('coaching_type')->distinct()->get() as $row)
+                                  <option value="{{ $row->coaching_type }}">{{ $row->coaching_type }}</option>
+                        @endforeach
+                      </select>
+                  </div>
+        
+            
           <div class="form-group col-12">
             <label for="branch">Sections</label>
             <input type="hidden" name="id" id="assign_id">
-            @foreach ($sections as $row)
-            <input type="checkbox" name="section[]" value="{{$row->section}}"> {{$row->section}}
-           @endforeach
+            <div id="sections">
+
+            </div>
           </div>
         
             <div class="form-group col-12">
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" name="submit" class="btn btn-primary">Submit</button>
             </div>
           </div>
         </form>
@@ -136,13 +159,29 @@
 
   });
 
+  $("#branch_id").change(function(){
+    $("#coaching_type").val('');
+  });
+
+  $("#coaching_type").change(function(){
+    var coaching_type = $(this).val();
+    var branch_id = $("#branch_id").val();
+    $.get(`{{ route('timetable.index') }}?coaching_type=${coaching_type}&branch_id=${branch_id}`, function(data){
+      var html = '';
+      $.each(data, function(index, value){
+        html += `<input type="checkbox" class="m-l-5" name="section[]" value="${value.section}">&nbsp;${value.section}`
+      });
+      $("#sections").html(html);
+    });
+  });
+
 $(".assign").click(function(){
   var id = $(this).data('id');
-  var section = $(this).data('section');
-  $('input:checkbox').prop('checked', false);
-  $.each(section, function(index, value){
-    $('input:checkbox[value="'+value+'"]').prop('checked', true);
-  })
+  // var section = $(this).data('section');
+  // $('input:checkbox').prop('checked', false);
+  // $.each(section, function(index, value){
+  //   $('input:checkbox[value="'+value+'"]').prop('checked', true);
+  // })
   $("#assign_id").val(id);
   $("#assignSection").modal('show');
 });
