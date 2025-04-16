@@ -40,7 +40,6 @@
             </select>
         </div>
         
-    
         <div class="form-group col-lg-3">
             <label>Room No</label>
             <input type="text" name="room_no" class="form-control form-control-sm" required>
@@ -106,7 +105,7 @@
         }
     });
 </script>
-<script>
+{{-- <script>
     const allStudents = @json($students);
 
     document.getElementById('section').addEventListener('change', function () {
@@ -124,7 +123,29 @@
             });
         }
     });
-</script>
+</script> --}}
+<script>
+    const allStudents = @json($students);
 
+    document.getElementById('section').addEventListener('change', function () {
+        const selectedSection = this.value;
+        const studentSelect = document.getElementById('student_id');
+        studentSelect.innerHTML = '<option value="">Select Student</option>';
+
+        if (selectedSection) {
+            const filtered = allStudents.filter(s => s.section === selectedSection);
+
+           
+            filtered.sort((a, b) => a.student_name.localeCompare(b.student_name));
+
+            filtered.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.student_id; // Use student_id here
+                option.text = `${student.user_name} - ${student.student_name}`;
+                studentSelect.appendChild(option);
+            });
+        }
+    });
+</script>
 @endsection
 
