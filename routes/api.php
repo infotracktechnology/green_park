@@ -9,6 +9,7 @@ use App\Models\Examportion;
 use App\Models\RevisionVideo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -40,16 +41,31 @@ Route::group(['prefix' => 'v2'], function () {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
-    Route::get('/announcements', function (Request $request) {
-        $announcements = Announcement::all()->map(function ($announcement) {
-            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            return $announcement;
-        });
+   
 
-        return response()->json($announcements);
+Route::get('/announcements', function (Request $request) {
+    $announcements = Announcement::all()->map(function ($announcement) {
+        $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
+
+        if ($announcement->attachment) {
+            $announcement->attachment = URL::to('/') . '/' . $announcement->attachment;
+        }
+
+        return $announcement;
     });
+
+    return response()->json($announcements);
+});
+
     Route::get('/examportion', function (Request $request, Student $student) {
         $examportion = $student->examportion()->get();
+        $examportion->each(function ($item) {
+            if ($item->attachment) {
+                $item->attachment = URL::to('/') . '/' . $item->attachment;
+            }
+        });
+
+
         return response()->json($examportion);
     });
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
