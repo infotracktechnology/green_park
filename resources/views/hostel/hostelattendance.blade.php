@@ -36,15 +36,15 @@
                     </div>
                     <form action="{{ route('hostelattendance') }}" method="get" enctype="multipart/form-data">
                     <div class="row">
-                        <div class="form-group col-lg-2">
+                        {{-- <div class="form-group col-lg-2">
                                 <label for="academic_year">Academic Year</label>
-                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required> --}}
                                     {{-- <option value="">Select Academic Year</option> --}}
-                                    @foreach ($academicyear as $row)
+                                    {{-- @foreach ($academicyear as $row)
                                         <option value="{{ $row->academic_year }}" @selected(request('academic_year') == $row->academic_year)>{{ $row->academic_year }}</option>
                                     @endforeach
                                 </select>
-                          </div>
+                          </div> --}}
 
                         <div class="form-group col-lg-2">
                             <label for="date">Attendance Date</label>
