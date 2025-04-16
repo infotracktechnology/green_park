@@ -27,7 +27,7 @@
                                     </div> --}}
 
                                     <div class="form-group col-md-3">
-                                        <label for="file_name">File Name</label>
+                                        <label for="file_name">Document Type</label>
                                         <input type="text" name="file_name" class="form-control form-control-sm">
                                     </div>
 
@@ -66,7 +66,7 @@
                                             <th>#</th>
                                             {{-- <th>Student ID</th> --}}
                                             <th>File Name</th>
-                                            <th>File</th>
+                                            <th>Document Type</th>
                                             <th>Uploaded At</th>
                                             <th>Action</th>
                                         </tr>
