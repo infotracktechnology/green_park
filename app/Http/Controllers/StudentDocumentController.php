@@ -16,38 +16,44 @@ class StudentDocumentController extends Controller
     
 
     public function store(Request $request)
-    {
-        $request->validate([
-          
-            'file_name' => 'required|string|max:255',
-            'document_file' => 'required|file|mimes:pdf|max:2048',
+{
+    $request->validate([
+        'file_name' => 'required|string|max:255',
+        'document_file' => 'required|file|mimes:pdf|max:2048',
+    ]);
+
+    $studentId = auth()->user()->student_id;
+
+    if ($request->hasFile('document_file')) {
+        $file = $request->file('document_file');
+        $originalName = $file->getClientOriginalName();
+        $fileName = $studentId . '_' . $originalName;
+        $file->move('documents', $fileName);
+        Document::create([
+            'student_id' => $studentId,
+            'file_name' => $request->file_name,
+            'file' => 'documents/' . $fileName,
         ]);
-    
-        $studentId = auth()->user()->student_id;
-        if ($request->hasFile('document_file')) {
-            $file = $request->file('document_file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->move('documents', $fileName);
-            Document::create([
-                'student_id' => $studentId,
-                'file_name' => $request->file_name,
-                'file' => 'documents/' . $fileName, 
-            ]);
-        }
-    
-        return redirect()->route('document.upload')->with('success', 'Document uploaded successfully.');
     }
+
+    return redirect()->route('document.upload')->with('success', 'Document uploaded successfully.');
+}
+
     
 
     
     public function destroy($id)
     {
         $document = Document::findOrFail($id);
-        if (file_exists(public_path($document->file))) {
-            unlink(public_path($document->file)); // Delete the file from server
+        $filePath = base_path('documents/' . basename($document->file)); // Get the full path of the file
+        if (file_exists($filePath)) {
+            unlink($filePath);
         }
-        $document->delete(); // Delete the record from DB
+    
+        $document->delete();
+    
         return redirect()->route('document.upload')->with('success', 'Document deleted successfully.');
     }
+   
 
 }
