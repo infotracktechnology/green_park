@@ -46,9 +46,8 @@ Route::group(['prefix' => 'v2'], function () {
 Route::get('/announcements', function (Request $request) {
     $announcements = Announcement::all()->map(function ($announcement) {
         $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-
         if ($announcement->attachment) {
-            $announcement->attachment = URL::to('/') . '/' . $announcement->attachment;
+            $announcement->attachment = 'public/' . $announcement->attachment;
         }
 
         return $announcement;
@@ -59,13 +58,6 @@ Route::get('/announcements', function (Request $request) {
 
     Route::get('/examportion', function (Request $request, Student $student) {
         $examportion = $student->examportion()->get();
-        $examportion->each(function ($item) {
-            if ($item->attachment) {
-                $item->attachment = URL::to('/') . '/' . $item->attachment;
-            }
-        });
-
-
         return response()->json($examportion);
     });
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
