@@ -152,11 +152,10 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function
     Route::get('mark/subject/{test_id}', [StudentController::class, 'mark_subject'])->name('student.mark_subject');
     Route::get('mark/download/{test_id}', [StudentController::class, 'mark_download'])->name('student.mark_download');
 
-  
-
     Route::get('student/documentupload', [StudentDocumentController::class, 'index'])->name('document.upload');
     Route::post('student/documentupload', [StudentDocumentController::class, 'store'])->name('document.store');
     Route::delete('/document/{id}', [App\Http\Controllers\StudentDocumentController::class, 'destroy'])->name('document.destroy');
+    Route::get('/student/mock', [App\Http\Controllers\StudentMockTestController::class, 'index'])->name('student.mock');
 
 
 
