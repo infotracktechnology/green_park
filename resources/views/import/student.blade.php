@@ -92,8 +92,8 @@
 
          document.querySelector('input[type="file"]').addEventListener('change', function (e) {
                                 const file = e.target.files[0];
-                                if (file.size > 2 * 1024 * 1024) { // 2MB in bytes
-                                    alert("File size must not exceed 2MB!");
+                                if (file.size > 5 * 1024 * 1024) { // 2MB in bytes
+                                    alert("File size must not exceed 5MB!");
                                     e.target.value = ""; // Clear the file input
                                 }
                             });
