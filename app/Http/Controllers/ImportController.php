@@ -24,7 +24,7 @@ class ImportController extends Controller
     {
         // Step 1: Validate the request
         $request->validate([
-            'csv_file' => 'required|mimes:csv,txt|max:2048', // Only CSV files up to 2MB
+            'csv_file' => 'required|mimes:csv,txt', // Only CSV files up to 2MB
         ]);
 
         $branch = $request->branch ?? '';
