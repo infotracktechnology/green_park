@@ -50,11 +50,20 @@ class ImportController extends Controller
                       
                     $student = Student::where('student_id', $student_id)->first();
                    if($student){
-                    $student->update($row);
+                    try{
+                      $update = $student->update($row);
+                    }catch(\Exception $e){
+                        return back()->with('error', 'Error updating student: ' . $e->getMessage());
+                    }
                    }
                    else{
                     $row = array_merge($row, ['campus' => $branch, 'academic_year' =>$academic_year]);
-                    $student = Student::create($row);
+                    try{
+                    $create = Student::create($row);
+                    }catch(\Exception $e){
+                        return back()->with('error', 'Error creating student: ' . $e->getMessage());
+                    }
+                    
                    }
                 }
                 
@@ -85,7 +94,6 @@ class ImportController extends Controller
 
            
             if (count($header) !== count($row)) {
-                \Log::warning('Skipping invalid row: ' . implode(',', $row));
                 continue;
             }
             $csvData[] = array_combine($header, $row);
