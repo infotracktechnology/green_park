@@ -57,7 +57,12 @@ Route::get('/announcements', function (Request $request) {
 });
 
     Route::get('/examportion', function (Request $request, Student $student) {
-        $examportion = $student->examportion()->get();
+        $examportion = $student->examportion()->get()->map(function ($portion) {
+            if ($portion->attachment) {
+                $portion->attachment = 'public/assets/attachments/' . basename($portion->attachment);
+            }
+            return $portion;
+        });
         return response()->json($examportion);
     });
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
