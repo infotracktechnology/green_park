@@ -65,8 +65,8 @@
                                         <tr>
                                             <th>#</th>
                                             {{-- <th>Student ID</th> --}}
-                                            <th>File Name</th>
                                             <th>Document Type</th>
+                                            <th>Download</th>
                                             <th>Uploaded At</th>
                                             <th>Action</th>
                                         </tr>
