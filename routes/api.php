@@ -7,9 +7,9 @@ use App\Models\Chairmanvideo;
 use App\Models\Announcement;
 use App\Models\Examportion;
 use App\Models\RevisionVideo;
+use App\Models\TimetableAssign;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -41,21 +41,14 @@ Route::group(['prefix' => 'v2'], function () {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
-   
+    Route::get('/announcements', function (Request $request) {
+        $announcements = Announcement::all()->map(function ($announcement) {
+            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
+            return $announcement;
+        });
 
-Route::get('/announcements', function (Request $request) {
-    $announcements = Announcement::all()->map(function ($announcement) {
-        $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-        if ($announcement->attachment) {
-            $announcement->attachment = 'public/' . $announcement->attachment;
-        }
-
-        return $announcement;
+        return response()->json($announcements);
     });
-
-    return response()->json($announcements);
-});
-
     Route::get('/examportion', function (Request $request, Student $student) {
         $examportion = $student->examportion()->get();
         return response()->json($examportion);
@@ -113,6 +106,27 @@ Route::get('/announcements', function (Request $request) {
     Route::get('/achievements', function (Request $request, Student $student) {
         $achievements = $student->achievements();
         return response()->json($achievements);
+    });
+
+    Route::get('/achievements', function (Request $request, Student $student) {
+        $achievements = $student->achievements();
+        return response()->json($achievements);
+    });
+
+    Route::get('/timetable/{branch_id}/{section}', function ($branch_id, $section) {
+      $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first();
+      return response()->json($periods->periods ?? []);
+    });
+
+    Route::get('/attendance/{student_id}', function ($student_id) {
+      $monthwise = DB::table('attendance')->where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
+      $daywise = DB::table('attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
+      return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
+    });
+
+    Route::post('/parent_concern', function (Request $request) {
+        $parent_concern = DB::table('parent_concern')->insert($request->all());
+        return response()->json($parent_concern);
     });
 
 

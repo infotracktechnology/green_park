@@ -14,6 +14,6 @@ class Controller extends BaseController
     public $academic_year = [];
 
     public function __construct(){
-        $this->academic_year = AcademicYear::where('enable', 1)->orderBy('id', 'desc')->first()->academic_year;
+        $this->academic_year = AcademicYear::where('active', 1)->first()->academic_year;
     }
 }

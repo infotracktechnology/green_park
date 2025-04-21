@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,5 +21,20 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        foreach (\App\Models\Student::all() as $Student) {
+            if($Student->password_1 != ''){
+                $Student->password = bcrypt($Student->password_1);
+                $Student->save(); 
+            }
+          
+            // $attributes = $Student->getAttributes();
+            // $update =[];
+            // foreach ($attributes as $key => $value) {
+            //     if (is_string($value)) {
+            //         $update[$key] = Str::title($value);
+            //     }
+            // }
+            // $Student->update($update);
+        }
     }
 }
