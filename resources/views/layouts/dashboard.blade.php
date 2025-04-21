@@ -219,6 +219,19 @@
                     <i class="fas fa-file" style="font-size: 20px; color: #5daaf1;"></i><span>Worksheet</span>
                   </a>
                 </li>
+                <li class="dropdown">
+                  <a href="{{ route('document.upload') }}" class="nav-link">
+
+                    <i class="fas fa-folder" style="font-size: 20px; color: #5daaf1;"></i><span>Document Upload</span>
+                  </a>
+                </li>
+                <li class="dropdown">
+                  <a href="{{ route('student.mock') }}" class="nav-link">
+                      <i class="fas fa-book-open" style="font-size: 20px; color: #5daaf1;"></i>
+                      <span>Mock Test</span>
+                  </a>
+              </li>
+              
               @endif
             </ul>
           

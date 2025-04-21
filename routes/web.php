@@ -22,6 +22,7 @@ use App\Http\Controllers\RevisionVideoController;
 use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
+use App\Http\Controllers\StudentDocumentController;
 
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
@@ -150,6 +151,14 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function
     Route::get('marksheet', [StudentController::class, 'marksheet'])->name('student.marksheet');
     Route::get('mark/subject/{test_id}', [StudentController::class, 'mark_subject'])->name('student.mark_subject');
     Route::get('mark/download/{test_id}', [StudentController::class, 'mark_download'])->name('student.mark_download');
+
+    Route::get('student/documentupload', [StudentDocumentController::class, 'index'])->name('document.upload');
+    Route::post('student/documentupload', [StudentDocumentController::class, 'store'])->name('document.store');
+    Route::delete('/document/{id}', [App\Http\Controllers\StudentDocumentController::class, 'destroy'])->name('document.destroy');
+    Route::get('/student/mock', [App\Http\Controllers\StudentMockTestController::class, 'index'])->name('student.mock');
+
+
+
 });
 
 Route::post('/exam/submit', 'App\Http\Controllers\ExamController@submit')->name('exam.submit');
