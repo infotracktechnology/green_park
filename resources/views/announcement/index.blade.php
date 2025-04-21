@@ -40,7 +40,8 @@
           <th>Coaching Type</th>
           <th>Gender</th>
           <th>Title</th>
-          <th>Action</th>
+          <th>Edit</th>
+          <th>Delete</th>
         </tr>
   
         </thead>
@@ -64,11 +65,11 @@
             <td>{{$announcement->gender}}</td>
             <td>{{$announcement->title}}</td>
            
-            {{-- <td>
+            <td>
               <a href="{{ route('announcement.edit', $announcement->id) }}" class="btn btn-warning text-white">
                  <i class="fas fa-edit"></i>
               </a>
-           </td> --}}
+           </td>
            <td>
               <form action="{{ route('announcement.destroy', $announcement->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
                  @csrf

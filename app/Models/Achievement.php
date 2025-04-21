@@ -13,6 +13,7 @@ class Achievement extends Model
     protected $guarded = [];
     protected $casts = [
         'images' => 'json',
+       
     ];
 
     function branch()
