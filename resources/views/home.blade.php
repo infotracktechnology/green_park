@@ -26,7 +26,7 @@
             </div>
           </div>
         </div>
-        <div class="col-xl-8 col-sm-12">
+        {{-- <div class="col-xl-8 col-sm-12">
           <form action="{{ route('admin.home') }}" method="get">
           <div class="row m-t-40">
             <div class="form-group col-lg-4">
@@ -43,7 +43,7 @@
           </div>
         </div>
         </form>
-        </div>
+        </div> --}}
         {{-- <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="card">
             <div class="card-statistic-4">

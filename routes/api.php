@@ -124,5 +124,10 @@ Route::group(['prefix' => 'v2'], function () {
       return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
     });
 
+    Route::post('/parent_concern', function (Request $request) {
+        $parent_concern = DB::table('parent_concern')->insert($request->all());
+        return response()->json($parent_concern);
+    });
+
 
 });
