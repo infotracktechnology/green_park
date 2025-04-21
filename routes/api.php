@@ -7,6 +7,7 @@ use App\Models\Chairmanvideo;
 use App\Models\Announcement;
 use App\Models\Examportion;
 use App\Models\RevisionVideo;
+use App\Models\TimetableAssign;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -118,6 +119,22 @@ Route::get('/announcements', function (Request $request) {
     Route::get('/achievements', function (Request $request, Student $student) {
         $achievements = $student->achievements();
         return response()->json($achievements);
+    });
+
+    Route::get('/achievements', function (Request $request, Student $student) {
+        $achievements = $student->achievements();
+        return response()->json($achievements);
+    });
+
+    Route::get('/timetable/{branch_id}/{section}', function ($branch_id, $section) {
+      $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first()->periods;
+      return response()->json($periods);
+    });
+
+    Route::get('/attendance/{student_id}', function ($student_id) {
+      $monthwise = DB::table('attendance')->where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
+      $daywise = DB::table('attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
+      return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
     });
 
 
