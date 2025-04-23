@@ -108,6 +108,7 @@
     <select name="category[]" id="category" class="select2 form-control form-control-sm" multiple="multiple" required>
         <option value="Video">Video</option>
         <option value="Image">Image</option>
+        <option value="pdf">PDF</option>
         <option value="Link">Link</option>
     </select>
 </div>
@@ -131,8 +132,18 @@
     <div class="invalid-feedback d-block">
         {{ $message }}
     </div>
-@enderror
+    @enderror
 </div>
+<div class="form-group col-lg-4" id="pdf-input" style="display: none;">
+    <label for="pdf">Upload PDF <span class="text-danger">(max size: 2MB*)</span></label>
+    <input type="file" name="pdf" id="pdf" class="form-control form-control-sm" accept="application/pdf">
+    @error('pdf')
+    <div class="invalid-feedback d-block">
+        {{ $message }}
+    </div>
+    @enderror
+</div>
+
 
 <!-- Link Input -->
 <div class="form-group col-lg-4" id="link-input" style="display: none;">
@@ -142,21 +153,10 @@
 
 
 
-
-
-
-
-
-
                                     <div class="form-group col-lg-12">
                                         <label for="content">Content</label>
                                         <textarea name="content" id="content" class="summernote-simple"></textarea>
                                     </div>
-
-
-                                  
-                                     
-                                    
 
                                        
                                     <div class="form-group col-lg-12">
@@ -205,6 +205,7 @@
             // Show or hide inputs based on selected options
             $('#video-input').toggle(selectedOptions.includes('Video'));
             $('#image-input').toggle(selectedOptions.includes('Image'));
+            $('#pdf-input').toggle(selectedOptions.includes('pdf'));
             $('#link-input').toggle(selectedOptions.includes('Link'));
         });
     });

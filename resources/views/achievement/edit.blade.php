@@ -94,45 +94,65 @@
 
                                 <div class="form-group col-lg-4">
                                     <label>Category</label>
-                                    <select name="category[]" id="category" class="select2 form-control" multiple required>
-                                        @foreach (['Video','Image','Link'] as $cat)
-                                            <option value="{{ $cat }}" {{ in_array($cat, explode(',', $achievement->category)) ? 'selected' : '' }}>
-                                                {{ $cat }}
-                                            </option>
+                                    <select name="category[]" id="category" class="select2 form-control form-control-sm" multiple required>
+                                        @php
+                                            $categories = ['Video', 'Image', 'pdf', 'Link'];
+                                        @endphp
+                                        @foreach ($categories as $cat)
+                                            <option value="{{ $cat }}" {{ in_array($cat, $selectedCategories) ? 'selected' : '' }}>{{ $cat }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-
-                                <!-- Video Upload -->
-                             
-                                <div class="form-group col-lg-4" id="video-input" style="display: none;">
-                                    <label>Upload Video <span class="text-danger">(max size: 40MB*)</span></label>
+                                
+                                <!-- Video Input -->
+                                <div class="form-group col-lg-4" id="video-input" style="{{ !empty($achievement->video) ? '' : 'display: none;' }}">
+                                    <label for="video">Upload Video <span class="text-danger">(max size: 40MB*)</span></label>
                                     <input type="file" name="video" id="video" class="form-control form-control-sm" accept="video/*">
                                     @if($achievement->video)
-                                        <div class="mt-1 text-muted">
-                                            Current Video: {{ basename($achievement->video) }}
-                                        </div>
+                                        <small class="text-muted d-block mt-1">Current: {{ basename($achievement->video) }}</small>
                                     @endif
+                                    @error('video')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
-
-                                <!-- Image Upload -->
-                                <div class="form-group col-lg-4" id="image-input" style="display: none;">
-                                    <label>Upload Images <span class="text-danger">(max size: 2MB*)</span></label>
+                                
+                                <!-- Image Input -->
+                                <div class="form-group col-lg-4" id="image-input" style="{{ !empty($achievement->images) ? '' : 'display: none;' }}">
+                                    <label for="images">Upload Images <span class="text-danger">(max size: 2MB*)</span></label>
                                     <input type="file" name="images[]" id="images" class="form-control form-control-sm" accept="image/*" multiple>
-                                    @if($achievement->images)
+                                    @if(!empty($achievement->images))
                                         <div class="mt-2 text-muted">
                                             @foreach ($achievement->images as $img)
                                                 <div>Image: {{ basename($img) }}</div>
                                             @endforeach
                                         </div>
                                     @endif
+                                    @error('images.*')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
-
-                                <!-- Link -->
-                                <div class="form-group col-lg-4" id="link-input" style="display: none;">
-                                    <label>Link</label>
-                                    <input type="url" name="link" class="form-control form-control-sm" value="{{ $achievement->link }}">
+                                
+                                <!-- PDF Input -->
+                                <div class="form-group col-lg-4" id="pdf-input" style="{{ !empty($achievement->pdf) ? '' : 'display: none;' }}">
+                                    <label for="pdf">Upload PDF <span class="text-danger">(max size: 3MB*)</span></label>
+                                    <input type="file" name="pdf" id="pdf" class="form-control form-control-sm" accept="application/pdf">
+                                    @if($achievement->pdf)
+                                        <small class="text-muted d-block mt-1">Current: {{ basename($achievement->pdf) }}</small>
+                                    @endif
+                                    @error('pdf')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
+                                
+                                <!-- Link Input -->
+                                <div class="form-group col-lg-4" id="link-input" style="{{ !empty($achievement->link) ? '' : 'display: none;' }}">
+                                    <label for="link">Enter Link</label>
+                                    <input type="url" name="link" id="link" class="form-control form-control-sm" value="{{ $achievement->link }}">
+                                </div>
+                                
+                                
+                             
+                                
 
                                 <!-- Content -->
                                 <div class="form-group col-lg-12">
@@ -157,54 +177,60 @@
 @section('js')
 <script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
 <script src="{{ asset('bundles/select2/dist/js/select2.full.min.js') }}"></script>
-<script>
-    $(document).ready(function() {
-        $('.select2').select2();
-    });
-</script>
-<script>
-    document.getElementById('myForm').addEventListener('submit', function (e) {
-        const videoInput = document.getElementById('video');
-        const imageInputs = document.getElementById('images');
 
-        // Validate video size
-        if (videoInput.files[0] && videoInput.files[0].size > 40 * 1024 * 1024) { // 40MB
-            e.preventDefault();
-            alert('The uploaded video exceeds the maximum allowed size of 40MB.');
-        }
-
-        // Validate each image size
-        if (imageInputs.files) {
-            for (let i = 0; i < imageInputs.files.length; i++) {
-                if (imageInputs.files[i].size > 2 * 1024 * 1024) { // 2MB
-                    e.preventDefault();
-                    alert('One or more images exceed the maximum allowed size of 2MB.');
-                    break;
-                }
-            }
-        }
-    });
-</script>
 <script>
     $(document).ready(function () {
-        $('#category').select2();
+        $('.select2').select2();
+        const hasExistingVideo = '{{ !empty($achievement->video) ? 'yes' : '' }}' === 'yes';
+        const hasExistingImages = '{{ !empty($achievement->images) ? 'yes' : '' }}' === 'yes';
+        const hasExistingPDF = '{{ !empty($achievement->pdf) ? 'yes' : '' }}' === 'yes';
+        const hasExistingLink = '{{ !empty($achievement->link) ? 'yes' : '' }}' === 'yes';
 
         function toggleInputs(selectedOptions) {
-            $('#video-input').toggle(selectedOptions.includes('Video'));
-            $('#image-input').toggle(selectedOptions.includes('Image'));
-            $('#link-input').toggle(selectedOptions.includes('Link'));
-        }
+            selectedOptions = selectedOptions || [];
 
-        // Trigger after select2 finishes rendering
-        setTimeout(function () {
-            const selectedOptions = $('#category').val() || [];
-            toggleInputs(selectedOptions);
-        }, 100);
+            $('#video-input').toggle(selectedOptions.includes('Video') || hasExistingVideo);
+            $('#image-input').toggle(selectedOptions.includes('Image') || hasExistingImages);
+            $('#pdf-input').toggle(selectedOptions.includes('pdf') || hasExistingpdf);
+            $('#link-input').toggle(selectedOptions.includes('Link') || hasExistingLink);
+        }
+        const initiallySelected = $('#category').val();
+        toggleInputs(initiallySelected);
 
         $('#category').on('change', function () {
-            const selected = $(this).val();
-            toggleInputs(selected);
+            const selectedOptions = $(this).val();
+            toggleInputs(selectedOptions);
+        });
+
+        document.getElementById('myForm').addEventListener('submit', function (e) {
+            const videoInput = document.getElementById('video');
+            const imageInputs = document.getElementById('images');
+            const pdfInput = document.getElementById('pdf');
+
+            if (videoInput && videoInput.files[0] && videoInput.files[0].size > 40 * 1024 * 1024) {
+                e.preventDefault();
+                alert('The uploaded video exceeds the maximum allowed size of 40MB.');
+                return;
+            }
+
+            if (imageInputs && imageInputs.files.length > 0) {
+                for (let i = 0; i < imageInputs.files.length; i++) {
+                    if (imageInputs.files[i].size > 2 * 1024 * 1024) {
+                        e.preventDefault();
+                        alert('One or more images exceed the maximum allowed size of 2MB.');
+                        return;
+                    }
+                }
+            }
+
+            if (pdfInput && pdfInput.files[0] && pdfInput.files[0].size > 3 * 1024 * 1024) {
+                e.preventDefault();
+                alert('The uploaded PDF exceeds the maximum allowed size of 3MB.');
+                return;
+            }
         });
     });
 </script>
+
+
 @endsection

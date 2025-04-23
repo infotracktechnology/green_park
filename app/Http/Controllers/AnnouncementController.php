@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
@@ -24,7 +23,6 @@ class AnnouncementController extends Controller
         $branches = DB::table('branch')->select('id', 'name')->get();
         return view('announcement.create', compact('branches'));
     }
-
 
     public function store(Request $request)
 {
@@ -49,27 +47,61 @@ class AnnouncementController extends Controller
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
 
-    
-    public function edit(Request $request, Announcement $announcement)
-    {
-        $branches = DB::table('branch')->select('id', 'name')->get();
+public function edit(Request $request, Announcement $announcement)
+{
+    $branches = Branch::all(); 
+    $academicyear = AcademicYear::all(); 
+    $selectedCoachingTypes = explode(',', $announcement->coaching_type);
 
-        return view('announcement.edit', compact('announcement', 'branches'));
+    return view('announcement.edit', compact('announcement', 'branches', 'academicyear', 'selectedCoachingTypes'));
+}
+
+
+public function update(Request $request, Announcement $announcement)
+{
+    $announcement->academic_year = $request->academic_year;
+    $announcement->branch = implode(',', $request->branch);
+    $announcement->coaching_type = implode(',', $request->coaching_type);
+    $announcement->gender = $request->gender;
+    $announcement->title = $request->title;
+    $announcement->content = $request->content;
+
+    if ($request->hasFile('attachment')) {
+        if ($announcement->attachment && file_exists(public_path($announcement->attachment))) {
+            unlink(public_path($announcement->attachment));
+        }
+
+        $file = $request->file('attachment');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('assets/attachments'), $filename);
+        $announcement->attachment = 'assets/attachments/' . $filename;
     }
 
-    public function update(Request $request, Announcement $announcement)
-    {
-        $announcement->update($request->all());
-        return to_route('announcement.index')->with('success', 'Announcement details successfully updated.');
+    if (in_array('Offline', $request->coaching_type)) {
+        $announcement->category = $request->category;
+    } else {
+        $announcement->category = null;
     }
 
-    public function destroy(Request $request, Announcement $announcement)
-    {
-        $announcement->delete();
-        session()->flash('success', 'Announcement deleted successfully');
-        return to_route('announcement.index');
+    $announcement->save();
+
+    return redirect()->route('announcement.index')->with('success', 'Announcement details successfully updated.');
+}
+
+
+public function destroy($id)
+{
+    $announcement = Announcement::findOrFail($id);
+    if ($announcement->attachment && file_exists(public_path($announcement->attachment))) {
+        unlink(public_path($announcement->attachment));
     }
-    
+
+    $announcement->delete();
+
+    return redirect()->route('announcement.index')->with('success', 'Announcement deleted successfully.');
+}
+
+
     public function notification(Request $request)
     {
     $announcements = auth()->user()->announcement();
