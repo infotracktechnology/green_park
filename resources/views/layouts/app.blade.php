@@ -38,13 +38,18 @@
             <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i data-feather="align-justify"></i></a></li>
             <li><a href="#" class="nav-link nav-link-lg fullscreen-btn"><i data-feather="maximize"></i></a></li>
             <li>
-              <form class="form-inline mr-auto">
-                <div class="search-element">
+              <form class="form-inline mr-auto" action="{{ route('admin.home') }}" method="get">
+                <select name="academic_year" id="academic_year" onchange="this.form.submit();" class="form-control" required>
+                  @foreach (\App\Models\AcademicYear::all() as $row)
+                      <option value="{{ $row->academic_year }}" @selected($row->active)>{{ $row->academic_year }}</option>
+                  @endforeach
+              </select>
+                {{-- <div class="search-element">
                   <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="200">
                   <button class="btn" type="submit">
                     <i class="fas fa-search"></i>
                   </button>
-                </div>
+                </div> --}}
               </form>
             </li>
           </ul>
