@@ -83,31 +83,32 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>April </td>
-                                            <td>20</td>
-                                            <td><span class="text-success font-weight-bold">90%</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>March</td>
-                                            <td>18</td>
-                                            <td><span class="text-info font-weight-bold">85.7%</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>February</td>
-                                            <td>22</td>
-                                            <td><span class="text-success font-weight-bold">95.6%</span></td>
-                                        </tr>
+                                        @foreach ($attendance as $data)
+                                            <tr>
+                                                <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $data->month)->format('F Y') }}</td>
+                                                <td>
+                                                    {{ fmod($data->present_days, 1) == 0 ? (int) $data->present_days : number_format($data->present_days, 1) }}
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $monthPercentage = $data->total_days > 0 ? ($data->present_days / $data->total_days) * 100 : 0;
+                                                    @endphp
+                                                    {{ fmod($monthPercentage, 1) == 0 ? (int) $monthPercentage : number_format($monthPercentage, 2) }}%
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
+                                    
                                 </table>
                             </div>
-
+                        
                             <div class="mt-3 p-3 rounded summary-box text-center">
                                 <strong>Present / Working Days:</strong>
-                                <span>180 / 200</span> &nbsp;&nbsp;
-                                ( <span>90%</span> )
+                                <span>{{ $total_present }} / {{ $total_days }}</span> &nbsp;&nbsp;
+                                ( <span>{{ $percentage }}%</span> )
                             </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
