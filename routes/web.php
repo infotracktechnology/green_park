@@ -156,6 +156,12 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function
     Route::post('student/documentupload', [StudentDocumentController::class, 'store'])->name('document.store');
     Route::delete('/document/{id}', [App\Http\Controllers\StudentDocumentController::class, 'destroy'])->name('document.destroy');
     Route::get('/student/mock', [App\Http\Controllers\StudentMockTestController::class, 'index'])->name('student.mock');
+    Route::get('/student/timetable', [App\Http\Controllers\TimetableController::class, 'timetable'])->name('student.timetable');
+    
+    Route::get('/student/attendance', [StudentController::class, 'attendance'])->name('student.attendance');
+
+
+    
 
 
 

@@ -185,6 +185,13 @@ public function dashboard()
         
         return view('student.discussionvideo', compact('discussionvideos', 'subject'));
     }
+
+    public function attendance()
+    {
+        return view('student.attendance');
+    }
+    
+
 }
 
 
