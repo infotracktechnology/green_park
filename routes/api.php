@@ -41,14 +41,23 @@ Route::group(['prefix' => 'v2'], function () {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
-    Route::get('/announcements', function (Request $request) {
-        $announcements = Announcement::all()->map(function ($announcement) {
-            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            return $announcement;
-        });
+
+    Route::get('/announcement_titles', function (Request $request) {
+        $announcements = Announcement::all()->pluck('title');
 
         return response()->json($announcements);
     });
+
+    Route::get('/announcement/{id}', function (Request $request, $id) {
+        $announcement = Announcement::find($id);
+        if ($announcement) {
+            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
+            unset($announcement->title);
+        }
+
+        return response()->json($announcement);
+    });
+
     Route::get('/examportion', function (Request $request, Student $student) {
         $examportion = $student->examportion()->get();
         return response()->json($examportion);
@@ -128,6 +137,8 @@ Route::group(['prefix' => 'v2'], function () {
         $parent_concern = DB::table('parent_concern')->insert($request->all());
         return response()->json($parent_concern);
     });
-
-
+    Route::get('/parent_concern/{student_id}', function (Request $request, $student_id) {
+        $parent_concern = DB::table('parent_concern')->where('student_id', $student_id)->get();
+        return response()->json($parent_concern ?? []);
+    });
 });
