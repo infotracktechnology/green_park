@@ -117,10 +117,6 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($achievements);
     });
 
-    Route::get('/achievements', function (Request $request, Student $student) {
-        $achievements = $student->achievements();
-        return response()->json($achievements);
-    });
 
     Route::get('/timetable/{branch_id}/{section}', function ($branch_id, $section) {
       $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first();
