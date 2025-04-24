@@ -42,18 +42,20 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($chairmanvideo);
     });
 
-    Route::get('/announcements', function (Request $request) {
-        $announcements = Announcement::all()->map(function ($announcement) {
-            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            return $announcement;
-        });
+    Route::get('/announcement_titles', function (Request $request) {
+        $announcements = Announcement::all();
 
         return response()->json($announcements);
     });
 
     Route::get('/announcement/{id}', function (Request $request, $id) {
         $announcement = Announcement::find($id);
-        return response()->json($announcement ?? []);
+        if ($announcement) {
+            $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
+           
+        }
+
+        return response()->json($announcement);
     });
 
     Route::get('/examportion', function (Request $request, Student $student) {
