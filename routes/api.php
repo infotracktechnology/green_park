@@ -43,7 +43,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/announcement_titles', function (Request $request) {
-        $announcements = Announcement::all()->pluck('title');
+        $announcements = Announcement::all();
 
         return response()->json($announcements);
     });
@@ -52,7 +52,7 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::find($id);
         if ($announcement) {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            unset($announcement->title);
+           
         }
 
         return response()->json($announcement);
