@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\Exam; // Import the Exam model
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Announcement;
+
 
 
 
@@ -185,6 +187,36 @@ public function dashboard()
         
         return view('student.discussionvideo', compact('discussionvideos', 'subject'));
     }
+
+    // public function attendance()
+    // {
+    //     return view('student.attendance');
+    // }
+    
+    public function attendance()
+{
+    $student_id = Auth::user()->student_id;
+    $attendance = DB::table('attendance')
+        ->selectRaw("
+            student_id,
+            DATE_FORMAT(attendance_date, '%Y-%m') AS month,
+            GROUP_CONCAT(timing) AS timings,
+            GROUP_CONCAT(status) AS statuses,
+            COUNT(DISTINCT attendance_date) AS total_days,
+            SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days
+        ")
+        ->where('student_id', $student_id)
+        ->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")
+        ->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")
+        ->get();
+
+    $total_present = $attendance->sum('present_days');
+    $total_days = $attendance->sum('total_days');
+    $percentage = $total_days > 0 ? round(($total_present / $total_days) * 100, 2) : 0;
+
+    return view('student.attendance', compact('attendance', 'total_present', 'total_days', 'percentage'));
+}
+
 }
 
 
