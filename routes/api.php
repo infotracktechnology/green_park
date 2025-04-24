@@ -134,7 +134,13 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::post('/parent_concern', function (Request $request) {
-        $parent_concern = DB::table('parent_concern')->insert($request->all());
+        $data = $request->all();
+        if ($request->has('attachment') && $request->attachment != null) {
+            $fileName = time() . '-' . $request->attachment->getClientOriginalName();
+            $request->attachment->move('uploads/concern', $fileName);
+            $data['attachment'] = 'uploads/concern/'.$fileName;
+        }
+        $parent_concern = DB::table('parent_concern')->insert($data);
         return response()->json($parent_concern);
     });
     Route::get('/parent_concern/{student_id}', function (Request $request, $student_id) {
