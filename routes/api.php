@@ -43,7 +43,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/announcement_titles', function (Request $request) {
-        $announcements = Announcement::all()->pluck('title');
+        $announcements = Announcement::all();
 
         return response()->json($announcements);
     });
@@ -52,7 +52,7 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::find($id);
         if ($announcement) {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            unset($announcement->title);
+           
         }
 
         return response()->json($announcement);
@@ -117,10 +117,6 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($achievements);
     });
 
-    Route::get('/achievements', function (Request $request, Student $student) {
-        $achievements = $student->achievements();
-        return response()->json($achievements);
-    });
 
     Route::get('/timetable/{branch_id}/{section}', function ($branch_id, $section) {
       $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first();
@@ -134,7 +130,13 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::post('/parent_concern', function (Request $request) {
-        $parent_concern = DB::table('parent_concern')->insert($request->all());
+        $data = $request->all();
+        if ($request->has('attachment') && $request->attachment != null) {
+            $fileName = time() . '-' . $request->attachment->getClientOriginalName();
+            $request->attachment->move('uploads/concern', $fileName);
+            $data['attachment'] = 'uploads/concern/'.$fileName;
+        }
+        $parent_concern = DB::table('parent_concern')->insert($data);
         return response()->json($parent_concern);
     });
     Route::get('/parent_concern/{student_id}', function (Request $request, $student_id) {
