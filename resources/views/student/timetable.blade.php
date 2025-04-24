@@ -4,7 +4,6 @@
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
 <style>
-   
     .card {
         border-radius: 15px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -40,8 +39,9 @@
 
     .table th, .table td {
         vertical-align: middle;
-        padding: 15px;
+        padding: 4px; /* Reduced padding */
         text-align: center;
+        text-transform: capitalize; /* Capitalize each word */
     }
 
     .table th {
@@ -62,7 +62,7 @@
     }
 
     .table td {
-        font-size: 1.1rem;
+        font-size: 14px;
     }
 
     .table-responsive {
@@ -70,7 +70,6 @@
     }
 
     .section-body {
-       
         padding: 20px;
         border-radius: 10px;
     }
@@ -90,6 +89,48 @@
     .text-center {
         text-align: center;
     }
+
+    /* Media query for smaller screens */
+    @media (max-width: 768px) {
+        .table th, .table td {
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .table-responsive {
+            padding: 0 15px;
+        }
+
+        .nav-pills {
+            font-size: 0.9rem;
+        }
+
+        .nav-pills .nav-link {
+            margin: 0 3px;
+        }
+
+        .card-header h4 {
+            font-size: 1.25rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .nav-pills .nav-link {
+            font-size: 0.85rem;
+        }
+
+        .card-header h4 {
+            font-size: 1.1rem;
+        }
+
+        .table th, .table td {
+            font-size: 0.85rem;
+        }
+
+        .section-body {
+            padding: 10px;
+        }
+    }
 </style>
 @endsection
 
@@ -99,7 +140,7 @@
         <div class="section-body">
             <div class="row justify-content-center">
                 <div class="col-12 col-sm-12 col-lg-12">
-                    <div class="card"> <!-- Only one card here -->
+                    <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4>Class Timetable</h4>
                             <div class="form-group mb-0">
@@ -138,17 +179,29 @@
                                                 <table class="table table-bordered">
                                                     <thead>
                                                         <tr>
+                                                            <th>S.No</th>
                                                             <th>Period</th>
                                                             <th>Subject</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         @foreach($timetable[$day] ?? [] as $session)
+                                                        @if(strtolower($session['period']) == 'break')
                                                             <tr>
-                                                                <td>{{ $session['period'] ?? '-' }}</td>
-                                                                <td>{{ $session['subject'] ?? '-' }}</td>
+                                                                <td colspan="3" class="text-center font-weight-bold" style="font-size: 1.1rem;">Break</td>
                                                             </tr>
-                                                        @endforeach
+                                                        @else
+                                                            <tr>
+                                                                <td>{{ $loop->iteration }}</td>
+                                                                <td>{{ ucfirst(strtolower($session['period'] ?? '-')) }}</td>
+                                                                <td>{{ is_array($session['subject']) ? ucfirst(strtolower(implode(', ', $session['subject']))) : ucfirst(strtolower($session['subject'])) }}</td>
+                                                            </tr>
+                                                        @endif
+                                                    @endforeach
+                                                    
+                                                    
+                                                        
+
                                                         @if(empty($timetable[$day]))
                                                             <tr>
                                                                 <td colspan="2" class="text-center">No timetable available for {{ $day }}</td>

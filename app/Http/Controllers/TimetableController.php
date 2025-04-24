@@ -130,14 +130,29 @@ class TimetableController extends Controller
     }
    
   
+  
+    
     public function timetable()
-    {
-        $student = Auth::user();
-       
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        $currentDay = Carbon::now()->format('l');
-        return view('student.timetable' , compact('student', 'days', 'currentDay'));
+{
+    $student = Auth::user();
+    $section = $student->section;
+
+    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    $currentDay = Carbon::now()->format('l');
+
+    $timetableData = TimetableAssign::where('section', $section)->first();
+    $timetable = [];
+
+    if ($timetableData && is_array($timetableData->periods)) {
+        foreach ($days as $day) {
+            $timetable[$day] = $timetableData->periods[$day] ?? [];
+        }
     }
+
+    return view('student.timetable', compact('student', 'days', 'currentDay', 'timetable'));
+}
+
+    
     
        
     
