@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'sickroom')
+@section('title', 'Student Activity')
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
@@ -22,10 +22,10 @@
                   <div class="card-body">
                     <div class="row">
                     <div class="col-md-10 col-sm-12 mb-3">
-                    <h6 class="col-deep-purple">Sick Room Entry</h6>
+                    <h6 class="col-deep-purple">Student Activity</h6>
                     </div>
                     <div class="col-md-2 col-sm-12 mb-3">
-                      <a href="{{route('sickroom.create')}}" class="btn btn-primary btn-block">Add Entry</a>
+                      <a href="{{route('studentactivity.create')}}" class="btn btn-primary btn-block">Add Activity</a>
                     </div>
                     </div>
                     <div class="col-12">
@@ -36,49 +36,43 @@
               <thead>
             <tr>
                 <th>#</th>
-                <th>Class</th>
+              
                 <th>Section</th>
-                <th>Room No</th>
-                <th>Student ID</th> 
-                <th>In Time</th>
-                <th>Out Time</th>
-                <th>Total Hrs spent</th>
-                <th>Reason</th>
-                <th>Result</th>
+               <th>Student ID</th> 
+                <th>Date</th>
+                <th>Activity</th>
                 <th>Edit</th>
                 <th>Delete</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($entries as $entry)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $entry->student_class }}</td>
-                    <td>{{ $entry->section }}</td>
-                    <td>{{ $entry->room_no }}</td>
-                    <td>{{ $entry->student_id }}</td>
-                    <td>{{ $entry->in_time }}</td>
-                    <td>{{ $entry->out_time }}</td>
-                    <td>{{ $entry->hours_spent }}</td>
-                    <td>{{ $entry->reason }}</td>
-                    <td>{{ $entry->result }}</td>
-                    <td>
-                        <a href="{{ route('sickroom.edit', $entry->id) }}" class="btn btn-warning text-white">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    </td>
-                    
-                    <td>
-                        <form action="{{ route('sickroom.destroy', $entry->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this Entry?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-            @endforeach
-        </tbody>
+           
+                @foreach($entries as $entry)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                       
+                        <td>{{ $entry->section }}</td>
+                       
+                        <td>{{ $entry->student_id }}</td>
+                      <td>{{ $entry->date }}</td>
+                        <td>{{ $entry->reason }}</td>
+                        <td>
+                            <a href="{{ route('studentactivity.edit', $entry->id) }}" class="btn btn-warning text-white">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <form action="{{ route('studentactivity.destroy', $entry->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this Entry?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
     </table>
 
 </div>

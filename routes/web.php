@@ -23,6 +23,7 @@ use App\Http\Controllers\ClassVideoController;
 use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
+use App\Http\Controllers\StudentActivityController;
 
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
@@ -116,9 +117,6 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
    
     Route::delete('/revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
     Route::resource('revisionvideo', RevisionVideoController::class);
-
-
-
     Route::resource('academicyear', App\Http\Controllers\AcademicYearController::class);
 
     Route::get('/report/section_exam/', [App\Http\Controllers\ReportController::class, 'section_exam'])->name('report.section_exam');
@@ -126,6 +124,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::post('attendance/store', [App\Http\Controllers\HolidayController::class, 'attendance_store'])->name('attendance.store');
     Route::get('/attendance', [App\Http\Controllers\HolidayController::class, 'attendance'])->name('attendance');
     Route::resource('timetable', App\Http\Controllers\TimetableController::class);
+    Route::resource('studentactivity', StudentActivityController::class);
     Route::get('/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
 });
 
@@ -157,6 +156,12 @@ Route::group(['middleware' => ['auth:student'], 'prefix' => 'student'], function
     Route::post('student/documentupload', [StudentDocumentController::class, 'store'])->name('document.store');
     Route::delete('/document/{id}', [App\Http\Controllers\StudentDocumentController::class, 'destroy'])->name('document.destroy');
     Route::get('/student/mock', [App\Http\Controllers\StudentMockTestController::class, 'index'])->name('student.mock');
+    Route::get('/student/timetable', [App\Http\Controllers\TimetableController::class, 'timetable'])->name('student.timetable');
+    
+    Route::get('/student/attendance', [StudentController::class, 'attendance'])->name('student.attendance');
+
+
+    
 
 
 

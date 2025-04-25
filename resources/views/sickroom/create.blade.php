@@ -47,20 +47,29 @@
 
         <div class="form-group col-lg-3">
             <label>In Time</label>
-            <input type="text" name="in_time"  class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d H:i') }}"  required>
+            <input type="text" name="in_time" id="in_time" class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d H:i') }}" required>
         </div>
         
-
         <div class="form-group col-lg-3">
             <label>Out Time</label>
-            <input type="text" name="out_time" class="datetime-picker form-control form-control-sm">
+            <input type="text" name="out_time" id="out_time" class="datetime-picker form-control form-control-sm">
         </div>
+        
+        <div class="form-group col-lg-3">
+            <label>Total no. of hours spent in sick room</label>
+            <input type="number" name="hours_spent" id="hours_spent" class="form-control form-control-sm" min="0" step="0.1" placeholder="e.g., 1.5" required readonly>
+        </div>
+        
+        
 
         <div class="form-group col-lg-3">
             <label>Reason</label>
             <textarea name="reason" class="form-control form-control-sm"></textarea>
         </div>
-
+        <div class="form-group col-lg-3">
+            <label>Result</label>
+            <textarea name="result" class="form-control form-control-sm"></textarea>
+        </div>
         <div class="form-group col-lg-12">
             <button type="submit" class="btn btn-primary">Submit</button>
          </div>
@@ -104,6 +113,30 @@
             $('#out_time').val('');
         }
     });
+</script>
+<script>
+function calculateHoursSpent() {
+    const inTimeVal = document.getElementById('in_time').value;
+    const outTimeVal = document.getElementById('out_time').value;
+
+    if (inTimeVal && outTimeVal) {
+        const inTime = new Date(inTimeVal);
+        const outTime = new Date(outTimeVal);
+
+        if (outTime > inTime) {
+            const diffMs = outTime - inTime;
+            const hours = (diffMs / 1000 / 60 / 60).toFixed(2); // Convert ms to hours
+            document.getElementById('hours_spent').value = hours;
+        } else {
+            document.getElementById('hours_spent').value = '';
+            alert('Out Time must be later than In Time.');
+        }
+    }
+}
+
+document.getElementById('in_time').addEventListener('change', calculateHoursSpent);
+document.getElementById('out_time').addEventListener('change', calculateHoursSpent);
+
 </script>
 {{-- <script>
     const allStudents = @json($students);
