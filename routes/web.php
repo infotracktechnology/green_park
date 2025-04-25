@@ -126,6 +126,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('timetable', App\Http\Controllers\TimetableController::class);
     Route::resource('studentactivity', StudentActivityController::class);
     Route::get('/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
+    Route::get('/feetype', [App\Http\Controllers\FinanceController::class, 'feetype'])->name('feetype');
+    Route::resource('feesplan', App\Http\Controllers\FinanceController::class);
 });
 
 #students routes
