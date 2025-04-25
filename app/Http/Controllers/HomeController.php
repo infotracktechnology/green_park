@@ -21,6 +21,17 @@ class HomeController extends Controller
        
         return view('home', compact('activeUsersCount'));
     }
+    public function parent_concern(Request $request)
+    {
+        $parentconcerns = DB::table('parent_concern')->where('status', '!=', 'Closed')->get();
+
+        if($request->has('submit')) {
+            $parentconcern = DB::table('parent_concern')->where('id', $request->id)->update(['status' => $request->status]);
+            return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
+        }       
+       
+        return view('announcement.parent_concern', compact('parentconcerns'));
+    }
 
     // public function dashboard()
     // {
