@@ -125,13 +125,8 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('/attendance', [App\Http\Controllers\HolidayController::class, 'attendance'])->name('attendance');
     Route::resource('timetable', App\Http\Controllers\TimetableController::class);
     Route::resource('studentactivity', StudentActivityController::class);
-
-    
-
-Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-
-
-
+    Route::get('/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 });
 
 #students routes
