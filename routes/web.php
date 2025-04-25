@@ -24,7 +24,7 @@ use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\StudentActivityController;
-
+use App\Http\Controllers\ChatController;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Student;
@@ -127,6 +127,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('studentactivity', StudentActivityController::class);
 
     
+
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+
 
 
 });

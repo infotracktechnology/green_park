@@ -166,7 +166,9 @@
               </ul>
             </li>
 
-           
+            <li class="dropdown">
+              <a href="{{ route('chat.index') }}" class="nav-link"><i data-feather="message-square"></i><span>Chat Box</span></a>
+            </li>
 
             <li class="dropdown">
               <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
