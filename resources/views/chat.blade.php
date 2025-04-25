@@ -2,29 +2,8 @@
 @section('title', 'Chat')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
-<link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
-
-<!-- General CSS Files -->
-<link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/bundles/fontawesome/css/all.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/bundles/izitoast/css/iziToast.min.css') }}">
-
-<!-- Template CSS -->
-<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/components.css') }}">
-
-<!-- Custom style CSS -->
-<link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/chat.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/flatpickr.min.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/flatpickr-airbnb.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/flatpickr-material.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/flatpickr-custom.css') }}">
-
 <style>
-/* Chat container */
-.card.chat {
+  card.chat {
   display: flex;
   flex-direction: column;
   height: 600px;
@@ -179,7 +158,7 @@
 @endsection
 
 @section('main')
-<div class="main-content">
+<div class="main-content" x-data="chat">
   <section class="section">
     <div class="section-body">
       <div class="row">
@@ -190,26 +169,23 @@
             <div class="body">
               <div id="plist" class="people-list">
                 <div class="chat-search">
-                  <input type="text" class="form-control" placeholder="Search..." />
+                  <input type="text" class="form-control" placeholder="Search..." x-model="searchTerm" />
                 </div>
                 <ul class="chat-list list-unstyled mt-3">
-                 
-                    <li class="clearfix active">
-                        <img src="{{ asset('img/users/user-3.png') }}" alt="avatar">
-                        <div class="about d-flex justify-content-between w-100 align-items-center">
-                          <div>
-                            <div class="name d-flex align-items-center">
-                              Maria Smith
-                              <span class="badge badge-pill badge-success ml-2">2</span>
-                            </div>
-                            <div class="status">
-                              <i class="material-icons offline">fiber_manual_record</i> left 7 mins ago
-                            </div>
+                  <template x-for="(user, index) in filteredUsers" :key="index">
+                    <li class="clearfix" :class="{ 'active': selectedUser === user.id }" x-on:click="selectUser(user.id)">
+                      <div class="about d-flex justify-content-between w-100 align-items-center">
+                        <div>
+                          <div class="name d-flex align-items-center">
+                            <span x-text="user.name"></span>
+                            <template x-if="user.unread > 0">
+                              <span class="badge badge-pill badge-success ml-2" x-text="user.unread"></span>
+                            </template>
                           </div>
                         </div>
-                      </li>
-                      
-                  <!-- Repeat for other users -->
+                      </div>
+                    </li>
+                  </template>
                 </ul>
               </div>
             </div>
@@ -221,44 +197,49 @@
           <div class="card chat">
             <!-- Header -->
             <div class="chat-header clearfix">
-             
               <div class="chat-about">
-                <div class="chat-with">Maria Smith</div>
-                <div class="chat-num-messages">2 new messages</div>
+                <div class="chat-with" x-text="currentUser ? currentUser.name : 'Select a chat'"></div>
+                <div class="chat-num-messages" x-text="currentUser ? `${currentUser.unread} new messages` : ''"></div>
               </div>
             </div>
 
             <!-- Messages -->
-            <div class="chat-messages" id="chat-messages">
-              <!-- Example: incoming -->
-              <div class="message incoming">
-                Hi there! How are you?
-                <div class="message-time">09:42 AM</div>
-              </div>
-              <!-- Example: outgoing -->
-              <div class="message outgoing">
-                I'm good, thanks! You?
-                <div class="message-time">09:43 AM</div>
-              </div>
+            <div class="chat-messages" id="chat-messages" x-ref="chatBox">
+              <template x-for="(message, index) in currentMessages" :key="index">
+                <div class="message" :class="message.outgoing ? 'outgoing' : 'incoming'">
+                  <span x-text="message.text"></span>
+                  <template x-if="message.image">
+                    <img :src="message.image" class="preview-img" />
+                  </template>
+                  <template x-if="message.file">
+                    <div>
+                      <i class="fas fa-file-pdf"></i>
+                      <small x-text="message.file"></small>
+                    </div>
+                  </template>
+                  
+                </div>
+              </template>
             </div>
 
             <div class="chat-form">
-              <form id="chat-form" enctype="multipart/form-data">
+              <form id="chat-form" @submit.prevent="sendMessage">
                 <div class="input-group align-items-center">
                   <div class="input-group-prepend">
                     <label class="btn btn-light p-2 m-0" for="file-input" style="cursor: pointer;">
                       <i class="fas fa-paperclip"></i>
                     </label>
-                    <input type="file" id="file-input" name="attachment" class="d-none" />
+                    <input type="file" id="file-input" name="attachment" class="d-none" x-on:change="handleFileChange" />
                   </div>
-                  <input type="text" name="message" id="chat-input" class="form-control" placeholder="Type a message..." autocomplete="off " />
+                  <input type="text" name="message" id="chat-input" class="form-control" placeholder="Type a message..." 
+                         autocomplete="off" x-model="messageText" />
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-primary">
                       <i class="far fa-paper-plane"></i>
                     </button>
                   </div>
                 </div>
-                <div id="file-preview"></div>
+                <div id="file-preview" x-html="filePreviewHTML"></div>
               </form>
             </div>
           </div>
@@ -271,56 +252,84 @@
 @endsection
 
 @section('js')
-<script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script>
-<script src="{{ asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
-<script src="{{ asset('assets/js/app.min.js') }}"></script>
-<script src="{{ asset('assets/js/scripts.js') }}"></script>
-<script src="{{ asset('assets/js/custom.js') }}"></script>
-
 <script>
-    const chatBox = document.getElementById('chat-messages');
-    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-    
-    const fileInput = document.getElementById('file-input');
-    const filePreview = document.getElementById('file-preview');
-    fileInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      filePreview.innerHTML = '';
-      if (!file) return;
-      if (file.type.startsWith('image/')) {
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        filePreview.appendChild(img);
-      } else if (file.type === 'application/pdf') {
-        filePreview.innerHTML = '<i class="fas fa-file-pdf"></i>';
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('chat', () => ({
+      users: [
+        { 
+          id: 1, 
+          name: 'Maria Smith', 
+          unread: 2, 
+        },
+        { 
+          id: 2, 
+          name: 'Smith', 
+          unread: 2, 
+        },
+      ],
+      messages: [],
+      selectedUser: 1,
+      messageText: '',
+      filePreviewHTML: '',
+      selectedFile: null,
+      searchTerm: '',
+      
+      init() {
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      },
+      
+      get filteredUsers() {
+        if (!this.searchTerm.trim()) return this.users;
+        const term = this.searchTerm.toLowerCase();
+        return this.users.filter(user => 
+          user.name.toLowerCase().includes(term)
+        );
+      },
+      
+      get currentUser() {
+        return this.users.find(user => user.id === this.selectedUser);
+      },
+      
+      get currentMessages() {
+        return this.messages[this.selectedUser] || [];
+      },
+      
+      selectUser(userId) {
+        this.selectedUser = userId;
+        const user = this.users.find(u => u.id === userId);
+        if (user) user.unread = 0;
+        
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      },
+      
+      handleFileChange(e) {
+        const file = e.target.files[0];
+        this.filePreviewHTML = '';
+        this.selectedFile = file;
+        
+        if (!file) return;
+        
+        if (file.type.startsWith('image/')) {
+          const url = URL.createObjectURL(file);
+          this.filePreviewHTML = `<img src="${url}" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 5px;">`;
+        } else if (file.type === 'application/pdf') {
+          this.filePreviewHTML = '<i class="fas fa-file-pdf"></i>';
+        }
+        
+        this.filePreviewHTML += `<div>Attached: ${file.name}</div>`;
+      },
+      
+      
+      scrollToBottom() {
+        if (this.$refs.chatBox) {
+          this.$refs.chatBox.scrollTop = this.$refs.chatBox.scrollHeight;
+        }
       }
-      filePreview.appendChild(document.createElement('div')).innerText = `Attached: ${file.name}`;
-    });
-    
-    document.getElementById('chat-form').addEventListener('submit', e => {
-      e.preventDefault();
-      const input = document.getElementById('chat-input');
-      const file = fileInput.files[0];
-      const text = input.value.trim();
-      if (!text && !file) return;
-    
-      const msg = document.createElement('div');
-      msg.className = 'message outgoing';
-      msg.innerHTML = `
-        ${text || ''}
-        ${file?.type?.startsWith('image/') ? `<img src="${URL.createObjectURL(file)}" class="preview-img" />` : ''}
-        ${file?.type === 'application/pdf' ? `<i class="fas fa-file-pdf"></i>` : ''}
-        ${file ? `<div class="message-time"><small>${file.name}</small></div>` : ''}
-        <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-      `;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      e.target.reset();
-      filePreview.innerHTML = '';
-    });
-    </script>
-    
+    }));
+  });
+</script>
 @endsection
