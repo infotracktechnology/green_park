@@ -33,6 +33,18 @@ class HomeController extends Controller
         return view('announcement.parent_concern', compact('parentconcerns'));
     }
 
+    public function chat(Request $request)
+    {
+        $parentconcerns = DB::table('parent_concern')->where('status', '!=', 'Closed')->get();
+
+        if($request->has('submit')) {
+            $parentconcern = DB::table('parent_concern')->where('id', $request->id)->update(['status' => $request->status]);
+            return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
+        }       
+       
+        return view('chat');
+    }
+
     // public function dashboard()
     // {
     //     $activeUsersCount = Student::where('active', 1)->count();
