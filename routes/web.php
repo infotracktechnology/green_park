@@ -24,7 +24,7 @@ use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\StudentActivityController;
-
+use App\Http\Controllers\ChatController;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Student;
@@ -126,6 +126,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('timetable', App\Http\Controllers\TimetableController::class);
     Route::resource('studentactivity', StudentActivityController::class);
     Route::get('/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 });
 
 #students routes
