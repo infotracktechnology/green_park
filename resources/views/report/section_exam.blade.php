@@ -89,7 +89,7 @@
             </div>
 
 
-            <form method="get" class="col-md-12" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('exam.report.dump') }}" enctype="multipart/form-data">
+            <form method="get" class="col-md-12" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
                 <input type="hidden" name="test_name" value="{{ $test_name }}">
                 <div class="col-lg-12">
                     <h6>Exam Publish</h6>
