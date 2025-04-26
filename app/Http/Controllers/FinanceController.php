@@ -52,5 +52,11 @@ class FinanceController extends Controller
         $fees_plan->items()->createMany($request->item);
         return redirect()->route('feetype.index')->with('success', 'Fees Plan created successfully!');
     }
+
+    public function destroy(Request $request, FeesPlan $fees_plan){
+        $fees_plan->items->delete();
+        $fees_plan->delete();
+        return redirect()->route('feetype.index')->with('success', 'Fees Plan deleted successfully!');
+    }
   
 }
