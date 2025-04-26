@@ -182,6 +182,9 @@
                               <span class="badge badge-pill badge-success ml-2" x-text="user.unread"></span>
                             </template>
                           </div>
+                          <div class="status" x-text="user.id">
+                            <i class="material-icons offline">fiber_manual_record</i>
+                          </div>
                         </div>
                       </div>
                     </li>
@@ -205,34 +208,36 @@
 
             <!-- Messages -->
             <div class="chat-messages" id="chat-messages" x-ref="chatBox">
-              <template x-for="(message, index) in currentMessages" :key="index">
-                <div class="message" :class="message.outgoing ? 'outgoing' : 'incoming'">
-                  <span x-text="message.text"></span>
-                  <template x-if="message.image">
-                    <img :src="message.image" class="preview-img" />
+              <template x-for="(message, index) in messages" :key="index">
+                <div class="message" :class="message.sender_id === selectedUser ? 'incoming' : 'outgoing'">
+                  <span x-text="message.message"></span>
+                  <template x-if="message.type === 'image'">
+                    <img :src="message.message" class="preview-img" />
                   </template>
-                  <template x-if="message.file">
-                    <div>
+                  <template x-if="message.type === 'pdf'">
+                    <a>
                       <i class="fas fa-file-pdf"></i>
-                      <small x-text="message.file"></small>
-                    </div>
+                      <small x-text="message.message"></small>
+                    </a>
                   </template>
-                  
+                  <div class="message-time" x-text="message.time"></div>
                 </div>
               </template>
             </div>
 
             <div class="chat-form">
-              <form id="chat-form" @submit.prevent="sendMessage">
+              <form method="POST" enctype="multipart/form-data" x-on:submit.prevent="sendMessage">
                 <div class="input-group align-items-center">
                   <div class="input-group-prepend">
                     <label class="btn btn-light p-2 m-0" for="file-input" style="cursor: pointer;">
                       <i class="fas fa-paperclip"></i>
                     </label>
-                    <input type="file" id="file-input" name="attachment" class="d-none" x-on:change="handleFileChange" />
+                    <input type="file" id="file-input" name="attachment" accept="image/*, application/pdf" class="d-none" x-on:change="handleFileChange" />
                   </div>
                   <input type="text" name="message" id="chat-input" class="form-control" placeholder="Type a message..." 
                          autocomplete="off" x-model="messageText" />
+                  <input type="hidden" name="receiver_id" x-model="selectedUser">
+                  <input type="hidden" name="type" x-model="chat_type">
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-primary">
                       <i class="far fa-paper-plane"></i>
@@ -255,29 +260,21 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('chat', () => ({
-      users: [
-        { 
-          id: 1, 
-          name: 'Maria Smith', 
-          unread: 2, 
-        },
-        { 
-          id: 2, 
-          name: 'Smith', 
-          unread: 2, 
-        },
-      ],
+      users:@json($users),
       messages: [],
-      selectedUser: 1,
+      selectedUser: 0,
       messageText: '',
       filePreviewHTML: '',
       selectedFile: null,
       searchTerm: '',
-      
+      chat_type: 'text',
       init() {
         this.$nextTick(() => {
           this.scrollToBottom();
+          this.currentMessages();
         });
+        this.selectedUser = this.users[0].id;
+        //this.currentMessages();
       },
       
       get filteredUsers() {
@@ -292,8 +289,14 @@
         return this.users.find(user => user.id === this.selectedUser);
       },
       
-      get currentMessages() {
-        return this.messages[this.selectedUser] || [];
+      currentMessages() {
+        $.get(`{{ env('APP_URL')}}api/v2/chat/messages/`+this.selectedUser, (data) => {
+          console.log(data);
+          const user = this.users.find(u => u.id === this.selectedUser);
+          if (user) user.unread = 0;
+          this.messages = data;
+        });
+        // return this.messages[this.selectedUser] || [];
       },
       
       selectUser(userId) {
@@ -316,14 +319,19 @@
         if (file.type.startsWith('image/')) {
           const url = URL.createObjectURL(file);
           this.filePreviewHTML = `<img src="${url}" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 5px;">`;
+          this.chat_type = 'image';
         } else if (file.type === 'application/pdf') {
           this.filePreviewHTML = '<i class="fas fa-file-pdf"></i>';
+          this.chat_type = 'pdf';
         }
-        
-        this.filePreviewHTML += `<div>Attached: ${file.name}</div>`;
+        else{
+          alert('Unsupported file type');
+          this.selectedFile = null;
+        }
       },
-      
-      
+      sendMessage() {
+        console.log(this.selectedFile);
+      },
       scrollToBottom() {
         if (this.$refs.chatBox) {
           this.$refs.chatBox.scrollTop = this.$refs.chatBox.scrollHeight;
