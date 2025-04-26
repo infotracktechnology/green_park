@@ -59,7 +59,10 @@
                 <td>{{$examportion->academic_year}}</td>
                   <td>{{$examportion->coaching_type}}</td>
                   <td>{{$examportion->title}}</td>
-                 <td>{{$examportion->attachment}}</td>
+                 {{-- <td>{{$examportion->attachment}}</td> --}}
+                 <td>
+                  <a href="{{ env('APP_URL').$examportion->attachment }}" class="btn btn-primary text-white" download><i class="fas fa-download"></i></a>
+              </td>
                 </td> 
               <td>
                    <form action="{{ route('examportion.destroy', $examportion->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this PDF?')" class="d-inline">
