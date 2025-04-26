@@ -166,10 +166,7 @@
               </ul>
             </li>
 
-            <li class="dropdown">
-              <a href="{{ route('chat.index') }}" class="nav-link"><i data-feather="message-square"></i><span>Chat Box</span></a>
-            </li>
-
+            
             <li class="dropdown">
               <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
             </li>
@@ -179,6 +176,14 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
                 <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
+                <li><a href="{{ route('feesplan.index') }}" class="nav-link">Fees Plan</a></li>
               </ul>
             </li>
 
