@@ -30,7 +30,12 @@ class BranchController extends Controller
         $request->validate([
             'mob_no' => ['unique:branch,mob_no', 'numeric', 'min:10'],
             'email' => ['unique:branch,email', 'email'],
+            'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+        $file = $request->file('file');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->move('branch', $fileName);
         $branch = branch::create($request->all());
         return to_route('branch.index');
     }
@@ -42,12 +47,36 @@ class BranchController extends Controller
     }
     
 
-    public function update(Request $request, Branch $branch) {
-        $data=$request->all();
-        $branch->update($data);
-        return to_route('branch.index');
+    public function update(Request $request, Branch $branch)
+{
+    $request->validate([
+        'mob_no' => ['unique:branch,mob_no,' . $branch->id, 'numeric', 'min:10'],
+        'email' => ['unique:branch,email,' . $branch->id, 'email'],
+        'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ]);
 
+    $data = $request->all();
+
+    
+
+    if ($request->hasFile('file')) {
+        $oldFilePath = storage_path('app/public/' . $branch->file);
+        if (file_exists($oldFilePath)) {
+            unlink($oldFilePath);
+        }
+
+        $file = $request->file('file');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->move('branch', $fileName);
+
+        $branch->file = 'branch/' . $fileName;
     }
+
+
+    $branch->update($data); // Update the branch record with new data
+    return to_route('branch.index');
+}
+
 
     public function destroy(Request $request, Branch $branch) {
         $branch->delete();
