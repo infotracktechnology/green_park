@@ -125,7 +125,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('/attendance', [App\Http\Controllers\HolidayController::class, 'attendance'])->name('attendance');
     Route::resource('timetable', App\Http\Controllers\TimetableController::class);
     Route::resource('studentactivity', StudentActivityController::class);
-    Route::get('/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
+    Route::match(['get', 'post'], '/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
     Route::get('/chat', [App\Http\Controllers\HomeController::class, 'chat'])->name('chat.index');
     Route::get('/feetype', [App\Http\Controllers\FinanceController::class, 'feetype'])->name('feetype');
     Route::resource('feesplan', App\Http\Controllers\FinanceController::class);

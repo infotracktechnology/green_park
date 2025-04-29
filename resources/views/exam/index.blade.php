@@ -42,6 +42,7 @@
             <th>Academic Year</th>
             <th>Branch</th>
             <th>Coaching Type</th>
+            <th>Category</th>
             <th>Name</th>
             <th>Subject</th>
             <th>Total Questions</th>
@@ -62,6 +63,7 @@
             <td>{{ $test->academic_year }}</td>
             <td>{{ $test->branch() }}</td>
             <td>{{ $test->coaching_type }}</td>
+            <td>{{ $test->category }}</td>
             <td>{{ $test->name }}</td>
             <td>{{ $test->subject_name }}</td>
             <td>{{ $test->total_questions }}</td>

@@ -65,6 +65,7 @@ class ExamController extends Controller
         $data['subject_name'] = implode(',', $request->subject_name);
         $data['branch_id'] = implode(',', $request->branch_id);
         $data['coaching_type'] = implode(',', $request->coaching_type);
+        $data['category'] = implode(',', $request->category); 
         $data['status'] = 'preview';
     
         $questions = [];
@@ -79,7 +80,7 @@ class ExamController extends Controller
                 }
             }
         }
-    
+      
         $data['questions'] = $questions;
         Exam::create($data);
         session()->flash('success', 'Test created successfully');
@@ -98,6 +99,7 @@ class ExamController extends Controller
         $data = $request->all();
         $data['branch_id'] = implode(',', $request->branch_id);
         $data['coaching_type'] = implode(',', $request->coaching_type);
+        $data['category'] = implode(',', $request->category);
         $exam->update($data);
         session()->flash('success', 'Test updated successfully');
         return to_route('exam.index');
