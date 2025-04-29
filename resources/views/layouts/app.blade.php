@@ -120,6 +120,16 @@
                 {{-- <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a></li> --}}
               </ul>
             </li>
+
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student App Menu</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('studentmenu.branch') }}" class="nav-link"> Branch Assign</a></li>
+                <li><a href="{{ route('studentmenu.type') }}" class="nav-link"> Type Assign</a></li>
+                <li><a href="{{ route('studentmenu.student') }}" class="nav-link"> Student Assign</a></li>
+              </ul>
+            </li>
+
             <li class="dropdown">
               <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
             </li>
