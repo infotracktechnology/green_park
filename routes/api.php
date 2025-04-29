@@ -52,7 +52,7 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::find($id);
         if ($announcement) {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            $announcement->attachment = env('APP_URL').$announcement->attachment;
+            $announcement->attachment = "public/".$announcement->attachment;
         }
 
         return response()->json($announcement);
