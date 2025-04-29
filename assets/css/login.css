@@ -6,7 +6,7 @@
     justify-content: center;
     align-items: center;
     background: #fff;
-    background: linear-gradient(132deg, #FC415A, #591BC5, #212335);
+    background: linear-gradient(132deg, #5864bd);
     background-size: 400% 400%;
     animation: Gradient 15s ease infinite;
 }
@@ -96,7 +96,9 @@
     top: 50px;
     left: 50px;
     border-radius: 100% 0 100% 100%;
-    background-image: linear-gradient(to bottom, #ffb100, #ff8e00);
+  background-image: linear-gradient(to bottom, #6baeed, #6baeed);
+
+
 }
 
 .login-13 .bg-img-inner:after {
@@ -109,7 +111,8 @@
     z-index: -1;
     -webkit-clip-path: polygon(0 0, 30% 0, 70% 10%);
     clip-path: polygon(0 0, 100% 50%, 100% 80%);
-    background-image: linear-gradient(to bottom, #ffb100, #ff8e00);
+    background-image: linear-gradient(to bottom, #6baeed, #6baeed);
+
 }
 
 .login-13 .info{
@@ -392,20 +395,20 @@
 }
 
 .login-13 .btn-primary {
-    background-image: linear-gradient(to bottom, #ffb400, #ff8a00);
+    background-image: linear-gradient(to bottom, #6baeed, #6baeed);
 }
 
 .login-13 .btn-primary:before {
-    background-image: linear-gradient(to bottom, #ffb400, #ff8a00);
+    background-image: linear-gradient(to bottom, #6baeed, #6baeed);
 }
 
 .login-13 .btn-primary:after {
-    background-image: linear-gradient(to bottom, #ffb400, #ff8a00);
+    background-image: linear-gradient(to bottom, #6baeed, #6baeed);
 }
 
 .login-13 .btn-primary:hover {
-    color: #ff8a00;
-    border: 2px solid #ff8a00;
+    color: #6baeed;
+    border: 2px solid #6baeed;
 }
 
 /** Social media **/

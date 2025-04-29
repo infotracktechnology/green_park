@@ -65,49 +65,27 @@
                           </div>
 
                       
-                        <div class="form-group col-lg-3">
-                          <label for="branch">Branch</label>
-                          <select name="branch_id" id="branch_id"  class="form-control form-control-sm"  required>
-                              <option value="">Select  Branch</option>
-                              @foreach ($branches as $branch)
-                                  <option value="{{ $branch->id }}" @selected(request('branch_id') == $branch->id)>{{ $branch->name }}</option>
-                              @endforeach
+                          <div class="form-group col-lg-3">
+                            <label for="branch">Branch</label>
+                            <select name="branch_id" id="branch_id" class="form-control form-control-sm" required>
+                                <option value="">Select Branch</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}" @selected(request('branch_id') == $branch->id)>{{ $branch->name }}</option>
+                                @endforeach
                             </select>
                         </div>
-
-
-
-                        <div class="form-group col-lg-3">
-                          <label for="hostel">Hostel / Dayscholar</label>
-                          <select name="hostel" id="hostel" onchange="getSection();" class="form-control form-control-sm" required>
-                              <option value="">Select Option</option>
-                              @foreach (['Hostel','Dayscholar'] as $row)
-                                  <option value="{{ $row }}" @selected(request('hostel') == $row)>{{ $row }}</option>
-                              @endforeach
-                            </select>
-                        </div>
-
-
-
+                
                         <div class="form-group col-lg-2">
-                          <label for="gender">Gender</label>
-                          <select name="gender" id="gender" onchange="getSection();"  class="form-control form-control-sm" required>
-                              <option value="">Select Gender</option>
-                              @foreach (['Male','Female'] as $row)
-                                  <option value="{{ $row }}" @selected(request('gender') == $row)>{{ $row }}</option>
-                              @endforeach
+                            <label for="section">Section</label>
+                            <select name="section" id="section" class="form-control form-control-sm" required>
+                                <option value="">Select Section</option>
+                                @foreach ($sections as $section)
+                                    <option value="{{ $section->section }}" @selected(request('section') == $section->section)>{{ $section->section }}</option>
+                                @endforeach
                             </select>
                         </div>
 
-                        <div class="form-group col-lg-2">
-                          <label for="section">Section</label>
-                          <select name="section" id="section"  class="form-control form-control-sm" required>
-                              <option value="">Select Section</option>
-                              @foreach ($sections as $section)
-                                  <option value="{{ $section->section }}" @selected(request('section') == $section->section)>{{ $section->section }}</option>
-                              @endforeach
-                            </select>
-                        </div>
+
 
                           <div class="form-group col-lg-2">
                                   <button type="submit" name="show" class="btn btn-primary m-t-25">Show</button>
@@ -208,25 +186,24 @@
     });
 
     const branch = $('#branch_id');
-    const hostel = $('#hostel');
-    const gender = $('#gender');
 
+branch.change(function() {
+    $('#section').html('<option value="">Select Section</option>');
+    if(branch.val() != "") {
+        getSection();
+    }
+})
 
-    branch.change(function() {
-      hostel.val('');
-      gender.val('');
-      $('#section').html('');
-    })
-
-    function getSection() {
-      $.get(`{{ route('holiday.create') }}?gender=${gender.val()}&branch=${branch.val()}&hostel=${hostel.val()}`, function(data) {
+function getSection() {
+    $.get(`{{ route('holiday.create') }}?branch=${branch.val()}`, function(data) {
         var html = '<option value="">Select Section</option>';
         $.each(data, function(key, item) {
-          html += '<option value="' + item.section + '">' + item.section + '</option>';
+            html += '<option value="' + item.section + '">' + item.section + '</option>';
         });
         $('#section').html(html);
-      });
-    }
+    });
+}
+
 
     $("#present").click(function() {
         if(this.checked) {
