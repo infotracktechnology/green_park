@@ -165,7 +165,7 @@ Route::group(['prefix' => 'v2'], function () {
         if ($request->has('attachment') && $request->attachment != null) {
             $fileName = time() . '-' . $request->attachment->getClientOriginalName();
             $request->attachment->move('documents', $fileName);
-            $data['attachment'] = 'documents/'.$fileName;
+            $data['file'] = 'documents/'.$fileName;
         }
         $parent_concern = DB::table('documents')->insert($data);
         return response()->json($parent_concern);
