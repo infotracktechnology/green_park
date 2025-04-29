@@ -52,7 +52,7 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::find($id);
         if ($announcement) {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-           
+            $announcement->attachment = env('APP_URL').$announcement->attachment;
         }
 
         return response()->json($announcement);
@@ -142,5 +142,10 @@ Route::group(['prefix' => 'v2'], function () {
     Route::get('/parent_concern/{student_id}', function (Request $request, $student_id) {
         $parent_concern = DB::table('parent_concern')->where('student_id', $student_id)->get();
         return response()->json($parent_concern ?? []);
+    });
+    Route::get('/chat/messages/{user_id}', function (Request $request, $user_id) {
+        $read = DB::table('chat')->where('sender_id', $user_id)->where('chat_read', 0)->update(['chat_read' => 1]);
+        $messages = DB::table('chat')->where('sender_id', $user_id)->orWhere('receiver_id', $user_id)->selectRaw("type, message,sender_id,receiver_id,created_at")->orderBy('created_at', 'desc')->get();
+        return response()->json($messages);
     });
 });

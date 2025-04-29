@@ -56,7 +56,13 @@
             <td>{{$row->name}}</td>
             <td>{{$row->coaching_type}}</td>
             <td></td>
-            <td></td>
+            <td> <form action="{{ route('feesplan.destroy', $row->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')" class="d-inline">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="btn btn-danger">
+                 <i class="fas fa-trash"></i>
+              </button>
+           </form></td>
         </tr>
         @endforeach
           
