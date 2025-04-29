@@ -83,13 +83,12 @@
        <div class="form-group col-lg-3">
     <label for="image">Upload File</label>
     <input type="file" name="file" id="image" class="form-control form-control-sm" accept="image/*">
-
     @if($branch->file)
-        <div class="mt-2">
-            <label>Current File:</label>
-            <p>{{ basename($branch->file) }}</p> 
-        </div>
-    @endif
+    <div class="mt-2">
+        <label>Current File:</label>
+        <p>{{ basename($branch->file) }}</p>
+    </div>
+@endif
 </div>
 
          <div class="form-group col-lg-12">
