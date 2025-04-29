@@ -172,7 +172,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/device_token/{student_id}/{device_token}',  function ($student_id, $device_token) {
-        $student = Student::where('id', $student_id)->update(['device_token' => $device_token]);
+        $student = Student::where('student_id', $student_id)->update(['device_token' => $device_token]);
         return response()->json($student);
     });
 
