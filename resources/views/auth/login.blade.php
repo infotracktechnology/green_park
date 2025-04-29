@@ -17,10 +17,10 @@
                 <div class="col-lg-6 col-md-12 bg-img">
                     <div class="bg-img-inner">
                         <div class="info">
-                            <div class="center">
+                            {{-- <div class="center">
                                 <h1>Welcome To GPCC</h1>
-                            </div>
-                            <p>Green Park Group of Educational Institutions are always known for their Academic Accomplishments in securing admissions into Professional courses. With the Central government making NEET mandatory for MBBS admissions, we have started Green Park Coaching Centre in 2017 to provide the students with extensive, exceptional, and efficacious coaching to crack NEET with effortless ease.</p>
+                            </div> --}}
+                            {{-- <p>Green Park Group of Educational Institutions are always known for their Academic Accomplishments in securing admissions into Professional courses. With the Central government making NEET mandatory for MBBS admissions, we have started Green Park Coaching Centre in 2017 to provide the students with extensive, exceptional, and efficacious coaching to crack NEET with effortless ease.</p> --}}
                         </div>
                     </div>
                 </div>

@@ -204,7 +204,7 @@
 
                                                         @if(empty($timetable[$day]))
                                                             <tr>
-                                                                <td colspan="2" class="text-center">No timetable available for {{ $day }}</td>
+                                                                <td colspan="3" class="text-center">No timetable available for {{ $day }}</td>
                                                             </tr>
                                                         @endif
                                                     </tbody>

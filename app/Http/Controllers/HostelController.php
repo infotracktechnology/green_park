@@ -213,21 +213,21 @@ class HostelController extends Controller
         $students = [];
         $attendances = [];
         $branches = DB::table('branch')->select('id', 'name')->get();
-        $academicyear = DB::table('student')->select('academic_year')->distinct()->get();
+        // $academicyear = DB::table('student')->select('academic_year')->distinct()->get();
     
         if ($request->has('show')) {
-            $students = Student::where('academic_year', $request->academic_year)
-                ->where('hostel_id', $request->hostel)
+            $students = Student ::where('hostel_id', $request->hostel)
+               
                 ->where('room_no', $request->room_no)
                 ->select('student_id', 'student_name', 'academic_year', 'coaching_type')
                 ->get();
         }
     
         return view('hostel.hostelattendance', compact(
-             'hostels', 'rooms', 'students', 'attendances', 'branches', 'academicyear'
+             'hostels', 'rooms', 'students', 'attendances', 'branches'
         ));
     }
-    
+
   
     public function storeAttendance(Request $request)
     {
