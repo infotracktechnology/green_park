@@ -38,6 +38,7 @@ Route::group(['prefix' => 'v2'], function () {
         $student = Student::where('id', $student_id)->first();
         return response()->json($student);
     });
+
     Route::get('/chairmanvideo',  function (Request $request, Student $student) {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
@@ -158,4 +159,21 @@ Route::group(['prefix' => 'v2'], function () {
         $daywise = DB::table('hostel_attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
         return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
       });
+
+      Route::post('/document_upload', function (Request $request) {
+        $data = $request->all();
+        if ($request->has('attachment') && $request->attachment != null) {
+            $fileName = time() . '-' . $request->attachment->getClientOriginalName();
+            $request->attachment->move('documents', $fileName);
+            $data['attachment'] = 'documents/'.$fileName;
+        }
+        $parent_concern = DB::table('documents')->insert($data);
+        return response()->json($parent_concern);
+    });
+
+    Route::get('/device_token/{student_id}/{device_token}',  function ($student_id, $device_token) {
+        $student = Student::where('id', $student_id)->update(['device_token' => $device_token]);
+        return response()->json($student);
+    });
+
 });
