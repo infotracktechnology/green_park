@@ -19,6 +19,11 @@ class Student extends Authenticatable
     public $table = 'student';
 
     protected $guarded = [];
+
+    protected $casts = [
+        'menu' => 'json',
+    ];
+
     function branch()
     {
         return $this->belongsTo(Branch::class, 'campus', 'id');
