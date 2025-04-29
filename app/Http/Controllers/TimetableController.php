@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Timetable;
+use App\Models\Student;
 use App\Models\TimetableAssign;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class TimetableController extends Controller
 {
@@ -89,19 +91,11 @@ class TimetableController extends Controller
             $timetableData[$day] = $daySchedule;
         }
 
-        Timetable::create([
-            'academic_year' => $request->academic_year,
-            'name' => $request->timetable_name,
-            'start_time' => $request->start_time,
-            'structure' => $timetableData
-        ]);
 
         return to_route('timetable.index')->with('success', 'Timetable created successfully');
             
     }
       
-       
-    
 
     public function edit(Request $request, Timetable $timetable) {
         $periods=[];
@@ -134,4 +128,32 @@ class TimetableController extends Controller
         session()->flash('success', 'Timetable deleted successfully');
         return to_route('timetable.index');
     }
+   
+  
+  
+    
+    public function timetable()
+{
+    $student = Auth::user();
+    $section = $student->section;
+
+    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    $currentDay = Carbon::now()->format('l');
+
+    $timetableData = TimetableAssign::where('section', $section)->first();
+    $timetable = [];
+
+    if ($timetableData && is_array($timetableData->periods)) {
+        foreach ($days as $day) {
+            $timetable[$day] = $timetableData->periods[$day] ?? [];
+        }
+    }
+
+    return view('student.timetable', compact('student', 'days', 'currentDay', 'timetable'));
+}
+
+    
+    
+       
+    
 }

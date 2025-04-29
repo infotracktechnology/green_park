@@ -59,10 +59,19 @@
         </div>
         
         <div class="form-group col-lg-3">
+            <label>Total no. of hours spent in sick room</label>
+            <input type="number" name="hours_spent" id="hours_spent" class="form-control form-control-sm" min="0" step="0.1" placeholder="e.g., 1.5" required readonly>
+        </div>
+
+
+        <div class="form-group col-lg-3">
             <label>Reason</label>
             <textarea name="reason" class="form-control form-control-sm">{{ old('reason', $sickroom->reason) }}</textarea>
         </div>
-
+        <div class="form-group col-lg-3">
+            <label>Result</label>
+            <textarea name="result" class="form-control form-control-sm">{{ old('reason', $sickroom->result) }}</textarea>
+        </div>
         <div class="form-group col-lg-12">
             <button type="submit" class="btn btn-primary">Submit</button>
          </div>
@@ -105,6 +114,32 @@
             $('#out_time_error').text('End time must be greater than start time.');
             $('#out_time').val('');
         }
+    });
+</script>
+<script>
+    function calculateHoursSpent() {
+        const inTimeVal = document.getElementById('in_time').value;
+        const outTimeVal = document.getElementById('out_time').value;
+
+        if (inTimeVal && outTimeVal) {
+            const inTime = new Date(inTimeVal);
+            const outTime = new Date(outTimeVal);
+
+            if (outTime > inTime) {
+                const diffMs = outTime - inTime;
+                const hours = (diffMs / 1000 / 60 / 60).toFixed(2); // milliseconds to hours
+                document.getElementById('hours_spent').value = hours;
+            } else {
+                document.getElementById('hours_spent').value = '';
+            }
+        }
+    }
+
+    document.getElementById('in_time').addEventListener('change', calculateHoursSpent);
+    document.getElementById('out_time').addEventListener('change', calculateHoursSpent);
+ // ✅ Auto-calculate on page load if both times exist
+ window.addEventListener('DOMContentLoaded', function () {
+        calculateHoursSpent();
     });
 </script>
 

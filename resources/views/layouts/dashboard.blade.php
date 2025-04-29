@@ -231,7 +231,20 @@
                       <span>Mock Test</span>
                   </a>
               </li>
-              
+              <li class="dropdown">
+                <a href="{{ route('student.timetable') }}" class="nav-link">
+                    <i class="fas fa-clock" style="font-size: 20px; color: #5daaf1;"></i>
+                    <span>Time Table</span>
+                </a>
+            </li>
+
+            <li class="dropdown">
+              <a href="{{ route('student.attendance') }}" class="nav-link">
+                  <i class="fas fa-user-plus" style="font-size: 20px; color: #5daaf1;"></i>
+                  <span>Attendance</span>
+              </a>
+          </li>
+
               @endif
             </ul>
           

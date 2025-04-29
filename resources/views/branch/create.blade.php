@@ -75,7 +75,11 @@
                                  <label>Manager Name</label>
                                  <input type="text" name="manager_name" class="form-control form-control-sm">
                               </div>
-
+                              <div class="form-group col-lg-3">
+                                 <label for="image">Upload File</label>
+                                 <input type="file" name="file" id="image" class="form-control form-control-sm" accept="image/*" required>
+                             </div>
+                             
                               <div class="form-group col-lg-12">
                                  <button type="submit" class="btn btn-primary">Submit</button>
                               </div>

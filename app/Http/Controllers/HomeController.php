@@ -21,6 +21,35 @@ class HomeController extends Controller
        
         return view('home', compact('activeUsersCount'));
     }
+    public function parent_concern(Request $request)
+    {
+        $parentconcerns = DB::table('parent_concern')->where('status', '!=', 'Closed')->get();
+
+        if($request->has('submit')) {
+            $parentconcern = DB::table('parent_concern')->where('id', $request->id)->update(['status' => $request->status]);
+            return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
+        }       
+       
+        return view('announcement.parent_concern', compact('parentconcerns'));
+    }
+
+    public function chat(Request $request)
+    {
+        $users = DB::table('chat')->where('sender_id', '!=', auth()->user()->id)->orWhere('receiver_id', '=', auth()->user()->id)->groupBy('sender_id')->selectRaw("sender_id,receiver_id,count(chat_read=0 and receiver_id=".auth()->user()->id.") as unread")->get()->map(function ($user) {
+            return [
+                'id' => $user->sender_id,
+                'name' => Student::where('student_id', $user->sender_id)->first()->student_name ?? '',
+                'unread' => $user->unread,
+            ];
+        });
+
+        if($request->has('submit')) {
+            $parentconcern = DB::table('parent_concern')->where('id', $request->id)->update(['status' => $request->status]);
+            return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
+        }       
+       
+        return view('chat', compact('users'));
+    }
 
     // public function dashboard()
     // {

@@ -95,13 +95,13 @@
                             </select>
                         </div>
 
-                          <div class="form-group col-lg-2">
-                                  <button type="submit" name="show" class="btn btn-primary m-t-25">Show</button>
-                          </div>
-                         
+                        <div class="form-group col-lg-2">
+                            <button type="submit" name="show" class="btn btn-primary m-t-25">Show</button>
+                    </div>
+                    
                      </div>
                     </form>
-
+                   
                      @if(request()->has('show'))
                      <form action="{{ route('hostelattendance.store') }}" method="post" enctype="multipart/form-data">
                      @csrf
@@ -112,7 +112,7 @@
                     <div class="table-responsive">
 <input type="hidden" name="attendance_date" value="{{ request('attendance_date') }}">
 <input type="hidden" name="timing" value="{{ request('attendance_timing') }}">
-<input type="hidden" name="academic_year" value="{{ request('academic_year') }}">
+{{-- <input type="hidden" name="academic_year" value="{{ request('academic_year') }}"> --}}
 <input type="hidden" name="hostel" value="{{ request('hostel') }}">
 <input type="hidden" name="room_no" value="{{ request('room_no') }}">
 <input type="hidden" name="branch_id" value="{{ request('branch_id') }}">
@@ -120,7 +120,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Academic Year</th>
+                    {{-- <th>Academic Year</th> --}}
                     <th>Student Id</th>
                     <th>Name</th>
                     <th>Coaching Type</th>
@@ -134,7 +134,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <input type="hidden" name="student_id[{{ $loop->iteration }}]" value="{{ $row->student_id }}">
 
-                   <td>{{ $row->academic_year }}</td>
+                   {{-- <td>{{ $row->academic_year }}</td> --}}
                    <td>{{ $row->student_id }}</td>
                    <td>{{ \Str::limit($row->student_name, 20) }}</td>
                    <td>{{ $row->coaching_type }}</td>
@@ -149,7 +149,7 @@
         </table>
 
         
-    </table>
+  
                 </div>
             </div>
             <div class="col-md-6 offset-md-4 col-sm-12 mt-3">

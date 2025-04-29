@@ -18,8 +18,13 @@ class HolidayController extends Controller
 
     public function create(Request $request)
     {
-        if($request->has('gender') && $request->has('branch') && $request->has('hostel')){
-            $section = Student::where('gender', $request->gender)->whereIn('campus', explode(',', $request->branch))->where('hostel_dayscholar', $request->hostel)->select('section')->distinct()->get();
+        if ($request->has('branch')) {
+            // Fetch sections based only on the selected branch
+            $section = Student::whereIn('campus', explode(',', $request->branch))
+                ->select('section')
+                ->distinct()
+                ->get();
+    
             return response()->json($section);
         }
         return view('holiday.create');
@@ -111,32 +116,43 @@ class HolidayController extends Controller
         return redirect()->route('holiday.index')->with('success', 'Holiday deleted successfully!');
     }
 
-    public function attendance(Request $request){
-        $sections = [];
-        $students = [];
-        $attendances = [];
-        if($request->has('hostel')){
-            $sections = Student::where('gender', $request->gender)->whereIn('campus', explode(',', $request->branch_id))->where('hostel_dayscholar', $request->hostel)->select('section')->distinct()->get();
+    public function attendance(Request $request)
+{
+    $sections = [];
+    $students = [];
+    $attendances = [];
+
+    if ($request->has('branch_id')) {
+        // Filter sections based on branch
+        $sections = Student::whereIn('campus', explode(',', $request->branch_id))
+            ->select('section')
+            ->distinct()
+            ->get();
+    }
+
+    if ($request->has('show')) {
+        if (Holiday::isHoliday($request->attendance_date, $request->branch_id, $request->attendance_timing, $request->section)) {
+            return redirect()->back()->with('error', 'Holiday already exists for this date!');
         }
 
-        if($request->has('show')){
+        $attendances = DB::table('attendance')
+            ->where('attendance_date', $request->attendance_date)
+            ->where('timing', $request->attendance_timing)
+            ->where('branch_id', $request->branch_id)
+            ->where('section', $request->section)
+            ->get()
+            ->keyBy('student_id');
 
-            if(Holiday::isHoliday($request->attendance_date, $request->branch_id, $request->hostel, $request->gender, $request->section)){
-                return redirect()->back()->with('error', 'Holiday already exists for this date!');
-            }
-
-        $attendances = DB::table('attendance')->where('attendance_date', $request->attendance_date)->where('timing', $request->attendance_timing)->where('branch_id', $request->branch_id)->where('section', $request->section)->get()->keyBy('student_id');
-            $students = Student::where('gender', $request->gender)->whereIn('campus', explode(',', $request->branch_id))->where('hostel_dayscholar', $request->hostel)->where('section', $request->section)->get();
-
-            if($attendances){
-                return view('holiday.attendance', compact('sections', 'students', 'attendances'));
-            }
-
-            $students = Student::where('gender', $request->gender)->whereIn('campus', explode(',', $request->branch_id))->where('hostel_dayscholar', $request->hostel)->where('section', $request->section)->get();
-        }
+        $students = Student::whereIn('campus', explode(',', $request->branch_id))
+            ->where('section', $request->section)
+            ->get();
 
         return view('holiday.attendance', compact('sections', 'students', 'attendances'));
     }
+
+    return view('holiday.attendance', compact('sections', 'students', 'attendances'));
+}
+
 
     public function attendance_store(Request $request){
         $attendances = DB::table('attendance')->where('attendance_date', $request->attendance_date)->where('timing', $request->attendance_timing)->where('branch_id', $request->branch_id)->where('section', $request->section)->delete();

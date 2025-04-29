@@ -139,7 +139,7 @@
                 <li><a href="{{ route('download.index') }}" class="nav-link">Downloads</a></li>
                 <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
                 <li><a href="{{ route('achievement.index') }}" class="nav-link">NEET Achievement</a></li>
-             
+                <li><a href="{{ route('parent_concern') }}" class="nav-link">Parent Concern</a></li>
               </ul>
             </li>
             <li class="dropdown">
@@ -160,17 +160,13 @@
                 <li><a  href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
                 <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
                 <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
+                <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li>
+
+
               </ul>
             </li>
 
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="save"></i><span>Attendance</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
-                <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
-              </ul>
-            </li>
-
+            
             <li class="dropdown">
               <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
             </li>
@@ -180,6 +176,14 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
                 <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
+                <li><a href="{{ route('feesplan.index') }}" class="nav-link">Fees Plan</a></li>
               </ul>
             </li>
 

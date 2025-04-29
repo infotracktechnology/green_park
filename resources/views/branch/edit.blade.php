@@ -80,6 +80,18 @@
              <input type="text" name="manager_name" value="{{$branch->manager_name}}" class="form-control form-control-sm">    
          </div>
 
+       <div class="form-group col-lg-3">
+    <label for="image">Upload File</label>
+    <input type="file" name="file" id="image" class="form-control form-control-sm" accept="image/*">
+
+    @if($branch->file)
+        <div class="mt-2">
+            <label>Current File:</label>
+            <p>{{ basename($branch->file) }}</p> 
+        </div>
+    @endif
+</div>
+
          <div class="form-group col-lg-12">
              <button type="submit" class="btn btn-primary">Submit</button>
          </div> 
