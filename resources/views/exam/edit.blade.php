@@ -7,6 +7,7 @@
 <?php
 $branch_ids =  explode(',', $exam->branch_id);
 $coaching_types = explode(',', $exam->coaching_type);
+$category = explode(',', $exam->category);
 ?>
 @section('main')
 <div class="main-content">
@@ -60,6 +61,37 @@ $coaching_types = explode(',', $exam->coaching_type);
                                     <option value="12" @selected(in_array('12', $coaching_types))>12</option>
                                  </select>
                               </div>
+
+                                <div class="form-group col-lg-4">  
+                                <label>Category</label>
+                                <select name="category[]" id="category" class="select" multiple required>
+                                    <option value="">Select Category</option>
+                                    <option value="Cumulative Test" @selected(in_array('Cumulative Test', $category))>Cumulative Test</option>
+                                    <option value="Grand Test" @selected(in_array('Grand Test', $category))>Grand Test</option>
+                                    <option value="Physics (Weekend)" @selected(in_array('Physics (Weekend)', $category))>Physics (Weekend)</option>
+                                    <option value="Chemistry (Weekend)" @selected(in_array('Chemistry (Weekend)', $category))>Chemistry (Weekend)</option>
+                                    <option value="Botany (Weekend)" @selected(in_array('Botany (Weekend)', $category))>Botany (Weekend)</option>
+                                    <option value="Zoology (Weekend)" @selected(in_array('Zoology (Weekend)', $category))>Zoology (Weekend)</option>
+                                    <option value="Term Test-2" @selected(in_array('Term Test-2', $category))>Term Test-2</option>
+                                    <option value="UNIT TEST - (CHEMISTRY/BOTANY)" @selected(in_array('UNIT TEST - (CHEMISTRY/BOTANY)', $category))>UNIT TEST - (CHEMISTRY/BOTANY)</option>
+                                    <option value="UNIT TEST - (PHYSICS/ZOOLOGY)" @selected(in_array('UNIT TEST - (PHYSICS/ZOOLOGY)', $category))>UNIT TEST - (PHYSICS/ZOOLOGY)</option>
+                                    <option value="70% SYLLABUS TEST" @selected(in_array('70% SYLLABUS TEST', $category))>70% SYLLABUS TEST</option>
+                                    <option value="FULL TEST - 1" @selected(in_array('FULL TEST - 1', $category))>FULL TEST - 1</option>
+                                    <option value="FULL TEST - 2" @selected(in_array('FULL TEST - 2', $category))>FULL TEST - 2</option>
+
+
+
+                                  
+                                </select>
+                            </div>
+
+                              
+
+                        
+                            
+                            
+
+
                               <div class="form-group col-lg-2">
                                 <label>Test ID <span class="text-danger">(should be unique*)</span></label>
                                 <input type="number" name="id" value="{{ $exam->id }}" id="id" class="form-control form-control-sm numberk" disabled>

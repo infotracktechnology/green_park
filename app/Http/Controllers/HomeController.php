@@ -15,28 +15,56 @@ class HomeController extends Controller
     {
         $activeUsersCount = Student::where('active', 1)->count();
 
-        if($request->has('academic_year')) {
+        if ($request->has('academic_year')) {
             DB::table('academic_year')->update(['active' => 0]);
             AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
-        }       
-       
+        }
+
         return view('home', compact('activeUsersCount'));
     }
     public function parent_concern(Request $request)
     {
         $parentconcerns = DB::table('parent_concern')->where('status', '!=', 'Closed')->get();
 
-        if($request->has('submit')) {
-            $parentconcern = DB::table('parent_concern')->where('id', $request->id)->update(['status' => $request->status]);
+        if ($request->has('submit')) {
+            $updateData = [
+                'status' => $request->status,
+            ];
+
+            if ($request->status === 'Closed') {
+                if ($request->hasFile('file')) {
+                    $parentconcern = DB::table('parent_concern')->where('id', $request->id)->first();
+
+                    if ($parentconcern && $parentconcern->file) {
+                        $oldFilePath = $parentconcern->file;
+                        if (file_exists($oldFilePath)) {
+                            unlink($oldFilePath);
+                        }
+                    }
+
+                    $file = $request->file('file');
+                    $fileName = time() . '_' . $file->getClientOriginalName();
+                    $file->move('uploads/concern', $fileName);
+                    $updateData['file'] = 'uploads/concern/'.$fileName;
+                }
+
+                $updateData['progress'] = $request->progress;
+            }
+
+            DB::table('parent_concern')->where('id', $request->id)->update($updateData);
+
             return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
-        }       
-       
+        }
+
         return view('announcement.parent_concern', compact('parentconcerns'));
     }
 
+
+
+
     public function chat(Request $request)
     {
-        $users = DB::table('chat')->where('sender_id', '!=', auth()->user()->id)->orWhere('receiver_id', '=', auth()->user()->id)->groupBy('sender_id')->selectRaw("sender_id,receiver_id,count(chat_read=0 and receiver_id=".auth()->user()->id.") as unread")->get()->map(function ($user) {
+        $users = DB::table('chat')->where('sender_id', '!=', auth()->user()->id)->orWhere('receiver_id', '=', auth()->user()->id)->groupBy('sender_id')->selectRaw("sender_id,receiver_id,count(chat_read=0 and receiver_id=" . auth()->user()->id . ") as unread")->get()->map(function ($user) {
             return [
                 'id' => $user->sender_id,
                 'name' => Student::where('student_id', $user->sender_id)->first()->student_name ?? '',
@@ -44,11 +72,11 @@ class HomeController extends Controller
             ];
         });
 
-        if($request->has('submit')) {
+        if ($request->has('submit')) {
             $parentconcern = DB::table('parent_concern')->where('id', $request->id)->update(['status' => $request->status]);
             return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
-        }       
-       
+        }
+
         return view('chat', compact('users'));
     }
     public function studentmenu_branch(Request $request)
@@ -63,7 +91,6 @@ class HomeController extends Controller
             })->toArray();
         }
         if($request->has('assign')) {
-
             $menu = collect($request->fields)->map(function ($menu) {
                return json_decode($menu, true);
             })->toArray();
@@ -135,5 +162,5 @@ class HomeController extends Controller
         return view('studentmenu.student', compact('menus','menu_student','types','students'));
     }
 
-}
 
+}

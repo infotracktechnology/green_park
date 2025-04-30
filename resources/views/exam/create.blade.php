@@ -58,6 +58,28 @@
                                     <option value="12">12</option>
                                  </select>
                               </div>
+
+                              <div class="form-group col-lg-3">
+                                <label>Category</label>
+                                <select name="category[]" id="category" class="select" multiple required>
+                                    <option value="all">All</option>
+                                    <option value="Cumulative Test">Cumulative Test</option>
+                                    <option value="Grand Test">Grand Test</option>
+                                    <option value="Physics (Weekend)">Physics (Weekend)</option>
+                                    <option value="Chemistry (Weekend)">Chemistry (Weekend)</option>
+                                    <option value="Botany (Weekend)">Botany (Weekend)</option>
+                                    <option value="Zoology (Weekend)">Zoology (Weekend)</option>
+                                    <option value="Term Test-2">Term Test-2</option>
+                                    <option value="UNIT TEST - (CHEMISTRY/BOTANY)">UNIT TEST - (CHEMISTRY/BOTANY)</option>
+                                    <option value="UNIT TEST - (PHYSICS/ZOOLOGY)">UNIT TEST - (PHYSICS/ZOOLOGY)</option>
+                                    <option value="70% SYLLABUS TEST">70% SYLLABUS TEST</option>
+                                    <option value="FULL TEST - 1">FULL TEST - 1</option>
+                                    <option value="FULL TEST - 2">FULL TEST - 2</option>
+                                </select>
+                            </div>
+                            
+                            
+                            
                               <div class="form-group col-lg-3">
                                 <label>Test ID <span class="text-danger">(should be unique*)</span></label>
                                 <input type="number" name="id" id="id" class="form-control form-control-sm numberk @error('id') is-invalid @enderror" required>
@@ -313,4 +335,5 @@ function validateFileCount(questionInputId, fileInputId) {
 //     return true;
 // }
 </script>
+
 @endsection
