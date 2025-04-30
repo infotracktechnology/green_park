@@ -8,23 +8,71 @@
   <link rel="stylesheet" href="{{asset('css/app.min.css')}}">
   <link rel="stylesheet" href="{{asset('css/login.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <style>
+  
+  
+    .swiper-slide {
+      background-size: cover;
+      background-position: center;
+    }
+    
+    .swiper-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+
+   
+    
+    /* Add a caption overlay for slides */
+    .slide-caption {
+      position: absolute;
+      bottom: 30px;
+      left: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
     <div class="login-13">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-6 col-md-12 bg-img">
-                    <div class="bg-img-inner">
-                        <div class="info">
-                            {{-- <div class="center">
-                                <h1>Welcome To GPCC</h1>
-                            </div> --}}
-                            {{-- <p>Green Park Group of Educational Institutions are always known for their Academic Accomplishments in securing admissions into Professional courses. With the Central government making NEET mandatory for MBBS admissions, we have started Green Park Coaching Centre in 2017 to provide the students with extensive, exceptional, and efficacious coaching to crack NEET with effortless ease.</p> --}}
+                <div class="col-lg-7 col-md-12 bg-img">
+                    <div class="swiper">
+                        <div class="swiper-wrapper">
+                          <div class="swiper-slide">
+                            <img src="https://www.gpccnamakkal.com/img/slide2.jpg" alt="Slide 1">
+                            
+                          </div>
+                          <div class="swiper-slide">
+                            <img src="https://www.gpccnamakkal.com/img/slide2.jpg" alt="Slide 2">
+                            
+                          </div>
+                          <div class="swiper-slide">
+                            <img src="https://www.gpccnamakkal.com/img/slide2.jpg" alt="Slide 3">
+                            
+                          </div>
                         </div>
-                    </div>
+                      
+                        <!-- Add pagination -->
+                        <div class="swiper-pagination"></div>
+                        
+                        <!-- Add navigation buttons -->
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                    
+                        <!-- Add scrollbar -->
+                        <div class="swiper-scrollbar"></div>
+                      </div>
                 </div>
-                <div class="col-lg-6 col-md-12 form-info">
+                <div class="col-lg-5 col-md-12 form-info">
                     <div class="form-section">
                        
                         <div class="form-section-innner">
@@ -58,11 +106,6 @@
                                     </div>
                                 </form>
                             </div>
-                            {{-- <ul class="social-list">
-                                <li><a href="#" class="facebook-color"><i class="fa fa-facebook facebook-i"></i><span>Facebook</span></a></li>
-                                <li><a href="#" class="twitter-color"><i class="fa fa-twitter twitter-i"></i><span>Twitter</span></a></li>
-                                <li><a href="#" class="google-color"><i class="fa fa-google google-i"></i><span>Google</span></a></li>
-                            </ul> --}}
                             
                         </div>
                     </div>
@@ -72,5 +115,36 @@
     </div>
 
   <script src="{{asset('js/app.min.js')}}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper', {
+      // Enable auto sliding
+      autoplay: {
+        delay: 5000, // 5 seconds between slides
+        disableOnInteraction: false, // Continue autoplay after user interaction
+      },
+      effect: 'fade', // Use fade transition between slides
+      fadeEffect: {
+        crossFade: true
+      },
+      direction: 'horizontal',
+      loop: true,
+      // Enable pagination
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true, // Allow clicking on pagination bullets
+      },
+      // Enable navigation arrows
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      // Add scrollbar
+      scrollbar: {
+        el: '.swiper-scrollbar',
+        draggable: true, // Make scrollbar draggable
+      },
+    });
+  </script>
 </body>
 </html>
