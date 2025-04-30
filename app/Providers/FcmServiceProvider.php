@@ -86,7 +86,7 @@ class FcmServiceProvider {
             ])
             ->withData($data);
 
-        // Add platform-specific configurations similar to sendToDevice method
+        
         $androidConfig = AndroidConfig::fromArray([
             'notification' => [
                 'icon' => 'ic_launcher',
