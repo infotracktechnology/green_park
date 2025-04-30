@@ -129,6 +129,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('/chat', [App\Http\Controllers\HomeController::class, 'chat'])->name('chat.index');
     Route::get('/feetype', [App\Http\Controllers\FinanceController::class, 'feetype'])->name('feetype');
     Route::resource('feesplan', App\Http\Controllers\FinanceController::class);
+    Route::get('studentmenu/branch', [App\Http\Controllers\HomeController::class, 'studentmenu_branch'])->name('studentmenu.branch');
+    Route::get('studentmenu/type', [App\Http\Controllers\HomeController::class, 'studentmenu_type'])->name('studentmenu.type');
+    Route::get('studentmenu/student', [App\Http\Controllers\HomeController::class, 'studentmenu_student'])->name('studentmenu.student');
 });
 
 #students routes

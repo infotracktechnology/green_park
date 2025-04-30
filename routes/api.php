@@ -10,6 +10,7 @@ use App\Models\RevisionVideo;
 use App\Models\TimetableAssign;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\SickRoomEntry;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -37,6 +38,7 @@ Route::group(['prefix' => 'v2'], function () {
         $student = Student::where('id', $student_id)->first();
         return response()->json($student);
     });
+
     Route::get('/chairmanvideo',  function (Request $request, Student $student) {
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
@@ -148,4 +150,30 @@ Route::group(['prefix' => 'v2'], function () {
         $messages = DB::table('chat')->where('sender_id', $user_id)->orWhere('receiver_id', $user_id)->selectRaw("type, message,sender_id,receiver_id,created_at")->orderBy('created_at', 'desc')->get();
         return response()->json($messages);
     });
+    Route::get('/sickroomentry/{student_id}', function ($student_id) {
+        $sickroomentry = SickRoomEntry::where('student_id', $student_id)->get();
+        return response()->json($sickroomentry);
+    });
+    Route::get('/hostelattendance/{student_id}', function ($student_id) {
+        $monthwise = DB::table('hostel_attendance')->where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
+        $daywise = DB::table('hostel_attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
+        return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
+      });
+
+      Route::post('/document_upload', function (Request $request) {
+        $data = $request->all();
+        if ($request->has('attachment') && $request->attachment != null) {
+            $fileName = time() . '-' . $request->attachment->getClientOriginalName();
+            $request->attachment->move('documents', $fileName);
+            $data['file'] = 'documents/'.$fileName;
+        }
+        $parent_concern = DB::table('documents')->insert($data);
+        return response()->json($parent_concern);
+    });
+
+    Route::get('/device_token/{student_id}/{device_token}',  function ($student_id, $device_token) {
+        $student = Student::where('student_id', $student_id)->update(['device_token' => $device_token]);
+        return response()->json($student);
+    });
+
 });
