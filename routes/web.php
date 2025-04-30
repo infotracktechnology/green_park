@@ -44,6 +44,7 @@ use App\Models\Exam;
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
 Route::post('/login', [LoginController::class, 'login'])->name('auth.login');
+Route::get('/notify', [App\Http\Controllers\HomeController::class, 'notify']);
 
 #admin routes
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
