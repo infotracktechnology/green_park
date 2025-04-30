@@ -7,6 +7,7 @@ use App\Models\Options;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Providers\FcmServiceProvider;
 //use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
@@ -160,6 +161,12 @@ class HomeController extends Controller
         }
        
         return view('studentmenu.student', compact('menus','menu_student','types','students'));
+    }
+
+    public function notify(FcmServiceProvider  $fcm)
+    {
+        $nofify = $fcm->sendToDevice("asdfghjklasdfghjklqwertyuioasdfghjkl", "GPCC Notification", "Testing", null, [], "https://www.google.com");
+       dd($nofify);
     }
 
 
