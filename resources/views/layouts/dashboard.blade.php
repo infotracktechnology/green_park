@@ -162,7 +162,7 @@
                 @foreach (auth()->user()->menu ?? [] as $menu)
                 <li class="dropdown">
                   <a href="{{ route($menu['route']) }}" class="nav-link">
-                    <i class="fas fa-bell" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
+                    <i class="{{ $menu['icon'] }}" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
                   </a>
                 </li>
                 @endforeach
