@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
+use App\Models\Student;
+use App\Providers\FcmServiceProvider;
 
 class AnnouncementController extends Controller
 {
@@ -24,7 +26,7 @@ class AnnouncementController extends Controller
         return view('announcement.create', compact('branches'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request,FcmServiceProvider $fcm)
 {
     $announcement = new Announcement();
     $announcement->academic_year = $request->academic_year;
@@ -43,6 +45,8 @@ class AnnouncementController extends Controller
     }
     $announcement->category = in_array('Offline', $request->coaching_type) ? $request->category : null;
     $announcement->save();
+    $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->where('gender', $request->gender)->whereNotNull('device_token')->get();
+    $fcm->sendMulticast($students->pluck('device_token')->toArray(), $request->title, $request->content);
 
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
