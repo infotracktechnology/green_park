@@ -24,6 +24,7 @@ use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\StudentActivityController;
+
 use App\Http\Controllers\ChatController;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,10 +51,17 @@ Route::get('/notify', [App\Http\Controllers\HomeController::class, 'notify']);
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('branch', 'App\Http\Controllers\BranchController');
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
+    Route::match(['get', 'post'], '/staff-class', [StaffProfileController::class, 'classAssign'])->name('staff.class');
+    Route::post('/staff-subject', [StaffProfileController::class, 'subjectAssign'])->name('staff.subjectAssign');
+
+    
+    
 
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
     Route::post('staff/export', [App\Http\Controllers\StaffProfileController::class, 'export'])->name('staff.export');
     Route::post('staff/import', [App\Http\Controllers\StaffProfileController::class, 'import'])->name('staff.import');
+
+
     Route::resource('student', 'App\Http\Controllers\StudentController');
     Route::resource('announcement', 'App\Http\Controllers\AnnouncementController');
 
