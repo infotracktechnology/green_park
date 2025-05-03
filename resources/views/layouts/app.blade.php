@@ -199,6 +199,8 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
                 <li><a href="{{ route('feesplan.index') }}" class="nav-link">Fees Plan</a></li>
+                <li><a href="{{ route('fees.collection') }}" class="nav-link">Fees Collection</a></li>
+
               </ul>
             </li>
 
