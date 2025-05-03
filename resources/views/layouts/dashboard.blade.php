@@ -159,12 +159,14 @@
                     <i class="fas fa-user-circle" style="font-size: 20px; color: #2196f3;"></i><span>Profile</span>
                   </a>
                 </li>
+                @foreach (auth()->user()->menu ?? [] as $menu)
                 <li class="dropdown">
-                  <a href="{{ route('student.notification') }}" class="nav-link">
-                    <i class="fas fa-bell" style="font-size: 20px; color: #2196f3;"></i><span>Notifications</span>
+                  <a href="{{ route($menu['route']) }}" class="nav-link">
+                    <i class="{{ $menu['icon'] }}" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
                   </a>
                 </li>
-                <li class="dropdown">
+                @endforeach
+                {{-- <li class="dropdown">
                   <a href="{{ route('student.chairmanvideo') }}" class="nav-link">
                     <i class="fas fa-video" style="font-size: 20px; color: #2196f3;"></i><span>Chairman's Video</span>
                   </a>
@@ -243,7 +245,7 @@
                   <i class="fas fa-user-plus" style="font-size: 20px; color: #5daaf1;"></i>
                   <span>Attendance</span>
               </a>
-          </li>
+          </li> --}}
 
               @endif
             </ul>
