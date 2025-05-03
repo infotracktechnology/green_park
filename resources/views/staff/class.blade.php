@@ -13,6 +13,9 @@
         <div class="section-body">
             <div class="row justify-content-center">
                 <div class="col-12">
+                    @if(session()->has('success'))
+                    <div class="alert alert-success alert-dismissible show fade"> {{ session('success') }} </div>
+                @endif
                     <!-- Staff Selection -->
                     <div class="card mt-4">
                         <div class="card-header"><h4>Staff Assign</h4></div>
