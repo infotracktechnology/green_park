@@ -19,10 +19,6 @@
                         <div class="card-body">
                             <form method="POST" action="{{  route('staff.subjectAssign') }}">
                                 @csrf
-                                {{-- <input type="hidden" name="name" value="" id="selected_staff_id_class"> --}}
-
-                               <input type="hidden" name="name" id="selected_staff_id_subject">
-                            
                                 <div class="form-row">
                                     <div class="form-group col-lg-3">
                                         <label for="name">Staff Name</label>
@@ -70,7 +66,7 @@
             <div class="tab-pane fade show active" id="class" role="tabpanel">
                 <form method="POST" action="{{ route('staff.class') }}">
                     @csrf
-                    <input type="hidden" name="name" id="selected_staff_id_class">
+                    <input type="hidden" name="name" class="id">
 
                     <div class="form-row">
                         <!-- Branch -->
@@ -121,7 +117,7 @@
             <div class="tab-pane fade" id="subject" role="tabpanel">
                 <form method="POST" action="{{ route('staff.subjectAssign') }}">
                     @csrf
-                    <input type="hidden" name="name" id="selected_staff_id_subject">
+                    <input type="hidden" name="name" class="id">
 
                     <div class="form-row">
                         <!-- Branch -->
@@ -193,7 +189,6 @@
 <script src="{{ asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
 
 <script>
-    $(document).ready(function () {
         const staffAssignData = @json($staffDetails->keyBy('id')->map->only(['class_assign', 'sub_assign']));
 
         const slugify = text => text.toLowerCase().replace(/ /g, '-');
@@ -225,18 +220,12 @@
         $('#branch_subject, #coaching_type_subject').on('change', () => updateSections('subject'));
 
         $('#staff_name').on('change', function () {
-    const staffId = $(this).val();
-    $('#assignCard').show();
-    $('.staff-data').hide();
-    $('#staff-' + staffId).show();
+            const staffId = $(this).val();
+            $('#assignCard').show();
+            $('.staff-data').hide();
+            $('#staff-' + staffId).show();
+            $(".id").val(staffId);
+        });
 
-    $('#selected_staff_id_subject').val(staffId);
-    $('#selected_staff_id_class').val(staffId); // both get set correctly
-});
-
-
-
-
-    });
 </script>
 @endsection
