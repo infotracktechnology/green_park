@@ -16,6 +16,8 @@ class Staff extends Model
 	  // Automatically cast children_details to and from JSON
 	  protected $casts = [
         'children_details' => 'json',
+		'class_assign' => 'array',
+		 'sub_assign' => 'array',
     ];
 	
 

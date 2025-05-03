@@ -131,7 +131,12 @@
             </li>
 
             <li class="dropdown">
-              <a href="{{ route('staff.index') }}" class="nav-link"><i data-feather="user-check"></i><span>Staff Profile</span></a>
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('staff.index') }}" class="nav-link"> Staff</a></li>
+                <li><a href="{{ route('staff.class') }}" class="nav-link"> Class Assign</a></li>
+               
+              </ul>
             </li>
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
