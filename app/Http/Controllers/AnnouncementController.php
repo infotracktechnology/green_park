@@ -45,8 +45,13 @@ class AnnouncementController extends Controller
     }
     $announcement->category = in_array('Offline', $request->coaching_type) ? $request->category : null;
     $announcement->save();
-    $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->where('gender', $request->gender)->whereNotNull('device_token')->get();
-    $fcm->sendMulticast($students->pluck('device_token')->toArray(), $request->title, $request->content);
+    $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->where('gender', $request->gender)->whereNotNull('device_token')->map(function ($student) use ($request) {
+        if($fcm->validateToken($student->device_token)){
+            return $student->device_token;
+        }
+    })->toArray();
+
+    $fcm->sendMulticast($students,"Announcement", $request->content);
 
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
