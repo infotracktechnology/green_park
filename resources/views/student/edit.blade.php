@@ -54,8 +54,8 @@
                                     <option value="Online Recorded" @if($Student->coaching_type == 'Online Recorded') selected @endif>Online Recorded</option>
                                     <option value="Online Live" @if($Student->coaching_type == 'Online Live') selected @endif>Online Live</option>
                                     <option value="Test Series" @if($Student->coaching_type == 'Test Series') selected @endif>Test Series</option>
-                                    <option value="11" @if($Student->coaching_type == '11') selected @endif>11</option>
-                                    <option value="12" @if($Student->coaching_type == '12') selected @endif>12</option>
+                                    <option value="XI - OB" @if($Student->coaching_type == 'XI - OB') selected @endif>XI - OB</option>
+                                     <option value="XII - OB" @if($Student->coaching_type == 'XII - OB') selected @endif>XII - OB</option>
                                 </select>
                             </div>
         

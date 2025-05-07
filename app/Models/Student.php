@@ -40,7 +40,7 @@ class Student extends Authenticatable
             $model->password = bcrypt($model->password_1);
         });
         static::created(function ($model) {
-            $model->student_id = self::generateID($model->coaching_type);
+            $model->student_id = self::generateID();
             $model->user_name = 'L'.$model->student_id;
             $model->save();
         });
@@ -114,15 +114,8 @@ class Student extends Authenticatable
         return $password;
     }
 
-    private static function generateID($coaching_type){
-        if($coaching_type == '11' || $coaching_type == '12'){
-            return $this->where('coaching_type', $coaching_type)->max('student_id') + 1;
-        }
-        else{
+    private static function generateID(){
             return $this->max('student_id') + 1;
-        }
     }
-
-   
    
 }
