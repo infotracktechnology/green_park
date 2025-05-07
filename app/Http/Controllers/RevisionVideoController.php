@@ -13,7 +13,13 @@ class RevisionVideoController extends Controller
     public function index()
     {
         $academic_years = AcademicYear::all();
-        $revisionvideos = RevisionVideo::latest()->get();
+        
+        $revisionvideos = RevisionVideo::when($this->academic_year, function ($query) {
+            $query->where('academic_year', $this->academic_year);
+        })
+        ->latest()
+        ->get();
+    
         return view('revisionvideo.index', compact('revisionvideos'));
     }
 
