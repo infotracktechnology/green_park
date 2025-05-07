@@ -41,8 +41,8 @@ class ImportController extends Controller
             if (!empty($data)) {
                 foreach ($data as $row) {
                     
-                    $row = array_map(function($value) {
-                        return is_string($value) ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
+                    $row = array_map(function($key,$value) {
+                        return is_string($value) && $key != 'password_1'   ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
                     }, $row);
                     
 
