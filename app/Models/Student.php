@@ -40,7 +40,7 @@ class Student extends Authenticatable
             $model->password = bcrypt($model->password_1);
         });
         static::created(function ($model) {
-            $model->student_id = self::generateID();
+            // $model->student_id = self::generateID();
             $model->user_name = 'L'.$model->student_id;
             $model->save();
         });
