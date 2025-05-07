@@ -24,6 +24,7 @@ use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\StudentActivityController;
+use App\Http\Controllers\UsersController;
 
 use App\Http\Controllers\ChatController;
 use GuzzleHttp\Psr7\Request;
@@ -53,9 +54,6 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
     Route::match(['get', 'post'], '/staff-class', [StaffProfileController::class, 'classAssign'])->name('staff.class');
     Route::post('/staff-subject', [StaffProfileController::class, 'subjectAssign'])->name('staff.subjectAssign');
-
-    
-    
 
     Route::resource('staff', App\Http\Controllers\StaffProfileController::class);
     Route::post('staff/export', [App\Http\Controllers\StaffProfileController::class, 'export'])->name('staff.export');
@@ -136,11 +134,15 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('studentactivity', StudentActivityController::class);
     Route::match(['get', 'post'], '/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
     Route::get('/chat', [App\Http\Controllers\HomeController::class, 'chat'])->name('chat.index');
+    Route::get('/fees/collection', [ App\Http\Controllers\FinanceController::class, 'collection'])->name('fees.collection');
     Route::get('/feetype', [App\Http\Controllers\FinanceController::class, 'feetype'])->name('feetype');
     Route::resource('feesplan', App\Http\Controllers\FinanceController::class);
     Route::get('studentmenu/branch', [App\Http\Controllers\HomeController::class, 'studentmenu_branch'])->name('studentmenu.branch');
     Route::get('studentmenu/type', [App\Http\Controllers\HomeController::class, 'studentmenu_type'])->name('studentmenu.type');
     Route::get('studentmenu/student', [App\Http\Controllers\HomeController::class, 'studentmenu_student'])->name('studentmenu.student');
+  
+    Route::resource('users', App\Http\Controllers\UsersController::class);
+
 });
 
 #students routes

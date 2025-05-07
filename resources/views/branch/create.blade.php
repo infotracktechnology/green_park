@@ -25,7 +25,7 @@
 
                               <div class="form-group col-lg-3">
                                  <label>Address Line1</label>
-                                 <input type="text" name="address_line_1" class="form-control form-control-sm" required>
+                                 <input type="text" name="address_line_1" class="form-control form-control-sm">
                               </div>
 
                               <div class="form-group col-lg-3">
@@ -35,7 +35,7 @@
 
                               <div class="form-group col-lg-3">
                                  <label>State</label>
-                                 <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm" required>
+                                 <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm">
                                     <option value="">Select State</option>
                                     @foreach ($states as $state)
                                     <option value="{{ $state->State }}">{{ $state->State }}</option>
@@ -45,7 +45,7 @@
 
                               <div class="form-group col-lg-3">
                                  <label>City</label>
-                                 <select name="city" id="city" class="form-control form-control-sm" required>
+                                 <select name="city" id="city" class="form-control form-control-sm">
                                     <option value="">Select City</option>
                                  </select>
                               </div>
@@ -57,7 +57,7 @@
 
                               <div class="form-group col-lg-3">
                                  <label>Contact Mobile No</label>
-                                 <input type="text" name="mob_no" class="form-control form-control-sm @error('mob_no') is-invalid @enderror" required>
+                                 <input type="text" name="mob_no" class="form-control form-control-sm @error('mob_no') is-invalid @enderror" >
                                  @error('mob_no')
                                  <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                                  @enderror
@@ -77,7 +77,7 @@
                               </div>
                               <div class="form-group col-lg-3">
                                  <label for="image">Upload File</label>
-                                 <input type="file" name="file" id="image" class="form-control form-control-sm" accept="image/*" required>
+                                 <input type="file" name="file" id="image" class="form-control form-control-sm" accept="image/*" >
                              </div>
                              
                               <div class="form-group col-lg-12">

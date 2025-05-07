@@ -19,12 +19,20 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
         'type',
-        'status',
+       
+        'branch',
+        'created_by',
+        'updated_by',
     ];
+    
+
+
+    // app/Models/User.php
+   
 
     /**
      * The attributes that should be hidden for serialization.
@@ -45,32 +53,42 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    function role(){
-        $role = ['Super Admin', 'Admin', 'User'];
-        return $role[$this->type];
+    function role()
+    {
+        $role = [
+            1 => 'Branch Admin',
+            2 => 'Accountant'
+        ];
+        return $role[$this->type]; 
     }
 
-    function status_text(){
-        return '<span class="badge badge-'.($this->status ? 'success' : 'danger').'">'.($this->status ? 'Active' : 'Inactive').'</span>';
+    function status_text()
+    {
+        return '<span class="badge badge-' . ($this->status ? 'success' : 'danger') . '">' . ($this->status ? 'Active' : 'Inactive') . '</span>';
     }
 
     public static function boot()
-	{
-		parent::boot();
-		static::creating(function($model)
-		{
-			$user = Auth::user();
-			$model->created_by = $user->id;
-			$model->updated_by = $user->id;
-		});
-		static::updating(function($model)
-		{
-			$user = Auth::user();
-			if($user)
-			{
-				$model->updated_by = $user->id;
-			}
-		});
-	}
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $user = Auth::user();
+            $model->created_by = $user->id;
+            $model->updated_by = $user->id;
+        });
+        static::updating(function ($model) {
+            $user = Auth::user();
+            if ($user) {
+                $model->updated_by = $user->id;
+            }
+        });
+    }
+
+    function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch', 'id');
+    }
+    
+
+
 
 }

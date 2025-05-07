@@ -15,15 +15,20 @@ class DownloadController extends Controller
     public function index() 
     { 
         $academicyear = AcademicYear::all();
-        $download = Download::latest()->get();
+        $download = Download::where('academic_year', $this->academic_year)
+        ->when(auth()->user()->branch, function ($query) {
+            $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+        })
+        ->get();
+        
         return view('download.index',compact('download'));
     }
 
     public function create()
     {
         $academicyear = AcademicYear::all();
-        $branches = Branch::all();
-        return view('download.create', compact('branches'));
+     
+        return view('download.create');
     }
  
 
@@ -63,8 +68,8 @@ class DownloadController extends Controller
     public function edit($id)
     {
         $download = Download::findOrFail($id);
-        $branches = Branch::all();
-        return view('download.edit', compact('download', 'branches'));
+      
+        return view('download.edit', compact('download'));
     }
 
     public function update(Request $request, $id)
