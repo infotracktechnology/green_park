@@ -36,7 +36,7 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
-            $model->password_1 = self::generatePassword(6);
+            // $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
         });
         static::created(function ($model) {
@@ -115,9 +115,7 @@ class Student extends Authenticatable
     }
 
     private static function generateID(){
-       return $this->max('student_id') + 1;
+            return $this->max('student_id') + 1;
     }
-
-   
    
 }
