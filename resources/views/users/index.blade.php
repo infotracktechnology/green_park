@@ -37,14 +37,14 @@
         <tr role="row">
   
           <th>#</th>
-  
+  <th>Branch</th>
           <th>Name</th>
   
           <th>Email</th>
   
           <th>Role</th>
   
-          <th>Status</th>
+          {{-- <th>Status</th> --}}
 
           <th>Edit</th>
   
@@ -59,14 +59,23 @@
           <tr>
 
             <td>{{$key+1}}</td>
+            <td>
+              @php
+                  $branchNames = collect(explode(',', $user->branch))
+                      ->map(fn($branchId) => optional(app\Models\Branch::find(trim($branchId)))->name)
+                      ->filter()
+                      ->implode(', ');
+              @endphp
+              {{ $branchNames }}
+          </td>
 
-            <td>{{$user->name}}</td>
+            <td>{{$user->username}}</td>
 
             <td>{{$user->email}}</td>
 
             <td>{{$user->role()}}</td>
 
-            <td> {!! $user->status_text() !!}</td>
+            {{-- <td> {!! $user->status_text() !!}</td> --}}
 
             <td><a href="{{route('users.edit', $user->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a></td>
 

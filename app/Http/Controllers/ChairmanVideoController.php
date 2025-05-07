@@ -11,17 +11,26 @@ use Illuminate\Support\Facades\DB;
 class ChairmanVideoController extends Controller
 {
     public function index()
-    {
-        $academic_years = AcademicYear::all();
-        $chairmanvideos = Chairmanvideo::all();
-        $branches = Branch::all();
-        $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
-        return view('chairmanvideo.index', compact('chairmanvideos', 'branches', 'branchList'));
-    }
+{
+    $academic_years = AcademicYear::all();
+    $branches = Branch::all();
+    $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
+
+    $chairmanvideos = Chairmanvideo::where('academic_year', $this->academic_year)
+    ->when(auth()->user()->branch, function ($query) {
+        $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+    })
+    ->get();
+
+
+
+    return view('chairmanvideo.index', compact('chairmanvideos', 'branches', 'branchList'));
+}
+
     public function create()
     {
-        $branches = Branch::all();
-        return view('chairmanvideo.create', compact('branches'));
+       
+        return view('chairmanvideo.create');
     }
     public function store(Request $request)
     {
@@ -46,8 +55,8 @@ class ChairmanVideoController extends Controller
 
  public function edit(Request $request, Chairmanvideo $chairmanvideo)
     {
-        $branches = Branch::all();
-        return view('chairmanvideo.edit', compact('chairmanvideo', 'branches'));
+       
+        return view('chairmanvideo.edit', compact('chairmanvideo'));
  }
  public function update(Request $request, $id)
 {

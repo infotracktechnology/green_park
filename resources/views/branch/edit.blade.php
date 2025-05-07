@@ -27,17 +27,17 @@
                       
                   <div class="form-group col-lg-3">
                     <label>Address Line1</label>
-                    <input type="text" name="address_line_1" value="{{$branch->address_line_1}}" class="form-control form-control-sm" required>
+                    <input type="text" name="address_line_1" value="{{$branch->address_line_1}}" class="form-control form-control-sm">
                 </div>
 
                 <div class="form-group col-lg-3">
                   <label>Address Line2</label>
-                  <input type="text" name="address_line_2" value="{{$branch->address_line_2}}" class="form-control form-control-sm" required>
+                  <input type="text" name="address_line_2" value="{{$branch->address_line_2}}" class="form-control form-control-sm">
               </div>
 
               <div class="form-group col-lg-3">
                 <label>State</label>
-                <select name="state" onchange="City(this.value);" class="form-control form-control-sm" required>
+                <select name="state" onchange="City(this.value);" class="form-control form-control-sm" >
                   <option value="">Select State</option>
                   @foreach ($states as $state)
                   <option value="{{$state->State}}" @if($branch->state == $state->State) selected @endif>{{$state->State}}</option>
@@ -48,7 +48,7 @@
 
                <div class="form-group col-lg-3">
                   <label>City</label>
-                   <select name="city" id="city"  class="form-control form-control-sm" required >
+                   <select name="city" id="city"  class="form-control form-control-sm" >
                      <option value="">Select City</option>
                      @foreach ($districts as $district) 
                      <option value="{{$district->District}}" @if($branch->city == $district->District) selected @endif>{{$district->District}}</option>
@@ -59,9 +59,8 @@
 
               <div class="form-group col-lg-3">
                 <label>Pincode</label>
-                <input type="number" name="pincode" value="{{$branch->pincode}}" class="form-control form-control-sm" required>
+                <input type="number" name="pincode" value="{{$branch->pincode}}" class="form-control form-control-sm" >
             </div>
-
             <div class="form-group col-lg-3">
               <label>Contact Mobile No</label>
               <input type="text" name="mob_no" value="{{$branch->mob_no}}" maxlength="10" class="form-control form-control-sm @error('mob_no') is-invalid @enderror">

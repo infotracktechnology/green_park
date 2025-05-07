@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Options;
@@ -59,4 +60,28 @@ class FinanceController extends Controller
         return redirect()->route('feetype.index')->with('success', 'Fees Plan deleted successfully!');
     }
   
+   public function collection(Request $request)
+{
+    $branches = Branch::pluck('name', 'id');
+    $coachingTypes = Student::select('coaching_type')->distinct()->get();
+    $students = Student::select('student_id', 'student_name', 'user_name', 'father_name', 'mother_name', 'ph_no1')->get();
+    
+    $student = null;
+
+    if ($request->filled('student_query') && $request->filled('student_search_type')) {
+        $field = $request->input('student_search_type');
+        $query = $request->input('student_query');
+
+        $student = Student::where($field, $query)->first();
+    }
+
+    return view('finance.collection', compact('branches', 'coachingTypes', 'students', 'student'));
+}
+
+    
+    
+    
+    
+    
+    
 }

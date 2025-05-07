@@ -19,18 +19,24 @@ use App\Models\HostelAttendance;
 class HostelController extends Controller
 {
     public function index(Request $request)
-    {
-        $hostels = Hostel::all();
-        $branches = Branch::all();
-        $staffs = Staff::all();
-        return view('hostel.index', compact('hostels', 'branches', 'staffs'));
-    }
+{
+    $hostels = Hostel::when(auth()->user()->branch, function ($query) {
+        $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+    })
+    ->get();
 
+
+
+    $branches = Branch::all();
+    $staffs = Staff::all();
+
+    return view('hostel.index', compact('hostels', 'branches', 'staffs'));
+}
 
 
     public function create(Request $request)
     {
-        $branches = DB::table('branch')->select('id', 'name')->get(); 
+        // $branches = DB::table('branch')->select('id', 'name')->get(); 
         $staffs = DB::table('staff')->select('id', 'name')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get(); 
         if ($request->has('state')) {
@@ -38,7 +44,7 @@ class HostelController extends Controller
             return response()->json($districts);
         }
 
-        return view('hostel.create', compact('branches', 'states', 'staffs')); 
+        return view('hostel.create', compact('states', 'staffs')); 
     }
 
     public function store(Request $request)
@@ -74,10 +80,10 @@ class HostelController extends Controller
     public function edit(Request $request, $id)
     {
         $hostel = Hostel::with('rooms')->findOrFail($id);
-        $branches = Branch::all();
+      
         $staffs = Staff::all();
         $rooms = HostelRoom::where('hostel_id', $id)->groupBy('room_no')->orderBy('id')->get()->toArray();
-        return view('hostel.edit', compact('hostel',  'branches', 'staffs', 'rooms'));
+        return view('hostel.edit', compact('hostel',  'staffs', 'rooms'));
     }
 
     public function update(Request $request, $id)
@@ -103,9 +109,9 @@ class HostelController extends Controller
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $row) {
-                for ($i=1; $i <= $room['no_of_cots'] ; $i++) { 
+                for ($i=1; $i <= $row['no_of_cots'] ; $i++) { 
                   $cart_no = "C-".$i;
-                  $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $room['room_no'])->where('cart_no', $cart_no)->first();
+                  $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $row['room_no'])->where('cart_no', $cart_no)->first();
                   if($room){
                     $room->update([
                       'floor' => $room['floor'],

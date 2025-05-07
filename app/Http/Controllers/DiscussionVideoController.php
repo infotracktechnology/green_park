@@ -12,16 +12,24 @@ class DiscussionVideoController extends Controller
     public function index()
     {
         $academic_years = AcademicYear::all();
-        $discussionvideos = DiscussionVideo::all();
+    
+      
+            $discussionvideos = DiscussionVideo::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+            })
+            ->get();
+    
         return view('discussionvideo.index', compact('discussionvideos'));
     }
+    
     
  
     public function create()
     {
         $academicyear = AcademicYear::all();
-        $branches = Branch::all();
-        return view('discussionvideo.create' , compact('branches'));
+      
+        return view('discussionvideo.create');
     }
 
    
@@ -54,8 +62,8 @@ class DiscussionVideoController extends Controller
     public function edit($id)
     {
         $video = DiscussionVideo::findOrFail($id);
-        $branches = Branch::all(); 
-        return view('discussionvideo.edit', compact('video', 'branches'));
+        
+        return view('discussionvideo.edit', compact('video'));
     }
     
     public function update(Request $request, $id)

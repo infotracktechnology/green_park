@@ -12,9 +12,15 @@ class ClassVideoController extends Controller
     public function index()
     {
         $academic_years = AcademicYear::all();
-        $classvideos = ClassVideo::latest()->get();
+        $classvideos = ClassVideo::where('academic_year', $this->academic_year)
+        ->when(auth()->user()->branch, function ($query) {
+          
+        })
+        ->get();
+    
         return view('classvideo.index', compact('classvideos'));
     }
+    
 
     public function create()
     { 
