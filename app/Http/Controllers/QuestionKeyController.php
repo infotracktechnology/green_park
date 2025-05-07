@@ -16,7 +16,13 @@ class QuestionKeyController extends Controller
     {
 
         $academicyear = AcademicYear::all();
-        $questionKeys = QuestionKey::latest()->get();
+        $questionKeys = QuestionKey::where('academic_year', $this->academic_year)
+        ->when(auth()->user()->branch, function ($query) {
+            $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+        })
+        ->latest()
+        ->get();
+    
         //$questionKeys = QuestionKey::orderBy('id', 'desc')->get();
         // dd($questionKeys->pluck('id', 'created_at'));
         return view('questionkey.index', compact('questionKeys'));
@@ -25,11 +31,9 @@ class QuestionKeyController extends Controller
    
     public function create()
     {
-        // Get all branches
-        $branches = Branch::all();
-       
+      
         // Pass the branches to the create view
-        return view('questionkey.create', compact('branches'));
+        return view('questionkey.create');
     }
 
     public function store(Request $request)
@@ -65,8 +69,8 @@ class QuestionKeyController extends Controller
     public function edit($id)
     {
         $questionKey = QuestionKey::findOrFail($id);
-        $branches = Branch::all();
-        return view('questionkey.edit', compact('questionKey', 'branches'));
+      
+        return view('questionkey.edit', compact('questionKey'));
     }
 
     public function update(Request $request, $id)

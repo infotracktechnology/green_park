@@ -112,6 +112,9 @@
               <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
             </li>
             <li class="dropdown">
+              <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a>
+            </li>
+            <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>

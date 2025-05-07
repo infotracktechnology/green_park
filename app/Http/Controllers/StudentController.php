@@ -22,20 +22,26 @@ class StudentController extends Controller
     {
         $students = Student::join('branch', 'student.campus', '=', 'branch.id')
             ->select('student.*', 'branch.name as campus')
-            ->where('student.academic_year', $this->academic_year)
+            ->when($this->academic_year, function ($query) {
+                $query->where('student.academic_year', $this->academic_year);
+            })
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('student.campus', 'like', '%' . auth()->user()->branch . '%');
+            })
             ->get();
+            
         return view('student.index', compact('students'));
     }
 
 
     public function create(Request $request)
     {
-        $branches = DB::table('branch')->select('id', 'name')->get();
+        // $branches = DB::table('branch')->select('id', 'name')->get();
         if ($request->has('city')) {
             $pincodes = DB::table('district_list')->where('District', $request->city)->select('Pincode')->get();
             return response()->json($pincodes);
         }
-        return view('student.create', compact('branches'));
+        return view('student.create');
     }
 
 
@@ -59,12 +65,12 @@ class StudentController extends Controller
 
     public function edit(Request $request, Student $Student)
     {
-        $branches = DB::table('branch')->select('id', 'name')->get();
+        // $branches = DB::table('branch')->select('id', 'name')->get();
         $districts = DB::table('district_list')->where('State', $Student->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
 
-        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes', 'Student'));
+        return view('student.edit', compact( 'districts', 'states', 'pincodes', 'Student'));
     }
 
 

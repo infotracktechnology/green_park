@@ -13,15 +13,24 @@ class AnswerKeyController extends Controller
     public function index()
     {
         $academicYears = AcademicYear::all();
-        $answerKeys = AnswerKey::latest()->get();
-        return view('answerkey.index', compact('answerKeys'));
+    
+     
+            $answerKeys = AnswerKey::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+            })
+            ->latest()
+            ->get();
+    
+        return view('answerkey.index', compact('answerKeys', 'academicYears'));
     }
+    
 
     public function create()
     {
         $academicYears = AcademicYear::all();
-        $branches = Branch::all();
-        return view('answerkey.create', compact('branches'));
+      
+        return view('answerkey.create', );
     }
 
 
@@ -58,8 +67,8 @@ class AnswerKeyController extends Controller
     public function edit($id)
     {
         $answerKey = AnswerKey::findOrFail($id);
-        $branches = Branch::all();
-        return view('answerkey.edit', compact('answerKey', 'branches'));
+      
+        return view('answerkey.edit', compact('answerKey'));
     }
 
     public function update(Request $request, $id)

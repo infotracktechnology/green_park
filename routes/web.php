@@ -24,6 +24,7 @@ use App\Http\Controllers\DiscussionVideoController;
 use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\StudentActivityController;
+use App\Http\Controllers\UsersController;
 
 use App\Http\Controllers\ChatController;
 use GuzzleHttp\Psr7\Request;
@@ -139,6 +140,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('studentmenu/branch', [App\Http\Controllers\HomeController::class, 'studentmenu_branch'])->name('studentmenu.branch');
     Route::get('studentmenu/type', [App\Http\Controllers\HomeController::class, 'studentmenu_type'])->name('studentmenu.type');
     Route::get('studentmenu/student', [App\Http\Controllers\HomeController::class, 'studentmenu_student'])->name('studentmenu.student');
+  
+    Route::resource('users', App\Http\Controllers\UsersController::class);
+
 });
 
 #students routes

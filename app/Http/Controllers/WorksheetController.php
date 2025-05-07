@@ -11,15 +11,23 @@ class WorksheetController extends Controller
 {
     public function index()
     {
-        $worksheets = Worksheet::latest()->get();
+        $worksheets = Worksheet::when($this->academic_year, function ($query) {
+            $query->where('academic_year', $this->academic_year);
+        })
+        ->when(auth()->user()->branch, function ($query) {
+            $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+        })
+        ->latest()
+        ->get();
+    
         return view('worksheet.index', compact('worksheets'));
     }
 
     public function create()
     {
         $academicyear = AcademicYear::all();
-        $branches = Branch::all();
-        return view('worksheet.create' , compact('branches'));
+      
+        return view('worksheet.create');
     }
 
     public function store(Request $request)
@@ -55,12 +63,12 @@ class WorksheetController extends Controller
 
     public function edit(Worksheet $worksheet)
     {
-        $branches = Branch::all();
+        
         $academicyear = AcademicYear::all();
     
         
     
-        return view('worksheet.edit', compact('worksheet', 'branches', 'academicyear'));
+        return view('worksheet.edit', compact('worksheet',  'academicyear'));
     }
     
 

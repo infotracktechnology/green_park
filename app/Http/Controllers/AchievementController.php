@@ -10,13 +10,19 @@ class AchievementController extends Controller
 {
     public function index()
     {
-        $achievements = Achievement::latest()->get();
+        $achievements = Achievement::where('academic_year', $this->academic_year)
+        ->when(auth()->user()->branch, function ($query) {
+            $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+        })
+        ->latest()
+        ->get();
+    
         return view('achievement.index', compact('achievements'));
     }
-
+    
     public function create()
     {
-        $branches = Branch::all(); 
+     
         $academicyear = AcademicYear::all(); 
         return view('achievement.create');
     }
@@ -79,11 +85,11 @@ class AchievementController extends Controller
   
     public function edit(Achievement $achievement)
     {
-        $branches = Branch::all();
+       
         $academicyear = AcademicYear::all();
         $selectedCategories = explode(',', $achievement->category);
     
-        return view('achievement.edit', compact('achievement', 'branches', 'academicyear', 'selectedCategories'));
+        return view('achievement.edit', compact('achievement',  'academicyear', 'selectedCategories'));
     }
 
 
