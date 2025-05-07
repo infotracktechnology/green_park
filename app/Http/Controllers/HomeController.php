@@ -165,8 +165,7 @@ class HomeController extends Controller
 
     public function notify(FcmServiceProvider  $fcm)
     {
-    //     $nofify = $fcm->sendToDevice("fx1Fd9zQT3WAdbVZBn74-r:APA91bEbbgUJAhdJwlHVS88Ekv5JBmLXaLzdOsz4y_T1YrA2ZaBrrYFYe1Bi_GKoTCuyBp3a_Hj3EnQ8WI5hqv_kRlbvQn5t4cAnKqQV8xrJpelPM9rIlOY", "GPCC Notification", "Testing", null, []);
-    //    dd($nofify);
+        
     }
 
 
