@@ -41,7 +41,7 @@ class Student extends Authenticatable
         });
         static::created(function ($model) {
             // $model->student_id = self::generateID();
-            $model->user_name = 'L'.$model->student_id;
+            $model->user_name = self::generateName($model->coaching_type,$model->student_id);
             $model->save();
         });
     }
@@ -116,6 +116,14 @@ class Student extends Authenticatable
 
     private static function generateID(){
             return $this->max('student_id') + 1;
+    }
+
+    private static function generateName($coaching_type,$student_id){
+        if($coaching_type == "XI - OB" || $coaching_type == "XII - OB"){
+            return 'S'.$student_id;
+        }else{
+            return 'L'.$student_id;
+        }
     }
    
 }
