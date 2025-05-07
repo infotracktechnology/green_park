@@ -40,7 +40,8 @@ class Student extends Authenticatable
             $model->password = bcrypt($model->password_1);
         });
         static::created(function ($model) {
-            $model->user_name = 'L' . $model->student_id;
+            $model->student_id = self::generateID();
+            $model->user_name = 'L'.$model->student_id;
             $model->save();
         });
     }
@@ -111,6 +112,10 @@ class Student extends Authenticatable
             $password .= $characters[random_int(0, strlen($characters) - 1)];
         }
         return $password;
+    }
+
+    private static function generateID(){
+       return $this->max('student_id') + 1;
     }
 
    
