@@ -6,7 +6,7 @@ use Kreait\Firebase\Messaging\WebpushConfig;
 use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\AndroidConfig;
 class FcmServiceProvider {
-    protected $messaging;
+    public $messaging;
 
     public function __construct()
     {
@@ -130,5 +130,7 @@ class FcmServiceProvider {
 
         return $this->messaging->sendMulticast($message, $tokens);
     }
+
+   
 
 }
