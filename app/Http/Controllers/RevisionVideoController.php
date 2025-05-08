@@ -37,16 +37,18 @@ class RevisionVideoController extends Controller
     
             foreach ($csvData as $data) {
                 
-                if(!isset($data['subject'])){
-                    return redirect()->back()->with('error', 'Subject Field is required.');
+                if(!isset($data['subject']) || !isset($data['video_id'])){
+                    return redirect()->back()->with('error', 'Subject, Chapter and Video ID fields are required.');
                 }
+
+                
     
     
                 $subject = trim($data['subject'] ?? 'Unknown');
                 $chapter = trim($data['chapter'] ?? 'Unknown');
                 $expire_at = $request->expire_at;
                 $video_id = trim($data['video_id'] ?? '0');
-                $academic_year = $request->academic_year;
+                $academic_year = $request->academic_year ?? $this->academic_year;
     
                 RevisionVideo::create([
                     'subject' => $subject,
