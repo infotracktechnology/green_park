@@ -139,7 +139,7 @@
                             <label>Coaching Type</label>
                             <select name="coaching_type" id="coaching_type_subject" class="select2 form-control form-control-sm" required>
                                 <option value="">Choose Coaching Type</option>
-                                @foreach (['Offline', 'Online Recorded', 'Online Live', 'Test Series', '11', '12'] as $ctype)
+                                @foreach (['Offline', 'Online Recorded', 'Online Live', 'Test Series', '11 to XI - OB','12 TO XII - OB'] as $ctype)
                                     <option value="{{ $ctype }}">{{ $ctype }}</option>
                                 @endforeach
                             </select>
