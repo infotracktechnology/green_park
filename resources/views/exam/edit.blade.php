@@ -57,8 +57,8 @@ $category = explode(',', $exam->category);
                                     <option value="Online Recorded" @selected(in_array('Online Recorded', $coaching_types))>Online Recorded</option>
                                     <option value="Online Live" @selected(in_array('Online Live', $coaching_types))>Online Live</option>
                                     <option value="Test Series" @selected(in_array('Test Series', $coaching_types))>Test Series</option>
-                                    <option value="11" @selected(in_array('11', $coaching_types))>11</option>
-                                    <option value="12" @selected(in_array('12', $coaching_types))>12</option>
+                                    <option value="11 to XI - OB" @selected(in_array('11', $coaching_types))>11 to XI - OB</option>
+                                    <option value="12 TO XII - OB" @selected(in_array('12', $coaching_types))>12 TO XII - OB</option>
                                  </select>
                               </div>
 
