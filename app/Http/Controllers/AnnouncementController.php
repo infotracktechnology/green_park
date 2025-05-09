@@ -56,9 +56,9 @@ class AnnouncementController extends Controller
         return $student->device_token;
     })->toArray();
 
-    if(!empty($students)) {
-        $fcm->sendMulticast($students,"Announcement", $request->title);
-    }
+    // if(!empty($students)) {
+    //     $fcm->sendMulticast($students,"Announcement", $request->title);
+    // }
 
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
