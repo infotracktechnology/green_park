@@ -25,9 +25,7 @@ use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\StudentActivityController;
 use App\Http\Controllers\UsersController;
-
 use App\Http\Controllers\ChatController;
-use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Student;
 use App\Models\Exam;

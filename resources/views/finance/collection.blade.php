@@ -1,8 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Fees Collection / Payment')
 @section('css')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
   .student-info-section {
     background: #f8f9fa;
@@ -125,11 +123,7 @@
               <label for="student_search_type" class="form-label">Search By</label>
               <select name="student_search_type" id="student_search_type" class="form-control form-control-sm">
                 <option value="student_name" {{ request('student_search_type') == 'student_name' ? 'selected' : '' }}>Student Name</option>
-                <option value="user_name" {{ request('student_search_type') == 'user_name' ? 'selected' : '' }}>User Name</option>
                 <option value="student_id" {{ request('student_search_type') == 'student_id' ? 'selected' : '' }}>Student ID</option>
-                <option value="father_name" {{ request('student_search_type') == 'father_name' ? 'selected' : '' }}>Father Name</option>
-                <option value="mother_name" {{ request('student_search_type') == 'mother_name' ? 'selected' : '' }}>Mother Name</option>
-                <option value="parent_mobile" {{ request('student_search_type') == 'parent_mobile' ? 'selected' : '' }}>Mobile Number</option>
               </select>
             </div>
 
@@ -171,7 +165,6 @@
               <ul class="list-unstyled small">
                 <li><strong>Section:</strong> {{ $student->section }}</li>
                 <li><strong>Coaching Type:</strong> {{ ucfirst($student->coaching_type) }}</li>
-                <li><strong>Student Status:</strong> {{ ucfirst($student->student_status) }}</li>
               </ul>
             </div>
           </div>
@@ -188,46 +181,5 @@
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-  const students = @json($students);
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const input = document.getElementById('student_query');
-    const suggestionsBox = document.getElementById('student_suggestions');
-    const typeSelector = document.getElementById('student_search_type');
-
-    input.addEventListener('keyup', function () {
-      const query = input.value.toLowerCase();
-      const field = typeSelector.value;
-      suggestionsBox.innerHTML = '';
-
-      if (query.length < 2) return;
-
-      const matches = students
-        .map(student => student[field])
-        .filter(val => val && val.toLowerCase().includes(query))
-        .filter((v, i, a) => a.indexOf(v) === i)
-        .slice(0, 10);
-
-      matches.forEach(match => {
-        const item = document.createElement('a');
-        item.href = '#';
-        item.className = 'list-group-item list-group-item-action';
-        item.textContent = match;
-        item.addEventListener('click', function (e) {
-          e.preventDefault();
-          input.value = match;
-          suggestionsBox.innerHTML = '';
-        });
-        suggestionsBox.appendChild(item);
-      });
-    });
-
-    document.addEventListener('click', function (e) {
-      if (!suggestionsBox.contains(e.target) && e.target !== input) {
-        suggestionsBox.innerHTML = '';
-      }
-    });
-  });
 </script>
 @endsection

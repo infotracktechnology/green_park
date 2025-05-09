@@ -168,7 +168,8 @@
                 <li><a href="{{ route('exam.test') }}" class="nav-link">Test Report</a></li>
                 <li><a href="{{route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
                 <li><a href="{{route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
-                <li><a href="{{ route('exam.report.dump') }}" class="nav-link">Result Report</a></li>
+                <li><a href="{{ route('exam.report.dump') }}" class="nav-link">Result Report</a></li>\
+                <li><a href="{{ route('report.section_exam') }}" class="nav-link">Exam Section Wise</a></li>
               </ul>
             </li>
             <li class="dropdown">
@@ -207,12 +208,7 @@
               </ul>
             </li>
 
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ route('report.section_exam') }}" class="nav-link">Exam Section Wise</a></li>
-              </ul>
-            </li>
+            
 
           </ul>
         </aside>
