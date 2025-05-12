@@ -140,7 +140,7 @@
 
  <div class="form-group col-lg-3">
     <label>Bill Type</label>
-    <select name="bill_type" id="bill_type" class="form-control form-control-sm" required>
+    <select name="institution_bill_type" id="bill_type" class="form-control form-control-sm" required>
         <option value="">Select Bill Type </option>
         <option value="GPCC,NKL">GPCC,NKL</option>
         <option value="GPI,NKL">GPI,NKL</option>
