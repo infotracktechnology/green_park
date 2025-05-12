@@ -46,6 +46,7 @@
                                         <th>Branch</th>
                                         <th>Coaching Type</th>
                                         <th>Subject</th>
+                                        <th>Title</th>
                                         <th>Part</th>
                                         <th>Video Id</th>
                                         <th>Start At</th>
@@ -69,6 +70,7 @@
                                         </td>
                                         <td>{{ implode(', ', explode(',', $discussionvideo->coaching_type)) }}</td>
                                         <td>{{ $discussionvideo->subject }}</td>
+                                        <td>{{ $discussionvideo->title }}</td>
                                         <td>{{ $discussionvideo->part }}</td>
                                         <td>{{ $discussionvideo->video_id }}</td>
                                         <td>{{ $discussionvideo->start_at }}</td>

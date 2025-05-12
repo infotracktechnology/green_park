@@ -32,7 +32,6 @@
                                 </div>
                                 <div class="col-md-2 col-sm-12 mb-3">
                                     <a href="{{ route('classvideo.upload.form') }}" class="btn btn-primary btn-block">Class Video Upload</a>
-
                                 </div>
 
                                  <div class="col-md-2 col-sm-12 mb-3">
@@ -61,7 +60,12 @@
                                     </div>
                                 </div>
                                  </form>
-                           
+                                 <div class="col-md-6 col-sm-12 mb-3">
+                                    
+                                    <button type="button" class="btn btn-danger mt-3" id="deleteSelected">
+                                        <i class="fas fa-trash"></i> Delete Selected
+                                    </button>
+                                    </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-sm" id="myTable">
                                     <thead>
@@ -182,5 +186,43 @@
             }
         });
     });
+
+ 
+
+    $('#deleteSelected').click(function() {
+    let selectedIds = [];
+    $('.ids:checked').each(function() {
+        selectedIds.push($(this).val());
+    });
+
+    if (selectedIds.length === 0) {
+        alert("Please select at least one video to delete.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete the selected videos?")) {
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('classvideo.bulk-delete') }}",
+        type: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            ids: selectedIds
+        },
+        success: function(response) {
+            sessionStorage.setItem('successMessage', 'Selected videos deleted successfully!');
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            alert('An error occurred while deleting the videos.');
+            console.log(xhr.responseText);
+        }
+    });
+});
+
+
+
 </script>
 @endsection

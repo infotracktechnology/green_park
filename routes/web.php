@@ -111,11 +111,13 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::resource('achievement', AchievementController::class);
     Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
+    Route::post('/classvideo/bulk-delete', [ClassVideoController::class, 'bulkDelete'])->name('classvideo.bulk-delete');
     Route::resource('classvideo', ClassVideoController::class)->except(['show']);
     Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
     Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
   
     Route::delete('/discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
+
     Route::resource('discussionvideo', DiscussionVideoController::class);
 
     Route::post('classvideo/schedule', [ClassVideoController::class, 'schedule'])->name('classvideo.schedule');
