@@ -16,8 +16,6 @@
                             <h6 class="col-deep-purple">Add Students</h6>
                         </div>
 
-
-
                         <div class="form-group col-lg-3">
                             <label>Admission Date</label>
                              <input type="date" name="admission_date"  class="form-control form-control-sm" >
@@ -50,9 +48,10 @@
                         <div class="form-group col-lg-3">
                             <label>Hostel/Dayscholar</label>
                             <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" required>
-                                <option value="">Select Option</option>
-                                <option value="Hostel">Hostel</option>
+                                {{-- <option value="">Select Hostel/Dayscholar</option> --}}
                                 <option value="Dayscholar">Dayscholar</option>
+                                <option value="Hostel">Hostel</option>
+                                
                             </select>
                         </div>
                         
@@ -66,22 +65,7 @@
                             @enderror
                        </div>
 
-                       <div class="form-group col-lg-3">
-                        <label>Mobile No1</label>
-                         <input type="text" name="ph_no1"  class="form-control form-control-sm @error('ph_no1') is-invalid @enderror" required>
-                         @error('ph_no1')
-                         <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                         @enderror
-                    </div>
-
-
-                    <div class="form-group col-lg-3">
-                        <label>Mobile No2</label>
-                         <input type="text" name="ph_no2" class="form-control form-control-sm @error('ph_no2') is-invalid @enderror" required>
-                         @error('ph_no2')
-                         <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                         @enderror
-                    </div>
+                      
     
     
 
@@ -154,6 +138,19 @@
         </div>
  --}}
 
+ <div class="form-group col-lg-3">
+    <label>Bill Type</label>
+    <select name="bill_type" id="bill_type" class="form-control form-control-sm" required>
+        <option value="">Select Bill Type </option>
+        <option value="GPCC,NKL">GPCC,NKL</option>
+        <option value="GPI,NKL">GPI,NKL</option>
+        <option value="GPCI,NKL">GPCI,NKL</option>
+        <option value="GPCI,KARUR">GPCI,KARUR</option>
+        <option value="GPCI,ERODE">GPCI,ERODE</option>
+        <option value="GPCA,COIMBATORE">GPCA,COIMBATORE</option>
+        <option value="GPA,CHENNAI">GPA,CHENNAI</option>
+    </select>
+</div>
 
       
         <div class="form-group col-lg-12">

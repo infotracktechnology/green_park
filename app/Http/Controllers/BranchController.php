@@ -57,11 +57,11 @@ class BranchController extends Controller
 
     public function update(Request $request, Branch $branch)
 {
-    $request->validate([
-        'mob_no' => ['unique:branch,mob_no,' . $branch->id, 'numeric', 'min:10'],
-        'email' => ['unique:branch,email,' . $branch->id, 'email'],
-        'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    ]);
+    // $request->validate([
+    //     'mob_no' => ['unique:branch,mob_no,' . $branch->id, 'numeric', 'min:10'],
+    //     'email' => ['unique:branch,email,' . $branch->id, 'email'],
+    //     'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    // ]);
 
     
     $data = $request->except('file');

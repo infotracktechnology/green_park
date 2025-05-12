@@ -89,6 +89,12 @@
         </div>
         
         <div class="form-group col-lg-3">
+            <label for="title">Title</label>
+            <input type="text" name="title" class="form-control form-control-sm" required>
+        </div>
+
+
+        <div class="form-group col-lg-3">
             <label for="video">Video ID</label>
             <input type="number" name="video_id" class="form-control form-control-sm" required>
         </div>

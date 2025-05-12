@@ -41,11 +41,20 @@ class ClassVideoController extends Controller
         public function destroy($id){
         $video = ClassVideo::findOrFail($id);
         $video->delete();
-
         return redirect()->route('classvideo.index')->with('success', 'Video deleted successfully!');
     }
 
-
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->ids;
+    
+        if (!$ids) {
+            return response()->json(['success' => false, 'message' => 'No videos selected.'], 400);
+        }
+        ClassVideo::whereIn('id', $ids)->delete();
+        return response()->json(['success' => true, 'message' => 'Videos deleted successfully.']);
+    }
+    
 
     public function edit($id){
     $classvideo = ClassVideo::findOrFail($id);
@@ -114,6 +123,8 @@ public function update(Request $request, $id)
     }
     
     public function schedule(Request $request){
+
+
         $ClassVideo = ClassVideo::whereIn('id', $request->ids)->update(['start_at' => $request->start_at, 'end_at' => $request->end_at]);
         if($ClassVideo){
             return response()->json(['status' => true, 'message' => 'Class video scheduled successfully.']);
@@ -123,6 +134,7 @@ public function update(Request $request, $id)
         }
     }
 
+   
     
 }
 

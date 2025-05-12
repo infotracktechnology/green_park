@@ -54,8 +54,8 @@
                 <option value="Online Live">Online Live</option>
                 <option value="Test Series">Test Series</option>
               
- <option value="11 to XI - OB">11 to XI - OB</option>
- <option value="12 TO XII - OB">12 TO XII - OB</option>
+ <option value=" XI - OB"> XI - OB</option>
+ <option value=" XII - OB"> XII - OB</option>
             </select>
             @error('coaching_type')
             <span class="text-danger">{{ $message }}</span>

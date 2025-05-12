@@ -80,7 +80,6 @@
                                                 <td> <a href="{{ env('APP_URL').$doc->file }}" 
                                                     class="btn btn-primary text-white" download>
                                                <i class="fas fa-download"></i></a>
-                                                
                                                 </td>
                                                 <td>{{ $doc->created_at->format('d-m-Y H:i') }}</td>
                                                 <td>

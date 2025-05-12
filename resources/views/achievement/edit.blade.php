@@ -84,7 +84,7 @@
                                 <div class="form-group col-lg-4">
                                     <label>Coaching Type</label>
                                     <select name="coaching_type[]" class="select2 form-control" multiple required>
-                                        @foreach (['Offline','Online Recorded','Online Live','Test Series','11 to XI - OB','12 TO XII - OB'] as $type)
+                                        @foreach (['Offline','Online Recorded','Online Live','Test Series',' XI - OB',' - OB'] as $type)
                                             <option value="{{ $type }}" {{ in_array($type, explode(',', $achievement->coaching_type)) ? 'selected' : '' }}>
                                                 {{ $type }}
                                             </option>

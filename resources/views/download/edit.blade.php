@@ -25,7 +25,7 @@
                               
                               <div class="form-group col-lg-3">
                                 <label for="academic_year">Academic Year</label>
-                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                                <select name="academic_year" id="academic_year" class="form-control form-control-sm" required>
                                     {{-- <option value="">Select Academic Year</option> --}}
                                     @foreach ($academicyear as $row)
                                         <option value="{{ $row->academic_year }}" {{ $download->academic_year == $row->academic_year ? 'selected' : '' }}>{{ $row->academic_year }}</option>
@@ -38,7 +38,8 @@
                                 <label for="branch">Branch</label>
                                 <select name="branch[]" class="form-control select2 @error('branch') is-invalid @enderror" multiple required>
                                     @php
-                                        $selectedBranches = explode(',', $download->branch); // Convert stored string to array
+                                        $selectedBranches = explode(',', $download->branch); 
+
                                     @endphp
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}" 
@@ -54,7 +55,7 @@
                             
                             <div class="form-group col-lg-5">
                                 <label>Coaching Type</label>
-                                <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
+                                <select name="coaching_type[]" class="form-control form-control-sm  select2" multiple required>
                                     @php
                                         $selectedTypes = explode(',', $download->coaching_type); // Convert stored string to array
                                     @endphp

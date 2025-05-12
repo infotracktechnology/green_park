@@ -29,9 +29,6 @@
                            <div class="col-md-6 col-sm-12 mb-3">
                             <h6 class="col-deep-purple">{{ now()->format('d/m/Y') }}</h6>
                            </div>
-                        
-                   
-                            
                                
                                 <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                                     <label for="subject">Subject</label>
@@ -49,8 +46,6 @@
                                 </div>
                             
                             
-                        
-                           
                         
                     </div>
                 </div>
