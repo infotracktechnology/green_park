@@ -51,12 +51,12 @@ class FinanceController extends Controller
             $data[] = ['coaching_type' => $request->coaching_type,'name'=> $request->name, 'instalment' => $item['instalment'], 'amount' => $item['amount'], 'academic_year' => $this->academic_year,'invoice_date' => $item['invoice_date'], 'due_date' => $item['due_date']];
         }
         FeesPlanItem::insert($data);
-        return redirect()->route('finance.index')->with('success', 'Fees Plan created successfully!');
+        return redirect()->route('feesplan.index')->with('success', 'Fees Plan created successfully!');
     }
 
     public function destroy(Request $request, FeesPlanItem $fees_plan){
         $fees_plan->delete();
-        return redirect()->route('finance.index')->with('success', 'Fees Plan deleted successfully!');
+        return redirect()->route('feesplan.index')->with('success', 'Fees Plan deleted successfully!');
     }
   
    public function collection(Request $request)
