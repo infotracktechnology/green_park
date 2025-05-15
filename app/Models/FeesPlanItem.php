@@ -12,10 +12,4 @@ class FeesPlanItem extends Model
     public $table = 'feeplan_item';
 
     protected $guarded = [];
-
-
-    function fees()
-    {
-        return $this->belongsTo(FeesPlan::class, 'plan_id', 'id');
-    }
 }

@@ -3,157 +3,127 @@
 
 @section('css')
 <style>
-  card.chat {
-  display: flex;
-  flex-direction: column;
-  height: 600px;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
+  /* Main Chat Container */
+  .chat {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
 
-/* Chat Header */
-.chat-header {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
-}
-.chat-header img {
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  margin-right: 15px;
-}
-.chat-about .chat-with {
-  font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 4px;
-}
-.chat-about .chat-num-messages {
-  font-size: 13px;
-  color: #999;
-}
+  /* Chat Header */
+  .chat-header {
+    padding: 15px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .chat-with {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  .chat-num-messages {
+    font-size: 13px;
+    color: #999;
+  }
 
-/* Chat Messages */
-.chat-messages {
-  flex: 1;
-  padding: 20px;
-  background: #f9f9f9;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.message {
-  max-width: 70%;
-  padding: 10px 15px;
-  border-radius: 10px;
-  position: relative;
-  word-break: break-word;
-  font-size: 14px;
-  line-height: 1.4;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-.incoming {
-  background: #ffffff;
-  align-self: flex-start;
-}
-.outgoing {
-  background: #6371f0;
-  color: white;
-  align-self: flex-end;
-}
-.message-time {
-  font-size: 10px;
-  color: #fffdfd;
-  margin-top: 4px;
-  text-align: right;
-}
-/* Preview image before sending */
-#file-preview img {
-  max-width: 150px;
-  max-height: 150px;
-  margin-top: 10px;
-  border-radius: 5px;
-}
+  /* Chat Messages */
+  .chat-messages {
+    flex: 1;
+    padding: 20px;
+    background: #f9f9f9;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .message {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 10px;
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .incoming {
+    background: #ffffff;
+    align-self: flex-start;
+  }
+  .outgoing {
+    background: #6371f0;
+    color: white;
+    align-self: flex-end;
+  }
+  .message-time {
+    font-size: 10px;
+    color: #fffdfd;
+    margin-top: 4px;
+    text-align: right;
+  }
 
-/* Sent image in chat bubble */
-.message img.preview-img {
-  max-width: 150px;
-  max-height: 150px;
-  margin-top: 8px;
-  border-radius: 10px;
-  display: block;
-}
+  /* Image Styles */
+  .preview-img {
+    max-width: 150px;
+    max-height: 150px;
+    margin-top: 8px;
+    border-radius: 10px;
+    display: block;
+  }
 
-/* Input Area */
-.chat-form {
-  padding: 12px 20px;
-  background: #fff;
-  border-top: 1px solid #e0e0e0;
-}
-.chat-form .form-control {
- 
-  padding: 10px 15px;
-}
-.chat-form .btn {
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #6371f0;
-  color: white;
-}
+  /* Input Area */
+  .chat-form {
+    padding: 12px 20px;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+  }
+  .chat-form .btn {
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #6371f0;
+    color: white;
+  }
 
-/* Users list */
-.people-list {
-  background: #fff;
-  border-radius: 15px;
-  padding: 15px;
-}
-.people-list .chat-search input {
-  border-radius: 20px;
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-}
-.people-list ul.chat-list {
-  margin-top: 15px;
-}
-.people-list ul.chat-list li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  padding: 10px;
-  border-radius: 12px;
-  transition: 0.2s;
-  cursor: pointer;
-}
-.people-list ul.chat-list li.active,
-.people-list ul.chat-list li:hover {
-  background-color: #f1f3ff;
-}
-.people-list ul.chat-list li img {
-  border-radius: 10px;
-  width: 40px;
-  height: 40px;
-  margin-right: 12px;
-}
-.people-list ul.chat-list li .about .name {
-  font-weight: 600;
-}
-.people-list ul.chat-list li .about .status {
-  font-size: 12px;
-  color: gray;
-}
-.people-list ul.chat-list li .about .status i {
-  font-size: 10px;
-  margin-right: 5px;
-}
-
+  /* Users List */
+  .people-list {
+    background: #fff;
+    border-radius: 15px;
+    padding: 15px;
+  }
+  .chat-search input {
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+  }
+  .chat-list {
+    margin-top: 15px;
+  }
+  .chat-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 12px;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .chat-list li.active,
+  .chat-list li:hover {
+    background-color: #f1f3ff;
+  }
+  .chat-list .name {
+    font-weight: 600;
+  }
+  .chat-list .status {
+    font-size: 12px;
+    color: gray;
+  }
 </style>
 @endsection
 
@@ -260,7 +230,7 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('chat', () => ({
-      users:@json($users),
+      users: @json($users),
       messages: [],
       selectedUser: 0,
       messageText: '',
@@ -268,70 +238,70 @@
       selectedFile: null,
       searchTerm: '',
       chat_type: 'text',
+
       init() {
+        this.selectedUser = this.users[0]?.id;
         this.$nextTick(() => {
           this.scrollToBottom();
-          this.currentMessages();
+          this.loadMessages();
         });
-        this.selectedUser = this.users[0].id;
-        //this.currentMessages();
       },
       
       get filteredUsers() {
         if (!this.searchTerm.trim()) return this.users;
         const term = this.searchTerm.toLowerCase();
-        return this.users.filter(user => 
-          user.name.toLowerCase().includes(term)
-        );
+        return this.users.filter(user => user.name.toLowerCase().includes(term));
       },
       
       get currentUser() {
         return this.users.find(user => user.id === this.selectedUser);
       },
       
-      currentMessages() {
-        $.get(`{{ env('APP_URL')}}api/v2/chat/messages/`+this.selectedUser, (data) => {
-          console.log(data);
+      loadMessages() {
+        $.get(`{{ env('APP_URL')}}api/v2/chat/messages/${this.selectedUser}`, (data) => {
+          this.messages = data;
           const user = this.users.find(u => u.id === this.selectedUser);
           if (user) user.unread = 0;
-          this.messages = data;
+          this.$nextTick(() => this.scrollToBottom());
         });
-        // return this.messages[this.selectedUser] || [];
       },
       
       selectUser(userId) {
         this.selectedUser = userId;
-        const user = this.users.find(u => u.id === userId);
-        if (user) user.unread = 0;
-        
-        this.$nextTick(() => {
-          this.scrollToBottom();
-        });
+        this.loadMessages();
       },
       
       handleFileChange(e) {
         const file = e.target.files[0];
+        if (!file) return;
+        
         this.filePreviewHTML = '';
         this.selectedFile = file;
         
-        if (!file) return;
-        
         if (file.type.startsWith('image/')) {
           const url = URL.createObjectURL(file);
-          this.filePreviewHTML = `<img src="${url}" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 5px;">`;
+          this.filePreviewHTML = `<img src="${url}" class="preview-img">`;
           this.chat_type = 'image';
         } else if (file.type === 'application/pdf') {
           this.filePreviewHTML = '<i class="fas fa-file-pdf"></i>';
           this.chat_type = 'pdf';
-        }
-        else{
+        } else {
           alert('Unsupported file type');
           this.selectedFile = null;
         }
       },
+
       sendMessage() {
-        console.log(this.selectedFile);
+        if (!this.messageText.trim() && !this.selectedFile) return;
+        // Add your message sending logic here
+        console.log('Sending message:', {
+          text: this.messageText,
+          file: this.selectedFile,
+          type: this.chat_type,
+          receiver: this.selectedUser
+        });
       },
+
       scrollToBottom() {
         if (this.$refs.chatBox) {
           this.$refs.chatBox.scrollTop = this.$refs.chatBox.scrollHeight;
