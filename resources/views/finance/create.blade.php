@@ -26,7 +26,8 @@
 
                               <div class="form-group col-lg-6">
                                     <label for="academic_year">Student Coaching Type</label>
-                                    <select name="coaching_type[]"  class="form-control form-control-sm select2" multiple required>
+                                    <select name="coaching_type"  class="form-control form-control-sm select2" required>
+                                      <option value="">Select  Coaching Type</option>
                                         @foreach ($coaching_type as $row)
                                             <option value="{{ $row->coaching_type }}">{{ $row->coaching_type }}</option>
                                         @endforeach

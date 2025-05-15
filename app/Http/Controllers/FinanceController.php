@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\FeesPlanItem;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Options;
-use App\Models\FeesPlan;
 class FinanceController extends Controller
 {
     public function feetype(Request $request)
@@ -34,7 +34,7 @@ class FinanceController extends Controller
         return view('finance.feetype', compact('feetype'));
     }
     public function index(Request $request){
-        $fees_plan = FeesPlan::where('academic_year', $this->academic_year)->get();
+        $fees_plan = FeesPlanItem::where('academic_year', $this->academic_year)->get();
         return view('finance.index', compact('fees_plan'));
     }
 
@@ -46,18 +46,17 @@ class FinanceController extends Controller
     }
 
     public function store(Request $request){
-        $data = $request->except(['coaching_type','item']);
-        $data['academic_year'] = $this->academic_year;
-        $data['coaching_type'] = implode(',', $request->coaching_type);
-        $fees_plan = FeesPlan::create($data);
-        $fees_plan->items()->createMany($request->item);
-        return redirect()->route('feetype.index')->with('success', 'Fees Plan created successfully!');
+        $data=[];
+        foreach($request->item as $item){
+            $data[] = ['coaching_type' => $request->coaching_type,'name'=> $request->name, 'instalment' => $item['instalment'], 'amount' => $item['amount'], 'academic_year' => $this->academic_year,'invoice_date' => $item['invoice_date'], 'due_date' => $item['due_date']];
+        }
+        FeesPlanItem::insert($data);
+        return redirect()->route('feesplan.index')->with('success', 'Fees Plan created successfully!');
     }
 
-    public function destroy(Request $request, FeesPlan $fees_plan){
-        $fees_plan->items->delete();
+    public function destroy(Request $request, FeesPlanItem $fees_plan){
         $fees_plan->delete();
-        return redirect()->route('feetype.index')->with('success', 'Fees Plan deleted successfully!');
+        return redirect()->route('feesplan.index')->with('success', 'Fees Plan deleted successfully!');
     }
   
    public function collection(Request $request)
