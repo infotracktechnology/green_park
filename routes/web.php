@@ -134,7 +134,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('studentactivity', StudentActivityController::class);
     Route::match(['get', 'post'], '/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
     Route::get('/chat', [App\Http\Controllers\HomeController::class, 'chat'])->name('chat.index');
-    Route::get('/fees/collection', [ App\Http\Controllers\FinanceController::class, 'collection'])->name('fees.collection');
+    Route::match(['get', 'post'],'/fees/collection', [ App\Http\Controllers\FinanceController::class, 'collection'])->name('fees.collection');
     Route::get('/feetype', [App\Http\Controllers\FinanceController::class, 'feetype'])->name('feetype');
     Route::resource('feesplan', App\Http\Controllers\FinanceController::class);
     Route::get('studentmenu/branch', [App\Http\Controllers\HomeController::class, 'studentmenu_branch'])->name('studentmenu.branch');
