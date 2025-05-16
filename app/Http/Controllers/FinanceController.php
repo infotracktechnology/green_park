@@ -70,8 +70,7 @@ class FinanceController extends Controller
     if ($request->filled('student_query') && $request->filled('student_search_type')) {
         $field = $request->input('student_search_type');
         $query = $request->input('student_query');
-
-        $student = Student::where($field, $query)->first();
+        $student = Student::where($field,'like', "%$query%")->first();
     }
 
     return view('finance.collection', compact('branches', 'coachingTypes', 'students', 'student'));
