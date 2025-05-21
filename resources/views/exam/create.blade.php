@@ -54,14 +54,14 @@
                                     <option value="Online Recorded">Online Recorded</option>
                                     <option value="Online Live">Online Live</option>
                                     <option value="Test Series">Test Series</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
+                                    <option value=" XI - OB"> XI - OB</option>
+                                    <option value=" XII - OB"> XII - OB</option>
                                  </select>
                               </div>
 
                               <div class="form-group col-lg-3">
                                 <label>Category</label>
-                                <select name="category[]" id="category" class="select" multiple required>
+                                <select name="category" id="category" class="form-control form-control-sm"  required>
                                     <option value="all">All</option>
                                     <option value="Cumulative Test">Cumulative Test</option>
                                     <option value="Grand Test">Grand Test</option>

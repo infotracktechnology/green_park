@@ -58,7 +58,7 @@
                                     @php
                                         $selectedTypes = explode(',', $answerKey->coaching_type); // Convert stored string to array
                                     @endphp
-                                    @foreach(['Offline', 'Online Recorded', 'Online Live', 'Test Series', '11', '12'] as $type)
+                                    @foreach(['Offline', 'Online Recorded', 'Online Live', 'Test Series', ' XI - OB',' XII - OB'] as $type)
                                         <option value="{{ $type }}" {{ in_array($type, $selectedTypes) ? 'selected' : '' }}>
                                             {{ $type }}
                                         </option>

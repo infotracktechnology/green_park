@@ -36,13 +36,16 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
+            $maxId = self::max('student_id') ?: 0;
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
+            $model->student_id = ($maxId + 1);
+            $model->user_name = 'L'.$model->student_id;
         });
-        static::created(function ($model) {
-            $model->user_name = 'L' . $model->student_id;
-            $model->save();
-        });
+        // static::created(function ($model) {
+          
+        //     $model->save();
+        // });
     }
    public function announcement()
    {
@@ -104,6 +107,26 @@ class Student extends Authenticatable
         return DiscussionVideo::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->get();
     }
 
+    public function fees()
+    {
+        return FeesPlanItem::where('coaching_type', $this->coaching_type)->get()->map(function ($item) {
+            $payed = FeeCollectionItem::where('studentid', $this->student_id)->where('feeid', $item->id)->sum('payamount');
+            return [
+                'id' => $item->id,
+                'check' => false,
+                'amount' => $item->amount - $payed,
+                'instalment' => $item->instalment,
+            ];
+        });
+    }
+
+    public function feespaid()
+    {
+       $amount = FeesPlanItem::where('coaching_type', $this->coaching_type)->sum('amount');
+       $payed = FeeCollectionItem::where('studentid', $this->student_id)->sum('payamount');
+       return $amount - $payed;
+    }
+
     private static function generatePassword($length = 6){
         $characters = 'ACFHJKMRXY23456789';
         $password = '';
@@ -113,6 +136,16 @@ class Student extends Authenticatable
         return $password;
     }
 
-   
+    private static function generateID(){
+            return $this->max('student_id') + 1;
+    }
+
+    private static function generateName($coaching_type,$student_id){
+        if($coaching_type == "XI - OB" || $coaching_type == "XII - OB"){
+            return 'S'.$student_id;
+        }else{
+            return 'L'.$student_id;
+        }
+    }
    
 }

@@ -64,9 +64,7 @@
             <div class="form-group col-lg-3">
               <label>Contact Mobile No</label>
               <input type="text" name="mob_no" value="{{$branch->mob_no}}" maxlength="10" class="form-control form-control-sm @error('mob_no') is-invalid @enderror">
-              @error('mob_no')
-              <div class="alert alert-danger">{{ $message }}</div>
-              @enderror
+            
            </div>
 
            <div class="form-group col-lg-3"> 

@@ -25,9 +25,7 @@ use App\Http\Controllers\SickRoomEntryController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\StudentActivityController;
 use App\Http\Controllers\UsersController;
-
 use App\Http\Controllers\ChatController;
-use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Student;
 use App\Models\Exam;
@@ -113,11 +111,13 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
     Route::resource('achievement', AchievementController::class);
     Route::get('/exam/csv_download/{test_ids}', [App\Http\Controllers\ExamController::class, 'csv_download'])->name('exam.csv_download');
+    Route::post('/classvideo/bulk-delete', [ClassVideoController::class, 'bulkDelete'])->name('classvideo.bulk-delete');
     Route::resource('classvideo', ClassVideoController::class)->except(['show']);
     Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
     Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
   
     Route::delete('/discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
+
     Route::resource('discussionvideo', DiscussionVideoController::class);
 
     Route::post('classvideo/schedule', [ClassVideoController::class, 'schedule'])->name('classvideo.schedule');
@@ -134,7 +134,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('studentactivity', StudentActivityController::class);
     Route::match(['get', 'post'], '/parent_concern', [App\Http\Controllers\HomeController::class, 'parent_concern'])->name('parent_concern');
     Route::get('/chat', [App\Http\Controllers\HomeController::class, 'chat'])->name('chat.index');
-    Route::get('/fees/collection', [ App\Http\Controllers\FinanceController::class, 'collection'])->name('fees.collection');
+    Route::match(['get', 'post'],'/fees/collection', [ App\Http\Controllers\FinanceController::class, 'collection'])->name('fees.collection');
     Route::get('/feetype', [App\Http\Controllers\FinanceController::class, 'feetype'])->name('feetype');
     Route::resource('feesplan', App\Http\Controllers\FinanceController::class);
     Route::get('studentmenu/branch', [App\Http\Controllers\HomeController::class, 'studentmenu_branch'])->name('studentmenu.branch');

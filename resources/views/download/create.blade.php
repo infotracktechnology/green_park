@@ -55,8 +55,8 @@
                 <option value="Online Recorded">Online Recorded</option>
                 <option value="Online Live">Online Live</option>
                 <option value="Test Series">Test Series</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
+                <option value=" XI - OB">XI - OB</option>
+                <option value=" XII - OB">XII - OB</option>
             </select>
         </div>
 

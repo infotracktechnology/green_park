@@ -5,17 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class FeesPlan extends Model
+class FeeCollection extends Model
 {
  
 
-    public $table = 'fees_plan';
+    public $table = 'fee_collection';
 
     protected $guarded = [];
 
-
-    function items()
+    public function item()
     {
-        return $this->hasMany(FeesPlanItem::class, 'plan_id', 'id');
+        return $this->hasMany(FeeCollectionItem::class,'collectionid','id');
     }
 }

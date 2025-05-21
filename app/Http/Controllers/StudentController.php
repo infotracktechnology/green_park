@@ -47,18 +47,9 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'student_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
-            'father_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
-            'mother_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
-            'ph_no1' => ['unique:student,ph_no1', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            'ph_no2' => ['unique:student,ph_no2', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            // 'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-        ]);
-
-        Student::create($request->all());
-
+        $data = $request->all();
+        $data['academic_year'] = $this->academic_year;
+        Student::create($data);
         return redirect()->route('student.index')->with('success', 'Student created successfully.');
     }
 

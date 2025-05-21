@@ -115,7 +115,7 @@
               <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a>
             </li>
             <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students Details </span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
@@ -127,7 +127,7 @@
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student App Menu</span></a>
               <ul class="dropdown-menu">
-                <li><a href="{{ route('studentmenu.branch') }}" class="nav-link"> Branch Assign</a></li>
+                {{-- <li><a href="{{ route('studentmenu.branch') }}" class="nav-link"> Branch Assign</a></li> --}}
                 <li><a href="{{ route('studentmenu.type') }}" class="nav-link"> Type Assign</a></li>
                 <li><a href="{{ route('studentmenu.student') }}" class="nav-link"> Student Assign</a></li>
               </ul>
@@ -148,12 +148,13 @@
                 <li><a href="{{route('chairmanvideo.index')}}"  class="nav-link"> Chairman Video</a></li>
                 <li><a href="{{route('classvideo.index')}}"  class="nav-link"> Class Video</a></li>
                 <li><a href="{{route('revisionvideo.index')}}"  class="nav-link"> Revision Video</a></li>
-                <li><a href="{{route('discussionvideo.index')}}"  class="nav-link"> Discussion Video</a></li>
+               
                 {{-- <li><a href="" class="nav-link">Class Video upload</a></li> --}}
 
                 <li><a href="{{route('examportion.index')}}"  class="nav-link"> Exam Portion</a></li>
-                <li><a href="{{route('questionkey.index')}}"  class="nav-link"> Question Key</a></li>
+                <li><a href="{{route('questionkey.index')}}"  class="nav-link"> Question Paper</a></li>
                 <li><a href="{{route('answerkey.index')}}"  class="nav-link"> Answer key</a></li>
+                <li><a href="{{route('discussionvideo.index')}}"  class="nav-link"> Discussion Video</a></li>
                 <li><a href="{{ route('download.index') }}" class="nav-link">Downloads</a></li>
                 <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
                 <li><a href="{{ route('achievement.index') }}" class="nav-link">NEET Achievement</a></li>
@@ -169,6 +170,7 @@
                 <li><a href="{{route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
                 <li><a href="{{route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
                 <li><a href="{{ route('exam.report.dump') }}" class="nav-link">Result Report</a></li>
+                <li><a href="{{ route('report.section_exam') }}" class="nav-link">Exam Section Wise</a></li>
               </ul>
             </li>
             <li class="dropdown">
@@ -207,12 +209,7 @@
               </ul>
             </li>
 
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ route('report.section_exam') }}" class="nav-link">Exam Section Wise</a></li>
-              </ul>
-            </li>
+            
 
           </ul>
         </aside>
