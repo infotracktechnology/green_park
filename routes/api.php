@@ -46,7 +46,6 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/announcement_titles', function (Request $request) {
         $announcements = Announcement::all();
-
         return response()->json($announcements);
     });
 
@@ -56,8 +55,21 @@ Route::group(['prefix' => 'v2'], function () {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
             $announcement->attachment = "public/".$announcement->attachment;
         }
-
         return response()->json($announcement);
+    });
+
+     Route::get('/announcement/count/{student_id}', function (Request $request, $student_id) {
+        $announcement = Announcement::whereJsonDoesntContain('student_ids', $student_id)->count();
+        return response()->json(['count' => $announcement]);
+    });
+
+     Route::post('/announcement', function (Request $request) {
+       $announcement = Announcement::find($request->id);
+       $student_ids = $announcement->student_ids ? $announcement->student_ids : [];
+       $student_ids[] = $request->student_id;
+       $announcement->student_ids = $student_ids;
+       $announcement->save();
+       return response()->json($announcement);
     });
 
     Route::get('/examportion', function (Request $request, Student $student) {
