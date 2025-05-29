@@ -45,8 +45,6 @@
 }
 
 
-
-
 @keyframes bounce {
     from { transform: translateY(0); }
     to { transform: translateY(-3px); }
@@ -79,7 +77,7 @@
 <div class="main-content">
     <div class="section-body">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-12">
               
                 <div class="card answer-key-card">
                     <div class="card-header">
