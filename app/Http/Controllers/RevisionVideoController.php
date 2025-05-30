@@ -98,10 +98,11 @@ public function update(Request $request, $id)
 }
 
 
-    public function revisionvideo(Request $request,Student $student)
+    public function revisionvideo(Request $request)
     {
         $datetime = date('Y-m-d H:i:s');
-        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
+        $academic_year = auth()->user()->academic_year;
+        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->where('academic_year', $academic_year)->get();
         return view('student.revisionvideo', compact('revisionvideos'));
     }
 
