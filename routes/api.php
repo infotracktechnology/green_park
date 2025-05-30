@@ -39,13 +39,15 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($student);
     });
 
-    Route::get('/chairmanvideo',  function (Request $request, Student $student) {
+    Route::get('/chairmanvideo/{student_id}',  function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
         $chairmanvideo = $student->chairmanvideo();
         return response()->json($chairmanvideo);
     });
 
-    Route::get('/announcement_titles', function (Request $request) {
-        $announcements = Announcement::all();
+    Route::get('/announcement_titles/{student_id}', function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
+        $announcements = $student->announcement();
         return response()->json($announcements);
     });
 
@@ -72,10 +74,12 @@ Route::group(['prefix' => 'v2'], function () {
        return response()->json($announcement);
     });
 
-    Route::get('/examportion', function (Request $request, Student $student) {
+    Route::get('/examportion/{student_id}', function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
         $examportion = $student->examportion()->get();
         return response()->json($examportion);
     });
+    
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
         $results = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$student_id and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
         $results = count($results) > 0 ? $results : [];
@@ -157,11 +161,11 @@ Route::group(['prefix' => 'v2'], function () {
         $parent_concern = DB::table('parent_concern')->where('student_id', $student_id)->get();
         return response()->json($parent_concern ?? []);
     });
-    Route::get('/chat/messages/{user_id}', function (Request $request, $user_id) {
-        $read = DB::table('chat')->where('sender_id', $user_id)->where('chat_read', 0)->update(['chat_read' => 1]);
-        $messages = DB::table('chat')->where('sender_id', $user_id)->orWhere('receiver_id', $user_id)->selectRaw("type, message,sender_id,receiver_id,created_at")->orderBy('created_at', 'desc')->get();
-        return response()->json($messages);
-    });
+    // Route::get('/chat/messages/{user_id}', function (Request $request, $user_id) {
+    //     $read = DB::table('chat')->where('sender_id', $user_id)->where('chat_read', 0)->update(['chat_read' => 1]);
+    //     $messages = DB::table('chat')->where('sender_id', $user_id)->orWhere('receiver_id', $user_id)->selectRaw("type, message,sender_id,receiver_id,created_at")->orderBy('created_at', 'desc')->get();
+    //     return response()->json($messages);
+    // });
     Route::get('/sickroomentry/{student_id}', function ($student_id) {
         $sickroomentry = SickRoomEntry::where('student_id', $student_id)->get();
         return response()->json($sickroomentry);
