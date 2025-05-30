@@ -59,7 +59,7 @@
     }
     .table thead {
         background-color: #f1f3f5;
-        font-weight: bold;
+        font-weight: bold;  
     }
     .table-hover tbody tr:hover {
         background-color: rgba(0, 123, 255, 0.1);
@@ -77,7 +77,7 @@
 <div class="main-content">
     <div class="section-body">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-12">
               
                 <div class="card answer-key-card">
                     <div class="card-header">
