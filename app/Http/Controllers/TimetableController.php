@@ -96,6 +96,13 @@ class TimetableController extends Controller
             $timetableData[$day] = $daySchedule;
         }
 
+        $timetable = Timetable::create([
+            'name' => $request->name,
+            'structure' => $timetableData,
+            'start_time' => $request->start_time,
+            'academic_year' => $this->academic_year,
+        ]);
+
 
         return to_route('timetable.index')->with('success', 'Timetable created successfully');
             

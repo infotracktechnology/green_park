@@ -11,6 +11,10 @@ class Announcement extends Model
     public $table = 'announcement';
 
     protected $guarded = [];
+
+     protected $casts = [
+        'student_ids' => 'json',
+    ];
     function branch()
     {
         return $this->belongsTo(Branch::class, 'branch', 'id');
