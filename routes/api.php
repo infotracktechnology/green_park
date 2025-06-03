@@ -76,7 +76,10 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/examportion/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $examportion = $student->examportion()->get();
+        $examportion = $student->examportion()->get()-map(function ($examportion) {
+            $examportion->attachment = "public/".$examportion->attachment;
+            return $examportion;
+        });
         return response()->json($examportion);
     });
     
@@ -86,22 +89,26 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($results);
     });
 
-    Route::get('/questionkey', function (Request $request, Student $student) {
+    Route::get('/questionkey/{student_id}', function (Request $request,$student_id) {
+        $student = Student::where('student_id', $student_id)->first();
         $questionkey = $student->questionkey();
         return response()->json($questionkey);
     });
 
-    Route::get('/answerkey', function (Request $request, Student $student) {
+    Route::get('/answerkey/{student_id}', function (Request $request,$student_id) {
+        $student = Student::where('student_id', $student_id)->first();
         $answerkey = $student->answerkey();
         return response()->json($answerkey);
     });
 
-    Route::get('/downloads', function (Request $request, Student $student) {
+    Route::get('/downloads/{student_id}', function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
         $downloads = $student->downloads();
         return response()->json($downloads);
     });
 
-    Route::get('/classvideos/{subject}/{period}', function (Student $student, $subject, $period) {
+    Route::get('/classvideos/{student_id}/{subject}/{period}', function ($student_id, $subject, $period) {
+        $student = Student::where('student_id', $student_id)->first();
         $classvideos = $student->classvideo($subject)->where('period', $period);
         return response()->json($classvideos);
     });
@@ -112,25 +119,29 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
 
-    Route::get('/discussionvideo/{subject}', function (Student $student, $subject) {
+    Route::get('/discussionvideo/{student_id}/{subject}', function ($student_id, $subject) {
+        $student = Student::where('student_id', $student_id)->first();
         $discussionvideos = $student->discussionvideos($subject);
         $discussionvideos = $discussionvideos->groupBy('part');
         return response()->json($discussionvideos);
     });
 
 
-    Route::get('revisionvideos/', function () {
+    Route::get('revisionvideos/{student_id}', function ($student_id) {
         $datetime = date('Y-m-d H:i:s');
-        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
+        $student = Student::where('student_id', $student_id)->first();
+        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->where('academic_year', $student->academic_year)->get();
         return response()->json($revisionvideos);
     });
 
-    Route::get('/worksheet', function (Request $request, Student $student) {
+    Route::get('/worksheet/{student_id}', function ($student_id) {
+        $student = Student::where('student_id', $student_id)->first();
         $worksheet = $student->worksheet();
         return response()->json($worksheet);
     });
 
-    Route::get('/achievements', function (Request $request, Student $student) {
+    Route::get('/achievements/{student_id}', function ($student_id) {
+        $student = Student::where('student_id', $student_id)->first();
         $achievements = $student->achievements();
         return response()->json($achievements);
     });
