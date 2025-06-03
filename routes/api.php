@@ -76,7 +76,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/examportion/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $examportion = $student->examportion()->get()-map(function ($examportion) {
+        $examportion = $student->examportion()->get()->map(function ($examportion) {
             $examportion->attachment = "public/".$examportion->attachment;
             return $examportion;
         });
