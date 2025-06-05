@@ -42,6 +42,7 @@ class AnnouncementController extends Controller
     $announcement->gender = $request->gender;
     $announcement->title = $request->title;
     $announcement->content = $request->content;
+    $announcement->student_ids = [];
 
     if ($request->has('attachment')) {
         $fileName = time() . '.' . $request->attachment->extension();
@@ -56,9 +57,9 @@ class AnnouncementController extends Controller
         return $student->device_token;
     })->toArray();
 
-    // if(!empty($students)) {
-    //     $fcm->sendMulticast($students,"Announcement", $request->title);
-    // }
+    if(!empty($students)) {
+        $fcm->sendMulticast($students,"Announcement", $request->title);
+    }
 
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }

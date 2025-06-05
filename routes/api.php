@@ -61,7 +61,8 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
      Route::get('/announcement/count/{student_id}', function (Request $request, $student_id) {
-        $announcement = Announcement::whereJsonDoesntContain('student_ids', $student_id)->count();
+         $student = Student::where('student_id', $student_id)->first();
+         $announcement = $student->announcement_count();
         return response()->json(['count' => $announcement]);
     });
 
