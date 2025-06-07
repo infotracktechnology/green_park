@@ -42,6 +42,9 @@
           <th>Academic Year</th>
           <th>Plan Name</th>
           <th>Coaching Type</th>
+          <th>Installment</th>
+          <th>Amount</th>
+          <th>Due Date</th>
           <th>Edit</th>
           <th>Delete</th>
         </tr>
@@ -55,6 +58,9 @@
             <td >{{$row->academic_year}}</td>
             <td>{{$row->name}}</td>
             <td>{{$row->coaching_type}}</td>
+            <td>{{$row->instalment}}</td>
+            <td>{{$row->amount}}</td>
+            <td>{{$row->due_date}}</td>
             <td></td>
             <td> <form action="{{ route('feesplan.destroy', $row->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')" class="d-inline">
               @csrf

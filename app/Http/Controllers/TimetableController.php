@@ -16,7 +16,12 @@ class TimetableController extends Controller
 
     public function index(Request $request)
     {
-        $timetables = Timetable::all();
+        $timetables = Timetable::when($this->academic_year, function ($query) {
+            $query->where('academic_year', $this->academic_year);
+        })
+        ->latest()
+        ->get();
+    
         $sections = [];
 
         if($request->has('submit')) {
@@ -90,6 +95,13 @@ class TimetableController extends Controller
             
             $timetableData[$day] = $daySchedule;
         }
+
+        $timetable = Timetable::create([
+            'name' => $request->name,
+            'structure' => $timetableData,
+            'start_time' => $request->start_time,
+            'academic_year' => $this->academic_year,
+        ]);
 
 
         return to_route('timetable.index')->with('success', 'Timetable created successfully');

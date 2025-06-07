@@ -72,27 +72,42 @@
             <div class="card card-primary">
                 <div class="card-body">
                 <div class="row">
-                    <form action="{{route('parent_concern')}}" class="col-md-12" method="GET">
-                        <div class="form-group">
-                            <h4 x-text="details.category"></h4>
-                            <h5 x-text="details.concern_type"></h5>
-                            <p x-text="details.details_concern"></p>
-                            <a x-bind:href="attachment" x-show="attachment != null" target="_blank"> <i class="fas fa-paperclip"></i> Attachment</a>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <input type="hidden" name="id" x-model="details.id">
-                            <select name="status" x-model="details.status" id="status" class="form-control form-control-sm">
-                                <option value="">Select Status</option>
-                                <option value="Open">Open</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Closed">Closed</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" name="submit" class="btn btn-primary">Update</button>
-                        </div>
-                    </form>
+                  <form action="{{ route('parent_concern') }}" class="col-md-12" method="POST" enctype="multipart/form-data">
+                    
+                    <div class="form-group">
+                        <h4 x-text="details.category"></h4>
+                        <h5 x-text="details.concern_type"></h5>
+                        <p x-text="details.details_concern"></p>
+                        <a x-bind:href="attachment" x-show="attachment != null" target="_blank"> 
+                            <i class="fas fa-paperclip"></i> Attachment
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <label for="status"><small>Status</small></label>
+                        <input type="hidden" name="id" x-model="details.id">
+                        <select name="status" x-model="details.status" id="status" class="form-control form-control-sm">
+                            <option value="">Select Status</option>
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                
+                    <div class="form-group" x-show="details.status === 'Closed'" x-transition>
+                        <label for="progress"><small>Remark</small></label>
+                        <input type="text" name="progress" id="progress" class="form-control form-control-sm" placeholder="Progress Report" x-model="details.progress">
+                    </div>
+                
+                    <div class="form-group" x-show="details.status === 'Closed'" x-transition>
+                        <label for="file"><small>Attachment (PDF or Image)</small></label>
+                        <input type="file" name="file" id="file" class="form-control form-control-sm" accept=".pdf,image/*">
+                    </div>
+                
+                    <div class="form-group">
+                        <button type="submit" name="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+                
                 </div>
                 </div>
             </div>

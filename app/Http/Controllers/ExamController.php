@@ -17,6 +17,15 @@ class ExamController extends Controller
     public function index(Request $request)
     {
         $tests = Exam::latest()->take(25)->get();
+        $tests = Exam::where('academic_year', $this->academic_year)
+        ->when(auth()->user()->branch, function ($query) {
+            $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+        })
+        ->latest()
+        ->get();
+    
+
+
 
         if ($request->has('test_id')) {
             $test = Exam::find($request->test_id);
@@ -50,8 +59,8 @@ class ExamController extends Controller
 
     public function create()
     {
-        $branches = Branch::all();
-        return view('exam.create', compact('branches'));
+      
+        return view('exam.create');
     }
 
 
@@ -79,7 +88,7 @@ class ExamController extends Controller
                 }
             }
         }
-    
+      
         $data['questions'] = $questions;
         Exam::create($data);
         session()->flash('success', 'Test created successfully');
@@ -88,8 +97,8 @@ class ExamController extends Controller
 
     public function edit(Request $request, Exam $exam)
     {
-        $branches = Branch::all();
-        return view('exam.edit', compact('exam', 'branches'));
+       
+        return view('exam.edit', compact('exam'));
     }
 
 

@@ -13,7 +13,13 @@ class RevisionVideoController extends Controller
     public function index()
     {
         $academic_years = AcademicYear::all();
-        $revisionvideos = RevisionVideo::latest()->get();
+        
+        $revisionvideos = RevisionVideo::when($this->academic_year, function ($query) {
+            $query->where('academic_year', $this->academic_year);
+        })
+        ->latest()
+        ->get();
+    
         return view('revisionvideo.index', compact('revisionvideos'));
     }
 
@@ -31,16 +37,18 @@ class RevisionVideoController extends Controller
     
             foreach ($csvData as $data) {
                 
-                if(!isset($data['subject'])){
-                    return redirect()->back()->with('error', 'Subject Field is required.');
+                if(!isset($data['subject']) || !isset($data['video_id'])){
+                    return redirect()->back()->with('error', 'Subject, Chapter and Video ID fields are required.');
                 }
+
+                
     
     
                 $subject = trim($data['subject'] ?? 'Unknown');
                 $chapter = trim($data['chapter'] ?? 'Unknown');
                 $expire_at = $request->expire_at;
                 $video_id = trim($data['video_id'] ?? '0');
-                $academic_year = $request->academic_year;
+                $academic_year = $request->academic_year ?? $this->academic_year;
     
                 RevisionVideo::create([
                     'subject' => $subject,
@@ -90,10 +98,11 @@ public function update(Request $request, $id)
 }
 
 
-    public function revisionvideo(Request $request,Student $student)
+    public function revisionvideo(Request $request)
     {
         $datetime = date('Y-m-d H:i:s');
-        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->get();
+        $academic_year = auth()->user()->academic_year;
+        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->where('academic_year', $academic_year)->get();
         return view('student.revisionvideo', compact('revisionvideos'));
     }
 

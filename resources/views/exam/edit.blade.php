@@ -56,10 +56,40 @@ $coaching_types = explode(',', $exam->coaching_type);
                                     <option value="Online Recorded" @selected(in_array('Online Recorded', $coaching_types))>Online Recorded</option>
                                     <option value="Online Live" @selected(in_array('Online Live', $coaching_types))>Online Live</option>
                                     <option value="Test Series" @selected(in_array('Test Series', $coaching_types))>Test Series</option>
-                                    <option value="11" @selected(in_array('11', $coaching_types))>11</option>
-                                    <option value="12" @selected(in_array('12', $coaching_types))>12</option>
+                                    <option value=" XI - OB" @selected(in_array('11', $coaching_types))>  XI - OB</option>
+                                    <option value=" XII - OB" @selected(in_array('12', $coaching_types))> XII - OB</option>
                                  </select>
                               </div>
+  <div class="form-group col-lg-4">  
+                                <label>Category</label>
+                                <select name="category" id="category" class="form-control form-control-sm"  required>
+                                    <option value="">Select Category</option>
+                                    <option value="Cumulative Test" @selected($exam->category == 'Cumulative Test')>Cumulative Test</option>
+                                    <option value="Grand Test" @selected($exam->category == 'Grand Test')>Grand Test</option>
+                                    <option value="Physics (Weekend)" @selected($exam->category == 'Physics (Weekend)')>Physics (Weekend)</option>
+                                    <option value="Chemistry (Weekend)" @selected($exam->category == 'Chemistry (Weekend)')>Chemistry (Weekend)</option>
+                                    <option value="Botany (Weekend)" @selected($exam->category == 'Botany (Weekend)')>Botany (Weekend)</option>
+                                    <option value="Zoology (Weekend)" @selected($exam->category == 'Zoology (Weekend)')>Zoology (Weekend)</option>
+                                    <option value="Term Test-2" @selected($exam->category == 'Term Test-2')>Term Test-2</option>
+                                    <option value="UNIT TEST - (CHEMISTRY/BOTANY)" @selected($exam->category == 'UNIT TEST - (CHEMISTRY/BOTANY)')>UNIT TEST - (CHEMISTRY/BOTANY)</option>
+                                    <option value="UNIT TEST - (PHYSICS/ZOOLOGY)" @selected($exam->category == 'UNIT TEST - (PHYSICS/ZOOLOGY)')>UNIT TEST - (PHYSICS/ZOOLOGY)</option>
+                                    <option value="70% SYLLABUS TEST" @selected($exam->category == '70% SYLLABUS TEST')>70% SYLLABUS TEST</option>
+                                    <option value="FULL TEST - 1" @selected($exam->category == 'FULL TEST - 1')>FULL TEST - 1</option>
+                                    <option value="FULL TEST - 2" @selected($exam->category == 'FULL TEST - 2')>FULL TEST - 2</option>
+
+
+
+                                  
+                                </select>
+                            </div>
+
+                              
+
+                        
+                            
+                            
+
+
                               <div class="form-group col-lg-2">
                                 <label>Test ID <span class="text-danger">(should be unique*)</span></label>
                                 <input type="number" name="id" value="{{ $exam->id }}" id="id" class="form-control form-control-sm numberk" disabled>

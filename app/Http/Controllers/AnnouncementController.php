@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
+use App\Models\Student;
+use App\Providers\FcmServiceProvider;
 
 class AnnouncementController extends Controller
 {
@@ -13,18 +15,25 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         $academic_years = AcademicYear::all();
-        $announcements = Announcement::all();
         $branches = Branch::all();
         $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
+    
+        $announcements = Announcement::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch', 'like' , '%'.auth()->user()->branch.'%');
+            })->get();
+           
+    
         return view('announcement.index', compact('announcements', 'branches', 'branchList', 'academic_years'));
     }
+    
     public function create()
     {
-        $branches = DB::table('branch')->select('id', 'name')->get();
-        return view('announcement.create', compact('branches'));
+       
+        return view('announcement.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request,FcmServiceProvider $fcm)
 {
     $announcement = new Announcement();
     $announcement->academic_year = $request->academic_year;
@@ -43,17 +52,24 @@ class AnnouncementController extends Controller
     }
     $announcement->category = in_array('Offline', $request->coaching_type) ? $request->category : null;
     $announcement->save();
+    $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->whereNotNull('device_token')->get()->map(function ($student) use ($fcm) {
+        return $student->device_token;
+    })->toArray();
+
+    // if(!empty($students)) {
+    //     $fcm->sendMulticast($students,"Announcement", $request->title);
+    // }
 
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
 
 public function edit(Request $request, Announcement $announcement)
 {
-    $branches = Branch::all(); 
+   
     $academicyear = AcademicYear::all(); 
     $selectedCoachingTypes = explode(',', $announcement->coaching_type);
 
-    return view('announcement.edit', compact('announcement', 'branches', 'academicyear', 'selectedCoachingTypes'));
+    return view('announcement.edit', compact('announcement',  'academicyear', 'selectedCoachingTypes'));
 }
 
 

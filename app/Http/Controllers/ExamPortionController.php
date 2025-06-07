@@ -16,7 +16,13 @@ class ExamPortionController extends Controller
     public function index()
     {
         $academic_years = AcademicYear::all();
-        $examportions = Examportion::all();
+        $examportions = Examportion::where('academic_year', $this->academic_year)
+        ->when(auth()->user()->branch, function ($query) {
+            $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+        })
+        ->get();
+    
+        $examportions = Examportion::latest()->get();
         $branches = Branch::all();
         $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
         return view('examportion.index', compact('examportions', 'branches', 'branchList'));
@@ -25,8 +31,8 @@ class ExamPortionController extends Controller
     {
 
         $academicyear = AcademicYear::all();
-        $branches = Branch::all();
-        return view('examportion.create', compact('branches'));
+      
+        return view('examportion.create');
     }
     public function store(Request $request)
     {
@@ -61,8 +67,8 @@ class ExamPortionController extends Controller
     
     public function examportion(Request $request)
     {
-        $examportion = Examportion::latest()->first();
+        $examportions = auth()->user()->examportion()->get();
        
-        return view('student.examportion', compact('examportion'));
+        return view('student.examportion', compact('examportions'));
     }
 }

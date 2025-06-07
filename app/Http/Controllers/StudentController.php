@@ -22,49 +22,46 @@ class StudentController extends Controller
     {
         $students = Student::join('branch', 'student.campus', '=', 'branch.id')
             ->select('student.*', 'branch.name as campus')
-            ->where('student.academic_year', $this->academic_year)
+            ->when($this->academic_year, function ($query) {
+                $query->where('student.academic_year', $this->academic_year);
+            })
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('student.campus', 'like', '%' . auth()->user()->branch . '%');
+            })
             ->get();
+            
         return view('student.index', compact('students'));
     }
 
 
     public function create(Request $request)
     {
-        $branches = DB::table('branch')->select('id', 'name')->get();
+        // $branches = DB::table('branch')->select('id', 'name')->get();
         if ($request->has('city')) {
             $pincodes = DB::table('district_list')->where('District', $request->city)->select('Pincode')->get();
             return response()->json($pincodes);
         }
-        return view('student.create', compact('branches'));
+        return view('student.create');
     }
 
 
     public function store(Request $request)
     {
-        $request->validate([
-            'student_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
-            'father_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
-            'mother_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
-            'ph_no1' => ['unique:student,ph_no1', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            'ph_no2' => ['unique:student,ph_no2', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            'father_ph_no' => ['unique:student,father_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-            // 'mother_ph_no' => ['unique:student,mother_ph_no', 'numeric', 'regex:/^[6-9]\d{9}$/'],
-        ]);
-
-        Student::create($request->all());
-
+        $data = $request->all();
+        $data['academic_year'] = $this->academic_year;
+        Student::create($data);
         return redirect()->route('student.index')->with('success', 'Student created successfully.');
     }
 
 
     public function edit(Request $request, Student $Student)
     {
-        $branches = DB::table('branch')->select('id', 'name')->get();
+        // $branches = DB::table('branch')->select('id', 'name')->get();
         $districts = DB::table('district_list')->where('State', $Student->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
 
-        return view('student.edit', compact('branches',  'districts', 'states', 'pincodes', 'Student'));
+        return view('student.edit', compact( 'districts', 'states', 'pincodes', 'Student'));
     }
 
 

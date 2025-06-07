@@ -12,7 +12,14 @@ class HolidayController extends Controller
 {
     public function index()
     {
-        $holidays = Holiday::latest()->get();
+        $holidays = Holiday::where('academic_year', $this->academic_year)
+    ->when(auth()->user()->branch, function ($query) {
+        $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+    })
+    ->latest()
+    ->get();
+
+        
         return view('holiday.index', compact('holidays'));
     }
 

@@ -27,18 +27,26 @@ class BranchController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'mob_no' => ['unique:branch,mob_no', 'numeric', 'min:10'],
-            'email' => ['unique:branch,email', 'email'],
-            'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->move('branch', $fileName);
-        $branch = branch::create($request->all());
+        // $request->validate([
+        //     'mob_no' => ['unique:branch,mob_no', 'numeric', 'min:10'],
+        //     'email' => ['unique:branch,email', 'email'],
+        //     'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        // ]);
+    
+        $data = $request->except('file'); // exclude file for now
+    
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move('branch', $fileName); // store in public/branch
+            $data['file'] = 'branch/' . $fileName;
+        }
+    
+        branch::create($data);
+    
         return to_route('branch.index');
     }
+    
 
     public function edit(Request $request, Branch $branch) {
         $districts = DB::table('district_list')->get();
@@ -49,33 +57,33 @@ class BranchController extends Controller
 
     public function update(Request $request, Branch $branch)
 {
-    $request->validate([
-        'mob_no' => ['unique:branch,mob_no,' . $branch->id, 'numeric', 'min:10'],
-        'email' => ['unique:branch,email,' . $branch->id, 'email'],
-        'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    ]);
-
-    $data = $request->all();
+    // $request->validate([
+    //     'mob_no' => ['unique:branch,mob_no,' . $branch->id, 'numeric', 'min:10'],
+    //     'email' => ['unique:branch,email,' . $branch->id, 'email'],
+    //     'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    // ]);
 
     
+    $data = $request->except('file');
 
     if ($request->hasFile('file')) {
-        $oldFilePath = storage_path('app/public/' . $branch->file);
-        if (file_exists($oldFilePath)) {
-            unlink($oldFilePath);
+       
+        if ($branch->file && file_exists(public_path($branch->file))) {
+            unlink(public_path($branch->file));
         }
 
         $file = $request->file('file');
         $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->move('branch', $fileName);
+        $file->move(public_path('branch'), $fileName);
 
-        $branch->file = 'branch/' . $fileName;
+      
+        $data['file'] = 'branch/' . $fileName;
     }
 
-
-    $branch->update($data); // Update the branch record with new data
+    $branch->update($data); 
     return to_route('branch.index');
 }
+
 
 
     public function destroy(Request $request, Branch $branch) {

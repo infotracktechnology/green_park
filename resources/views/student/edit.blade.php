@@ -54,8 +54,8 @@
                                     <option value="Online Recorded" @if($Student->coaching_type == 'Online Recorded') selected @endif>Online Recorded</option>
                                     <option value="Online Live" @if($Student->coaching_type == 'Online Live') selected @endif>Online Live</option>
                                     <option value="Test Series" @if($Student->coaching_type == 'Test Series') selected @endif>Test Series</option>
-                                    <option value="11" @if($Student->coaching_type == '11') selected @endif>11</option>
-                                    <option value="12" @if($Student->coaching_type == '12') selected @endif>12</option>
+                                    <option value="XI - OB" @if($Student->coaching_type == 'XI - OB') selected @endif>XI - OB</option>
+                                     <option value="XII - OB" @if($Student->coaching_type == 'XII - OB') selected @endif>XII - OB</option>
                                 </select>
                             </div>
         
@@ -80,7 +80,7 @@
                             
                             
         
-                            <div class="form-group col-lg-3">
+                            {{-- <div class="form-group col-lg-3">
                                 <label for="ph_no1">Mobile No 1</label>
                                 <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $Student->ph_no1) }}" class="form-control form-control-sm digits" >
                               
@@ -90,7 +90,7 @@
                                 <label for="ph_no2">Mobile No 2</label>
                                 <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $Student->ph_no2) }}" class="form-control form-control-sm digits">
                                
-                            </div>
+                            </div> --}}
         
                             <div class="form-group col-lg-3">
                                 <label>Gender</label>
@@ -254,6 +254,23 @@
                                 <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $Student->student_whatsapp_no) }}" class="form-control form-control-sm digits">
                                
                             </div>     
+
+
+                            <div class="form-group col-lg-3">
+                                <label>Bill Type</label>
+                                <select name="bill_type" id="bill_type" class="form-control form-control-sm" required>
+                                    <option value="">Select Bill Type</option>
+                                    <option value="GPCC,NKL" @selected($Student->bill_type == 'GPCC,NKL')>GPCC,NKL</option>
+                                    <option value="GPI,NKL" @selected($Student->bill_type == 'GPI,NKL')>GPI,NKL</option>
+                                    <option value="GPCI,NKL" @selected($Student->bill_type == 'GPCI,NKL')>GPCI,NKL</option>
+                                    <option value="GPCI,KARUR" @selected($Student->bill_type == 'GPCI,KARUR')>GPCI,KARUR</option>
+                                    <option value="GPCI,ERODE" @selected($Student->bill_type == 'GPCI,ERODE')>GPCI,ERODE</option>
+                                    <option value="GPCA,COIMBATORE" @selected($Student->bill_type == 'GPCA,COIMBATORE')>GPCA,COIMBATORE</option>
+                                    <option value="GPA,CHENNAI" @selected($Student->bill_type == 'GPA,CHENNAI')>GPA,CHENNAI</option>
+                                </select>
+                            </div>
+                            
+
 
                             <div class="form-group col-lg-12">
                                 <button type="submit" class="btn btn-primary">Submit</button>

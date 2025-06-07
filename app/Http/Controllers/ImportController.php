@@ -40,13 +40,18 @@ class ImportController extends Controller
             // Step 4: Insert data into the database
             if (!empty($data)) {
                 foreach ($data as $row) {
+
+                    if(!isset($row['student_id']) || !isset($row['password_1'])){
+                        return back()->with('error', 'student_id and password_1 fields are required.');
+                    }
                     
-                    $row = array_map(function($value) {
-                        return is_string($value) ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
-                    }, $row);
+                    foreach($row as $key => $value){
+                        $row[$key] = is_string($value) && $key != 'password_1'   ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
+                    }
                     
 
                     $student_id = $row['student_id'] ?? 0;
+                    $row['password'] = bcrypt($row['password_1']);
                       
                     $student = Student::where('student_id', $student_id)->first();
                    if($student){
@@ -59,7 +64,7 @@ class ImportController extends Controller
                    else{
                     $row = array_merge($row, ['campus' => $branch, 'academic_year' =>$academic_year]);
                     try{
-                    $create = Student::create($row);
+                    $create = DB::table('student')->insert($row);
                     }catch(\Exception $e){
                         return back()->with('error', 'Error creating student: ' . $e->getMessage());
                     }

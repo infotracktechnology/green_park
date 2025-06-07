@@ -43,6 +43,7 @@
           <th>Student ID</th>       
           <th>Section</th>   
           {{-- <th>SET</th> --}}
+          <th>Bill Type</th>
           <th>Campus</th>
           <th>Coaching Type</th>
           <th>User Name</th>
@@ -66,6 +67,8 @@
           <tr>
             <td>{{$student->student_id}}</td>
             <td>{{$student->section}}</td>
+            <td>{{$student->bill_type}}</td>
+            {{-- <td>{{$student->set}}</td> --}}
             <td>{{$student->campus}}</td>
             <td>{{$student->coaching_type}}</td>
             <td>{{$student->user_name}}</td>
