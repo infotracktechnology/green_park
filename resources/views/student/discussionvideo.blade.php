@@ -43,11 +43,7 @@
                                 <div class="col-lg-2 col-md-3 col-sm-12 mb-3">
                                     <button type="submit" class="btn btn-primary m-t-25">Show</button>
                                 </div>
-                            
-                            
-                        
                            
-                        
                     </div>
                 </div>
                     </form>
