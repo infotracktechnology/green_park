@@ -8,8 +8,7 @@
 <div class="main-content">
     <div class="section-body">
         <div class="row">
-            <div class="col-md-6 col-lg-12 col-xl-8">
-                @if(isset($examportion->title) && isset($examportion->attachment))
+            <div class="col-md-6 col-lg-12 col-xl-12">
                 <div class="card">
                   <div class="card-header">
                     <h4><i style="font-size: 30px;" class="fas fa-file-pdf"></i> Exam Portion</h4>
@@ -18,20 +17,21 @@
                     <table class="table table-bordered table-striped">
                       <tr>
                         <th>Title</th>
-                        <td>{{ $examportion->title }}</td>
+                        <th>Attachment</th> 
                       </tr>
+                      @foreach ($examportions as $examportion)
                       <tr>
-                        <th>Attachment</th>
+                        <td>{{ $examportion->title }}</td>
                         <td>
                           <a href="{{ env('APP_URL') }}public/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
                             <i class="fas fa-paperclip"></i> Attachment
                         </a>
                         </td>
                       </tr>
+                      @endforeach
                     </table>
                   </div>
                 </div>
-                @endif
             </div>
                 </div>
             </div>
