@@ -160,11 +160,13 @@
                   </a>
                 </li>
                 @foreach (auth()->user()->menu ?? [] as $menu)
+                @if($menu['route'] !='')
                 <li class="dropdown">
                   <a href="{{ route($menu['route']) }}" class="nav-link">
                     <i class="{{ $menu['icon'] }}" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
                   </a>
                 </li>
+                @endif
                 @endforeach
                 {{-- <li class="dropdown">
                   <a href="{{ route('student.chairmanvideo') }}" class="nav-link">

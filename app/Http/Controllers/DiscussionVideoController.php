@@ -117,7 +117,6 @@ class DiscussionVideoController extends Controller
         return response()->json(['message' => 'Selected discussion videos deleted successfully!'], 200);
     }
     
-    
-    
+
 
 }
