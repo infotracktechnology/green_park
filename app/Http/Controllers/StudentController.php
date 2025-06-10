@@ -176,10 +176,10 @@ public function dashboard()
     }
 
 
-    public function discussionvideo(Request $request,Student $student)
+    public function discussionvideo(Request $request)
     {
         $subject = $request->subject ?? 0;
-        $discussionvideos = $student->discussionvideos($subject);
+        $discussionvideos = auth()->user()->discussionvideos($subject);
         $discussionvideos = $discussionvideos->groupBy('part');
         
         return view('student.discussionvideo', compact('discussionvideos', 'subject'));

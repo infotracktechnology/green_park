@@ -60,6 +60,17 @@ class Student extends Authenticatable
            ->get();
    }
 
+   public function announcement_count(){
+
+       return Announcement::where('branch', 'like', "%{$this->campus}%")
+           ->where('coaching_type', 'like', "%{$this->coaching_type}%")
+           ->where('academic_year', $this->academic_year)
+           ->whereJsonDoesntContain('student_ids', $student_id)
+           ->where(function ($query) { 
+            $query->where('gender', $this->gender)->orWhere('gender', 'All');
+            })->count();
+   }
+
     function chairmanvideo()
     {
         return Chairmanvideo::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('gender', 'like', "%$this->gender%")->where('academic_year', $this->academic_year)->latest()->first();
