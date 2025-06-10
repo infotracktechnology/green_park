@@ -34,10 +34,13 @@ Route::group(['prefix' => 'v2'], function () {
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
     });
-    Route::get('/student_profile/{student_id}',  function (Student $student, $student_id) {
-        $student = Student::where('id', $student_id)->first();
-        $student->branch_name = $student->branch->name;
-        return response()->json($student);
+    Route::get('/student_profile/{student_id}', function ($student_id, Student $attendanceService) {
+        $student = Student::findOrFail($student_id);
+        $attendanceStats = $attendanceService->calculateCurrentMonthStats($student->student_id);
+        $student->total_attendance_days = $attendanceStats->total_days;
+        $student->present_attendance_days = $attendanceStats->present_days;
+        $student->branch_name = $student->branch->name ?? 'N/A';
+    return response()->json($student);
     });
 
     Route::get('/chairmanvideo/{student_id}',  function (Request $request, $student_id) {
