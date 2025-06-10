@@ -67,7 +67,7 @@ class Student extends Authenticatable
        return Announcement::where('branch', 'like', "%{$this->campus}%")
            ->where('coaching_type', 'like', "%{$this->coaching_type}%")
            ->where('academic_year', $this->academic_year)
-           ->whereJsonDoesntContain('student_ids', $student_id)
+           ->whereJsonDoesntContain('student_ids', $this->student_id)
            ->where(function ($query) { 
             $query->where('gender', $this->gender)->orWhere('gender', 'All');
             })->count();
