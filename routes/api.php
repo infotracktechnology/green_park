@@ -36,6 +36,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
     Route::get('/student_profile/{student_id}',  function (Student $student, $student_id) {
         $student = Student::where('id', $student_id)->first();
+        $student->branch_name = $student->branch->name;
         return response()->json($student);
     });
 

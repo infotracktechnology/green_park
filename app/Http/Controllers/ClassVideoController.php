@@ -74,10 +74,10 @@ public function update(Request $request, $id)
 }
 
 
-    public function classvideo(Request $request,Student $student)
+    public function classvideo(Request $request)
     {
         $subject = $request->subject ?? 0;
-        $classvideos = $student->classvideo($subject);
+        $classvideos = auth()->user()->classvideo($subject);
         $classvideos = $classvideos->groupBy('period');
         return view('student.classvideo', compact('classvideos', 'subject'));
     }
