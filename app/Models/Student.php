@@ -11,6 +11,8 @@ use App\Models\ExamAnswer;
 use App\Models\AnswerKey;
 use App\Models\QuestionKey;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Attendance;
+use Illuminate\Support\Facades\DB;
 
 
 class Student extends Authenticatable
@@ -65,7 +67,7 @@ class Student extends Authenticatable
        return Announcement::where('branch', 'like', "%{$this->campus}%")
            ->where('coaching_type', 'like', "%{$this->coaching_type}%")
            ->where('academic_year', $this->academic_year)
-           ->whereJsonDoesntContain('student_ids', $student_id)
+           ->whereJsonDoesntContain('student_ids', $this->student_id)
            ->where(function ($query) { 
             $query->where('gender', $this->gender)->orWhere('gender', 'All');
             })->count();
@@ -158,6 +160,32 @@ class Student extends Authenticatable
         }else{
             return 'L'.$student_id;
         }
+    }
+    public function calculateCurrentMonthStats(string $studentId): object
+    {
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+        $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
+            ->where('student_id', $studentId)
+            ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth]) 
+            ->distinct();
+        $stats = DB::query()
+            ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
+            ->selectRaw("
+                COUNT(DISTINCT attendance_date) as total_days,
+                SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days
+            ")
+            ->first();
+        $totalDays = $stats->total_days ?? 0;
+        $presentDays = $stats->present_days ?? 0;
+        $percentage = ($totalDays > 0) 
+                      ? round(($presentDays / $totalDays) * 100, 2) 
+                      : 0;
+        return (object) [
+            'total_days' => $totalDays,
+            'present_days' => $presentDays,
+            'percentage' => $percentage,
+        ];
     }
    
 }
