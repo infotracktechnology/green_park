@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('title', 'Dashboard')
-
+@include('dashboards.studentdashboard')
 
 @section("meta")
 <meta http-equiv="refresh" content="60">
