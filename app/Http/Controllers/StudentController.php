@@ -177,7 +177,36 @@ public function dashboard()
 
     $examStartTime = $exam ? $exam->start_at->toIso8601String() : null; 
 
-    return view('dashboards.studentdashboard', compact('examStartTime'));
+     $studentId = Auth::user()->student_id;
+    $startOfMonth = now()->startOfMonth();
+    $endOfMonth = now()->endOfMonth();
+
+    
+    $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
+        ->where('student_id', $studentId)
+        ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
+        ->distinct();
+
+    $stats = DB::query()
+        ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
+        ->selectRaw("
+            -- Logic for Total Days: Count the unique days.
+            COUNT(DISTINCT attendance_date) as total_days,
+            
+            -- Logic for Present Days: Sum 0.5 for every 'P' status.
+            SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days
+        ")
+        ->first();
+
+   
+    $totalDaysInMonth = $stats->total_days ?? 0;
+    $presentDaysInMonth = $stats->present_days ?? 0;
+
+    $percentage = $totalDaysInMonth > 0 
+                  ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2) 
+                  : 0;
+
+    return view('dashboards.studentdashboard', compact('examStartTime', 'totalDaysInMonth', 'presentDaysInMonth', 'percentage'));
 }
     function marksheet(Request $request){
         $sid = auth()->user()->student_id;

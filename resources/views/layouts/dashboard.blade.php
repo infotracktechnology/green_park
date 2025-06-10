@@ -150,7 +150,7 @@
               </li>
               @else
                 <li class="dropdown">
-                  <a href="{{ route('student.home') }}" class="nav-link">
+                  <a href="{{ route('studentdashboard') }}" class="nav-link">
                     <i class="fas fa-home" style="font-size: 20px; color: #2196f3;"></i><span>Home</span>
                   </a>
                 </li>

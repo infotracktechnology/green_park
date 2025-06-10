@@ -214,12 +214,12 @@
                <div class="card-icon card-icon-large"><i class="fa fa-calendar-check"></i></div>
                 <div class="card-content">
                  <h5 class="card-title">Attendance (Current Month)</h5>
-                     <span style="font-size: 17px;"><strong>Working Days:</strong> {{ $totalDays }}</span>
+                     <span style="font-size: 17px;"><strong>Working Days:</strong> {{ $totalDaysInMonth }}</span>
 
                      <p class="mb-0 text-sm">
                          <span class="text-nowrap">
                         
-                      <span style="font-size: 17px;">  <strong>Present Days :</strong> {{ $presentDays }}</span> <span style="font-size: 24px;float: right"> ({{ number_format($attendancePercentage, 2) }}%)
+                      <span style="font-size: 17px;">  <strong>Present Days :</strong> {{ $presentDaysInMonth }}</span> <span style="font-size: 24px;float: right"> ({{ number_format($percentage, 2) }}%)
                      </span>
                     </p>
                 </div>
