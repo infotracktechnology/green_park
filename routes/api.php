@@ -27,13 +27,17 @@ use App\Models\SickRoomEntry;
 // });
 
 Route::group(['prefix' => 'v2'], function () {
+
     Route::post('/login',  function (Request $request) {
         $student = Student::where('user_name', $request->username)->where('password_1', $request->password)->first();
         if ($student) {
+            $student->active = 1;
+            $student->save();
             return response()->json(['message' => 'Login successful', 'student_id' => $student->id], 200);
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
     });
+
     Route::get('/student_profile/{student_id}', function ($student_id, Student $attendanceService) {
         $student = Student::findOrFail($student_id);
         $attendanceStats = $attendanceService->calculateCurrentMonthStats($student->student_id);
