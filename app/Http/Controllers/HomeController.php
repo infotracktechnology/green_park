@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AcademicYear;
 use App\Models\Options;
 use App\Models\Student;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Providers\FcmServiceProvider;
@@ -14,15 +15,15 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $activeUsersCount = Student::where('active', 1)->count();
-
+        $branchs = Branch::all();
+        $students = Student::all();
         if ($request->has('academic_year')) {
             DB::table('academic_year')->update(['active' => 0]);
             AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
         }
-
-        return view('home', compact('activeUsersCount'));
+        return view('home',compact('branchs', 'students'));
     }
+
     public function parent_concern(Request $request)
     {
         $parentconcerns = DB::table('parent_concern')->where('status', '!=', 'Closed')->get();

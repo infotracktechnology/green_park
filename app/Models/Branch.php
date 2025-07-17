@@ -13,6 +13,10 @@ class Branch extends Model
 
     protected $guarded = [];
 
+	public function student(){
+		return $this->hasMany(Student::class, 'campus', 'id');
+	}
+
 	public static function boot()
 	{
 		parent::boot();
@@ -28,4 +32,5 @@ class Branch extends Model
 			$model->updated_by = $user->id;
 		});
 	}
+
 }
