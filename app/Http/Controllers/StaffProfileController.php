@@ -155,7 +155,7 @@ class StaffProfileController extends Controller
 
     public function export(Request $request)
     {
-        $staffs = Staff::selectRaw("id,name,school_initial,staff_type,hostel_dayscholar,gender,dob,age,marital_status,blood_group,department,qualifications,nationality,religion,community,caste,mob_no,alternate_mob_no,aadhaar_no,email,address_line_1,address_line_2,state,city,pincode,photo,biometric_no,father_name,mother_name,spouse_name,spouse_ph_no,spouse_occupation,father_ph_no,date_of_joining,designation,experience,class_handling_type,paper_correction,handeling_class,previous_school")->get()->toArray();
+        $staffs = Staff::selectRaw("staff.id,staff.name,branch.name as branch,school_initial,staff_type,hostel_dayscholar,gender,dob,age,marital_status,blood_group,department,qualifications,nationality,religion,community,caste,staff.mob_no,alternate_mob_no,aadhaar_no,staff.email,staff.address_line_1,staff.address_line_2,staff.state,staff.city,staff.pincode,photo,biometric_no,father_name,mother_name,spouse_name,spouse_ph_no,spouse_occupation,father_ph_no,date_of_joining,designation,experience,class_handling_type,paper_correction,handeling_class,previous_school")->join('branch', 'staff.branch_id', '=', 'branch.id', )->get()->toArray();
         $file = fopen('staff_export.csv', 'w');
         $headers = array_keys($staffs[0]);
         fputcsv($file, $headers);
