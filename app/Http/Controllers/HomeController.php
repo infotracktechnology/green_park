@@ -9,6 +9,7 @@ use App\Models\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Providers\FcmServiceProvider;
+use App\Models\Staff;
 //use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
@@ -17,11 +18,16 @@ class HomeController extends Controller
     {
         $branchs = Branch::all();
         $students = Student::all();
+        $branchvsStaff = [];
+        $branchs->each(function ($branch) use (&$branchvsStaff) {
+            $branchvsStaff[$branch->name] = Staff::where('branch_id', $branch->id)
+                ->count();
+        });
         if ($request->has('academic_year')) {
             DB::table('academic_year')->update(['active' => 0]);
             AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
         }
-        return view('home',compact('branchs', 'students'));
+        return view('home',compact('branchs', 'students', 'branchvsStaff'));
     }
 
     public function parent_concern(Request $request)

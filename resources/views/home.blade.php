@@ -75,7 +75,7 @@
       </div>
       <div class="col-md-3"></div>
 
-      <div class="col-md-6">
+      <div class="col-md-6 mb-3">
         <div class="ibox-content">
           <h5 class="col-black">Branch Students</h5>
             {{-- <ul class="m-0 p-0">
@@ -86,11 +86,11 @@
               </li>       
               @endforeach  
             </ul> --}}
-            <div id="chart2"></div>
+            <div id="chart1"></div>
         </div> 
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-6 mb-3">
         <div class="ibox-content">
           <h5 class="col-black">Coaching Type Students</h5>
             {{-- <ul class="m-0 p-0">
@@ -101,8 +101,14 @@
               </li>       
               @endforeach  
             </ul> --}}
-            <div id="chart3"></div>
+            <div id="chart2"></div>
 
+        </div> 
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="ibox-content">
+          <h5 class="col-black">Branch Satffs</h5>
+            <div id="chart3"></div>
         </div> 
       </div>
 
@@ -110,12 +116,13 @@
     </div>
   </section>
 </div>
-<div style="background-color: #006100"></div>
+<div style="background-color: #5c15e0"></div>
 
 @endsection
 @section('js')
 <script src="{{ asset('bundles/apexcharts/apexcharts.min.js') }}"></script>
 <script>
+  
     const branches = @json($branches->map(function($branch) {
         return [
             'name' => $branch->name,
@@ -149,10 +156,10 @@
             formatter: function (val) {
                 return val;
             },
-            offsetY: -20,
+            offsetY: 0,
             style: {
                 fontSize: '12px',
-                colors: ["#9aa0ac"]
+                colors: ["#ffffff"]
             }
         },
         series: [{
@@ -235,7 +242,7 @@
     }
 
     var chart = new ApexCharts(
-        document.querySelector("#chart2"),
+        document.querySelector("#chart1"),
         options
     );
 
@@ -264,10 +271,10 @@
         formatter: function (val) {
             return val;
         },
-        offsetY: -20,
+        offsetY: 0,
         style: {
             fontSize: '12px',
-            colors: ["#9aa0ac"]
+            colors: ["#ffffff"]
         }
     },
     series: [{
@@ -345,8 +352,126 @@
     },
 };
 
+var chart = new ApexCharts(document.querySelector("#chart2"), options);
+chart.render();
+
+</script>
+<script>
+const branchvsStaff = @json($branchvsStaff);
+var options = {
+    chart: {
+        height: 350,
+        type: 'bar',
+    },
+    colors: ["#5c15e0"],
+    grid: {
+        padding: {
+            top: 35,        // Space for data labels
+        }
+    },
+    plotOptions: {
+        bar: {
+            columnWidth: '50%',
+            dataLabels: {
+                position: 'top',
+            },
+        }
+    },
+    dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+            return val;
+        },
+        offsetY: 0,       // Slightly closer to bars
+        style: {
+            fontSize: '12px',
+            colors: ["#ffffff"]
+        }
+    },
+    series: [{
+        name: 'Staff',
+        data: Object.values(branchvsStaff).map(function(count) {
+            return count;
+        })
+    }],
+    xaxis: {
+        categories: Object.keys(branchvsStaff).map(function(branch) {
+            return branch.split(',')[0];
+        }),
+        position: 'top',
+        labels: {
+            offsetY: -18,
+            style: {
+                colors: '#9aa0ac',
+            }
+        },
+        axisBorder: {
+            show: false
+        },
+        axisTicks: {
+            show: false
+        },
+        crosshairs: {
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    colorFrom: '#D8E3F0',
+                    colorTo: '#BED1E6',
+                    stops: [0, 100],
+                    opacityFrom: 0.4,
+                    opacityTo: 0.5,
+                }
+            }
+        },
+        tooltip: {
+            enabled: true,
+            offsetY: -35,
+        }
+    },
+    fill: {
+        gradient: {
+            shade: 'light',
+            type: "horizontal",
+            shadeIntensity: 0.25,
+            gradientToColors: undefined,
+            inverseColors: true,
+            opacityFrom: 1,
+            opacityTo: 1,
+            stops: [50, 0, 100, 100]
+        },
+    },
+    yaxis: {
+        axisBorder: {
+            show: false
+        },
+        axisTicks: {
+            show: false,
+        },
+        labels: {
+            show: false,
+            formatter: function (val) {
+                return val;
+            }
+        },
+        min: 0,                    // Always start from 0
+        forceNiceScale: true,      // Auto-calculate nice intervals
+        tickAmount: 6,             // Maximum 6 axis fractions
+        decimalsInFloat: 0,        // Whole numbers only
+    },
+    title: {
+        text: 'Branches Vs Staff',
+        floating: true,
+        offsetY: 320,
+        align: 'center',
+        style: {
+            color: '#9aa0ac'
+        }
+    },
+};
+
 var chart = new ApexCharts(document.querySelector("#chart3"), options);
 chart.render();
+
 
 </script>
 
