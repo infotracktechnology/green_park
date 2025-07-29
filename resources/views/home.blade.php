@@ -28,7 +28,7 @@
                 <span class="col-black font-18">{{ $students->where('gender', 'Male')->count() }}</span>
               </div>
               <div class="col-auto">
-                <div class="card-circle l-bg-orange text-white">
+                <div class="card-circle bg-green text-white">
                   <i class="fas fa-user-friends font-18"></i>
                 </div>
               </div>
@@ -46,7 +46,7 @@
                 <span class="col-black font-18">{{ $students->where('gender', 'Female')->count() }}</span>
               </div>
               <div class="col-auto">
-                <div class="card-circle l-bg-orange text-white">
+                <div class="card-circle bg-green text-white">
                   <i class="fas fa-user-friends font-18"></i>
                 </div>
               </div>
@@ -65,7 +65,7 @@
                 <span class="col-black font-18">{{ $students->where('active', 1)->count() }}</span>
               </div>
               <div class="col-auto">
-                <div class="card-circle l-bg-orange text-white">
+                <div class="card-circle bg-green text-white">
                   <i class="fas fa-user-friends font-18"></i>
                 </div>
               </div>
@@ -75,31 +75,34 @@
       </div>
       <div class="col-md-3"></div>
 
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="ibox-content">
-          <h5 class="col-black">Branch Users</h5>
-            <ul class="m-0 p-0">
+          <h5 class="col-black">Branch Students</h5>
+            {{-- <ul class="m-0 p-0">
               @foreach($branches as $branch)
                   <li class="list-item list-group-item">
                   <h6 class="col-black">{{ $branch->name }}</h6>
                   <span class="col-black font-16">{{ $branch->student->count() }}</span>
               </li>       
               @endforeach  
-            </ul>
+            </ul> --}}
+            <div id="chart2"></div>
         </div> 
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="ibox-content">
-          <h5 class="col-black">Coaching Type Users</h5>
-            <ul class="m-0 p-0">
+          <h5 class="col-black">Coaching Type Students</h5>
+            {{-- <ul class="m-0 p-0">
               @foreach($students->groupBy('coaching_type') as $key => $coaching_type)
                   <li class="list-item list-group-item">
                   <h6 class="col-black">{{ $key }}</h6>
                   <span class="col-black font-16">{{ $coaching_type->count() }}</span>
               </li>       
               @endforeach  
-            </ul>
+            </ul> --}}
+            <div id="chart3"></div>
+
         </div> 
       </div>
 
@@ -107,5 +110,244 @@
     </div>
   </section>
 </div>
+<div style="background-color: #006100"></div>
+
+@endsection
+@section('js')
+<script src="{{ asset('bundles/apexcharts/apexcharts.min.js') }}"></script>
+<script>
+    const branches = @json($branches->map(function($branch) {
+        return [
+            'name' => $branch->name,
+            'users' => $branch->student->count()
+        ];
+    }));
+
+    const filtereddata = branches.map(function(branch) {
+        return {
+            name: branch.name.split(',')[0],
+            users: branch.users
+        };
+    });
+  
+    var options = {
+        chart: {
+            height: 350,
+            type: 'bar',
+        },
+        colors: ["#ffa500"],
+        plotOptions: {
+            bar: {
+                columnWidth: '60%',
+                dataLabels: {
+                    position: 'top', // top, center, bottom
+                },
+            }
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function (val) {
+                return val;
+            },
+            offsetY: -20,
+            style: {
+                fontSize: '12px',
+                colors: ["#9aa0ac"]
+            }
+        },
+        series: [{
+            name: 'Students',
+            data: filtereddata.map(function(branch) {
+                return branch.users;
+            })
+        }],
+        xaxis: {
+            categories: filtereddata.map(function(branch) {
+                return branch.name;
+            }),
+            position: 'top',
+            labels: {
+                offsetY: -18,
+                style: {
+                    colors: '#9aa0ac',
+                }
+            },
+            axisBorder: {
+                show: false
+            },
+            axisTicks: {
+                show: false
+            },
+            crosshairs: {
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        colorFrom: '#D8E3F0',
+                        colorTo: '#BED1E6',
+                        stops: [0, 100],
+                        opacityFrom: 0.4,
+                        opacityTo: 0.5,
+                    }
+                }
+            },
+            tooltip: {
+                enabled: true,
+                offsetY: -35,
+
+            }
+        },
+        fill: {
+            gradient: {
+                shade: 'light',
+                type: "horizontal",
+                shadeIntensity: 0.25,
+                gradientToColors: undefined,
+                inverseColors: true,
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [50, 0, 100, 100]
+            },
+        },
+        yaxis: {
+            axisBorder: {
+                show: false
+            },
+            axisTicks: {
+                show: false,
+            },
+            labels: {
+                show: false,
+                formatter: function (val) {
+                    return val;
+                }
+            }
+
+        },
+        title: {
+            text: 'Branches Vs Students',
+            floating: true,
+            offsetY: 320,
+            align: 'center',
+            style: {
+                color: '#9aa0ac'
+            }
+        },
+    }
+
+    var chart = new ApexCharts(
+        document.querySelector("#chart2"),
+        options
+    );
+
+    chart.render();
+</script>
+<script>
+
+  const coachingTypes = @json($students->groupBy('coaching_type'));
+  
+  var options = {
+    chart: {
+        height: 350,
+        type: 'bar',
+    },
+    colors: ["#f81a1a"],
+    plotOptions: {
+        bar: {
+            columnWidth: '20%',
+            dataLabels: {
+                position: 'top',
+            },
+        }
+    },
+    dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+            return val;
+        },
+        offsetY: -20,
+        style: {
+            fontSize: '12px',
+            colors: ["#9aa0ac"]
+        }
+    },
+    series: [{
+        name: 'Students',
+        data: Object.values(coachingTypes).map(function(coachingType) {
+            return coachingType.length;
+        })
+    }],
+    xaxis: {
+        categories: Object.keys(coachingTypes),
+        position: 'top',
+        labels: {
+            offsetY: -18,
+            style: {
+                colors: '#9aa0ac',
+            }
+        },
+        axisBorder: {
+            show: false
+        },
+        axisTicks: {
+            show: false
+        },
+        crosshairs: {
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    colorFrom: '#D8E3F0',
+                    colorTo: '#BED1E6',
+                    stops: [0, 100],
+                    opacityFrom: 0.4,
+                    opacityTo: 0.5,
+                }
+            }
+        },
+        tooltip: {
+            enabled: true,
+            offsetY: -35,
+        }
+    },
+    fill: {
+        gradient: {
+            shade: 'light',
+            type: "horizontal",
+            shadeIntensity: 0.25,
+            gradientToColors: undefined,
+            inverseColors: true,
+            opacityFrom: 1,
+            opacityTo: 1,
+            stops: [50, 0, 100, 100]
+        },
+    },
+    yaxis: {
+        axisBorder: {
+            show: false
+        },
+        axisTicks: {
+            show: false,
+        },
+        labels: {
+            show: false,
+            formatter: function (val) {
+                return val;
+            }
+        }
+    },
+    title: {
+        text: 'Coaching Type Vs Students',
+        floating: true,
+        offsetY: 320,
+        align: 'center',
+        style: {
+            color: '#9aa0ac'
+        }
+    },
+};
+
+var chart = new ApexCharts(document.querySelector("#chart3"), options);
+chart.render();
+
+</script>
 
 @endsection
