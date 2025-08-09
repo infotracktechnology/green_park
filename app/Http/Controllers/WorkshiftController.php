@@ -51,5 +51,10 @@ class WorkshiftController extends Controller
         return redirect()->route('worksheet.index')->with('success', 'Workshift deleted.');
     }
 
+    public function assign()
+    {
+        return view('workshift.assign');
+    }
+
 
 }
