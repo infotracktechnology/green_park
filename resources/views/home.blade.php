@@ -20,16 +20,16 @@
     <div class="row">
 
       <div class="col-md-3">
-        <div class="card">
-          <div class="card-body card-type-3">
+        <div class="card l-bg-red">
+          <div class="card-body">
             <div class="row">
               <div class="col">
-               <h4 class="col-black">Boys</h4>
-                <span class="col-black font-18">{{ $students->where('gender', 'Male')->count() }}</span>
+               <h4>Boys</h4>
+                <span class="font-18">{{ $students->where('gender', 'Male')->count() }}</span>
               </div>
               <div class="col-auto">
-                <div class="card-circle bg-green text-white">
-                  <i class="fas fa-user-friends font-18"></i>
+                <div class="text-white">
+                  <i class="fas fa-user-friends font-24"></i>
                 </div>
               </div>
             </div>
@@ -38,16 +38,16 @@
       </div>
 
       <div class="col-md-3">
-        <div class="card">
-          <div class="card-body card-type-3">
+        <div class="card l-bg-cyan-dark">
+          <div class="card-body">
             <div class="row">
               <div class="col">
-               <h4 class="col-black">Girls</h4>
-                <span class="col-black font-18">{{ $students->where('gender', 'Female')->count() }}</span>
+               <h4>Girls</h4>
+                <span class="font-18">{{ $students->where('gender', 'Female')->count() }}</span>
               </div>
               <div class="col-auto">
-                <div class="card-circle bg-green text-white">
-                  <i class="fas fa-user-friends font-18"></i>
+                <div class="text-white">
+                  <i class="fas fa-user-friends font-24"></i>
                 </div>
               </div>
             </div>
@@ -57,16 +57,16 @@
 
 
       <div class="col-md-3">
-        <div class="card">
-          <div class="card-body card-type-3">
+        <div class="card l-bg-orange">
+          <div class="card-body">
             <div class="row">
               <div class="col">
-                <h4 class="col-black">Active Users</h4>
-                <span class="col-black font-18">{{ $students->where('active', 1)->count() }}</span>
+                <h4>Active Users</h4>
+                <span class="font-18">{{ $students->where('active', 1)->count() }}</span>
               </div>
               <div class="col-auto">
-                <div class="card-circle bg-green text-white">
-                  <i class="fas fa-user-friends font-18"></i>
+                <div class="text-white">
+                  <i class="fas fa-user-friends font-24"></i>
                 </div>
               </div>
             </div>
