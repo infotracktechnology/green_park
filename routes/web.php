@@ -143,7 +143,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
   
     Route::resource('users', App\Http\Controllers\UsersController::class);
     Route::resource('workshift', App\Http\Controllers\WorkshiftController::class);
-    Route::match(['get', 'post'],'/workshift/assign', [ App\Http\Controllers\WorkshiftController::class, 'assign'])->name('workshift.assign');
+    Route::match(['get', 'post'],'/shiftwork/assign', [ App\Http\Controllers\WorkshiftController::class, 'assign'])->name('workshift.assign');
 
 });
 
