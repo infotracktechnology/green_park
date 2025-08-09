@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Workshift;
+use App\Models\Staff;
 
 class WorkshiftController extends Controller
 {
@@ -51,9 +52,14 @@ class WorkshiftController extends Controller
         return redirect()->route('worksheet.index')->with('success', 'Workshift deleted.');
     }
 
-    public function assign()
+    public function assign(Request $request)
     {
-        return view('workshift.assign');
+        $staffs = Staff::all();
+        $shifts = Workshift::all();
+        if($request->isMethod('post')) {
+            //dd($request->all());
+        }
+        return view('workshift.assign', compact('staffs', 'shifts'));
     }
 
 
