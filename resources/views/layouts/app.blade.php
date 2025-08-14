@@ -137,6 +137,8 @@
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('staff.index') }}" class="nav-link"> Staff</a></li>
+                <li><a href="{{ route('workshift.index') }}" class="nav-link">Staff Shift</a></li>
+                <li><a href="{{ route('workshift.assign') }}" class="nav-link"> Shift Assign</a></li>
                 <li><a href="{{ route('staff.class') }}" class="nav-link"> Class Assign</a></li>
                
               </ul>

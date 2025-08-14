@@ -26,6 +26,11 @@ class Staff extends Model
 		return $this->belongsTo(Branch::class, 'branch_id'); // Ensure 'branch_id' is the correct foreign key
 	}
 
+	public function shift()
+	{
+		return $this->belongsTo(Workshift::class, 'shiftid');
+	}
+
 	public static function boot()
 	{
 		parent::boot();
