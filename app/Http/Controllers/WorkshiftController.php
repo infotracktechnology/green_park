@@ -54,11 +54,25 @@ class WorkshiftController extends Controller
 
     public function assign(Request $request)
     {
-        $staffs = Staff::all();
-        $shifts = Workshift::all();
+        try{
         if($request->isMethod('post')) {
-            //dd($request->all());
+            $request->validate([
+                'staff_ids' => 'required|array',
+                'shift' => 'required',
+            ]);
+            $shift = Workshift::findorFail($request->shift);
+            $staffs = Staff::whereIn('id', $request->staff_ids)->get();
+            $staffs->each(function ($staff) use ($shift) {
+                $staff->update(['shiftid' => $shift->id]);
+            });
+            return to_route('workshift.assign')->with('success', 'Shift assigned successfully.');
         }
+    }
+        catch(\Exception $e){
+            return to_route('workshift.assign')->with('error', 'Error: ' . $e->getMessage());
+    }
+        $staffs = Staff::with('shift')->get();
+        $shifts = Workshift::all();
         return view('workshift.assign', compact('staffs', 'shifts'));
     }
 
