@@ -31,7 +31,7 @@ class HomeController extends Controller
     // }
 
     public function index(Request $request){
-        $data = DB::table('student')->when(auth()->user()->branch, function ($query) {
+        $data = Student::when(auth()->user()->branch, function ($query) {
             $query->where('campus', auth()->user()->branch);
         })
             ->select(
@@ -46,10 +46,9 @@ class HomeController extends Controller
             ->orderBy('section')
             ->get()
             ->groupBy('coaching_type');
-                // dd($data);
-            $boys = Student::where('gender', 'Male')->count();
-            $girls = Student::where('gender', 'Female')->count();
-            $total = Student::count();
+            $boys = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Male')->count();
+            $girls = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Female')->count();
+            $total = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->count();
         return view('home', compact('data', 'boys', 'girls', 'total'));
     }
     
