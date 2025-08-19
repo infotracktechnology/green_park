@@ -123,12 +123,10 @@ $(document).on("click", "td", function() {
     const section = $(this).data("section") == '' ? '-' : $(this).data("section");
     const type = $(this).data("type");
     const gender = $(this).data("gender");
-    console.log($(this).data());
     
 if (!section || !type || !gender) {
         return;
     }
-    console.log("Clicked:", section, type, gender);
 
     // Send AJAX request
     $.ajax({
@@ -136,7 +134,6 @@ if (!section || !type || !gender) {
         type: "GET",
         data: { section: section, type: type, gender: gender },
         success: function(response) {
-            console.log("Server Response:", response);
 
             // Empty modal body
             $('#studentInfoModalBody').empty();
@@ -171,7 +168,7 @@ if (!section || !type || !gender) {
             $('#studentInfoModal').modal('show');
         },
         error: function(xhr) {
-            console.log("Error:", xhr.responseText);
+            alert('An error occurred while fetching student information.');
         }
     });
 });
