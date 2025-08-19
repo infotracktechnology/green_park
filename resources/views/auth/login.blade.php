@@ -4,14 +4,11 @@
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
   <title>Login</title>
-  <!-- General CSS Files -->
+
   <link rel="stylesheet" href="{{asset('css/app.min.css')}}">
-  <link rel="stylesheet" href="{{asset('css/login.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
   <style>
-  
-  
     .swiper-slide {
       background-size: cover;
       background-position: center;
@@ -22,11 +19,7 @@
       height: 100%;
       object-fit: cover;
     }
-    
-
-   
-    
-    /* Add a caption overlay for slides */
+  
     .slide-caption {
       position: absolute;
       bottom: 30px;
@@ -41,108 +34,138 @@
 </head>
 <body>
 
-    <div class="login-13">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-7 col-md-12 bg-img">
-                    <div class="swiper">
-                        <div class="swiper-wrapper">
-                          <div class="swiper-slide">
-                            <img src="https://www.gpccnamakkal.com/img/slide2.jpg" alt="Slide 1">
-                            
-                          </div>
-                          <div class="swiper-slide">
-                            <img src="https://www.gpccnamakkal.com/img/slide2.jpg" alt="Slide 2">
-                            
-                          </div>
-                          <div class="swiper-slide">
-                            <img src="https://www.gpccnamakkal.com/img/slide2.jpg" alt="Slide 3">
-                            
-                          </div>
-                        </div>
-                      
-                        <!-- Add pagination -->
-                        <div class="swiper-pagination"></div>
-                        
-                        <!-- Add navigation buttons -->
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
-                    
-                        <!-- Add scrollbar -->
-                        <div class="swiper-scrollbar"></div>
-                      </div>
-                </div>
-                <div class="col-lg-5 col-md-12 form-info">
-                    <div class="form-section">
-                       
-                        <div class="form-section-innner">
-                            <div class="logo clearfix">
-                                
-                                <img alt="image" src="{{asset('img/logo.png')}}" style="height:80px;"  /> 
-                                
-                               
-                            </div>
-                            @if ($message = Session::get('error'))
-                            <div class="alert alert-danger fade show" role="alert">
-                                 {{ $message }}
-                            </div>
-                        @endif
-                            <h3>Login</h3>
-                        
-                            <div class="login-inner-form">
-                                <form method="POST" action="{{ route('auth.login') }}" enctype="multipart/form-data">
-                                    @csrf
-                                    <div class="form-group form-box clearfix">
-                                        <input name="username" type="text" class="form-control" placeholder="Enter Username" aria-label="Username" required>
-                                        <i class="fa fa-user"></i>
-                                    </div>
-                                    <div class="form-group form-box clearfix">
-                                        <input name="password" type="password" class="form-control" autocomplete="off" placeholder="Enter Password" aria-label="Password" required>
-                                        <i class="fa fa-lock"></i>
-                                    </div>
-                                   
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary btn-lg btn-theme">Login</button>
-                                    </div>
-                                </form>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
+  <div class="container-fluid" style="border-bottom: none;padding-top: 10px;padding-bottom: 10px;">
+        <div class="row">
+            <div class="col-md-9">
+                   <img alt="image" src="{{asset('img/logo.png')}}" style="height:80px;"  />
+            </div>
+
+            <div class="col-md-3">
+                    <h6 class="mb-1 text-center">Support<br>(+91) 91883 99999</h6>
             </div>
         </div>
     </div>
+
+  
+        <div class="container-fluid" style="background-image: url('https://cdndataicici.myclassboard.com/Assets/img/ICICI-bg.png'); background-size: 100% 100%;">
+            <div class="row" style="padding-bottom: 140px;">
+                <div class="col-md-7">
+                    <div class="mt-3">
+                        <div class="container">
+                            <div class="row mt-5">
+                                <div class="col-md-12">
+                                    <h1 class="text-white head-text mt-5">
+                                        GREEN PARK<br>
+                                        COACHING CENTRE<br>
+                                        WHEN YOU CAN<br>
+                                        DO MORE?
+                                    </h1>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p class="text-white">
+                                        Get on your mobile - Download now
+                                    </p>
+                                    <p>
+                                        <a href="#" target="_blank"><img src="https://cdndataicici.myclassboard.com/Assets/img/ICICI-googleapp.png" class="img-fluid"></a>
+                                        <a href="#" target="_blank"><img src="https://cdndataicici.myclassboard.com/Assets/img/ICICI-Iosapp.png" class="img-fluid"></a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                        
+                </div>
+
+                <div class="col-md-4" style="margin-top: 60px;">
+                    <div class="card" style="border-radius:12px;padding: 30px 0px;">
+                        <div class="card-body">
+                            <h4 class="title text-center" style="color: #0b3c6d;">LOGIN</h4>
+                        </div>
+                         <form method="POST" action="{{ route('auth.login') }}" enctype="multipart/form-data">
+                        @csrf
+
+                                   <div class="col s12 mt-3">
+                                      @if ($message = Session::get('error'))
+                                    <div class="alert alert-danger fade show" role="alert">
+                                            {{ $message }}
+                                        </div>
+                                    @endif
+                                   </div>
+
+
+                              <div class="col s12 mt-3">
+                                    <div class="w-100">
+                                        <label for="email" style="color: #0b3c6d;">Username</label>
+                                         <input name="username" type="text" class="form-control" placeholder="Username/Email" aria-label="Username" required>
+                                    </div>
+                                </div>
+
+                                  <div class="col s12 mt-3">
+                                    <div class="w-100">
+                                        <label for="email" style="color: #0b3c6d;">Password</label>
+                                        <input name="password" type="password" class="form-control" autocomplete="off" placeholder="Enter Password" aria-label="Password" required>
+                                    </div>
+                                </div>
+
+
+                                  <div class="col s12" style="margin-top: 20px;">
+                                    <div class="w-100">
+                                       <button class="btn btn-block btn-success text-uppercase" type="submit" style="border-radius: 12px !important;padding: 10px 0px;">
+                                            Login
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+ 
+        <div class="footer" style="background: #f0f0f0;padding: 20px 0px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>
+                        © Copyrights {{ date('Y') }} All rights reserved.  Powered by  <a class="link" href="#" target="_blank">Green Park Coaching Centre</a>
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    
 
   <script src="{{asset('js/app.min.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
     const swiper = new Swiper('.swiper', {
-      // Enable auto sliding
       autoplay: {
-        delay: 5000, // 5 seconds between slides
-        disableOnInteraction: false, // Continue autoplay after user interaction
+        delay: 5000,
+        disableOnInteraction: false,
       },
-      effect: 'fade', // Use fade transition between slides
+      effect: 'fade',
       fadeEffect: {
         crossFade: true
       },
       direction: 'horizontal',
       loop: true,
-      // Enable pagination
       pagination: {
         el: '.swiper-pagination',
-        clickable: true, // Allow clicking on pagination bullets
+        clickable: true,
       },
-      // Enable navigation arrows
       navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       },
-      // Add scrollbar
       scrollbar: {
         el: '.swiper-scrollbar',
-        draggable: true, // Make scrollbar draggable
+        draggable: true,
       },
     });
   </script>

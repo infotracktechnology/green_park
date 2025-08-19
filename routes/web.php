@@ -50,6 +50,7 @@ Route::get('/notify', [App\Http\Controllers\HomeController::class, 'notify']);
 Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('branch', 'App\Http\Controllers\BranchController');
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.home');
+    Route::get('/dashboard/gender', [App\Http\Controllers\HomeController::class, 'dashboardGender'])->name('dashboard.gender');
     Route::match(['get', 'post'], '/staff-class', [StaffProfileController::class, 'classAssign'])->name('staff.class');
     Route::post('/staff-subject', [StaffProfileController::class, 'subjectAssign'])->name('staff.subjectAssign');
 

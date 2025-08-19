@@ -1,4 +1,196 @@
- @extends('layouts.app')
+@extends('layouts.app')
+ @section('title', 'Dashboard')
+ @section('main')
+<div class="main-content">
+  <section class="section">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive" style="overflow-y: scroll;">
+                    <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width:50px;"><i class="fas fa-layer-group"></i></th>
+                                <th class="align-middle">📚 Coaching Type</th>
+                                <th class="align-middle">
+                                    {{-- 👥  --}}
+                                    Total <br>
+                                    <span class="badge badge-info p-2">{{$total}}</span>
+                                </th>
+                                <th class="align-middle">👦 <br>
+                                    <span class="badge badge-primary p-2">{{$boys}}</span>
+                                </th>
+                                <th class="align-middle">👧 <br>
+                                    <span class="badge bg-pink p-2">{{$girls}}</span>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="collapse-tbody" class="collapse show">
+                            @foreach($data as $coachingType => $sections)
+                                @php
+                                    $totalBoys = $sections->sum('boys_count');
+                                    $totalGirls = $sections->sum('girls_count');
+                                    $totalAll = $sections->sum('total_count');
+                                @endphp
+
+                                {{-- Parent (Coaching Type) Row --}}
+                                <tr class="bg-light fw-bold cursor-pointer"
+                                    data-toggle="collapse"
+                                    data-target="#collapse-{{ Str::slug($coachingType) }}"
+                                    aria-expanded="false">
+                                    <td>
+                                        <i class="fas fa-plus-circle text-success toggle-icon"
+                                        id="icon-{{ Str::slug($coachingType) }}"></i>
+                                    </td>
+                                    <td class="text-start">{{ $coachingType }}</td>
+                                    <td class="text-warning">{{ $totalAll }}</td>
+                                    <td class="text-primary">{{ $totalBoys }}</td>
+                                    <td class="text-pink">{{ $totalGirls }}</td>
+                                </tr>
+
+                                {{-- Child (Sections Table) --}}
+                                <tr class="collapse bg-white" id="collapse-{{ Str::slug($coachingType) }}">
+                                    <td colspan="5">
+                                        <table class="table table-sm table-striped mb-0 border">
+                                            {{-- <thead class="table-secondary" style="display: none;">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Section</th>
+                                                    <th>Total</th>
+                                                    <th>Boys</th>
+                                                    <th>Girls</th>
+                                                </tr>
+                                            </thead> --}}
+                                            <tbody>
+                                                @foreach($sections as $section)
+                                                    <tr>
+                                                        
+                                                        <td width="55%">{{ $section->section == '' ? '-' : $section->section }}</td>
+                                                        
+                                                        <td class="fw-bold" data-section="{{ $section->section }}" data-type="{{ $coachingType }}" data-gender="all">{{ $section->total_count }}</td>
+                                                        <td class="text-primary" data-section="{{ $section->section }}" data-type="{{ $coachingType }}" data-gender="Male">{{ $section->boys_count }}</td>
+                                                        <td class="text-pink" data-section="{{ $section->section }}" data-type="{{ $coachingType }}" data-gender="Female">{{ $section->girls_count }}</td>
+                                                    </tr>
+                                                @endforeach
+                                                {{-- <tr class="table-warning fw-bold">
+                                                    <td>Subtotal</td>
+                                                    <td>{{ $totalAll }}</td>
+                                                    <td>{{ $totalBoys }}</td>
+                                                    <td>{{ $totalGirls }}</td>
+                                                </tr> --}}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="modal fade" id="studentInfoModal" tabindex="-1" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+      <div class="modal-content bg-white rounded shadow">
+        <div class="modal-header bg-success text-white py-2">
+          <h5 class="modal-title" id="studentInfoModalLabel">Student Information</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="studentInfoModalBody">
+        </div>
+        <div class="modal-footer bg-light py-2">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@endsection
+
+@section('js')
+
+<script>
+$(document).on("click", "td", function() {
+    // Get data attributes
+    
+    const section = $(this).data("section") == '' ? '-' : $(this).data("section");
+    const type = $(this).data("type");
+    const gender = $(this).data("gender");
+    console.log($(this).data());
+    
+if (!section || !type || !gender) {
+        return;
+    }
+    console.log("Clicked:", section, type, gender);
+
+    // Send AJAX request
+    $.ajax({
+        url: "{{ route('dashboard.gender') }}", // change this
+        type: "GET",
+        data: { section: section, type: type, gender: gender },
+        success: function(response) {
+            console.log("Server Response:", response);
+
+            // Empty modal body
+            $('#studentInfoModalBody').empty();
+            // Open modal with data
+            $('#studentInfoModalLabel').text(`${type} - ${section} - ${gender == 'all' ? 'All' : gender}`);
+                const table = $('<table class="table table-striped table-bordered table-hover"></table>');
+                const thead = $('<thead class="thead-dark"></thead>');
+                const tbody = $('<tbody></tbody>');
+                const trHead = $('<tr></tr>');
+                trHead.append('<th scope="col">#</th>');
+                trHead.append('<th scope="col">ID</th>');
+                trHead.append('<th scope="col">Name</th>');
+                trHead.append('<th scope="col">Section</th>');
+                trHead.append('<th scope="col">Type</th>');
+                trHead.append('<th scope="col">Gender</th>');
+                trHead.append('<th scope="col">Campus</th>');
+                thead.append(trHead);
+                response.students.forEach((student, index) => {
+                    const tr = $('<tr></tr>');
+                    tr.append(`<td>${index + 1 || '-'}</td>`);
+                    tr.append(`<td>${student.student_id || '-'}</td>`);
+                    tr.append(`<td>${student.student_name || '-'}</td>`);
+                    tr.append(`<td>${student.section || '-'}</td>`);
+                    tr.append(`<td>${student.coaching_type || '-'}</td>`);
+                    tr.append(`<td>${student.gender || '-'}</td>`);
+                    tr.append(`<td>${student.branch.name || '-'}</td>`);
+                    tbody.append(tr);
+                });
+                table.append(thead);
+                table.append(tbody);
+                $('#studentInfoModalBody').append(table);
+            $('#studentInfoModal').modal('show');
+        },
+        error: function(xhr) {
+            console.log("Error:", xhr.responseText);
+        }
+    });
+});
+</script>
+    
+@endsection
+
+
+
+
+
+
+
+
+
+
+
+
+{{-- @extends('layouts.app')
  @section('title', 'Dashboard')
  @section('main')
  <style>
@@ -78,14 +270,7 @@
       <div class="col-md-6 mb-3">
         <div class="ibox-content">
           <h5 class="col-black">Branch Students</h5>
-            {{-- <ul class="m-0 p-0">
-              @foreach($branches as $branch)
-                  <li class="list-item list-group-item">
-                  <h6 class="col-black">{{ $branch->name }}</h6>
-                  <span class="col-black font-16">{{ $branch->student->count() }}</span>
-              </li>       
-              @endforeach  
-            </ul> --}}
+
             <div id="chart1"></div>
         </div> 
       </div>
@@ -93,14 +278,7 @@
       <div class="col-md-6 mb-3">
         <div class="ibox-content">
           <h5 class="col-black">Coaching Type Students</h5>
-            {{-- <ul class="m-0 p-0">
-              @foreach($students->groupBy('coaching_type') as $key => $coaching_type)
-                  <li class="list-item list-group-item">
-                  <h6 class="col-black">{{ $key }}</h6>
-                  <span class="col-black font-16">{{ $coaching_type->count() }}</span>
-              </li>       
-              @endforeach  
-            </ul> --}}
+
             <div id="chart2"></div>
 
         </div> 
@@ -147,7 +325,7 @@
             bar: {
                 columnWidth: '60%',
                 dataLabels: {
-                    position: 'top', // top, center, bottom
+                    position: 'top', 
                 },
             }
         },
@@ -366,7 +544,7 @@ var options = {
     colors: ["#5c15e0"],
     grid: {
         padding: {
-            top: 35,        // Space for data labels
+            top: 35,    
         }
     },
     plotOptions: {
@@ -382,7 +560,7 @@ var options = {
         formatter: function (val) {
             return val;
         },
-        offsetY: 0,       // Slightly closer to bars
+        offsetY: 0,       
         style: {
             fontSize: '12px',
             colors: ["#ffffff"]
@@ -453,10 +631,10 @@ var options = {
                 return val;
             }
         },
-        min: 0,                    // Always start from 0
-        forceNiceScale: true,      // Auto-calculate nice intervals
-        tickAmount: 6,             // Maximum 6 axis fractions
-        decimalsInFloat: 0,        // Whole numbers only
+        min: 0,                   
+        forceNiceScale: true,      
+        tickAmount: 6,             
+        decimalsInFloat: 0,        
     },
     title: {
         text: 'Branches Vs Staff',
@@ -475,4 +653,4 @@ chart.render();
 
 </script>
 
-@endsection
+@endsection --}}
