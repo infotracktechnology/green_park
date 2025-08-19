@@ -68,8 +68,8 @@
                                         Get on your mobile - Download now
                                     </p>
                                     <p>
-                                        <a href="#" target="_blank"><img src="https://cdndataicici.myclassboard.com/Assets/img/ICICI-googleapp.png" class="img-fluid"></a>
-                                        <a href="#" target="_blank"><img src="https://cdndataicici.myclassboard.com/Assets/img/ICICI-Iosapp.png" class="img-fluid"></a>
+                                        <a href="https://play.google.com/store/apps/details?id=com.gpcc.gpcc" target="_blank"><img src="https://cdndataicici.myclassboard.com/Assets/img/ICICI-googleapp.png" class="img-fluid"></a>
+                                        <a href="https://apps.apple.com/app/id6748722000" target="_blank"><img src="https://cdndataicici.myclassboard.com/Assets/img/ICICI-Iosapp.png" class="img-fluid"></a>
                                     </p>
                                 </div>
                             </div>
