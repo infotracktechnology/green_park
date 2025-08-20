@@ -14,21 +14,44 @@ use App\Models\Staff;
 
 class HomeController extends Controller
 {
-    public function index(Request $request)
-    {
-        $branchs = Branch::all();
-        $students = Student::all();
-        $branchvsStaff = [];
-        $branchs->each(function ($branch) use (&$branchvsStaff) {
-            $branchvsStaff[$branch->name] = Staff::where('branch_id', $branch->id)
-                ->count();
-        });
-        if ($request->has('academic_year')) {
-            DB::table('academic_year')->update(['active' => 0]);
-            AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
-        }
-        return view('home',compact('branchs', 'students', 'branchvsStaff'));
+    // public function index(Request $request)
+    // {
+    //     $branchs = Branch::all();
+    //     $students = Student::all();
+    //     $branchvsStaff = [];
+    //     $branchs->each(function ($branch) use (&$branchvsStaff) {
+    //         $branchvsStaff[$branch->name] = Staff::where('branch_id', $branch->id)
+    //             ->count();
+    //     });
+    //     if ($request->has('academic_year')) {
+    //         DB::table('academic_year')->update(['active' => 0]);
+    //         AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
+    //     }
+    //     return view('home',compact('branchs', 'students', 'branchvsStaff'));
+    // }
+
+    public function index(Request $request){
+        $data = Student::when(auth()->user()->branch, function ($query) {
+            $query->where('campus', auth()->user()->branch);
+        })
+            ->select(
+                'coaching_type',
+                'section',
+                DB::raw("SUM(CASE WHEN gender = 'Male' THEN 1 ELSE 0 END) as boys_count"),
+                DB::raw("SUM(CASE WHEN gender = 'Female' THEN 1 ELSE 0 END) as girls_count"),
+                DB::raw("COUNT(*) as total_count")
+            )
+            ->groupBy('coaching_type', 'section')
+            ->orderBy('coaching_type')
+            ->orderBy('section')
+            ->get()
+            ->groupBy('coaching_type');
+            $boys = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Male')->count();
+            $girls = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Female')->count();
+            $total = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->count();
+        return view('home', compact('data', 'boys', 'girls', 'total'));
     }
+    
 
     public function parent_concern(Request $request)
     {
@@ -173,6 +196,38 @@ class HomeController extends Controller
     public function notify(FcmServiceProvider  $fcm)
     {
         
+    }
+
+    public function dashboardGender(Request $request)
+    {
+        $user = auth()->user();
+        $query = Student::with('branch')->select('student_id', 'student_name','section','coaching_type','gender','campus')->when(auth()->user()->branch, function ($query) {
+            $query->where('campus', auth()->user()->branch);
+        });
+        if($request->has('type')) {
+            $query->where('coaching_type', $request->type);
+        }
+
+        if($request->has('section')) {
+            if($request->section == '-') {
+                $query->where('section', '=', '');
+            } else {
+            $query->where('section', $request->section);
+            }
+        }
+        if($request->has('gender')) {
+            if($request->gender == 'all') {
+                
+            } else{
+            $query->where('gender', $request->gender);
+            }
+        }
+
+        $students = $query->get();
+
+        
+        return response()->json(['students' => $students, 'data' => $request->all(),'user' => $user]);
+
     }
 
 
