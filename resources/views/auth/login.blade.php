@@ -47,7 +47,7 @@
     </div>
 
   
-        <div class="container-fluid" style="background-image: url('https://cdndataicici.myclassboard.com/Assets/img/ICICI-bg.png'); background-size: 100% 100%;">
+        <div class="container-fluid" style="background-image: url('{{asset('img/home-bg.png')}}'); background-size: 100% 100%;">
             <div class="row" style="padding-bottom: 140px;">
                 <div class="col-md-7">
                     <div class="mt-3">
