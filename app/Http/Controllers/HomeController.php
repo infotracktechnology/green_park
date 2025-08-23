@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
+use App\Models\Announcement;
 use App\Models\Options;
 use App\Models\Student;
 use App\Models\Branch;
@@ -10,26 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Providers\FcmServiceProvider;
 use App\Models\Staff;
+use Carbon\Carbon;
 //use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $branchs = Branch::all();
-    //     $students = Student::all();
-    //     $branchvsStaff = [];
-    //     $branchs->each(function ($branch) use (&$branchvsStaff) {
-    //         $branchvsStaff[$branch->name] = Staff::where('branch_id', $branch->id)
-    //             ->count();
-    //     });
-    //     if ($request->has('academic_year')) {
-    //         DB::table('academic_year')->update(['active' => 0]);
-    //         AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
-    //     }
-    //     return view('home',compact('branchs', 'students', 'branchvsStaff'));
-    // }
-
     public function index(Request $request){
         $data = Student::when(auth()->user()->branch, function ($query) {
             $query->where('campus', auth()->user()->branch);
@@ -49,7 +35,12 @@ class HomeController extends Controller
             $boys = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Male')->count();
             $girls = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Female')->count();
             $total = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->count();
-        return view('home', compact('data', 'boys', 'girls', 'total'));
+
+            $staffs = collect(Staff::select('department')->when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->get())->groupBy('department');
+
+            $activities = Announcement::when(auth()->user()->branch, function ($query) {$query->whereRaw('FIND_IN_SET(?, branch)', [auth()->user()->branch]);})->whereBetween('created_at', [Carbon::now()->subDays(30)->startOfDay(),Carbon::now()->endOfDay(),])->get();
+            
+        return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'activities'));
     }
     
 
@@ -226,8 +217,32 @@ class HomeController extends Controller
         $students = $query->get();
 
         
-        return response()->json(['students' => $students, 'data' => $request->all(),'user' => $user]);
+        return response()->json(['students' => $students]);
 
+    }
+
+    public function dashboardStaff(Request $request)
+    {
+        $user = auth()->user();
+        $query = Staff::with('branch')->select('name','gender','department','school_initial','designation','branch_id')->when(auth()->user()->branch, function ($query) {
+            $query->where('branch_id', auth()->user()->branch);
+        });
+        if($request->has('department')) {
+            $query->where('department', $request->department);
+        }
+
+        $staffs = $query->get();
+        return response()->json(['staffs' => $staffs]);
+    }
+
+    public function dashboardAnnouncement(Request $request){
+        $start_date = $request->start_date ? Carbon::createFromFormat('Y-m-d H:i', $request->start_date)->format('Y-m-d H:i:s') : Carbon::now()->startOfDay()->format('Y-m-d H:i:s');
+        $end_date = $request->end_date ? Carbon::createFromFormat('Y-m-d H:i', $request->end_date)->endOfDay()->format('Y-m-d H:i:s') : Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
+        $query = Announcement::when(auth()->user()->branch, function ($query) {
+            $query->whereRaw('FIND_IN_SET(?, branch)', [auth()->user()->branch]);
+        });
+        $announcements = $query->get();
+        return response()->json(['announcements' => $announcements]);
     }
 
 
