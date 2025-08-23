@@ -19,5 +19,9 @@ class Announcement extends Model
     {
         return $this->belongsTo(Branch::class, 'branch', 'id');
     }
+    protected function serializeDate(\DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
     
 }
