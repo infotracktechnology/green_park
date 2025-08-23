@@ -54,12 +54,12 @@
                         <div class="container">
                             <div class="row mt-5">
                                 <div class="col-md-12">
-                                    {{-- <h1 class="text-white head-text mt-5">
+                                    <h1 class="text-white head-text mt-5">
                                         GREEN PARK<br>
-                                        COACHING CENTRE<br>
+                                        {{-- COACHING CENTRE<br>
                                         WHEN YOU CAN<br>
-                                        DO MORE?
-                                    </h1> --}}
+                                        DO MORE? --}}
+                                    </h1>
                                 </div>
                             </div>
                             <div class="row">

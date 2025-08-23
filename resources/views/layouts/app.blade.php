@@ -139,8 +139,8 @@
                 <li><a href="{{ route('staff.index') }}" class="nav-link"> Staff</a></li>
                 <li><a href="{{ route('workshift.index') }}" class="nav-link">Staff Shift</a></li>
                 <li><a href="{{ route('workshift.assign') }}" class="nav-link"> Shift Assign</a></li>
+                <li><a href="{{ route('biometric.report') }}" class="nav-link"> Biometric Daily Report</a></li>
                 <li><a href="{{ route('staff.class') }}" class="nav-link"> Class Assign</a></li>
-               
               </ul>
             </li>
             <li class="dropdown">

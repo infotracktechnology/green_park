@@ -32,21 +32,21 @@ class Staff extends Model
 	{
 		return $this->belongsTo(Workshift::class, 'shiftid');
 	}
-	public function AttendedShift($date = null,$sno=1){
-		$date = $date ? Carbon::parse($date) : Carbon::today();
-		$suffix = $date->format('n_Y');
-		$ontime = $sno == 1 ? $this->shift->session1_ontime : $this->shift->session2_ontime;
-		$ontime = Carbon::parse($date->format('Y-m-d') . ' ' . $ontime);
-		$attended = DB::connection('epushserver')->table("DeviceLogs_$suffix")->where('UserId', $this->biometric_no)->whereDate('LogDate', $date)->first();
-		if($attended){
-			$logtime = Carbon::parse($attended->LogDate);
-			if($ontime->lte($logtime)){
-				return "P";
-			}
-			return "L";
-		}
-		return "A";
-	}
+	// public function AttendedShift($sno=1,$date = null){
+	// 	$date = $date ? Carbon::parse($date) : Carbon::now();
+	// 	$suffix = $date->format('n_Y');
+	// 	$ontime = $sno == 1 ? $this->shift->session1_ontime : $this->shift->session2_ontime;
+	
+	// 	$attended = DB::connection('epushserver')->table("DeviceLogs_$suffix")->where('UserId', $this->biometric_no)->whereDate('LogDate', $date)->first();
+
+	// 	if($attended){
+	// 		$session = DB::connection('epushserver')->table("DeviceLogs_$suffix")->where('UserId', $this->biometric_no)->whereDate('LogDate', $date)->whereTime('LogDate', '<=', $ontime)->first();
+	// 		return $session ? "P" : "L";
+	// 	}
+
+	// 	return "A";
+	// }
+
 
 	public static function boot()
 	{

@@ -9,7 +9,7 @@ use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ImportController;
-
+use Carbon\Carbon;
 class StaffProfileController extends Controller
 {
 
@@ -227,4 +227,36 @@ class StaffProfileController extends Controller
 
         return redirect()->back()->with('error', 'Staff not found!');
     }
+  public function biometric_report(Request $request)
+{
+    $staffs = [];
+
+    if ($request->filled(['date', 'branch_id'])) {
+        $date = Carbon::parse($request->date);
+        $suffix = $date->format('n_Y');
+        
+        if(!DB::connection('epushserver')->getSchemaBuilder()->hasTable("DeviceLogs_$suffix")){
+               return to_route('biometric.report')->with('error', "Biometric data not available for ".$date->format('F Y'));
+        }
+    
+        $staffs = Staff::where('branch_id', $request->branch_id)->get()->map(function ($staff) use ($date, $suffix) {
+                $logs = DB::connection('epushserver')->table("DeviceLogs_$suffix")->where('UserId', $staff->biometric_no)->whereDate('LogDate', $date)->selectRaw("TIME(LogDate) as log_time, LogDate")->get();
+
+                $firstIn = $logs->first()?->log_time ?? '-';
+                $lastOut = $logs->count() > 1 ? $logs->last()->log_time : '-';
+                $timeLogs = $logs->pluck('log_time')->implode(', ');
+
+                $status = 'A';
+                if ($logs->isNotEmpty()) {
+                    $firstLogTime = strtotime($logs->first()->log_time);
+                    $onTime = strtotime($staff->shift->session1_ontime);
+                    $status = $firstLogTime <= $onTime ? 'P' : 'L';
+                }
+                
+                return ['department' => $staff->department,'name' => $staff->name,'biometric_no' => $staff->biometric_no,'first_in' => $firstIn,'last_out' => $lastOut,'status' => $status,'time_logs' => $timeLogs ?: '-'];
+            });
+    }
+    
+    return view('staff.biometric_report', compact('staffs'));
+}
 }
