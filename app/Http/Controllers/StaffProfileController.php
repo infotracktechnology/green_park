@@ -249,7 +249,7 @@ class StaffProfileController extends Controller
                 $status = 'A';
                 if ($logs->isNotEmpty()) {
                     $firstLogTime = strtotime($logs->first()->log_time);
-                    $onTime = strtotime($staff->shift->session1_ontime);
+                    $onTime = strtotime($staff?->shift?->session1_ontime);
                     $status = $firstLogTime <= $onTime ? 'P' : 'L';
                 }
                 
