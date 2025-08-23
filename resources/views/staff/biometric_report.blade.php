@@ -24,7 +24,7 @@
                                 <div class="row mb-3">
                                     <div class="col-lg-4">
                                         <label for="branch">Branch</label>
-                                        <select name="branch_id" id="branch" class="form-control" required>
+                                        <select name="branch_id" id="branch" class="form-control form-control-sm" required>
                                             <option value="">Select Branch</option>
                                             @foreach ($branches as $branch)
                                             <option value="{{ $branch->id }}" @selected($branch->id == request('branch_id'))>
@@ -37,7 +37,7 @@
                                     <div class="col-lg-4">
                                         <label for="date">Date</label>
                                         <input type="date" name="date" id="date" value="{{ request('date') }}" 
-                                               class="form-control" required />
+                                               class="form-control form-control-sm" required />
                                     </div>
                                     
                                     <div class="col-lg-2 d-flex align-items-end">
@@ -56,7 +56,7 @@
                                                 <th>First In</th>
                                                 <th>Last Out</th>
                                                 <th>Status</th>
-                                                <th>Time Logs</th>
+                                                <th>Biometric Logs</th>
                                             </tr>
                                         </thead>
                                         <tbody>
