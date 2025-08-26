@@ -115,9 +115,9 @@
               <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a>
             </li>
             <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students Details </span></a>
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
-                <li><a href="{{ route('student.index') }}" class="nav-link">Add Students</a></li>
+                <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
                 <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
                 {{-- <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a></li> --}}
@@ -125,7 +125,7 @@
             </li>
 
             <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student App Menu</span></a>
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
               <ul class="dropdown-menu">
                 {{-- <li><a href="{{ route('studentmenu.branch') }}" class="nav-link"> Branch Assign</a></li> --}}
                 <li><a href="{{ route('studentmenu.type') }}" class="nav-link"> Type Assign</a></li>
