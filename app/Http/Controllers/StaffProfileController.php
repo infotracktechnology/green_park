@@ -246,14 +246,19 @@ class StaffProfileController extends Controller
                 $lastOut = $logs->count() > 1 ? $logs->last()->log_time : '-';
                 $timeLogs = $logs->pluck('log_time')->implode(', ');
 
-                $status = 'A';
+                  $session1 = 'A';
+                  $session2 = 'A';
+
                 if ($logs->isNotEmpty()) {
                     $firstLogTime = strtotime($logs->first()->log_time);
                     $onTime = strtotime($staff?->shift?->session1_ontime);
-                    $status = $firstLogTime <= $onTime ? 'P' : 'L';
+                    $session1 = 'P';
+                    if($staff?->shift?->no_session == 2){
+                        $session2 = strtotime($lastOut) >= strtotime($staff?->shift?->session2_endtime) ? 'P' : 'A';
+                    }
                 }
                 
-                return ['department' => $staff->department,'name' => $staff->name,'biometric_no' => $staff->biometric_no,'first_in' => $firstIn,'last_out' => $lastOut,'status' => $status,'time_logs' => $timeLogs ?: '-'];
+                return ['branch' => $staff->branch->name,'department' => $staff->department,'school_initial'=> $staff->school_initial,'name' => $staff->name,'biometric_no' => $staff->biometric_no,'first_in' => $firstIn,'last_out' => $lastOut,'session1' => $session1,'session2' => $session2,'time_logs' => $timeLogs ?: '-','date' => $date->format('d/m/Y')];
             });
     }
     

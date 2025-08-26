@@ -30,10 +30,13 @@ class Student extends Authenticatable
     {
         return $this->belongsTo(Branch::class, 'campus', 'id');
     }
-    function room()
+   
+
+    function attendance()
     {
-        return $this->belongsTo(HostelRoom::class, 'room_id', 'id');
+        return $this->belongsTo(Attendance::class, 'student_id', 'id');
     }
+
     public static function boot()
     {
         parent::boot();

@@ -73,7 +73,7 @@
                 <div class="card-body">
                 <div class="row">
                   <form action="{{ route('parent_concern') }}" class="col-md-12" method="POST" enctype="multipart/form-data">
-                    
+                    @csrf
                     <div class="form-group">
                         <h4 x-text="details.category"></h4>
                         <h5 x-text="details.concern_type"></h5>
@@ -95,7 +95,7 @@
                 
                     <div class="form-group" x-show="details.status === 'Closed'" x-transition>
                         <label for="progress"><small>Remark</small></label>
-                        <input type="text" name="progress" id="progress" class="form-control form-control-sm" placeholder="Progress Report" x-model="details.progress">
+                        <input type="text" name="remark" id="progress" class="form-control form-control-sm" placeholder="Progress Report" x-model="details.progress">
                     </div>
                 
                     <div class="form-group" x-show="details.status === 'Closed'" x-transition>

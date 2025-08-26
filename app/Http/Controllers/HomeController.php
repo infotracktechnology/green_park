@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
 use App\Models\Announcement;
+use App\Models\Chairmanvideo;
 use App\Models\Options;
 use App\Models\Student;
 use App\Models\Branch;
@@ -12,35 +13,38 @@ use Illuminate\Support\Facades\DB;
 use App\Providers\FcmServiceProvider;
 use App\Models\Staff;
 use Carbon\Carbon;
-//use Illuminate\Support\Facades\Session;
+use App\Models\Attendance;
+use App\Models\ParentConcern;
+
 
 class HomeController extends Controller
 {
     public function index(Request $request){
-        $data = Student::when(auth()->user()->branch, function ($query) {
-            $query->where('campus', auth()->user()->branch);
-        })
-            ->select(
-                'coaching_type',
-                'section',
-                DB::raw("SUM(CASE WHEN gender = 'Male' THEN 1 ELSE 0 END) as boys_count"),
-                DB::raw("SUM(CASE WHEN gender = 'Female' THEN 1 ELSE 0 END) as girls_count"),
-                DB::raw("COUNT(*) as total_count")
-            )
-            ->groupBy('coaching_type', 'section')
-            ->orderBy('coaching_type')
-            ->orderBy('section')
-            ->get()
-            ->groupBy('coaching_type');
-            $boys = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Male')->count();
-            $girls = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Female')->count();
-            $total = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->count();
+        $data = Branch::when(auth()->user()->branch, function ($query) {$query->where('id', auth()->user()->branch);})->get();
+        
+        $boys = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Male')->count();
 
-            $staffs = collect(Staff::select('department')->when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->get())->groupBy('department');
+        $girls = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Female')->count();
 
-            $activities = Announcement::when(auth()->user()->branch, function ($query) {$query->whereRaw('FIND_IN_SET(?, branch)', [auth()->user()->branch]);})->whereBetween('created_at', [Carbon::now()->subDays(30)->startOfDay(),Carbon::now()->endOfDay(),])->get();
-            
-        return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'activities'));
+        $total = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->count();
+
+        $present = Attendance::when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->where('status', 'P')->where('attendance_date', date('Y-m-d'))->distinct('student_id')->count();
+
+        $staffs = collect(Staff::select('department')->when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->get())->groupBy('department');
+
+        $concerns = ParentConcern::all();
+
+        $announcement = $data->map(function($item) {
+          $count = Announcement::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count();
+          return ['branch' => $item->name, 'count' => $count];
+        });
+
+         $chairman = $data->map(function($item) {
+          $count = Chairmanvideo::where('academic_year', $this->academic_year)->where('branch_id', 'like', "%{$item->id}%")->count();
+          return ['branch' => $item->name, 'count' => $count];
+        });
+    
+     return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
     }
     
 
@@ -70,10 +74,10 @@ class HomeController extends Controller
                     $updateData['file'] = 'uploads/concern/'.$fileName;
                 }
 
-                $updateData['progress'] = $request->progress;
+                $updateData['remark'] = $request->remark;
             }
 
-            DB::table('parent_concern')->where('id', $request->id)->update($updateData);
+           ParentConcern::where('id', $request->id)->update($updateData);
 
             return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
         }
@@ -192,13 +196,8 @@ class HomeController extends Controller
     public function dashboardGender(Request $request)
     {
         $user = auth()->user();
-        $query = Student::with('branch')->select('student_id', 'student_name','section','coaching_type','gender','campus')->when(auth()->user()->branch, function ($query) {
-            $query->where('campus', auth()->user()->branch);
-        });
-        if($request->has('type')) {
-            $query->where('coaching_type', $request->type);
-        }
-
+        $query = Student::with('branch')->select('student_id', 'student_name','section','coaching_type','gender','campus')->where('campus', $request->campus);
+       
         if($request->has('section')) {
             if($request->section == '-') {
                 $query->where('section', '=', '');
