@@ -58,6 +58,8 @@
                                                 <th>Staff Initial</th>
                                                 <th>First In</th>
                                                 <th>Last Out</th>
+                                                <th>Day</th>
+                                                <th>Total Hours</th>
                                                 <th>First Session</th>
                                                 <th>Second Session</th>
                                                 <th>Biometric Logs</th>
@@ -75,6 +77,8 @@
                                                 <td>{{ $staff['school_initial'] }}</td>
                                                 <td>{{ $staff['first_in'] }}</td>
                                                 <td>{{ $staff['last_out'] }}</td>
+                                                <td>{{ $staff['day'] }}</td>
+                                                <td>{{ $staff['hours'] }}</td>
                                                 <td>
                                                     <span class="badge badge-{{ $staff['session1'] == 'P' ? 'success' : 'danger' }}">
                                                         {{ $staff['session1'] }}
@@ -114,7 +118,6 @@ $(document).ready(function() {
         dom: "Bfrtip",
         buttons: ["excel"],
         pageLength: 25,
-        responsive: true
     });
 });
 </script>
