@@ -36,7 +36,7 @@
                                     
                                     <div class="col-lg-4">
                                         <label for="date">Date</label>
-                                        <input type="date" name="date" id="date" value="{{ request('date') }}" 
+                                        <input type="date" name="date" id="date" value="{{ request('date')  ?? date('Y-m-d') }}" 
                                                class="form-control form-control-sm" required />
                                     </div>
                                     
@@ -50,12 +50,16 @@
                                         <thead>
                                             <tr>
                                                 <th>S.NO</th>
+                                                <th>Branch</th>
+                                                <th>Date</th>
                                                 <th>Department</th>
                                                 <th>Name</th>
                                                 <th>Biometric No</th>
+                                                <th>Staff Initial</th>
                                                 <th>First In</th>
                                                 <th>Last Out</th>
-                                                <th>Status</th>
+                                                <th>First Session</th>
+                                                <th>Second Session</th>
                                                 <th>Biometric Logs</th>
                                             </tr>
                                         </thead>
@@ -63,14 +67,22 @@
                                             @foreach($staffs as $staff)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $staff['branch'] }}</td>
+                                                <td>{{ $staff['date'] }}</td>
                                                 <td>{{ $staff['department'] }}</td>
                                                 <td>{{ $staff['name'] }}</td>
                                                 <td>{{ $staff['biometric_no'] }}</td>
+                                                <td>{{ $staff['school_initial'] }}</td>
                                                 <td>{{ $staff['first_in'] }}</td>
                                                 <td>{{ $staff['last_out'] }}</td>
                                                 <td>
-                                                    <span class="badge badge-{{ $staff['status'] == 'P' ? 'success' : ($staff['status'] == 'L' ? 'warning' : 'danger') }}">
-                                                        {{ $staff['status'] }}
+                                                    <span class="badge badge-{{ $staff['session1'] == 'P' ? 'success' : 'danger' }}">
+                                                        {{ $staff['session1'] }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-{{ $staff['session2'] == 'P' ? 'success' : 'danger' }}">
+                                                        {{ $staff['session2'] }}
                                                     </span>
                                                 </td>
                                                 <td>{{ $staff['time_logs'] }}</td>

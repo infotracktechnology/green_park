@@ -211,6 +211,15 @@
               </ul>
             </li>
 
+             <li class="dropdown">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
+              <ul class="dropdown-menu">
+                {{-- <li><a href="{{ route('feetype') }}" class="nav-link">Log Report</a></li> --}}
+              </ul>
+            </li>
+
+            
+
             
 
           </ul>

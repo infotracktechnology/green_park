@@ -148,6 +148,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::resource('workshift', App\Http\Controllers\WorkshiftController::class);
     Route::match(['get', 'post'],'/shiftwork/assign', [ App\Http\Controllers\WorkshiftController::class, 'assign'])->name('workshift.assign');
     Route::get('biometric/report', [App\Http\Controllers\StaffProfileController::class, 'biometric_report'])->name('biometric.report');
+    Route::group(['prefix' => 'report','as' => 'report.'], function () {
+        Route::get('/log', [App\Http\Controllers\ReportController::class, 'LogReport'])->name('log');
+    });
 });
 
 #students routes

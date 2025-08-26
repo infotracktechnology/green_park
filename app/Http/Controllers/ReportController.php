@@ -61,44 +61,9 @@ class ReportController extends Controller
         return view('report.section_exam', compact('sections', 'tests', 'test_name'));
     }
 
-    // function GenerateOverall($results, $test_name, $section, $testIds) {
-    //     $testids = implode(',', $testIds);
-    //     $pdf = new TCPDF();
-    //     $pdf->SetCreator('PDF-Laravel');
-    //     $pdf->SetTitle('Overall Report');
-    //     $pdf->SetSubject('Overall Report');
-    //     $pdf->SetKeywords('example, test, guide');
-    //     $pdf->SetMargins(3, 10, 15);
-    //     $pdf->setAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-    //     $pdf->AddPage();
-    //     $html = '<!DOCTYPE html><html><head><style>body { font-size: 9.5px; font-family:Verdana, Geneva, sans-serif;margin: 0; padding: 0; } table { border-collapse: collapse;border-color: black; } table th { font-weight:bold;text-align: center;}</style></head><body><h3>GREEN PARK COACHING CENTRE, NAMAKKAL</h3><h4>'.$test_name.'</h4><h4>Sec: '.$section.'</h4><table cellspacing="0" cellpadding="1" border="1" nobr="true">';
-    //     $html .= '<thead><tr>';
-    //     $html .= '<th>S.no</th><th>Roll No</th><th>Q Type</th><th width="20%">Name</th>';
-      
-    //     $subjects = explode(',', $results[0]->subjects);
-    //     foreach($subjects as $subject) {
-    //         $html .= '<th colspan="4" width="16%">'.$subject.'</th>';
-    //     }
-    //     $html .= '<th>Total</th></tr><tr><th></th><th></th><th></th><th></th>';
-    //     foreach($subjects as $subject) {
-    //         $html .= '<th width="4%">R</th width="4%"><th>W</th width="4%"><th>L</th><th width="4%">T</th>';
-    //     }
-    //     $html .= '<th></th></tr></thead>';
-    //     $html .= '<tbody>';
-    //     foreach($results as $i => $result) {
-    //         $html .= '<tr>';
-    //         $html .= '<td style="text-align: center;">'.($i+1).'</td><td style="text-align: center;">'.$result->student_id.'</td><td style="text-align: center;">'.$result->test_id.'</td><td width="20%">'.$result->student_name.'</td>';
-    //         foreach($subjects as $subject) {
-    //             $marks = DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,subject FROM `exam_answer` where test_id in($testids) and student_id=$result->student_id and subject='$subject'");
-    //             $html .= '<td width="4%" style="text-align: center;">'.$marks[0]->r.'</td><td width="4%" style="text-align: center;">'.$marks[0]->w.'</td><td width="4%" style="text-align: center;">'.$marks[0]->l.'</td><td width="4%" style="text-align: center;">'.$marks[0]->tot.'</td>';
-    //         }
-    //         $html .= '<td style="text-align: center;">'.$result->mark.'</td>';
-    //         $html .= '</tr>';
-    //     }
-    //     $html .= '</tbody></table></body></html>';
-    //     $pdf->writeHTML($html, true, false, false, false, '');
-    //     return $pdf->Output("Overall Report $test_name.pdf", 'D');
-    // }
+    public function LogReport(Request $request) {
+        
+    }
 
 
   

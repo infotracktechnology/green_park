@@ -17,6 +17,14 @@ class Branch extends Model
 		return $this->hasMany(Student::class, 'campus', 'id');
 	}
 
+	public function staff(){
+		return $this->hasMany(Staff::class, 'branch_id', 'id');
+	}
+
+	public function attendance(){
+		return $this->hasMany(Attendance::class, 'branch_id', 'id');
+	}
+
 	public static function boot()
 	{
 		parent::boot();
