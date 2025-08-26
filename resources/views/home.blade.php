@@ -406,29 +406,6 @@
 </div>
 </div>
 
-{{-- <div class="col-md-6">
-  <div class="card shadow-sm border-0 rounded-3">
-    <div class="card-header text-white rounded-top-3">
-      <h4 class="mb-0 fw-bold text-white">Chairmanvideo Overview</h4>
-    </div>
- 
-  <div class="card-body overflow_scrollbar" style="overflow-y: auto; height: 350px">
-    <table class="table table-striped">
-        <tr>
-            <th>Branch</th>
-            <th>Count</th>
-        </tr>
-        @foreach($data as $key => $branchs)
-        <tr>
-            <td>{{ $branchs->name }}</td>
-            <td><a href="{{ route('chairmanvideo.index') }}">  {{ $branchs->chairmanvideo() }}</a></td>
-        </tr>
-        @endforeach
-        
-    </table>
-  </div>
-</div>
-</div> --}}
 
 
 <div class="col-md-6">
@@ -455,6 +432,29 @@
 </div>
 </div>
 
+<div class="col-md-6">
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header text-white rounded-top-3">
+      <h4 class="mb-0 fw-bold text-white">Chairmanvideo Overview</h4>
+    </div>
+ 
+  <div class="card-body">
+    <table class="table table-striped">
+        <tr>
+            <th>Branch</th>
+            <th>Count</th>
+        </tr>
+         @foreach($chairman as $key => $row)
+        <tr>
+            <td>{{ $row['branch'] }}</td>
+            <td><a href="{{ route('chairmanvideo.index') }}">  {{ $row['count'] }}</a></td>
+        </tr>
+        @endforeach
+        
+    </table>
+  </div>
+</div>
+</div>
 
 
 
