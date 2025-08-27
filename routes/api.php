@@ -77,9 +77,11 @@ Route::group(['prefix' => 'v2'], function () {
      Route::post('/announcement', function (Request $request) {
        $announcement = Announcement::find($request->id);
        $student_ids = $announcement->student_ids ? $announcement->student_ids : [];
+       if(!in_array($request->student_id, $student_ids)){
        $student_ids[] = $request->student_id;
        $announcement->student_ids = $student_ids;
        $announcement->save();
+       }
        return response()->json($announcement);
     });
 

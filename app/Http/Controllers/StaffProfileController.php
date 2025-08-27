@@ -227,8 +227,7 @@ class StaffProfileController extends Controller
 
         return redirect()->back()->with('error', 'Staff not found!');
     }
-  public function biometric_report(Request $request)
-{
+  public function biometric_report(Request $request){
     $staffs = [];
 
     if ($request->filled(['date', 'branch_id'])) {
@@ -246,19 +245,24 @@ class StaffProfileController extends Controller
                 $lastOut = $logs->count() > 1 ? $logs->last()->log_time : '-';
                 $timeLogs = $logs->pluck('log_time')->implode(', ');
 
-                  $session1 = $session2 = 'A';
-                  $hours=0;
-                  $day=0.0;
+                $session1 = $session2 = 'A';
+                $hours=0;
+                $day=0.0;
+
                 if ($logs->isNotEmpty()) {
-                    $session1 = strtotime($firstIn) <= strtotime($staff?->shift?->session1_endtime) ? 'P' : 'A';
-                    $day = $session1 == 'P' ? 0.5 : 0;
-                    if($staff?->shift?->no_session == 2){
+                $session1 = strtotime($firstIn) <= strtotime($staff?->shift?->session1_endtime) ? 'P' : 'A';
+                $day = $session1 == 'P' ? 0.5 : 0;
+                if($lastOut != '-'){
                      $session2 = strtotime($lastOut) >= strtotime($staff?->shift?->session2_endtime) ? 'P' : 'A';
-                     $day = ($session1 == 'P' ? 0.5 : 0) + ($session2 == 'P' ? 0.5 : 0);
-                    }
-                    $hours =  $logs->count() > 1 ? Carbon::parse($firstIn)->diffInHours(Carbon::parse($lastOut)) : 0; 
+                     $hours =  Carbon::parse($firstIn)->diffInHours(Carbon::parse($lastOut));
                 }
-                
+                else
+                {
+                    $session2 = strtotime($firstIn) >= strtotime($staff?->shift?->session2_endtime) ? 'P' : 'A';
+                }
+                $day = ($session1 == 'P' ? 0.5 : 0) + ($session2 == 'P' ? 0.5 : 0);
+                }
+
                 return ['branch' => $staff->branch->name,'department' => $staff->department,'school_initial'=> $staff->school_initial,'name' => $staff->name,'biometric_no' => $staff->biometric_no,'first_in' => $firstIn,'last_out' => $lastOut,'session1' => $session1,'session2' => $session2,'time_logs' => $timeLogs ?: '-','date' => $date->format('d/m/Y'),'hours'=>$hours,'day'=>$day];
             });
     }

@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Exam;
-
+use App\Models\Student;
+use App\Models\Announcement;
 
 class ReportController extends Controller
 {
@@ -62,7 +63,15 @@ class ReportController extends Controller
     }
 
     public function LogReport(Request $request) {
-        
+        $students = [];
+        $announcements = [];
+        if($request->has('branch')) {
+            $students = Student::where('campus', $request->branch)->where('coaching_type', $request->coaching_type)->get();
+            $announcements = Announcement::where('branch','like', '%'.$request->branch.'%')->where('coaching_type','like','%'.$request->coaching_type.'%')->get()->map(function ($announcement) use ($students) {
+                return ['title' => $announcement->title, 'seen' => count($announcement->student_ids), 'unseen' => $students->count() - count($announcement->student_ids)];
+            });
+        }
+        return view('report.logreport', compact('students', 'announcements'));
     }
 
 
