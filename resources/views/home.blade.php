@@ -27,11 +27,7 @@
             padding: 15px;
             border-bottom: 1px solid #e9ecef;
         }
-        /* .date-slider {
-            background-color: #e9f7fe;
-            padding: 15px 0;
-            overflow-x: auto;
-        } */
+    
 
         .date-slider-container {
             display: flex;
@@ -312,7 +308,7 @@
 
 
 
-<div class="col-md-6">
+<div class="col-md-4">
   <div class="card shadow-sm border-0 rounded-3">
     <div class="card-header text-white rounded-top-3">
       <h4 class="mb-0 fw-bold text-white">Staff Overview</h4>
@@ -377,7 +373,7 @@
   </div>
 </div>
 
-<div class="col-md-6">
+<div class="col-md-4">
   <div class="card shadow-sm border-0 rounded-3">
     <div class="card-header text-white rounded-top-3">
       <h4 class="mb-0 fw-bold text-white">Concerns</h4>
@@ -408,13 +404,13 @@
 
 
 
-<div class="col-md-6">
+<div class="col-md-4">
   <div class="card shadow-sm border-0 rounded-3">
     <div class="card-header text-white rounded-top-3">
       <h4 class="mb-0 fw-bold text-white">Announcement Overview</h4>
     </div>
  
-  <div class="card-body">
+  <div class="card-body overflow_scrollbar" style="overflow-y: auto; height: 350px">
     <table class="table table-striped">
         <tr>
             <th>Branch</th>
@@ -432,13 +428,13 @@
 </div>
 </div>
 
-<div class="col-md-6">
+<div class="col-md-4">
   <div class="card shadow-sm border-0 rounded-3">
     <div class="card-header text-white rounded-top-3">
       <h4 class="mb-0 fw-bold text-white">Chairmanvideo Overview</h4>
     </div>
  
-  <div class="card-body">
+  <div class="card-body overflow_scrollbar" style="overflow-y: auto; height: 350px">
     <table class="table table-striped">
         <tr>
             <th>Branch</th>
@@ -535,7 +531,7 @@ $(document).ready(function() {
             })
         }
     });
-    $('.students-table').on("click", "td", function() {
+    $('.students-table').on("click", "td", function(){
     
     const section = $(this).data("section") == '' ? '-' : $(this).data("section");
     const campus = $(this).data("campus");

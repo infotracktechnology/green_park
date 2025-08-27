@@ -7,6 +7,7 @@ use App\Models\Student;
 use Illuminate\Support\Facades\View;
 use App\Models\AcademicYear;
 use App\Models\Branch;
+use Illuminate\Support\Facades\Auth;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,7 +29,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $academicyear = AcademicYear::where('active', 1)->get();
-        $branchs = Branch::all();
+        $user = Auth::user();
+        $branchs = Branch::when($user && $user->branch, function ($query) {
+            $query->where('id', $user->branch);
+        })->get();
+
         View::share('academicyear', $academicyear);
         View::share('branches', $branchs);
     }
