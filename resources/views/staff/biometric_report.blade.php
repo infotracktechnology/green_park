@@ -46,7 +46,7 @@
                                 </div>
 
                                 <div class="table-responsive">
-                                    <table class="table table-striped" id="biometric-table">
+                                    <table class="table table-striped" id="biometric-table" style="color: #000;">
                                         <thead>
                                             <tr>
                                                 <th>S.NO</th>
@@ -79,15 +79,11 @@
                                                 <td>{{ $staff['last_out'] }}</td>
                                                 <td>{{ $staff['day'] }}</td>
                                                 <td>{{ $staff['hours'] }}</td>
-                                                <td>
-                                                    <span class="badge badge-{{ $staff['session1'] == 'P' ? 'success' : 'danger' }}">
-                                                        {{ $staff['session1'] }}
-                                                    </span>
+                                                <td class="{{ $staff['session1'] == 'A' ? 'bg-red' : '' }}">
+                                                  {{ $staff['session1'] }}
                                                 </td>
-                                                <td>
-                                                    <span class="badge badge-{{ $staff['session2'] == 'P' ? 'success' : 'danger' }}">
-                                                        {{ $staff['session2'] }}
-                                                    </span>
+                                                <td class="{{ $staff['session2'] == 'A' ? 'bg-red' : '' }}">
+                                                  {{ $staff['session2'] }}
                                                 </td>
                                                 <td>{{ $staff['time_logs'] }}</td>
                                             </tr>
@@ -113,12 +109,38 @@
 <script src="{{asset('bundles/datatables/export-tables/buttons.print.min.js')}}"></script>
 
 <script>
-$(document).ready(function() {
-    $("#biometric-table").DataTable({
-        dom: "Bfrtip",
-        buttons: ["excel"],
-        pageLength: 25,
-    });
+$(document).ready(function () {
+  $("#biometric-table").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+      {
+        extend: "excelHtml5",
+        customize: function (xlsx) {
+          const sheet = xlsx.xl.worksheets['sheet1.xml'];
+          const styles = xlsx.xl['styles.xml'];
+          
+          const fills = $('fills', styles);
+          fills.attr('count', +fills.attr('count') + 1)
+            .append('<fill><patternFill patternType="solid"><fgColor rgb="FFFF0000"/></patternFill></fill>');
+
+          const cellXfs = $('cellXfs', styles);
+          const newXfIndex = cellXfs.children().length;
+          cellXfs.attr('count', newXfIndex + 1)
+            .append('<xf xfId="0" applyFill="1" fillId="' + (fills.children().length - 1) + '"/>');
+
+          function colorColumn(col) {
+            $('row c[r^="' + col + '"]', sheet).each(function () {
+              const val = $('is t', this).text() || $('v', this).text();
+              if (val === "A") $(this).attr('s', newXfIndex);
+            });
+          }
+          ["L", "M"].forEach(colorColumn);
+        }
+      }
+    ],
+    pageLength: 25,
+  });
 });
+
 </script>
 @endsection

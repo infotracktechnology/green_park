@@ -13,20 +13,20 @@
             padding: 0;
         }
         
-        h1, h3 {
+        h3, h5 {
             text-align: center;
-            margin: 15px 0;
+            margin: 10px 0;
         }
         
         table {
             border-collapse: collapse;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 0px;
         }
         
         .table th, .table thead th, .table td {
             border: 1px solid #2e2e2e;
-            padding: 2px 5px;
+            padding: 0px 4px;
             font-size: 12px;
             text-align: center;
         }
@@ -44,8 +44,8 @@
         }
         
         .student-info {
-            font-size: 16px;
-            margin-bottom: 20px;
+            font-size: 13px;
+            margin-bottom: 10px;
         }
         
         .student-info td {
@@ -60,8 +60,7 @@
         }
         
         .answer-table {
-            width: calc(25% - 10px);
-            margin: 5px;
+            margin: 2px;
             box-sizing: border-box;
         }
         
@@ -78,8 +77,8 @@
     </style>
 </head>
 <body>
-    <h1>GREEN PARK COACHING CENTRE, NAMAKKAL</h1>
-    <h3>CHECK THE ANSWERS THAT YOU MARKED</h3>
+    <h3>GREEN PARK COACHING CENTRE, NAMAKKAL</h3>
+    <h5>CHECK THE ANSWERS THAT YOU MARKED</h5>
     
     <table class="student-info">
         <tr>
@@ -97,7 +96,7 @@
     
     <div class="tables-container">
         @foreach($answers as $answer)
-        <div class="answer-table">
+        <div class="answer-table" style="width: {{ (100/$answers->count()) - 2 }}%;">
             <table class="table">
                 <tr>
                     <th>QNo</th>
@@ -129,7 +128,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="text/javascript">
-        var opt = {
+      var opt = {
             margin: [0.5, 0.5, 0.5, 0.5],
             filename: "{{ $exam->name }}-{{ $exam->exam_date }}.pdf",
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
