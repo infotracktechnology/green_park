@@ -11,6 +11,7 @@ use App\Models\TimetableAssign;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\SickRoomEntry;
+use App\Models\Exam;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -100,6 +101,20 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($results);
     });
 
+    Route::get('/marksheet/{student_id}/{exam}', function (Request $request, $student_id, Exam $exam) {
+         $student = Student::where('student_id', $student_id)->select('student_name', 'user_name')->first();
+         $answers = DB::table('exam_answer')->where('test_id', $exam->id)->where('student_id', $student_id)->orderBy('q_no')->get()->map(function ($answer) {
+             return [
+                 'q_no' => $answer->q_no,
+                 'answer_key' => $answer->answer_key,
+                 'answer' => $answer->answer,
+                 'mark' => $answer->answer_key == 'DEL' ? 'DEL' : ($answer->mark == 4 ? 'C' : ($answer->mark == -1 ? 'W' : 'L'))
+             ];
+         })->chunk(45);
+
+         return response()->json(['answers' => $answers,'subject'=>$exam->name,'exam_date'=>$exam->exam_date,'test_id'=>$exam->id,'student'=>$student]);
+    });
+    
     Route::get('/questionkey/{student_id}', function (Request $request,$student_id) {
         $student = Student::where('student_id', $student_id)->first();
         $questionkey = $student->questionkey();
