@@ -65,13 +65,18 @@ class ReportController extends Controller
     public function LogReport(Request $request) {
         $students = [];
         $announcements = [];
+        $exams =[];
         if($request->has('branch')) {
             $students = Student::where('campus', $request->branch)->where('coaching_type', $request->coaching_type)->get();
             $announcements = Announcement::where('branch','like', '%'.$request->branch.'%')->where('coaching_type','like','%'.$request->coaching_type.'%')->get()->map(function ($announcement) use ($students) {
                 return ['title' => $announcement->title, 'seen' => count($announcement->student_ids), 'unseen' => $students->count() - count($announcement->student_ids)];
             });
+            $exams = Exam::where('branch_id','like', '%'.$request->branch.'%')->where('coaching_type','like','%'.$request->coaching_type.'%')->get()->map(function ($exam) use ($students) {
+                $seen = DB::table('exam_answer')->where('test_id', $exam->id)->whereIn('student_id', $students->pluck('student_id')->toArray())->distinct('student_id')->count();
+                return ['title' => $exam->name, 'seen' => $seen,'unseen' => $students->count() - $seen];
+            });
         }
-        return view('report.logreport', compact('students', 'announcements'));
+        return view('report.logreport', compact('students', 'announcements', 'exams'));
     }
 
 
