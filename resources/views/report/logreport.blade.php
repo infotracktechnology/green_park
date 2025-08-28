@@ -170,6 +170,13 @@
                     <th>Written</th>
                     <th>Not Written</th>
                 </tr>
+                @foreach($exams as $key => $row)
+                <tr>
+                    <td>{{ $row['title'] }}</td>
+                    <td><a href="javascript:void(0);">  {{ $row['seen'] }}</a></td>
+                    <td><a href="javascript:void(0);">  {{ $row['unseen'] }}</a></td>
+                </tr>
+                @endforeach
                 </table>
                 </div>
                 </div>
