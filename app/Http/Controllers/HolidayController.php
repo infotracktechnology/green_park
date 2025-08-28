@@ -7,6 +7,7 @@ use App\Models\Holiday;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Models\Attendance;
 
 class HolidayController extends Controller
 {
@@ -127,10 +128,9 @@ class HolidayController extends Controller
 {
     $sections = [];
     $students = [];
-    $attendances = [];
+    $attendance = [];
 
     if ($request->has('branch_id')) {
-        // Filter sections based on branch
         $sections = Student::whereIn('campus', explode(',', $request->branch_id))
             ->select('section')
             ->distinct()
@@ -140,44 +140,50 @@ class HolidayController extends Controller
     if ($request->has('show')) {
         if (Holiday::isHoliday($request->attendance_date, $request->branch_id, $request->attendance_timing, $request->section)) {
             return redirect()->back()->with('error', 'Holiday already exists for this date!');
-        }
-
-        $attendances = DB::table('attendance')
-            ->where('attendance_date', $request->attendance_date)
-            ->where('timing', $request->attendance_timing)
-            ->where('branch_id', $request->branch_id)
-            ->where('section', $request->section)
-            ->get()
-            ->keyBy('student_id');
-
-        $students = Student::whereIn('campus', explode(',', $request->branch_id))
-            ->where('section', $request->section)
-            ->get();
-
-        return view('holiday.attendance', compact('sections', 'students', 'attendances'));
     }
 
-    return view('holiday.attendance', compact('sections', 'students', 'attendances'));
+        $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->get();
+
+        $students = Student::whereIn('campus', explode(',', $request->branch_id))->where('section', $request->section)->get();
+
+        return view('holiday.attendance', compact('sections', 'students', 'attendance'));
+    }
+
+    return view('holiday.attendance', compact('sections', 'students', 'attendance'));
 }
 
 
     public function attendance_store(Request $request){
-        $attendances = DB::table('attendance')->where('attendance_date', $request->attendance_date)->where('timing', $request->attendance_timing)->where('branch_id', $request->branch_id)->where('section', $request->section)->delete();
-        $data = collect($request->status)->map(function ($status, $key) use ($request) {
-            return [
-                'attendance_date' => $request->attendance_date,
-                'timing' => $request->timing,
-                'academic_year' => $request->academic_year,
-                'student_id' => $request->student_id[$key],
-                'status' => $status ?? 'A',
-                'section' => $request->section,
-                'branch_id' => $request->branch_id,
-            ];
-        });
-        DB::table('attendance')->insert($data->toArray());
-        return to_route('attendance')->with('success', 'Attendance marked successfully!');
+    
+    $timings = !empty($request->status[0]) ? array_keys($request->status[0]) : [];
+    
+    if (empty($timings)) {
+        return redirect()->back()->with('error', 'No attendance data provided.');
     }
 
+   Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->whereIn('timing', $timings)->delete();
+ 
+    $attendanceData = [];
+    foreach($request->status as $key => $status){             
+        foreach($status as $time => $value){             
+            $student_id = $request->student_id[$key][$time];
+            $attendanceData[] = [
+                'academic_year' => $request->academic_year,
+                'branch_id' => $request->branch_id,
+                'attendance_date' => $request->attendance_date,
+                'timing' => $time,
+                'student_id' => $student_id,
+                'section' => $request->section,
+                'status' => $value ?? 'A',
+            ];
+        }
+    }
 
+    if (!empty($attendanceData)) {
+        Attendance::insert($attendanceData);
+    }
+
+    return redirect()->route('attendance')->with('success', 'Attendance saved successfully.');
+    }
 
 }

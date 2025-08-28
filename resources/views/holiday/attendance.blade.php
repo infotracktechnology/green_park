@@ -41,7 +41,6 @@
                         <div class="form-group col-lg-2">
                                 <label for="academic_year">Academic Year</label>
                                 <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
-                                    {{-- <option value="">Select Academic Year</option> --}}
                                     @foreach ($academicyear as $row)
                                         <option value="{{ $row->academic_year }}" @selected(request('academic_year') == $row->academic_year)>{{ $row->academic_year }}</option>
                                     @endforeach
@@ -58,6 +57,7 @@
                             <label for="hostel">Attendance Timing</label>
                             <select name="attendance_timing" id="attendance_timing"  class="form-control form-control-sm" required>
                                 <option value="">Select Option</option>
+                                <option value="Morning,Afternoon" @selected(request('attendance_timing') == 'Morning,Afternoon')>All Timing</option>
                                 @foreach (['Morning','Afternoon'] as $row)
                                     <option value="{{ $row }}" @selected(request('attendance_timing') == $row)>{{ $row }}</option>
                                 @endforeach
@@ -98,18 +98,14 @@
                      <form action="{{ route('attendance.store') }}" method="post" enctype="multipart/form-data">
                      @csrf
                     <div class="row">
-                        {{-- <div class="col-md-12 col-sm-12 mt-3">
-                            <input type="checkbox" id="present" /> Prsent All
-                        </div> --}}
-
+                      
             <div class="col-md-12 col-sm-12 mb-3">
-                    <div class="table-responsive">
+<div class="table-responsive">
 <input type="hidden" name="attendance_date" value="{{ request('attendance_date') }}">
-<input type="hidden" name="timing" value="{{ request('attendance_timing') }}">
 <input type="hidden" name="academic_year" value="{{ request('academic_year') }}">
 <input type="hidden" name="section" value="{{ request('section') }}">
 <input type="hidden" name="branch_id" value="{{ request('branch_id') }}">
-      <table class="table table-striped table-sm">
+      <table class="table table-striped attendance-table table-sm">
             <thead>
                 <tr>
                     <th>#</th>
@@ -118,24 +114,39 @@
                     <th>Name</th>
                     <th>Coaching Type</th>
                     <th>Section</th>
-                    <th>Present/Absent</th>
+                    @foreach(explode(',', request('attendance_timing')) as $time)
+                    <?php 
+                    $edit = $attendance->where('timing', $time)->count();
+                    ?>
+                    <th>
+                        {{ $time }}
+                        @if($edit)
+                        <br><button type="button" data-time="{{ $time }}" class="btn edit_timing"><i class="fa fa-edit col-green font-18"></i></button>
+                        @endif
+                    </th>
+                    @endforeach
                 </tr>
             </thead>
             <tbody>
-                @foreach($students as $row)
+                @foreach($students as $i => $row)
                <tr>
                    <td>{{ $loop->iteration }}</td>
-                   <input type="hidden" name="student_id[{{ $loop->iteration }}]" value="{{ $row->student_id }}">
-                  
                    <td>{{ $row->academic_year }}</td>
                    <td>{{ $row->student_id }}</td>
                    <td>{{ \Str::limit($row->student_name, 20) }}</td>
                    <td>{{ $row->coaching_type }}</td>
                    <td>{{ $row->section }}</td>
-                   <td>
-                    <input type="radio" name="status[{{ $loop->iteration }}]" value="P" class="present" required checked> <label>P</label>
-                    <input type="radio" name="status[{{ $loop->iteration }}]" value="A" class="absent" required> <label>A</label>
+                   @foreach(explode(',', request('attendance_timing')) as  $time)
+                   <?php 
+                    $disabled = $attendance->where('timing', $time)->where('student_id', $row->student_id)->count();
+                    $checked = $attendance->where('timing', $time)->where('student_id', $row->student_id)->first()->status ?? 'P';
+                    ?>
+                   <td class="{{ $time }}">
+                    <input type="hidden" name="student_id[{{$i}}][{{$time}}]" value="{{ $row->student_id }}">
+                    <input type="radio" name="status[{{$i}}][{{$time}}]" value="P" class="present" @disabled($disabled) @checked($checked == 'P')> <label>P</label>
+                    <input type="radio" name="status[{{$i}}][{{$time}}]" value="A" class="absent" @disabled($disabled) @checked($checked == 'A')> <label>A</label>
                    </td>
+                   @endforeach
                </tr>
                 @endforeach
             </tbody>
@@ -205,12 +216,12 @@ function getSection() {
 }
 
 
-    $("#present").click(function() {
-        if(this.checked) {
-            $(".present").prop('checked', true);
-        } else {
-            $(".present").prop('checked', false);
-        }
-    });
+  $(".edit_timing").click(function(e) {
+    var time = $(this).data('time');
+    if(confirm('Are you sure you want to edit?')) {
+        $(`.${time} input`).prop('disabled', false);
+    }
+
+});
 </script>
 @endsection
