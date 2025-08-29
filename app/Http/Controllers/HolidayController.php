@@ -154,20 +154,16 @@ class HolidayController extends Controller
 
 
     public function attendance_store(Request $request){
-    
-    $timings = !empty($request->status[0]) ? array_keys($request->status[0]) : [];
-    
-    if (empty($timings)) {
-        return redirect()->back()->with('error', 'No attendance data provided.');
-    }
-
-   Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->whereIn('timing', $timings)->delete();
- 
     $attendanceData = [];
     foreach($request->status as $key => $status){             
-        foreach($status as $time => $value){             
-            $student_id = $request->student_id[$key][$time];
-            $attendanceData[] = [
+        foreach($status as $time => $value){  
+            if($request->has('attendance_id')){
+                $attendance_id = $request->attendance_id[$key][$time];
+                $attendanceData[] = ['id' => $attendance_id, 'status' => $value ?? 'A'];
+            }
+          else{         
+           $student_id = $request->student_id[$key][$time];
+           $attendanceData[] = [
                 'academic_year' => $request->academic_year,
                 'branch_id' => $request->branch_id,
                 'attendance_date' => $request->attendance_date,
@@ -178,12 +174,10 @@ class HolidayController extends Controller
             ];
         }
     }
-
-    if (!empty($attendanceData)) {
-        Attendance::insert($attendanceData);
     }
+    $attendance = Attendance::upsert($attendanceData, ['id'], ['status']);
 
     return redirect()->route('attendance')->with('success', 'Attendance saved successfully.');
-    }
+ }
 
 }
