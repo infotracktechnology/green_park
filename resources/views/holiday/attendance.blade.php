@@ -139,13 +139,19 @@
                    @foreach(explode(',', request('attendance_timing')) as  $time)
                    <?php 
                     $disabled = $attendance->where('timing', $time)->where('student_id', $row->student_id)->count();
-                    $checked = $attendance->where('timing', $time)->where('student_id', $row->student_id)->first()->status ?? 'P';
+                    $attendance_entry = $attendance->where('timing', $time)->where('student_id', $row->student_id)->first();
+                    $checked = $attendance_entry ? $attendance_entry->status : 'P';
                     ?>
                    <td class="{{ $time }}">
+                    @if($attendance_entry)
+                    <input type="hidden" name="attendance_id[{{$i}}][{{$time}}]" value="{{ $attendance_entry->id }}">
+                    @endif
+
                     <input type="hidden" name="student_id[{{$i}}][{{$time}}]" value="{{ $row->student_id }}">
                     <input type="radio" name="status[{{$i}}][{{$time}}]" value="P" class="present" @disabled($disabled) @checked($checked == 'P')> <label>P</label>
                     <input type="radio" name="status[{{$i}}][{{$time}}]" value="A" class="absent" @disabled($disabled) @checked($checked == 'A')> <label>A</label>
                    </td>
+                   
                    @endforeach
                </tr>
                 @endforeach
