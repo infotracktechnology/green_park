@@ -149,6 +149,11 @@ class HolidayController extends Controller
         return view('holiday.attendance', compact('sections', 'students', 'attendance'));
     }
 
+    if ($request->has('delete')) {
+       $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->whereIn('timing',explode(',', $request->timing))->delete();
+         return response()->json(['success' => 'Attendance deleted successfully!']);
+    }
+
     return view('holiday.attendance', compact('sections', 'students', 'attendance'));
 }
 
@@ -177,7 +182,7 @@ class HolidayController extends Controller
     }
     $attendance = Attendance::upsert($attendanceData, ['id'], ['status']);
 
-    return redirect()->route('attendance')->with('success', 'Attendance saved successfully.');
+    return redirect()->back()->with('success', 'Attendance saved successfully.');
  }
 
 }

@@ -48,17 +48,11 @@
 
         <div class="form-group col-lg-5">
             <label>Coaching Type</label>
-            <select name="coaching_type[]" class="form-control form-control-sm select2 @error('coaching_type') is-invalid @enderror" multiple required>
-                <option value="Offline">Offline</option>
-                <option value="Online Recorded">Online Recorded</option>
-                <option value="Online Live">Online Live</option>
-                <option value="Test Series">Test Series</option>
-                <option value=" XI - OB"> XI - OB</option>
-                <option value=" XII - OB"> XII - OB</option>
+            <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
+               @foreach ($coachingtype as $row)
+                <option value="{{$row}}">{{$row}}</option>
+             @endforeach
             </select>
-            @error('coaching_type')
-            <span class="text-danger">{{ $message }}</span>
-        @enderror
         </div>
 
         <div class="form-group col-lg-3">

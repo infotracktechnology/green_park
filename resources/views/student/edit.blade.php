@@ -29,6 +29,16 @@
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div class="form-group col-lg-3">
+                               <label>Course</label>
+                                <select name="course" id="course" class="form-control form-control-sm" required>
+                                    <option value="">Select Course</option>
+                                    @foreach ($course as $row)
+                                    <option value="{{$row}}" @selected($row == $Student->course)>{{$row}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             
                            
                             <div class="form-group col-lg-3">
@@ -50,12 +60,9 @@
                                <label>Coaching Type</label>
                                 <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" onchange="hostel(this.value)"  >
                                     <option value="">Select Coaching Type</option>
-                                    <option value="Offline" @if($Student->coaching_type == 'Offline') selected @endif>Offline</option>
-                                    <option value="Online Recorded" @if($Student->coaching_type == 'Online Recorded') selected @endif>Online Recorded</option>
-                                    <option value="Online Live" @if($Student->coaching_type == 'Online Live') selected @endif>Online Live</option>
-                                    <option value="Test Series" @if($Student->coaching_type == 'Test Series') selected @endif>Test Series</option>
-                                    <option value="XI - OB" @if($Student->coaching_type == 'XI - OB') selected @endif>XI - OB</option>
-                                     <option value="XII - OB" @if($Student->coaching_type == 'XII - OB') selected @endif>XII - OB</option>
+                                    @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}" @selected($row == $Student->coaching_type)>{{$row}}</option>
+                                    @endforeach
                                 </select>
                             </div>
         

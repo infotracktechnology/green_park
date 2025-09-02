@@ -79,13 +79,9 @@
                             <div class="form-group col-lg-5">
                                 <label>Coaching Type</label>
                                 <select name="coaching_type[]" id="coaching_type" class="select2 form-control form-control-sm" multiple="multiple" required>
-                                    <option value="Offline">Offline</option>
-                                    <option value="Online Recorded">Online Recorded</option>
-                                    <option value="Online Live">Online Live</option>
-                                    <option value="Test Series">Test Series</option>
-                                   
- <option value=" XI - OB"> XI - OB</option>
- <option value="XII - OB"> XII - OB</option>
+                                    @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}">{{$row}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                              <div class="form-group col-lg-3">

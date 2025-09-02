@@ -33,8 +33,12 @@ class AppServiceProvider extends ServiceProvider
         $branchs = Branch::when($user && $user->branch, function ($query) {
             $query->where('id', $user->branch);
         })->get();
+        $course =['NEET','JEE','XI-OB','XII-OB'];
+        $coachingtype = ['Offline','Online Recorded','Online Live','Test Series'];
 
         View::share('academicyear', $academicyear);
         View::share('branches', $branchs);
+        View::share('course', $course);
+        View::share('coachingtype', $coachingtype);
     }
 }

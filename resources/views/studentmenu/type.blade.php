@@ -33,15 +33,15 @@
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="form-group col-lg-6">
                                 <label for="branch">Coaching Type</label>
                                 <select name="type" id="type" class="form-control form-control-sm" required>
                                     <option value="">-- Choose Coaching Type --</option>
-                                    @foreach ($types as $type)
-                                        <option value="{{ $type->coaching_type }}" @selected($type->coaching_type == request('type'))>{{ $type->coaching_type }}</option>
+                                     @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}" @selected($row == request('type'))>{{$row}}</option>
                                     @endforeach
                                 </select>
-
                             </div>
 
                         @foreach($menus as $key => $field)
