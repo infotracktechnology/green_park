@@ -150,6 +150,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
     Route::get('biometric/report', [App\Http\Controllers\StaffProfileController::class, 'biometric_report'])->name('biometric.report');
     Route::group(['prefix' => 'report','as' => 'report.'], function () {
         Route::get('/log', [App\Http\Controllers\ReportController::class, 'LogReport'])->name('log');
+        Route::get('/attendance', [App\Http\Controllers\ReportController::class, 'AttendanceReport'])->name('attendance');
     });
 });
 

@@ -98,6 +98,10 @@
                      <form action="{{ route('attendance.store') }}" method="post" enctype="multipart/form-data">
                      @csrf
                     <div class="row">
+                        <div class="col-md-12 col-sm-12 d-flex justify-content-end">
+                            <button type="button" id="attendance_del" name="delete" data-timing="{{ request('attendance_timing') }}" class="btn btn-danger mx-2">Delete</button>
+                            <button type="submit" name="submit" class="btn btn-primary">Save Attendance</button>
+                        </div>
                       
             <div class="col-md-12 col-sm-12 mb-3">
 <div class="table-responsive">
@@ -151,7 +155,7 @@
                     <input type="radio" name="status[{{$i}}][{{$time}}]" value="P" class="present" @disabled($disabled) @checked($checked == 'P')> <label>P</label>
                     <input type="radio" name="status[{{$i}}][{{$time}}]" value="A" class="absent" @disabled($disabled) @checked($checked == 'A')> <label>A</label>
                    </td>
-                   
+
                    @endforeach
                </tr>
                 @endforeach
@@ -162,9 +166,7 @@
     </table>
                 </div>
             </div>
-            <div class="col-md-6 offset-md-4 col-sm-12 mt-3">
-                <button type="submit" name="submit" class="btn btn-primary m-t-10">Save Attendance</button>
-            </div>
+            
 
         </div>
     </form>
@@ -220,6 +222,19 @@ function getSection() {
         $('#section').html(html);
     });
 }
+
+$("#attendance_del").click(function(e) {
+    var timing = $(this).data('timing');
+    var attendance_date = $('input[name="attendance_date"]').val();
+    var section = $('input[name="section"]').val();
+    var branch_id = $('input[name="branch_id"]').val();
+    if(confirm('Are you sure you want to delete?')) {
+    $.get(`{{ route('attendance') }}`,{timing: timing, attendance_date: attendance_date, section: section, branch_id: branch_id,delete:1},function(data) {
+       alert("Attendance deleted successfully");
+       location.reload();
+    });
+    }
+});
 
 
   $(".edit_timing").click(function(e) {

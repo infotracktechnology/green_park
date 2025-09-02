@@ -57,13 +57,8 @@
                             <div class="form-group col-lg-5">
                                 <label>Coaching Type</label>
                                 <select name="coaching_type[]" class="form-control select2" multiple required>
-                                    @php
-                                        $selectedTypes = explode(',', $questionKey->coaching_type); // Convert stored string to array
-                                    @endphp
-                                    @foreach(['Offline', 'Online Recorded', 'Online Live', 'Test Series', ' XI - OB',' XII - OB'] as $type)
-                                        <option value="{{ $type }}" {{ in_array($type, $selectedTypes) ? 'selected' : '' }}>
-                                            {{ $type }}
-                                        </option>
+                                     @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}" @selected(in_array($row, explode(',', $questionKey->coaching_type)))>{{$row}}</option>
                                     @endforeach
                                 </select>
                             </div>

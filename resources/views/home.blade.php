@@ -264,7 +264,8 @@
                         <tbody id="collapse-tbody" class="collapse show">
                             @foreach($data as $key => $branchs)
                         <?php
-                        $branch_present = $branchs->attendance->where('attendance_date', today())->where('status', 'P')->unique('student_id')->count();
+                        $branch_present = $branchs->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->unique('student_id')->count();
+                        
                         ?>
                                 <tr class="bg-light fw-bold cursor-pointer" data-toggle="collapse" data-target="#attendance-{{ Str::slug($branchs->name) }}" aria-expanded="false">
                                     <td>
@@ -282,7 +283,7 @@
                                             <tbody>
                                                 @foreach($branchs->student->groupBy('section') as $key => $section)
                         <?php
-                        $section_present = $branchs->attendance->where('attendance_date', today())->where('status', 'P')->where('section', $key)->unique('student_id')->count();
+                        $section_present = $branchs->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->where('section', $key)->unique('student_id')->count();
                         ?>
                                                     <tr>
                                                         <td></td>

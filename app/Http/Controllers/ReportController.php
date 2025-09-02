@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Exam;
 use App\Models\Student;
 use App\Models\Announcement;
+use App\Models\Attendance;
 
 class ReportController extends Controller
 {
@@ -77,6 +78,29 @@ class ReportController extends Controller
             });
         }
         return view('report.logreport', compact('students', 'announcements', 'exams'));
+    }
+
+        public function AttendanceReport(Request $request) {
+        $attendances = [];
+        if($request->has('branch_id')) {
+        $attendances = Attendance::where('branch_id', $request->branch_id)->where('attendance_date', $request->date)->get()->groupBy('section');
+        $attendances = $attendances->map(function ($attendance, $section) use ($request) {
+        $present = $attendance->where('status', 'P')->unique('student_id')->count();
+        $absent = $attendance->where('status', 'A')->unique('student_id')->count();
+        $boys = Student::where('section', $section)->where('campus', $request->branch_id)->where('gender', 'Male')->count();
+        $girls = Student::where('section', $section)->where('campus', $request->branch_id)->where('gender', 'Female')->count();
+                return [
+                    'section' => $section, 
+                    'boys' => $boys,
+                    'girls' => $girls,
+                    'total' => $boys + $girls,
+                    'present' =>$present,
+                    'absent' => $absent
+                ];
+            });
+        }
+
+        return view('report.attendancereport', compact('attendances'));
     }
 
 

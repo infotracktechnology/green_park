@@ -83,13 +83,12 @@
                             <div class="form-group col-lg-4">
                                 <label>Coaching Type</label>
                                 <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
-                                    @foreach(['Offline', 'Online Recorded', 'Online Live', 'Test Series', 'XI - OB',' XII - OB'] as $type)
-                                        <option value="{{ $type }}" {{ in_array($type, explode(',', $chairmanvideo->coaching_type)) ? 'selected' : '' }}>
-                                            {{ $type }}
-                                        </option>
+                                     @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}" @selected(in_array($row, explode(',', $chairmanvideo->coaching_type)))>{{$row}}</option>
                                     @endforeach
                                 </select>
                             </div>
+                            
                              <div class="form-group col-lg-3">
                                 <label>Gender</label>
                                 <select name="gender" id="gender" class="form-control form-control-sm" required>
