@@ -32,7 +32,7 @@
 
                             <div class="form-group col-lg-3">
                                <label>Course</label>
-                                <select name="course" id="course" class="form-control form-control-sm" required>
+                                <select name="course" id="course" class="form-control form-control-sm" onchange="handleType(this);" required>
                                     <option value="">Select Course</option>
                                     @foreach ($course as $row)
                                     <option value="{{$row}}" @selected($row == $Student->course)>{{$row}}</option>
@@ -58,7 +58,7 @@
         
                            <div class="form-group col-lg-3">
                                <label>Coaching Type</label>
-                                <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" onchange="hostel(this.value)"  >
+                                <select name="coaching_type" id="coaching_type" class="form-control form-control-sm type" onchange="hostel(this.value)"  >
                                     <option value="">Select Coaching Type</option>
                                     @foreach ($coachingtype as $row)
                                     <option value="{{$row}}" @selected($row == $Student->coaching_type)>{{$row}}</option>
@@ -791,71 +791,7 @@
         acNonAcSelect.val(''); // Reset value to null when campus is not GPCC on page load
     }
 });
-
-
-$('.steps ul li').addClass('done').removeClass('disabled');
-    'use strict';
-
-    // Real-time input validation
-    // $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').on('input', function () {
-    //     let input = $(this).val();
-    //     let nameRegex = /^[a-zA-Z .]*$/;  // Allow alphabets, spaces, and dots
-    //     let phoneRegex = /^[0-9]{10}$/;  // Only 10 digits allowed for phone numbers
-    //     let aadharRegex = /^[0-9]{12}$/;  // 12 digits for Aadhar card
-
-    //     if ($(this).attr('id') == 'student_name' || $(this).attr('id') == 'father_name' || $(this).attr('id') == 'mother_name') {
-    //         if (!nameRegex.test(input)) {
-    //             $(this).addClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('Only alphabets, spaces, and dots are allowed');
-    //         } else {
-    //             $(this).removeClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('');
-    //         }
-    //     }
-
-        // For phone numbers: only 10 digits allowed
-    //     if ($(this).attr('id') == 'ph_no1' || $(this).attr('id') == 'ph_no2' || $(this).attr('id') == 'father_ph_no' || $(this).attr('id') == 'mother_ph_no' || $(this).attr('id') == 'student_whatsapp_no' || $(this).attr('id') == 'parent_whatsapp_no') {
-    //         if (!phoneRegex.test(input)) {
-    //             $(this).addClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('Phone numbers must be exactly 10 digits');
-    //         } else {
-    //             $(this).removeClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('');
-    //         }
-    //     }
-
-    //     if ($(this).attr('id') == 'aadhar_card_no') {
-    //         if (!aadharRegex.test(input)) {
-    //             $(this).addClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('Aadhar card number should be exactly 12 digits');
-    //         } else {
-    //             $(this).removeClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('');
-    //         }
-    //     }
-    // });
-
-    // Prevent form submission if invalid
-//     $('#wizard_with_validation').on('submit', function (e) {
-//         let isFormValid = true;
-
-//         // Validate all inputs again before submitting
-//         $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').each(function () {
-//             $(this).trigger('input'); // Trigger input event to revalidate the field
-//             if ($(this).hasClass('is-invalid')) {
-//                 isFormValid = false;
-//             }
-//         });
-
-//         if (!isFormValid) {
-//             e.preventDefault();
-//             alert('Please correct the errors before submitting the form.');
-//         }
-//     });
-// });
-
-
-  
+$('.steps ul li').addClass('done').removeClass('disabled');  
 </script>
 
 @endsection
