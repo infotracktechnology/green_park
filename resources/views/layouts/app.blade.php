@@ -265,5 +265,23 @@
     $(document).on('mousedown', event => event.preventDefault());
 </script> --}}
   @yield('js')
+<script>
+
+function toggleOption(show = [], hide = [], element = null) {
+  if (!element) return;
+  element.val('');
+  show.forEach(v => element.find(`option[value="${v}"]`).prop('hidden', false));
+  hide.forEach(v => element.find(`option[value="${v}"]`).prop('hidden', true));
+}
+
+function handleType(input) {
+  if (input.value === 'XI-OB' || input.value === 'XII-OB') {
+    toggleOption(['Online'], ['Online Recorded','Online Live','Test Series'], $('.type'));
+  } else {
+    toggleOption(['Online Recorded','Online Live','Test Series'], ['Online'], $('.type'));
+  }
+}
+
+</script>
 </body>
 </html>
