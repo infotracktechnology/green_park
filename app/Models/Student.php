@@ -57,10 +57,7 @@ class Student extends Authenticatable
        return Announcement::where('branch', 'like', "%{$this->campus}%")
            ->where('coaching_type', 'like', "%{$this->coaching_type}%")
            ->where('academic_year', $this->academic_year)
-           ->where(function ($query) {
-               $query->where('gender', $this->gender)
-                     ->orWhere('gender', 'All');
-           })
+           ->where(function ($query){$query->where('gender', $this->gender)->orWhere('gender', 'All');})
            ->latest()
            ->get();
    }
