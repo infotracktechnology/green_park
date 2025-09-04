@@ -40,22 +40,18 @@
       <thead>
   
         <tr role="row">
-          <th>Student ID</th>       
-          <th>Section</th>   
-          {{-- <th>SET</th> --}}
-          <th>Bill Type</th>
+          <th>Student ID</th>  
+          <th>Student Name</th>     
+          <th>Course</th>
           <th>Campus</th>
           <th>Coaching Type</th>
+          <th>H/D</th>
+          <th>Section</th>
+          <th>Batch</th>
           <th>User Name</th>
           <th>Password</th>
-          <th>Student Name</th>
           <th>Gender</th>
-          <th>Father Name</th>
           <th>Phone1</th>
-          <th>Phone2</th>
-          <th>H/D</th>
-          {{-- <th>Allotment Letter</th>
-          <th>Verification Latter</th> --}}
           <th>Edit </th>
           <th>Action</th>
         </tr>
@@ -66,20 +62,17 @@
           @foreach ($students as $student)
           <tr>
             <td>{{$student->student_id}}</td>
-            <td>{{$student->section}}</td>
-            <td>{{$student->bill_type}}</td>
-            {{-- <td>{{$student->set}}</td> --}}
+            <td>{{$student->student_name}}</td>
+            <td>{{$student->course}}</td>
             <td>{{$student->campus}}</td>
             <td>{{$student->coaching_type}}</td>
+            <td>{{$student->hostel_dayscholar}}</td>
+            <td>{{$student->section}}</td>
+            <td>{{$student->batch}}</td>
             <td>{{$student->user_name}}</td>
             <td>{{$student->password_1}}</td>
-            <td>{{$student->student_name}}</td>
             <td>{{$student->gender}}</td>
-            <td>{{$student->father_name}}</td>
-            <td>{{$student->ph_no1}}</td>
-            <td>{{$student->ph_no2}}</td>
-            <td>{{$student->hostel_dayscholar}}</td>
-            
+            <td>{{$student->phone1}}</td>        
             <td>
               <a href="{{route('student.edit', $student->id)}}" class="btn btn-warning text-white"><i class="fas fa-edit"></i></a>
             </td>
