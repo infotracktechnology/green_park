@@ -20,7 +20,7 @@
                 <div class="card card-primary">
   
                     <div class="card-body">
-                      <div class="row ">
+                      <div class="row">
                        
                         <div class="col-md-10 col-sm-12">
                             <h6 class="col-deep-purple">Students Details</h6>
@@ -31,6 +31,17 @@
                                 </div>
                            
                     </div>
+
+                    <form action="{{route('student.index')}}" id="myForm" method="get">
+                    <div class="col-md-4 form-group">
+                      <select class="form-control form-control-sm" onchange="document.getElementById('myForm').submit();" name="course">
+                        <option value="">Select Course</option>
+                        @foreach($course as $row)
+                        <option value="{{$row}}" @selected($row == request('course'))>{{$row}}</option>
+                        @endforeach
+                      </select>
+                    </div>
+                    </form>
                     
                    
                     <div class="col-12">
@@ -51,7 +62,8 @@
           <th>User Name</th>
           <th>Password</th>
           <th>Gender</th>
-          <th>Phone1</th>
+          <th>Father No</th>
+          <th>Mother No</th>
           <th>Edit </th>
           <th>Action</th>
         </tr>
@@ -64,7 +76,7 @@
             <td>{{$student->student_id}}</td>
             <td>{{$student->student_name}}</td>
             <td>{{$student->course}}</td>
-            <td>{{$student->campus}}</td>
+            <td>{{$student->branch->name}}</td>
             <td>{{$student->coaching_type}}</td>
             <td>{{$student->hostel_dayscholar}}</td>
             <td>{{$student->section}}</td>
@@ -72,7 +84,8 @@
             <td>{{$student->user_name}}</td>
             <td>{{$student->password_1}}</td>
             <td>{{$student->gender}}</td>
-            <td>{{$student->phone1}}</td>        
+            <td>{{$student->father_ph_no}}</td>  
+            <td>{{$student->mother_ph_no}}</td>      
             <td>
               <a href="{{route('student.edit', $student->id)}}" class="btn btn-warning text-white"><i class="fas fa-edit"></i></a>
             </td>

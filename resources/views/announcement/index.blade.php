@@ -36,9 +36,12 @@
   
         <tr role="row">
           <th>Academic Year </th>
-        <th>Branch </th>
+          <th>Course</th>
+          <th>Branch </th>
           <th>Coaching Type</th>
-          <th>Gender</th>
+          <th>H/D</th>
+          <th>Section</th>
+          <th>Batch</th>
           <th>Title</th>
           <th>Edit</th>
           <th>Delete</th>
@@ -49,9 +52,8 @@
         <tbody>
           @foreach ($announcements as $announcement)
           <tr>
-          
             <td>{{ $announcement->academic_year }}</td> 
-             
+            <td>{{ $announcement->course }}</td>
             <td>
                 @php
                     $branchNames = collect(explode(',', $announcement->branch))
@@ -62,7 +64,9 @@
                 {{ $branchNames }}
             </td>
             <td>{{$announcement->coaching_type}}</td>
-            <td>{{$announcement->gender}}</td>
+            <td>{{$announcement->category}}</td>
+            <td>{{$announcement->section}}</td>
+            <td>{{$announcement->batch}}</td>
             <td>{{$announcement->title}}</td>
            
             <td>

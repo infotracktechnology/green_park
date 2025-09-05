@@ -3,38 +3,6 @@
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}">
-
-<style>
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #6777ef;
-        color: #fff;
-        border: none;
-        padding: 5px 10px;
-        margin: 5px 5px 0 0;
-        border-radius: 3px;
-    }
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        display: none;
-    }
-    .select2-container--default .select2-selection--single {
-        border-color: #6777ef;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: #6777ef transparent transparent transparent;
-    }
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #6777ef;
-        color: #fff;
-    }
-    .select2-container--default .select2-selection--multiple {
-        border: 1px solid #6777ef;
-        min-height: 38px;
-        padding: 0;
-    }
-    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-        padding: 0 5px;
-    }
-</style>
 @endsection
 
 @section('main')
@@ -57,18 +25,27 @@
                                 <label for="academic_year">Academic Year</label>
                                 <select name="academic_year" id="academic_year" class="form-control form-control-sm" required>
                                     @foreach ($academicyear as $row)
-                                    <option value="{{ $row->academic_year }}" {{ $announcement->academic_year == $row->academic_year ? 'selected' : '' }}>
+                                    <option value="{{ $row->academic_year }}" @selected($row->academic_year == $announcement->academic_year)>
                                         {{ $row->academic_year }}
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div class="form-group col-lg-4">
+                    <label>Course</label>
+                    <select name="course[]" id="course" class="select2" multiple="multiple" required>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->course)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
                          
                             <div class="form-group col-lg-4">
                                 <label for="branch">Branch</label>
                                 <select name="branch[]" id="branch" class="select2 form-control" multiple required>
                                     @foreach ($branches as $branch)
-                                    <option value="{{ $branch->id }}" {{ in_array($branch->id, explode(',', $announcement->branch)) ? 'selected' : '' }}>
+                                <option value="{{ $branch->id }}"@selected(in_array($branch->id, explode(',', $announcement->branch)))>
                                         {{ $branch->name }}
                                     </option>
                                     @endforeach
@@ -84,40 +61,56 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-lg-3" id="categoryDiv" style="display: none;">
-                                <label>Category</label>
-                                <select name="category" id="category" class="form-control form-control-sm">
-                                    <option value="All" {{ $announcement->category == 'All' ? 'selected' : '' }}>All Types</option>
-                                    <option value="Hostel" {{ $announcement->category == 'Hostel' ? 'selected' : '' }}>Hostel</option>
-                                    <option value="Day Scholar" {{ $announcement->category == 'Day Scholar' ? 'selected' : '' }}>Day Scholar</option>
-                                </select>
-                            </div>
+                            <div class="form-group col-lg-4">
+                    <label>H/D</label>
+                    <select name="category[]" id="category" class="select2" multiple="multiple" required>
+                      @foreach ($hostel as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->category)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
-                            <div class="form-group col-lg-3">
-                                <label for="gender">Gender</label>
-                                <select name="gender" id="gender" class="form-control form-control-sm" required>
-                                    @foreach (['All' => 'All Gender', 'Male' => 'Male', 'Female' => 'Female', 'Other' => 'Other'] as $value => $label)
-                                        <option value="{{ $value }}" {{ $announcement->gender == $value ? 'selected' : '' }}>{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
 
+                   <div class="form-group col-lg-4">
+                    <label>Section</label>
+                    <select name="section[]" id="section" class="select2" multiple="multiple" required>
+                      @foreach ($section as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->section)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+
+                   <div class="form-group col-lg-4">
+                    <label>Batch</label>
+                    <select name="batch[]" id="batch" class="select2" multiple="multiple" required>
+                      @foreach ($batch as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->batch)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                            
+
+                            
                             <div class="form-group col-lg-4">
                                 <label for="title">Title</label>
-                                <input type="text" name="title" id="title" class="form-control form-control-sm" required value="{{ old('title', $announcement->title) }}">
+                                <input type="text" name="title" id="title" class="form-control form-control-sm" required value="{{ $announcement->title }}">
                             </div>
 
-                            <div class="form-group col-lg-12">
-                                <label for="content">Content</label>
-                                <textarea name="content" id="content" class="summernote-simple">{{ old('content', $announcement->content) }}</textarea>
-                            </div>
-
+                            
                             <div class="form-group col-lg-4">
                                 <label for="attachment">Attachment</label>
                                 <input type="file" name="attachment" id="attachment" class="form-control form-control-sm">
                                 @if (!empty($announcement->attachment))
                                     <p class="mt-2">Current File: {{ basename($announcement->attachment) }}</p>
                                 @endif
+                            </div>
+
+
+                            <div class="form-group col-lg-12">
+                                <label for="content">Content</label>
+                                <textarea name="content" id="content" class="summernote-simple">{{  $announcement->content }}</textarea>
                             </div>
 
                             <div class="form-group col-lg-12">
@@ -138,28 +131,5 @@
 <script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
 <script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
 <script>
-    $(document).ready(function () {
-        $('.select2').select2();
-
-        const selectedCoachingTypes = @json($selectedCoachingTypes);
-
-        function toggleCategoryField(selected) {
-            if (selected.includes('Offline')) {
-                $('#categoryDiv').show();
-                $('#category').prop('disabled', false);
-            } else {
-                $('#categoryDiv').hide();
-                $('#category').prop('disabled', true);
-            }
-        }
-
-        // Run on page load
-        toggleCategoryField(selectedCoachingTypes);
-
-        // Run on change
-        $('#coaching_type').on('change', function () {
-            toggleCategoryField($(this).val());
-        });
-    });
 </script>
 @endsection

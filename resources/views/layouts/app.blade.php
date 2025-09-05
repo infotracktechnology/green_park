@@ -12,7 +12,6 @@
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
-  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
@@ -241,7 +240,6 @@
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script>
     $(document).ready(function () {
       $('.select').each(function () {
@@ -260,25 +258,23 @@
         }
     });
 </script>
-{{-- <script>
-    $(document).on('contextmenu', event => event.preventDefault());
-    $(document).on('mousedown', event => event.preventDefault());
-</script> --}}
   @yield('js')
 <script>
 
-function toggleOption(show = [], hide = [], element = null) {
-  if (!element) return;
-  element.val('');
-  show.forEach(v => element.find(`option[value="${v}"]`).prop('hidden', false));
-  hide.forEach(v => element.find(`option[value="${v}"]`).prop('hidden', true));
+function toggleOption(options=[],element = null) {
+  element.empty();
+  let html = '';
+  options.forEach((option) => {
+    html += `<option value="${option}">${option}</option>`;
+  });
+  element.html(html);
 }
 
 function handleType(input) {
   if (input.value === 'XI-OB' || input.value === 'XII-OB') {
-    toggleOption(['Online'], ['Online Recorded','Online Live','Test Series'], $('.type'));
+    toggleOption(['OFFLINE','ONLINE'], $('.type'));
   } else {
-    toggleOption(['Online Recorded','Online Live','Test Series'], ['Online'], $('.type'));
+    toggleOption(['OFFLINE','ONLINE LIVE','ONLINE RECORDED','TEST SERIES'], $('.type'));
   }
 }
 

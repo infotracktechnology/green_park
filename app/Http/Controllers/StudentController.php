@@ -21,15 +21,10 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $students = Student::join('branch', 'student.campus', '=', 'branch.id')
-            ->select('student.*', 'branch.name as campus')
-            ->when($this->academic_year, function ($query) {
-                $query->where('student.academic_year', $this->academic_year);
-            })
-            ->when(auth()->user()->branch, function ($query) {
-                $query->where('student.campus', 'like', '%' . auth()->user()->branch . '%');
-            })
-            ->get();
+        $students = [];
+        if($request->has('course')) {
+            $students = Student::when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%'.auth()->user()->branch.'%'))->where('course', $request->course)->get();
+        }
             
         return view('student.index', compact('students'));
     }

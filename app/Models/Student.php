@@ -41,11 +41,9 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
-            $maxId = self::max('student_id') ?: 0;
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
-            $model->student_id = ($maxId + 1);
-            $model->user_name = 'L'.$model->student_id;
+            $model->user_name = self::generateName($model->coaching_type,$model->student_id);
         });
         // static::created(function ($model) {
           
