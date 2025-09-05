@@ -23,17 +23,19 @@ class ImportController extends Controller
             'csv_file' => 'required|mimes:csv,txt', // Only CSV files up to 2MB
         ]);
 
-        $branch = $request->branch ?? '';
-        $academic_year = $request->academic_year ?? '';
         if ($request->hasFile('csv_file')) {
             $file = $request->file('csv_file');
             $filePath = $file->getRealPath();
             $data = $this->parseCSV($filePath);
 
-           $data = array_map(function ($row) use ($branch, $academic_year) {
-                $row['campus'] = $branch;
-                $row['academic_year'] = $academic_year;
+           $data = array_map(function ($row) use ($request) {
+                $row['academic_year'] = $request->academic_year;
+                if($request->operation == 'add'){
+                $row['campus'] = $request->campus;
+                }
+                if(isset($row['password_1'])){
                 $row['password'] = bcrypt($row['password_1']);
+                }
                 return $row;
             }, $data);
 
