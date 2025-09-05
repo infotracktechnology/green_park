@@ -83,7 +83,7 @@
 
                    <div class="form-group col-lg-4">
                     <label>Batch</label>
-                    <select name="batch[]" id="batch" class="select2" multiple="multiple" required>
+                    <select name="batch[]" id="batch" class="select2" multiple="multiple">
                       @foreach ($batch as $row)
                       <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->batch)))>{{$row}}</option>
                       @endforeach
