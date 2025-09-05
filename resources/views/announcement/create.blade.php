@@ -97,6 +97,11 @@
                     <input type="text" name="title" id="title" class="form-control form-control-sm" required />
                   </div>
 
+                  <div class="form-group col-lg-4">
+                        <label for="attachment">Attachment</label>
+                        <input type="file" name="attachment" class="form-control form-control-sm">             
+                  </div>
+
                   <div class="form-group col-lg-12">
                     <label for="content">Content</label>
                     <textarea name="content" id="content" class="summernote-simple"></textarea>

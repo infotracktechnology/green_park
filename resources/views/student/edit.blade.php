@@ -623,23 +623,23 @@
 <script>
 
 
-    function hostel(type){
-        document.getElementById('hostel_dayscholar').value = '';
-        if(type == 'OFFLINE'){
-            document.getElementById('hostel_dayscholar').disabled = false;
-        }else{
-            document.getElementById('hostel_dayscholar').disabled = true;
-        }
-    }
-    // Initial check if the page loads with a predefined value
-    window.onload = function() {
-        var selectedCoachingType = document.getElementById('coaching_type').value;
-        var hostelSelect = document.getElementById('hostel_dayscholar');
+    // function hostel(type){
+    //     document.getElementById('hostel_dayscholar').value = '';
+    //     if(type == 'OFFLINE'){
+    //         document.getElementById('hostel_dayscholar').disabled = false;
+    //     }else{
+    //         document.getElementById('hostel_dayscholar').disabled = true;
+    //     }
+    // }
+
+    // window.onload = function() {
+    //     var selectedCoachingType = document.getElementById('coaching_type').value;
+    //     var hostelSelect = document.getElementById('hostel_dayscholar');
         
-        if (selectedCoachingType !== 'OFFLINE') {
-            hostelSelect.disabled = true;  // Disable if the value is not "OFFLINE"
-        }
-    };
+    //     if (selectedCoachingType !== 'OFFLINE') {
+    //         hostelSelect.disabled = true;  
+    //     }
+    // };
 
     function  City(state) {
       if(!state) return;

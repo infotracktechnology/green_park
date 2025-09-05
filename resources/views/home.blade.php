@@ -204,8 +204,8 @@
                                     </td>
                                     <td class="text-start">{{ $branchs->name }}</td>
                                     <td class="text-warning">{{ $branchs->student->count() }}</td>
-                                    <td class="text-primary">{{ $branchs->student->where('gender', 'Male')->count() }}</td>
-                                    <td class="col-pink">{{ $branchs->student->where('gender', 'Female')->count() }}</td>
+                                    <td class="text-primary">{{ $branchs->student->where('gender', 'MALE')->count() }}</td>
+                                    <td class="col-pink">{{ $branchs->student->where('gender', 'FEMALE')->count() }}</td>
                                 </tr>
 
                                 <tr class="collapse" id="collapse-{{ Str::slug($branchs->name) }}">
@@ -218,8 +218,8 @@
                                                         <td>{{ $key == '' ? '-' : $key }}</td>
                                                         
                                                         <td class="fw-bold cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="all">{{ $section->count() }}</td>
-                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Male">{{ $section->where('gender', 'Male')->count() }}</td>
-                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Female">{{ $section->where('gender', 'Female')->count() }}</td>
+                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="MALE">{{ $section->where('gender', 'MALE')->count() }}</td>
+                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="FEMALE">{{ $section->where('gender', 'FEMALE')->count() }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -290,8 +290,8 @@
                                                         <td>{{ $key == '' ? '-' : $key }}</td>
                                                         
                                                         <td class="fw-bold cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="all">{{ $section->count() }}</td>
-                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Male">{{ $section_present }}</td>
-                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Female">{{ $section->count() - $section_present }}</td>
+                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="MALE">{{ $section_present }}</td>
+                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="FEMALE">{{ $section->count() - $section_present }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
