@@ -70,8 +70,9 @@
                                <label>Hostel/Day Scholar</label>
                                 <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" >
                                     <option value="">Select Option</option>
-                                    <option value="Hostel" @if($Student->hostel_dayscholar == 'Hostel') selected @endif>Hostel</option>
-                                    <option value="Dayscholar" @if($Student->hostel_dayscholar == 'Dayscholar') selected @endif>Dayscholar</option>
+                                    @foreach ($hostel as $row)
+                                    <option value="{{$row}}" @selected($row == $Student->hostel_dayscholar)>{{$row}}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -80,31 +81,19 @@
                                 <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" >
                                     <option value="">Select AC/Non AC</option>
                                     <option value="AC" @if($Student->ac_nonac == 'AC') selected @endif>AC</option>
-                                    <option value="Non AC" @if($Student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
+                                    <option value="NON AC" @if($Student->ac_nonac == 'NON AC') selected @endif>NON AC</option>
                                 </select>
                             </div>
         
                             
                             
         
-                            {{-- <div class="form-group col-lg-3">
-                                <label for="ph_no1">Mobile No 1</label>
-                                <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $Student->ph_no1) }}" class="form-control form-control-sm digits" >
-                              
-                            </div>
-                            
-                            <div class="form-group col-lg-3">
-                                <label for="ph_no2">Mobile No 2</label>
-                                <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $Student->ph_no2) }}" class="form-control form-control-sm digits">
-                               
-                            </div> --}}
-        
                             <div class="form-group col-lg-3">
                                 <label>Gender</label>
                                 <select name="gender" class="form-control form-control-sm"  >
                                     <option value="">Select Gender</option>
-                                    <option value="Male" @if($Student->gender == 'Male') selected @endif>Male</option>
-                                    <option value="Female" @if($Student->gender == 'Female') selected @endif>Female</option>
+                                    <option value="MALE" @if($Student->gender == 'MALE') selected @endif>MALE</option>
+                                    <option value="FEMALE" @if($Student->gender == 'FEMALE') selected @endif>FEMALE</option>
                                     <option value="Other" @if($Student->gender == 'Other') selected @endif>Other</option>
                                 </select>
                             </div>
@@ -162,15 +151,7 @@
                             
 
                 
-                            {{-- <div class="form-group col-lg-3">
-                                <label>Admission Opted For</label>
-                                 <select name="admission_opted_for" class="form-control form-control-sm"  >
-                                     <option value="">Select Coaching Type</option>
-                                     <option value="Online" @if($Student->admission_opted_for == 'Online') selected @endif>Online</option>
-                                     <option value="Offline" @if($Student->admission_opted_for == 'Offline') selected @endif>Offline</option>
-                                 </select>
-                             </div>
-         --}}
+                 
                           
         
         
@@ -192,11 +173,7 @@
 
 
                          
-{{--          
-                             <div class="form-group col-lg-3">
-                                <label>Age</label>
-                                 <input type="number" name="age" value="{{$Student->age}}" class="form-control form-control-sm" >
-                            </div> --}}
+
         
         
                           
@@ -208,9 +185,7 @@
     </div>
 </div>
 
-                             {{-- @error('aadhar_card_no')
-                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                             @enderror --}}
+                           
 
         
                           
@@ -478,18 +453,7 @@
                         <h3>Mark Details</h3>
                         <fieldset class="row">
                             
-                            {{-- <div class="form-group col-lg-4">
-                                <label>Subject 1</label>
-                                <select name="S1" class="form-control form-control-sm" >
-                                    <option value="">Select Subject</option>
-                                    <option value="ENGLISH" {{ $Student->S1 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                    <option value="PHYSICS" {{ $Student->S1 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                    <option value="CHEMISTRY" {{ $Student->S1 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                    <option value="BIOLOGY" {{ $Student->S1 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                                </select>
-                            
-                            </div> --}}
-
+                         
 
                             <div class="form-group col-lg-4">
                                 <label>Subject 1</label>
@@ -507,28 +471,12 @@
                             <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}"  max="100" class="form-control form-control-sm" >
                         </div>
 
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Maximum Marks of S1</label>
-                            <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}" class="form-control form-control-sm" >
-                        </div> --}}
-
       <div class="form-group col-lg-4">
     <label>Marks Obtained in S1</label>
     <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$Student->S1_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
 
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Subject 2</label>
-                            <select name="S2" class="form-control form-control-sm" >
-                                <option value="">Select Subject</option>
-                                <option value="ENGLISH" {{ $Student->S2 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                <option value="PHYSICS" {{ $Student->S2 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                <option value="CHEMISTRY" {{ $Student->S2 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                <option value="BIOLOGY" {{ $Student->S2 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                            </select>
-                        </div> --}}
-
-
+                       
 
                         <div class="form-group col-lg-4">
                             <label>Subject 2</label>
@@ -544,19 +492,6 @@
     <label>Marks Obtained in S2</label>
     <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$Student->S2_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
-
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Subject 3</label>
-                            <select name="S3" class="form-control form-control-sm" >
-                                <option value="">Select Subject</option>
-                                <option value="ENGLISH" {{ $Student->S3 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                <option value="PHYSICS" {{ $Student->S3 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                <option value="CHEMISTRY" {{ $Student->S3 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                <option value="BIOLOGY" {{ $Student->S3 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                            </select>
-                        </div> --}}
-
-
 
                         <div class="form-group col-lg-4">
                             <label>Subject 3</label>
@@ -575,18 +510,7 @@
 </div>
 
 
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Subject 4</label>
-                            <select name="S4" class="form-control form-control-sm" >
-                                <option value="">Select Subject</option>
-                                <option value="ENGLISH" {{ $Student->S4 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                <option value="PHYSICS" {{ $Student->S4 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                <option value="CHEMISTRY" {{ $Student->S4 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                <option value="BIOLOGY" {{ $Student->S4 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                            </select>
-                        </div> --}}
-
-
+                     
                         <div class="form-group col-lg-4">
                             <label>Subject 4</label>
                             <input type="text" name="S4" value="{{ $Student->S4
@@ -701,7 +625,7 @@
 
     function hostel(type){
         document.getElementById('hostel_dayscholar').value = '';
-        if(type == 'Offline'){
+        if(type == 'OFFLINE'){
             document.getElementById('hostel_dayscholar').disabled = false;
         }else{
             document.getElementById('hostel_dayscholar').disabled = true;
@@ -712,8 +636,8 @@
         var selectedCoachingType = document.getElementById('coaching_type').value;
         var hostelSelect = document.getElementById('hostel_dayscholar');
         
-        if (selectedCoachingType !== 'Offline') {
-            hostelSelect.disabled = true;  // Disable if the value is not "Offline"
+        if (selectedCoachingType !== 'OFFLINE') {
+            hostelSelect.disabled = true;  // Disable if the value is not "OFFLINE"
         }
     };
 

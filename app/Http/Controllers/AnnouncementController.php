@@ -33,27 +33,26 @@ class AnnouncementController extends Controller
         return view('announcement.create');
     }
 
-    public function store(Request $request,FcmServiceProvider $fcm)
+public function store(Request $request,FcmServiceProvider $fcm)
 {
-    $announcement = new Announcement();
-    $announcement->academic_year = $request->academic_year;
-    $announcement->branch = implode(',', $request->branch);
-    $announcement->coaching_type = implode(',', $request->coaching_type);
-    $announcement->gender = $request->gender;
-    $announcement->title = $request->title;
-    $announcement->content = $request->content;
-    $announcement->student_ids = [];
+   $data = $request->all();
 
-    if ($request->has('attachment')) {
+   foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
+       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+   }
+
+   $data['student_ids'] = [];
+   if ($request->has('attachment')) {
         $fileName = time() . '.' . $request->attachment->extension();
         $request->attachment->move(public_path('assets/attachments'), $fileName);
-        $announcement->attachment = 'assets/attachments/' . $fileName;
+        $data['attachment'] = 'assets/attachments/' . $fileName;
     } else {
-        $announcement->attachment = null;
+        $data['attachment'] = null;
     }
-    $announcement->category = in_array('Offline', $request->coaching_type) ? $request->category : null;
-    $announcement->save();
-    $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->whereNotNull('device_token')->get()->map(function ($student) use ($fcm) {
+
+    $announcement = Announcement::create($data);
+
+     $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->whereNotNull('device_token')->get()->map(function ($student) use ($fcm) {
         return $student->device_token;
     })->toArray();
 
@@ -66,42 +65,30 @@ class AnnouncementController extends Controller
 
 public function edit(Request $request, Announcement $announcement)
 {
-   
-    $academicyear = AcademicYear::all(); 
-    $selectedCoachingTypes = explode(',', $announcement->coaching_type);
 
-    return view('announcement.edit', compact('announcement',  'academicyear', 'selectedCoachingTypes'));
+    return view('announcement.edit', compact('announcement'));
 }
 
 
 public function update(Request $request, Announcement $announcement)
 {
-    $announcement->academic_year = $request->academic_year;
-    $announcement->branch = implode(',', $request->branch);
-    $announcement->coaching_type = implode(',', $request->coaching_type);
-    $announcement->gender = $request->gender;
-    $announcement->title = $request->title;
-    $announcement->content = $request->content;
+    $data = $request->all();
 
-    if ($request->hasFile('attachment')) {
-        if ($announcement->attachment && file_exists(public_path($announcement->attachment))) {
-            unlink(public_path($announcement->attachment));
-        }
+   foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
+       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+   }
 
-        $file = $request->file('attachment');
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('assets/attachments'), $filename);
-        $announcement->attachment = 'assets/attachments/' . $filename;
-    }
-
-    if (in_array('Offline', $request->coaching_type)) {
-        $announcement->category = $request->category;
+   $data['student_ids'] = [];
+   if ($request->has('attachment')) {
+        $fileName = time() . '.' . $request->attachment->extension();
+        $request->attachment->move(public_path('assets/attachments'), $fileName);
+        $data['attachment'] = 'assets/attachments/' . $fileName;
     } else {
-        $announcement->category = null;
+        $data['attachment'] = null;
     }
 
-    $announcement->save();
-
+   $announcement->update($data);
+    
     return redirect()->route('announcement.index')->with('success', 'Announcement details successfully updated.');
 }
 

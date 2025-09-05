@@ -34,11 +34,16 @@ class AppServiceProvider extends ServiceProvider
             $query->where('id', $user->branch);
         })->get();
         $course =['NEET','JEE','XI-OB','XII-OB'];
-        $coachingtype = ['Offline','Online','Online Live','Online Recorded','Test Series'];
-
+        $coachingtype = ['OFFLINE','ONLINE','ONLINE LIVE','ONLINE RECORDED','TEST SERIES'];
+        $hostel =['DAYSCHOLAR','HOSTEL'];
+        $section = Student::select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+        $batch = Student::select('batch')->distinct()->orderBy('batch')->get()->pluck('batch')->toArray();
         View::share('academicyear', $academicyear);
         View::share('branches', $branchs);
         View::share('course', $course);
         View::share('coachingtype', $coachingtype);
+        View::share('hostel', $hostel);
+        View::share('section', $section);
+        View::share('batch', $batch);
     }
 }
