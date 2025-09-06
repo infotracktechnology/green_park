@@ -197,12 +197,12 @@ class HomeController extends Controller
     public function Filter(Request $request)
     {
          if($request->has('batch')) {
-            $section = self::StudentFilterQuery($request->branch,$request->course,$request->type,$request->category,$request->batch)->select('section')->distinct()->get()->pluck('section');
+            $section = Student::StudentFilterQuery($request->branch,$request->course,$request->type,$request->category,$request->batch)->select('section')->distinct()->get()->pluck('section');
             return response()->json($section);
         }
 
         if($request->has('branch')) {
-            $type = self::StudentFilterQuery($request->branch,$request->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type');
+            $type = Student::StudentFilterQuery($request->branch,$request->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type');
             return response()->json($type);
         }
 
@@ -260,25 +260,7 @@ class HomeController extends Controller
         return response()->json(['announcements' => $announcements]);
     }
 
-    public static function StudentFilterQuery($branch,$course,$type=null,$category=null, $batch=null) {
-        $query = Student::query();
-        if($branch) {
-            $query->whereIn('campus', explode(',', $branch));
-        }
-        if($type) {
-            $query->where('coaching_type', $type);
-        }
-        if($course) {
-            $query->where('course', $course);
-        }
-        if($category) {
-            $query->where('hostel_dayscholar', $category);
-        }
-        if($batch) {
-            $query->where('batch', $batch);
-        }
-        return $query;
-    }
+    
 
 
 }

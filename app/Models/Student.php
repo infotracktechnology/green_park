@@ -185,5 +185,24 @@ class Student extends Authenticatable
             'percentage' => $percentage,
         ];
     }
+    public static function StudentFilterQuery($branch,$course,$type=null,$category=null,$batch=null){
+        $query = self::query();
+        if($branch){
+            $query->whereIn('campus', explode(',', $branch));
+        }
+        if($type){
+            $query->where('coaching_type', $type);
+        }
+        if($course){
+            $query->where('course', $course);
+        }
+        if($category){
+            $query->where('hostel_dayscholar', $category);
+        }
+        if($batch){
+            $query->where('batch', $batch);
+        }
+        return $query;
+    }
    
 }

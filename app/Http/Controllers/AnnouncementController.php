@@ -66,9 +66,9 @@ public function store(Request $request,FcmServiceProvider $fcm)
 
 public function edit(Request $request, Announcement $announcement)
 {
-    $type = HomeController::StudentFilterQuery($announcement->branch,$announcement->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+    $type = Student::StudentFilterQuery($announcement->branch,$announcement->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-    $section = HomeController::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch)->select('section')->distinct()->get()->pluck('section')->toArray();
+    $section = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch)->select('section')->distinct()->get()->pluck('section')->toArray();
 
     return view('announcement.edit', compact('announcement','type','section'));
 }
