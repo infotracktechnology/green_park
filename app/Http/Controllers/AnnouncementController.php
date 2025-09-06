@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Providers\FcmServiceProvider;
+use App\Http\Controllers\HomeController;
 
 class AnnouncementController extends Controller
 {
@@ -37,9 +38,9 @@ public function store(Request $request,FcmServiceProvider $fcm)
 {
    $data = $request->all();
 
-   foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
-       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
-   }
+//    foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
+//        $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+//    }
 
    $data['student_ids'] = [];
    if ($request->has('attachment')) {
@@ -52,21 +53,24 @@ public function store(Request $request,FcmServiceProvider $fcm)
 
     $announcement = Announcement::create($data);
 
-     $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->whereNotNull('device_token')->get()->map(function ($student) use ($fcm) {
-        return $student->device_token;
-    })->toArray();
+    //  $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->whereNotNull('device_token')->get()->map(function ($student) use ($fcm) {
+    //     return $student->device_token;
+    // })->toArray();
 
-    if(!empty($students)) {
-        $fcm->sendMulticast($students,"Announcement", $request->title);
-    }
+    // if(!empty($students)) {
+    //     $fcm->sendMulticast($students,"Announcement", $request->title);
+    // }
 
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
 
 public function edit(Request $request, Announcement $announcement)
 {
+    $type = HomeController::StudentFilterQuery($announcement->branch,$announcement->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-    return view('announcement.edit', compact('announcement'));
+    $section = HomeController::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch)->select('section')->distinct()->get()->pluck('section')->toArray();
+
+    return view('announcement.edit', compact('announcement','type','section'));
 }
 
 
@@ -74,9 +78,9 @@ public function update(Request $request, Announcement $announcement)
 {
     $data = $request->all();
 
-   foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
-       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
-   }
+//    foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
+//        $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+//    }
 
    $data['student_ids'] = [];
    if ($request->has('attachment')) {
