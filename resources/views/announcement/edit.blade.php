@@ -21,7 +21,7 @@
                                 <h6 class="col-deep-purple">Update Announcement</h6>
                             </div>
 
-                            <div class="form-group col-lg-4">
+                            <div class="form-group col-lg-3">
                                 <label for="academic_year">Academic Year</label>
                                 <select name="academic_year" id="academic_year" class="form-control form-control-sm" required>
                                     @foreach ($academicyear as $row)
@@ -32,65 +32,81 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-lg-4">
+                    <div class="form-group col-lg-3">
                     <label>Course</label>
-                    <select name="course[]" id="course" class="select2" multiple="multiple" required>
+                    <select name="course" id="course" class="form-control form-control-sm" required>
+                      <option value="">Select Course</option>
                       @foreach ($course as $row)
-                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->course)))>{{$row}}</option>
+                      <option value="{{$row}}" @selected($row == $announcement->course)>{{$row}}</option>
                       @endforeach
                     </select>
                   </div>
-                         
-                            <div class="form-group col-lg-4">
-                                <label for="branch">Branch</label>
-                                <select name="branch[]" id="branch" class="select2 form-control" multiple required>
-                                    @foreach ($branches as $branch)
-                                <option value="{{ $branch->id }}"@selected(in_array($branch->id, explode(',', $announcement->branch)))>
-                                        {{ $branch->name }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <div class="form-group col-lg-4">
-                                <label>Coaching Type</label>
-                                <select name="coaching_type[]" id="coaching_type" class="select2 form-control" multiple required>
-                                     @foreach ($coachingtype as $row)
-                                    <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->coaching_type)))>{{$row}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
 
-                            <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-3">
+                    <label for="branch">Branch</label>
+                    <select name="branch" id="branch" class="form-control form-control-sm" required>
+                      <option value="">Select Branch</option>
+                      <option value="{{ $branches->implode('id', ',') }}" @selected($branches->implode('id', ',') == $announcement->branch)>All</option>
+                      @foreach ($branches as $branch)
+                      <option value="{{ $branch->id }}" @selected($branch->id == $announcement->branch)>{{ $branch->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Coaching Type</label>
+                    <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
+                      <option value="">Select Coaching Type</option>
+                      @foreach ($type as $row)
+                      <option value="{{$row}}" @selected($row == $announcement->coaching_type)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  
+                   <div class="form-group col-lg-4 typefilter">
                     <label>H/D</label>
-                    <select name="category[]" id="category" class="select2" multiple="multiple" required>
+                    <select name="category" id="category" class="form-control form-control-sm">
+                      <option value="">Select H/D</option>
                       @foreach ($hostel as $row)
-                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->category)))>{{$row}}</option>
+                      <option value="{{$row}}" @selected($row == $announcement->category)>{{$row}}</option>
                       @endforeach
                     </select>
                   </div>
 
 
-                   <div class="form-group col-lg-4">
-                    <label>Section</label>
-                    <select name="section[]" id="section" class="select2" multiple="multiple" required>
-                      @foreach ($section as $row)
-                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->section)))>{{$row}}</option>
-                      @endforeach
-                    </select>
-                  </div>
-
-
-                   <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-4 typefilter">
                     <label>Batch</label>
-                    <select name="batch[]" id="batch" class="select2" multiple="multiple">
+                    <select name="batch" id="batch" class="form-control form-control-sm">
+                      <option value="">Select Batch</option>
                       @foreach ($batch as $row)
-                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->batch)))>{{$row}}</option>
+                      <option value="{{$row}}" @selected($row == $announcement->batch)>{{$row}}</option>
                       @endforeach
                     </select>
                   </div>
 
-                            
+
+                   <div class="form-group col-lg-4 typefilter">
+                    <label>Section</label>
+                    <select name="section" id="section" class="form-control form-control-sm">
+                    <option value="">Select Section</option>
+                    <option value="{{ implode(',', $section)}}" @selected(implode(',', $section) == $announcement->section)>All</option>
+                    @foreach ($section as $row)
+                      <option value="{{$row}}" @selected($row == $announcement->section)>{{$row}}</option>
+                    @endforeach
+                    </select>
+                  </div>
+                
+
+                  <div class="form-group col-lg-4">
+                    <label>Gender</label>
+                    <select name="gender" class="form-control form-control-sm" required>
+                      <option value="All" @selected($announcement->gender == 'All') >All Gender</option>
+                      <option value="MALE" @selected($announcement->gender == 'MALE')>MALE</option>
+                      <option value="FEMALE" @selected($announcement->gender == 'FEMALE')>FEMALE</option>
+                    </select>
+                  </div>
+
 
                             
                             <div class="form-group col-lg-4">

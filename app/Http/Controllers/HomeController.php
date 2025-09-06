@@ -20,29 +20,35 @@ use App\Models\ParentConcern;
 class HomeController extends Controller
 {
     public function index(Request $request){
-        $data = Branch::when(auth()->user()->branch, function ($query) {$query->where('id', auth()->user()->branch);})->get();
-        
-        $boys = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Male')->count();
+        $branchId = auth()->user()->branch;
+        $today = date('Y-m-d');
 
-        $girls = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Female')->count();
+        $data = Branch::when($branchId, fn($q) => $q->where('id', $branchId))->get();
+        $students = Student::when($branchId, fn($q) => $q->where('campus', $branchId));
+        $boys = $students->where('gender', 'Male')->count();
+        $girls = $students->where('gender', 'Female')->count();
+        $total = $students->count();
 
-        $total = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->count();
+        $present = Attendance::when($branchId, fn($q) => $q->where('branch_id', $branchId))
+        ->where('status', 'P')->where('attendance_date', $today)->distinct('student_id')->count();
 
-        $present = Attendance::when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->where('status', 'P')->where('attendance_date', date('Y-m-d'))->distinct('student_id')->count();
+         $staffs = collect(Staff::select('department')->when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->get())->groupBy('department');
 
-        $staffs = collect(Staff::select('department')->when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->get())->groupBy('department');
+    $concerns = ParentConcern::all();
 
-        $concerns = ParentConcern::all();
+    $announcement = $data->map(fn($item) => [
+        'branch' => $item->name,
+        'count'  => Announcement::where('academic_year', $this->academic_year)
+            ->where('branch', 'like', "%{$item->id}%")
+            ->count()
+    ]);
 
-        $announcement = $data->map(function($item) {
-          $count = Announcement::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count();
-          return ['branch' => $item->name, 'count' => $count];
-        });
-
-         $chairman = $data->map(function($item) {
-          $count = Chairmanvideo::where('academic_year', $this->academic_year)->where('branch_id', 'like', "%{$item->id}%")->count();
-          return ['branch' => $item->name, 'count' => $count];
-        });
+    $chairman = $data->map(fn($item) => [
+        'branch' => $item->name,
+        'count'  => Chairmanvideo::where('academic_year', $this->academic_year)
+            ->where('branch_id', 'like', "%{$item->id}%")
+            ->count()
+    ]);
     
      return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
     }
@@ -188,9 +194,19 @@ class HomeController extends Controller
         return view('studentmenu.student', compact('menus','menu_student','types','students'));
     }
 
-    public function notify(FcmServiceProvider  $fcm)
+    public function Filter(Request $request)
     {
-        
+         if($request->has('batch')) {
+            $section = self::StudentFilterQuery($request->branch,$request->course,$request->type,$request->category,$request->batch)->select('section')->distinct()->get()->pluck('section');
+            return response()->json($section);
+        }
+
+        if($request->has('branch')) {
+            $type = self::StudentFilterQuery($request->branch,$request->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type');
+            return response()->json($type);
+        }
+
+       
     }
 
     public function dashboardGender(Request $request)
@@ -242,6 +258,26 @@ class HomeController extends Controller
         });
         $announcements = $query->get();
         return response()->json(['announcements' => $announcements]);
+    }
+
+    public static function StudentFilterQuery($branch,$course,$type=null,$category=null, $batch=null) {
+        $query = Student::query();
+        if($branch) {
+            $query->whereIn('campus', explode(',', $branch));
+        }
+        if($type) {
+            $query->where('coaching_type', $type);
+        }
+        if($course) {
+            $query->where('course', $course);
+        }
+        if($category) {
+            $query->where('hostel_dayscholar', $category);
+        }
+        if($batch) {
+            $query->where('batch', $batch);
+        }
+        return $query;
     }
 
 

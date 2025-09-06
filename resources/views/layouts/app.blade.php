@@ -259,25 +259,69 @@
     });
 </script>
   @yield('js')
+
 <script>
+  const course = $('#course');
+  const branch = $('#branch');
+  const type = $('#coaching_type');
+  const typefilter = $('.typefilter');
+  const section = $('#section');
 
-function toggleOption(options=[],element = null) {
-  element.empty();
-  let html = '';
-  options.forEach((option) => {
-    html += `<option value="${option}">${option}</option>`;
-  });
-  element.html(html);
-}
-
-function handleType(input) {
-  if (input.value === 'XI-OB' || input.value === 'XII-OB') {
-    toggleOption(['OFFLINE','ONLINE'], $('.type'));
-  } else {
-    toggleOption(['OFFLINE','ONLINE LIVE','ONLINE RECORDED','TEST SERIES'], $('.type'));
+ function populateSelect($el, data, { placeholder = 'Select', addAllOption = false } = {}) {
+        let optionsHtml = `<option value="">${placeholder}</option>`;
+        if (addAllOption && data && data.length > 0) {
+            optionsHtml += `<option value="${data.join(',')}">All</option>`;
+        }
+        if (data) {
+            $.each(data, (key, value) => {
+                optionsHtml += `<option value="${value}">${value}</option>`;
+            });
+        }
+        $el.html(optionsHtml);
   }
-}
 
+  function resetFields() {
+    branch.val('');
+    $('#batch').val('');
+    $('#category').val('');
+    section.val('');
+    populateSelect(type, [], { placeholder: 'Select Coaching Type' });
+    populateSelect(section, [], { placeholder: 'Select Section'});
+  }
+
+  function fetchData(params) {
+  return $.get('{{ route("filter") }}', params);
+  }
+
+  course.change(function() {
+    resetFields();
+  });
+
+  branch.change(function() {
+    fetchData({ course: course.val(), branch: branch.val() }).done(data => {
+      populateSelect(type, data, { placeholder: 'Select Coaching Type' });
+    })
+  });
+
+  type.change(function() {
+    if(type.val() === "OFFLINE") {
+    typefilter.show();
+    }
+    else {
+      $('#batch').val('');
+      $('#category').val('');
+      section.val('');
+      typefilter.hide();
+    } 
+  });
+
+$("#batch").change(function() {
+fetchData({category: $('#category').val(),batch: $('#batch').val(),type: type.val(),branch: branch.val(),course: course.val()}).done(data => {
+      populateSelect(section, data, { placeholder: 'Select Section', addAllOption: true });
+    });
+  });
+  type.trigger('change');
 </script>
+
 </body>
 </html>
