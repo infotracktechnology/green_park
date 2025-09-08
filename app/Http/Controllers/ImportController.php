@@ -31,7 +31,7 @@ class ImportController extends Controller
            $data = array_map(function ($row) use ($request) {
                 $row['academic_year'] = $request->academic_year;
                 if($request->operation == 'add'){
-                $row['campus'] = $request->campus;
+                $row['campus'] = $request->branch;
                 }
                 if(isset($row['password_1'])){
                 $row['password'] = bcrypt($row['password_1']);
