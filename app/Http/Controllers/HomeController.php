@@ -24,15 +24,15 @@ class HomeController extends Controller
         $today = date('Y-m-d');
 
         $data = Branch::when($branchId, fn($q) => $q->where('id', $branchId))->get();
-        $students = Student::when($branchId, fn($q) => $q->where('campus', $branchId));
-        $boys = $students->where('gender', 'Male')->count();
-        $girls = $students->where('gender', 'Female')->count();
+        $students = Student::when($branchId, fn($q) => $q->where('campus', $branchId))->get();
+        $boys = $students->where('gender', 'MALE')->count();
+        $girls = $students->where('gender', 'FEMALE')->count();
         $total = $students->count();
 
         $present = Attendance::when($branchId, fn($q) => $q->where('branch_id', $branchId))
         ->where('status', 'P')->where('attendance_date', $today)->distinct('student_id')->count();
 
-         $staffs = collect(Staff::select('department')->when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->get())->groupBy('department');
+         $staffs = collect(Staff::select('department')->when($branchId, function ($query) {$query->where('branch_id', $branchId);})->get())->groupBy('department');
 
     $concerns = ParentConcern::all();
 
@@ -49,47 +49,40 @@ class HomeController extends Controller
             ->where('branch_id', 'like', "%{$item->id}%")
             ->count()
     ]);
-    
+
      return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
     }
     
 
-    public function parent_concern(Request $request)
-    {
-        $parentconcerns = DB::table('parent_concern')->where('status', '!=', 'Closed')->get();
+    public function parent_concern(Request $request){
 
-        if ($request->has('submit')) {
-            $updateData = [
-                'status' => $request->status,
-            ];
+    $parentconcerns = ParentConcern::where('status', '!=', 'Closed')->get();
 
-            if ($request->status === 'Closed') {
-                if ($request->hasFile('file')) {
-                    $parentconcern = DB::table('parent_concern')->where('id', $request->id)->first();
+    if ($request->has('submit')) {
+        $parentconcern = ParentConcern::findOrFail($request->id);
+        $updateData = ['status' => $request->status];
 
-                    if ($parentconcern && $parentconcern->file) {
-                        $oldFilePath = $parentconcern->file;
-                        if (file_exists($oldFilePath)) {
-                            unlink($oldFilePath);
-                        }
-                    }
-
-                    $file = $request->file('file');
-                    $fileName = time() . '_' . $file->getClientOriginalName();
-                    $file->move('uploads/concern', $fileName);
-                    $updateData['file'] = 'uploads/concern/'.$fileName;
+        if ($request->status === 'Closed') {
+            if ($request->hasFile('file')) {
+                if ($parentconcern->file && file_exists($parentconcern->file)) {
+                    unlink($parentconcern->file);
                 }
-
-                $updateData['remark'] = $request->remark;
+                $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
+                $path = $request->file('file')->move('uploads/concern', $fileName);
+                $updateData['file'] = $path;
             }
 
-           ParentConcern::where('id', $request->id)->update($updateData);
-
-            return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
+            $updateData['remark'] = $request->remark;
         }
 
-        return view('announcement.parent_concern', compact('parentconcerns'));
+        $parentconcern->update($updateData);
+
+        return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
     }
+
+    return view('announcement.parent_concern', compact('parentconcerns'));
+}
+
 
 
 
