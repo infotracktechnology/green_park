@@ -43,7 +43,6 @@
                     <label for="branch">Branch</label>
                     <select name="branch" id="branch" class="form-control form-control-sm" required>
                       <option value="">Select Branch</option>
-                      <option value="{{ $branches->implode('id', ',') }}">All</option>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                       @endforeach
@@ -61,7 +60,7 @@
                   </div>
 
                   
-                   <div class="form-group col-lg-4 typefilter">
+                   <div class="form-group col-lg-4">
                     <label>H/D</label>
                     <select name="category" id="category" class="form-control form-control-sm">
                       <option value="">Select H/D</option>
@@ -72,7 +71,7 @@
                   </div>
 
 
-                  <div class="form-group col-lg-4 typefilter">
+                  <div class="form-group col-lg-4">
                     <label>Batch</label>
                     <select name="batch" id="batch" class="form-control form-control-sm">
                       <option value="">Select Batch</option>
@@ -83,7 +82,7 @@
                   </div>
 
 
-                   <div class="form-group col-lg-4 typefilter">
+                   <div class="form-group col-lg-4">
                     <label>Section</label>
                     <select name="section" id="section" class="form-control form-control-sm">
                     </select>
