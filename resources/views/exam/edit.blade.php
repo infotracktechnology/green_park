@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Examinations')
 @section('css')
+<link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}" />
+<link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css"/>
 @endsection
@@ -137,6 +139,8 @@ $coaching_types = explode(',', $exam->coaching_type);
 @endsection
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
+<script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
+<script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
 @section('js')
 <script>
      flatpickr(".datetime-picker", {
