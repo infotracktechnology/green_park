@@ -261,67 +261,97 @@
   @yield('js')
 
 <script>
-  const course = $('#course');
-  const branch = $('#branch');
-  const type = $('#coaching_type');
-  const typefilter = $('.typefilter');
-  const section = $('#section');
+  const course   = $('#course');
+  const branch   = $('#branch');
+  const type     = $('#coaching_type');
+  const section  = $('#section');
+  const batch    = $('#batch');
+  const category = $('#category');
 
- function populateSelect($el, data, { placeholder = 'Select', addAllOption = false } = {}) {
-        let optionsHtml = `<option value="">${placeholder}</option>`;
-        if (addAllOption && data && data.length > 0) {
-            optionsHtml += `<option value="${data.join(',')}">All</option>`;
-        }
-        if (data) {
-            $.each(data, (key, value) => {
-                optionsHtml += `<option value="${value}">${value}</option>`;
-            });
-        }
-        $el.html(optionsHtml);
+  function populateSelect($el, data, { placeholder = 'Select', addAllOption = false } = {}) {
+    let optionsHtml = `<option value="">${placeholder}</option>`;
+    if (addAllOption && data) {
+      optionsHtml += `<option value="${data.join(',')}">All</option>`;
+    }
+    if (data) {
+      $.each(data, (_, value) => {
+        optionsHtml += `<option value="${value}">${value}</option>`;
+      });
+    }
+    $el.html(optionsHtml);
   }
 
   function resetFields() {
     branch.val('');
-    $('#batch').val('');
-    $('#category').val('');
+    batch.val('');
+    category.val('');
     section.val('');
     populateSelect(type, [], { placeholder: 'Select Coaching Type' });
-    populateSelect(section, [], { placeholder: 'Select Section'});
+    populateSelect(section, [], { placeholder: 'Select Section' });
   }
 
   function fetchData(params) {
-  return $.get('{{ route("filter") }}', params);
+    return $.get('{{ route("filter") }}', params);
   }
 
-  course.change(function() {
+  function toggleField($el, show = true) {
+    $el.closest('.form-group').toggle(show);
+    if (!show) $el.val('');
+  }
+
+  course.change(() => {
+     let c = course.val();
+    if (c === 'XI-OB' || c === 'XII-OB') {
+      branch.find('option[value="1"], option[value="4"], option[value="5"]').prop('hidden', true);
+    } else {
+      branch.find('option').prop('hidden', false);
+    }
     resetFields();
   });
 
-  branch.change(function() {
-    fetchData({ course: course.val(), branch: branch.val() }).done(data => {
-      populateSelect(type, data, { placeholder: 'Select Coaching Type' });
-    })
+  branch.change(() => {
+    fetchData({ course: course.val(), branch: branch.val() })
+      .done(data => populateSelect(type, data, { placeholder: 'Select Coaching Type' }));
   });
 
-  type.change(function() {
-    if(type.val() === "OFFLINE") {
-    typefilter.show();
+  type.change(() => {
+    let c = course.val();
+    let t = type.val();
+    let b = parseInt(branch.val());
+    toggleField(batch, false);
+    toggleField(category, false);
+    toggleField(section, false);
+
+    if (t === 'OFFLINE') {
+      if ((c === 'NEET' || c === 'JEE') && [1, 4, 5].includes(b)) {
+        toggleField(category, true);
+        toggleField(batch, true);
+        toggleField(section, true);
+      } else if ((c === 'NEET' || c === 'JEE') && [3, 6].includes(b)) {
+        toggleField(batch, true);
+        toggleField(section, true);
+      } else {
+        toggleField(section, true);
+      }
     }
-    else {
-      $('#batch').val('');
-      $('#category').val('');
-      section.val('');
-      typefilter.hide();
-    } 
   });
 
-$("#batch").change(function() {
-fetchData({category: $('#category').val(),batch: $('#batch').val(),type: type.val(),branch: branch.val(),course: course.val()}).done(data => {
+
+  batch.change(() => {
+    fetchData({
+      category: category.val(),
+      batch: batch.val(),
+      type: type.val(),
+      branch: branch.val(),
+      course: course.val()
+    }).done(data => {
       populateSelect(section, data, { placeholder: 'Select Section', addAllOption: true });
     });
   });
+
   type.trigger('change');
 </script>
+
 
 </body>
 </html>
