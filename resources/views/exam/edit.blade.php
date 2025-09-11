@@ -54,17 +54,14 @@ $coaching_types = explode(',', $exam->coaching_type);
 
                                  <select name="coaching_type[]" id="coaching_type" class="select" multiple required>
                                     <option value="">Select Coaching Type</option>
-                                    <option value="Offline" @selected(in_array('Offline', $coaching_types))>Offline</option>
-                                    <option value="Online Recorded" @selected(in_array('Online Recorded', $coaching_types))>Online Recorded</option>
-                                    <option value="Online Live" @selected(in_array('Online Live', $coaching_types))>Online Live</option>
-                                    <option value="Test Series" @selected(in_array('Test Series', $coaching_types))>Test Series</option>
-                                    <option value=" XI - OB" @selected(in_array('11', $coaching_types))>  XI - OB</option>
-                                    <option value=" XII - OB" @selected(in_array('12', $coaching_types))> XII - OB</option>
+                                     @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}" @selected(in_array($row, explode(',', $exam->coaching_type)))>{{$row}}</option>
+                                    @endforeach
                                  </select>
                               </div>
   <div class="form-group col-lg-4">  
                                 <label>Category</label>
-                                <select name="category" id="category" class="form-control form-control-sm"  required>
+                                <select name="category"  class="form-control form-control-sm"  required>
                                     <option value="">Select Category</option>
                                     <option value="Cumulative Test" @selected($exam->category == 'Cumulative Test')>Cumulative Test</option>
                                     <option value="Grand Test" @selected($exam->category == 'Grand Test')>Grand Test</option>
