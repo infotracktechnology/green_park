@@ -50,20 +50,16 @@
 
                                  <select name="coaching_type[]" id="coaching_type" class="select2" multiple required>
                                     <option value="">Select Coaching Type</option>
-                                    <option value="Offline,Online Recorded,Online Live,Test Series,11,12">All</option>
-                                    <option value="Offline">Offline</option>
-                                    <option value="Online Recorded">Online Recorded</option>
-                                    <option value="Online Live">Online Live</option>
-                                    <option value="Test Series">Test Series</option>
-                                    <option value=" XI - OB"> XI - OB</option>
-                                    <option value=" XII - OB"> XII - OB</option>
+                                     @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}">{{$row}}</option>
+                                    @endforeach
                                  </select>
                               </div>
 
                               <div class="form-group col-lg-3">
                                 <label>Category</label>
-                                <select name="category" id="category" class="form-control form-control-sm"  required>
-                                    <option value="all">All</option>
+                                <select name="category" class="form-control form-control-sm"  required>
+                                    {{-- <option value="all">All</option> --}}
                                     <option value="Cumulative Test">Cumulative Test</option>
                                     <option value="Grand Test">Grand Test</option>
                                     <option value="Physics (Weekend)">Physics (Weekend)</option>
