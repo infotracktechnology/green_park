@@ -55,7 +55,7 @@
                   </div>
                   <div class="card-body">
                     <div class="notice-board">
-                        @forelse(auth()->user()->announcement() as $announcement)
+                        @forelse($announcements as $announcement)
                             <div class="notice-board-item border p-3 mb-3 rounded">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="notice-board-id">

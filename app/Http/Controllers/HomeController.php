@@ -194,6 +194,11 @@ class HomeController extends Controller
             return response()->json($section);
         }
 
+        if($request->has('type')) {
+            $students = Student::StudentFilterQuery($request->branch,$request->course,$request->type,null,null)->get()->pluck('student_name','student_id');
+            return response()->json($students);
+        }
+
         if($request->has('branch')) {
             $type = Student::StudentFilterQuery($request->branch,$request->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type');
             return response()->json($type);

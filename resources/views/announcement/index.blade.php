@@ -36,6 +36,7 @@
   
         <tr role="row">
           <th>Academic Year </th>
+          <th>User Type</th>
           <th>Course</th>
           <th>Branch </th>
           <th>Coaching Type</th>
@@ -53,6 +54,7 @@
           @foreach ($announcements as $announcement)
           <tr>
             <td>{{ $announcement->academic_year }}</td> 
+            <td>{{ $announcement->usertype }}</td>
             <td>{{ $announcement->course }}</td>
             <td>
                 @php
