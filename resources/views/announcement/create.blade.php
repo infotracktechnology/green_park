@@ -1,9 +1,12 @@
 @extends('layouts.app') 
 @section('title', ' Announcement') 
+
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}" />
 <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
-@endsection @section('main')
+@endsection 
+
+@section('main')
 <div class="main-content">
   <section class="section">
     <div class="section-body">
@@ -29,6 +32,14 @@
                     </select>
                   </div>
 
+                   <div class="form-group col-lg-3">
+                    <label>User Type</label>
+                    <select name="usertype" id="usertype" class="form-control form-control-sm" required>
+                      <option value="GROUP">GROUP</option>
+                      <option value="INDIVIDUAL">INDIVIDUAL STUDENT</option>
+                    </select>
+                   </div>
+
                   <div class="form-group col-lg-3">
                     <label>Course</label>
                     <select name="course" id="course" class="form-control form-control-sm" required>
@@ -41,8 +52,7 @@
 
                   <div class="form-group col-lg-3">
                     <label for="branch">Branch</label>
-                    <select name="branch" id="branch" class="form-control form-control-sm" required>
-                      <option value="">Select Branch</option>
+                    <select name="branch[]" id="branch" class="select2" multiple required>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                       @endforeach
@@ -51,8 +61,7 @@
 
                   <div class="form-group col-lg-3">
                     <label>Coaching Type</label>
-                    <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
-                      <option value="">Select Coaching Type</option>
+                    <select name="coaching_type[]" id="coaching_type" class="select2" multiple required>
                       @foreach ($coachingtype as $row)
                       <option value="{{$row}}">{{$row}}</option>
                       @endforeach
@@ -60,7 +69,7 @@
                   </div>
 
                   
-                   <div class="form-group col-lg-4">
+                   <div class="form-group col-lg-2">
                     <label>H/D</label>
                     <select name="category" id="category" class="form-control form-control-sm">
                       <option value="">Select H/D</option>
@@ -71,7 +80,7 @@
                   </div>
 
 
-                  <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-2">
                     <label>Batch</label>
                     <select name="batch" id="batch" class="form-control form-control-sm">
                       <option value="">Select Batch</option>
@@ -82,19 +91,25 @@
                   </div>
 
 
-                   <div class="form-group col-lg-4">
+                   <div class="form-group col-lg-2">
                     <label>Section</label>
                     <select name="section" id="section" class="form-control form-control-sm">
                     </select>
                   </div>
                 
 
-                  <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-2">
                     <label>Gender</label>
-                    <select name="gender" class="form-control form-control-sm" required>
+                    <select name="gender" id="gender" class="form-control form-control-sm" required>
                       <option value="All" selected>All Gender</option>
                       <option value="MALE">MALE</option>
                       <option value="FEMALE">FEMALE</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-4">
+                    <label>Students</label>
+                    <select name="students" id="students" class="form-control form-control-sm select2" required>
                     </select>
                   </div>
 
@@ -103,7 +118,7 @@
                     <input type="text" name="title" id="title" class="form-control form-control-sm" required />
                   </div>
 
-                  <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-3">
                         <label for="attachment">Attachment</label>
                         <input type="file" name="attachment" class="form-control form-control-sm">             
                   </div>
@@ -126,7 +141,9 @@
     </div>
   </section>
 </div>
-@endsection @section('js')
+@endsection 
+
+@section('js')
 <script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
 <script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
 @endsection

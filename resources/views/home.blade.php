@@ -27,7 +27,7 @@
 <div class="main-content">
   <section class="section">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="card">
             <div class="card-header">
                 <h4 class="text-white">Students</h4>
@@ -92,7 +92,7 @@
         </div>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="card">
             <div class="card-header">
                 <h4 class="text-white">Attendance</h4>

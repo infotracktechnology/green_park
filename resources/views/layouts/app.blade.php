@@ -12,18 +12,12 @@
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <style>
-    .select2 {
-      width: 100% !important;
-    }
-
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-  </style>
+<style>
+  .select2{
+    width: 100% !important;
+  }
+</style>
   @yield('css')
 </head>
 <body>
@@ -267,91 +261,122 @@
   const section  = $('#section');
   const batch    = $('#batch');
   const category = $('#category');
+  const usertype = $('#usertype');
+  const gender   = $('#gender');
+  const students = $('#students');
 
-  function populateSelect($el, data, { placeholder = 'Select', addAllOption = false } = {}) {
-    let optionsHtml = `<option value="">${placeholder}</option>`;
-    if (addAllOption && data) {
-      optionsHtml += `<option value="${data.join(',')}">All</option>`;
+  const fetchData = (params) => $.get('{{ route("filter") }}', params);
+
+  const populate = ($el, data=[], {placeholder='', addAll=false}={})=>{
+    let html = placeholder ? `<option value="">${placeholder}</option>` : '';
+    if(addAll && Array.isArray(data) && data.length) {
+      html += `<option value="${data.join(',')}">All</option>`;
     }
-    if (data) {
-      $.each(data, (_, value) => {
-        optionsHtml += `<option value="${value}">${value}</option>`;
-      });
-    }
-    $el.html(optionsHtml);
-  }
+    Array.isArray(data)
+      ? data.forEach(v=> html += `<option value="${v}">${v}</option>`)
+      : $.each(data,(k,v)=> html += `<option value="${k}">${v}</option>`);
+    $el.html(html);
+  };
 
-  function resetFields() {
-    branch.val('');
-    batch.val('');
-    category.val('');
-    section.val('');
-    populateSelect(type, [], { placeholder: 'Select Coaching Type' });
-    populateSelect(section, [], { placeholder: 'Select Section' });
-  }
-
-  function fetchData(params) {
-    return $.get('{{ route("filter") }}', params);
-  }
-
-  function toggleField($el, show = true) {
+  const togglefield = ($el, show=true)=>{
     $el.closest('.form-group').toggle(show);
-    if (!show) $el.val('');
-  }
+    $el.prop('required', show);
+    if(!show) $el.val('');
+  };
 
-  course.change(() => {
-     let c = course.val();
-    if (c === 'XI-OB' || c === 'XII-OB') {
-      branch.find('option[value="1"], option[value="4"], option[value="5"]').prop('hidden', true);
-    } else {
-      branch.find('option').prop('hidden', false);
-    }
-    resetFields();
-  });
+  const updateVisibility = ()=>{
+    const u = usertype.val();
+    const t = type.val() || [];
+    const c = course.val();
+    const b = (branch.val() || []).map(v=>parseInt(v));
 
-  branch.change(() => {
-    fetchData({ course: course.val(), branch: branch.val() })
-      .done(data => populateSelect(type, data, { placeholder: 'Select Coaching Type' }));
-  });
+    togglefield(students, u === 'INDIVIDUAL');
+    togglefield(gender,   u !== 'INDIVIDUAL');
 
-  type.change(() => {
-    let c = course.val();
-    let t = type.val();
-    let b = parseInt(branch.val());
-    toggleField(batch, false);
-    toggleField(category, false);
-    toggleField(section, false);
-
-    if (t === 'OFFLINE') {
-      if ((c === 'NEET' || c === 'JEE') && [1, 4, 5].includes(b)) {
-        toggleField(category, true);
-        toggleField(batch, true);
-        toggleField(section, true);
-      } else if ((c === 'NEET' || c === 'JEE') && [3, 6].includes(b)) {
-        toggleField(batch, true);
-        toggleField(section, true);
+    const hasOffline = t.some(v => v.includes('OFFLINE'));
+    if(hasOffline && u === 'GROUP'){
+      if(['NEET','JEE'].includes(c)){
+        if(b.some(x=>[1,4,5].includes(x))){
+          [category,batch,section].forEach(f=>togglefield(f,true));
+        } else if(b.some(x=>[3,6].includes(x))){
+          togglefield(category,false);
+          [batch,section].forEach(f=>togglefield(f,true));
+        } else {
+          togglefield(category,false);
+          togglefield(batch,false);
+          togglefield(section,true);
+        }
       } else {
-        toggleField(section, true);
+        togglefield(category,false);
+        togglefield(batch,false);
+        togglefield(section,true);
       }
+    } else {
+      [category,batch,section].forEach(f=>togglefield(f,false));
+    }
+  };
+
+ 
+course.change(() => {
+  const c = course.val();
+  if (typeof originalBranchOptions === 'undefined') {
+    originalBranchOptions = branch.find('option').clone();
+  }
+  branch.select2('destroy');
+  branch.empty();
+  if(['XI-OB','XII-OB'].includes(c)) {
+    originalBranchOptions.each(function() {
+      const value = $(this).val();
+      if(!['1','4','5'].includes(value)) {
+        branch.append($(this).clone());
+      }
+    });
+  } else {
+    branch.append(originalBranchOptions.clone());
+  }
+  branch.select2();
+  branch.val('').trigger('change');
+  populate(type);
+  populate(section, [], {placeholder: 'Select Section'});
+});
+
+  branch.change(()=>{
+    if(branch.val()==='') return;
+    fetchData({ course: course.val(), branch: branch.val().join(',') })
+      .done(data=> populate(type,data));
+  });
+
+  const resetFields = ()=>{ 
+    course.val('').trigger('change'); 
+    branch.val('').trigger('change'); 
+    type.val('').trigger('change'); 
+    students.html(''); 
+  };
+
+  usertype.change(()=>{
+    resetFields();
+    updateVisibility();
+  });
+
+  type.change(()=>{
+    updateVisibility();
+    if(usertype.val()==='INDIVIDUAL'){
+      fetchData({ type: type.val()?.join(','), branch: branch.val()?.join(','), course: course.val() })
+        .done(data=>{
+          let options = '';
+          $.each(data, (k, v) => options += `<option value="${k}">${k}-${v}</option>`);
+          students.html(options);
+        });
     }
   });
 
-
-  batch.change(() => {
-    fetchData({
-      category: category.val(),
-      batch: batch.val(),
-      type: type.val(),
-      branch: branch.val(),
-      course: course.val()
-    }).done(data => {
-      populateSelect(section, data, { placeholder: 'Select Section', addAllOption: true });
-    });
+  batch.change(()=>{
+    if(branch.val()===null || type.val()===null || batch.val()===null || category.val()===null) return;
+    fetchData({ category: category.val(), batch: batch.val(), type: type.val()?.join(','), branch: branch.val()?.join(','), course: course.val() })
+      .done(data=> populate(section,data,{placeholder:'Select Section',addAll:true}));
   });
 
-  type.trigger('change');
+  window.onload = updateVisibility;
 </script>
-
-
 </body>
 </html>

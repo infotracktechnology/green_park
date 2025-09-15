@@ -38,9 +38,9 @@ public function store(Request $request,FcmServiceProvider $fcm)
 {
    $data = $request->all();
 
-//    foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
-//        $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
-//    }
+    foreach (['coaching_type','branch'] as $field) {
+       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+   }
 
    $data['student_ids'] = [];
    if ($request->has('attachment')) {
@@ -70,7 +70,10 @@ public function edit(Request $request, Announcement $announcement)
 
     $section = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch)->select('section')->distinct()->get()->pluck('section')->toArray();
 
-    return view('announcement.edit', compact('announcement','type','section'));
+    $students = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,null,null)->get()->pluck('student_name','student_id')->toArray();
+  
+
+    return view('announcement.edit', compact('announcement','type','section','students'));
 }
 
 
@@ -78,9 +81,9 @@ public function update(Request $request, Announcement $announcement)
 {
     $data = $request->all();
 
-//    foreach (['course','coaching_type','branch','category','section','batch'] as $field) {
-//        $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
-//    }
+   foreach (['coaching_type','branch'] as $field) {
+       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+   }
 
    $data['student_ids'] = [];
    if ($request->has('attachment')) {
@@ -112,12 +115,9 @@ public function destroy($id)
 
     public function notification(Request $request)
     {
-    $announcements = auth()->user()->announcement();
-
+    $student = Student::where('student_id', auth()->user()->student_id)->first();
+    $announcements = Announcement::ForStudent($student)->latest()->get();
     return view('student.notification', compact('announcements'));
     }
-
-    
-
 
 }

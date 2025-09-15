@@ -58,7 +58,7 @@
 
                               <div class="form-group col-lg-3">
                                 <label>Category</label>
-                                <select name="category" class="form-control form-control-sm"  required>
+                                <select name="testcategory" class="form-control form-control-sm"  required>
                                     {{-- <option value="all">All</option> --}}
                                     <option value="Cumulative Test">Cumulative Test</option>
                                     <option value="Grand Test">Grand Test</option>

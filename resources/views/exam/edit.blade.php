@@ -61,8 +61,8 @@ $coaching_types = explode(',', $exam->coaching_type);
                               </div>
   <div class="form-group col-lg-4">  
                                 <label>Category</label>
-                                <select name="category"  class="form-control form-control-sm"  required>
-                                    <option value="">Select Category</option>
+                                <select name="testcategory"  class="form-control form-control-sm"  required>
+                                    
                                     <option value="Cumulative Test" @selected($exam->category == 'Cumulative Test')>Cumulative Test</option>
                                     <option value="Grand Test" @selected($exam->category == 'Grand Test')>Grand Test</option>
                                     <option value="Physics (Weekend)" @selected($exam->category == 'Physics (Weekend)')>Physics (Weekend)</option>

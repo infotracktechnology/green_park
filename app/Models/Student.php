@@ -50,26 +50,7 @@ class Student extends Authenticatable
         //     $model->save();
         // });
     }
-   public function announcement()
-   {
-       return Announcement::where('branch', 'like', "%{$this->campus}%")
-           ->where('coaching_type', 'like', "%{$this->coaching_type}%")
-           ->where('academic_year', $this->academic_year)
-           ->where(function ($query){$query->where('gender', $this->gender)->orWhere('gender', 'All');})
-           ->latest()
-           ->get();
-   }
 
-   public function announcement_count(){
-
-       return Announcement::where('branch', 'like', "%{$this->campus}%")
-           ->where('coaching_type', 'like', "%{$this->coaching_type}%")
-           ->where('academic_year', $this->academic_year)
-           ->whereJsonDoesntContain('student_ids', $this->student_id)
-           ->where(function ($query) { 
-            $query->where('gender', $this->gender)->orWhere('gender', 'All');
-            })->count();
-   }
 
     function chairmanvideo()
     {
@@ -191,7 +172,7 @@ class Student extends Authenticatable
             $query->whereIn('campus', explode(',', $branch));
         }
         if($type){
-            $query->where('coaching_type', $type);
+            $query->where('coaching_type', explode(',',$type));
         }
         if($course){
             $query->where('course', $course);
