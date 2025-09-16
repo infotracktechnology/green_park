@@ -2,16 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Student;
-use App\Models\Chairmanvideo;
-use App\Models\Announcement;
-use App\Models\Examportion;
-use App\Models\RevisionVideo;
-use App\Models\TimetableAssign;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\SickRoomEntry;
-use App\Models\Exam;
+use App\Models\{Student,Chairmanvideo,Announcement,Examportion,RevisionVideo,TimetableAssign,SickRoomEntry,Exam};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,10 +15,6 @@ use App\Models\Exam;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 
 Route::group(['prefix' => 'v2'], function () {
 
@@ -198,11 +187,7 @@ Route::group(['prefix' => 'v2'], function () {
         $parent_concern = DB::table('parent_concern')->where('student_id', $student_id)->get();
         return response()->json($parent_concern ?? []);
     });
-    // Route::get('/chat/messages/{user_id}', function (Request $request, $user_id) {
-    //     $read = DB::table('chat')->where('sender_id', $user_id)->where('chat_read', 0)->update(['chat_read' => 1]);
-    //     $messages = DB::table('chat')->where('sender_id', $user_id)->orWhere('receiver_id', $user_id)->selectRaw("type, message,sender_id,receiver_id,created_at")->orderBy('created_at', 'desc')->get();
-    //     return response()->json($messages);
-    // });
+   
     Route::get('/sickroomentry/{student_id}', function ($student_id) {
         $sickroomentry = SickRoomEntry::where('student_id', $student_id)->get();
         return response()->json($sickroomentry);
