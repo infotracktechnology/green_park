@@ -46,7 +46,7 @@ class HomeController extends Controller
     $chairman = $data->map(fn($item) => [
         'branch' => $item->name,
         'count'  => Chairmanvideo::where('academic_year', $this->academic_year)
-            ->where('branch_id', 'like', "%{$item->id}%")
+            ->where('branch', 'like', "%{$item->id}%")
             ->count()
     ]);
 
