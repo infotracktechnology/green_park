@@ -189,8 +189,8 @@ class HomeController extends Controller
 
     public function Filter(Request $request)
     {
-         if($request->has('batch')) {
-            $section = Student::StudentFilterQuery($request->branch,$request->course,$request->type,$request->category,$request->batch)->select('section')->distinct()->get()->pluck('section');
+         if($request->has('gender')) {
+            $section = Student::StudentFilterQuery($request->branch,$request->course,$request->type,$request->category,$request->batch,$request->gender)->select('section')->distinct()->get()->pluck('section');
             return response()->json($section);
         }
 

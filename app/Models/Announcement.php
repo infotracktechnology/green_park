@@ -23,6 +23,11 @@ class Announcement extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function branchNames()
+    {
+        return Branch::whereIn('id', explode(',', $this->branch))->get()->implode('name', '/');
+    }
     
 public static function ForStudent(Student $student)
 {
@@ -54,6 +59,7 @@ public function StudentList()
         return $query
             ->where('academic_year', $this->academic_year)
             ->where('student_id', $this->students)
+            ->whereNotNull('device_token')
             ->get();
     }
 
@@ -80,7 +86,7 @@ public function StudentList()
         $query->where('gender', $this->gender);
     }
 
-    return $query->get();
+    return $query->whereNotNull('device_token')->get();
 }
 
 }

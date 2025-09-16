@@ -166,7 +166,7 @@ class Student extends Authenticatable
             'percentage' => $percentage,
         ];
     }
-    public static function StudentFilterQuery($branch,$course,$type=null,$category=null,$batch=null){
+    public static function StudentFilterQuery($branch,$course,$type=null,$category=null,$batch=null,$gender=null){
         $query = self::query();
         if($branch){
             $query->whereIn('campus', explode(',', $branch));
@@ -182,6 +182,9 @@ class Student extends Authenticatable
         }
         if($batch){
             $query->where('batch', $batch);
+        }
+        if($gender && $gender != 'All'){
+            $query->where('gender', $gender);
         }
         return $query;
     }
