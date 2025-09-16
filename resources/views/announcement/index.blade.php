@@ -56,15 +56,7 @@
             <td>{{ $announcement->academic_year }}</td> 
             <td>{{ $announcement->usertype }}</td>
             <td>{{ $announcement->course }}</td>
-            <td>
-                @php
-                    $branchNames = collect(explode(',', $announcement->branch))
-                        ->map(fn($branchId) => optional(app\Models\Branch::find(trim($branchId)))->name)
-                        ->filter()
-                        ->implode(', ');
-                @endphp
-                {{ $branchNames }}
-            </td>
+            <td>{{ $announcement->branchNames() }}</td>
             <td>{{$announcement->coaching_type}}</td>
             <td>{{$announcement->category}}</td>
             <td>{{$announcement->section}}</td>
@@ -90,7 +82,6 @@
           
         </tbody>
       </table>
-    </table>
                 </div>
             </div>
         </div>

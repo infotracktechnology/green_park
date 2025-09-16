@@ -1,9 +1,5 @@
 @extends('layouts.app')
 @section('title', 'announcement')
-@section('css')
-<link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}">
-<link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}">
-@endsection
 
 @section('main')
 <div class="main-content">
@@ -92,6 +88,17 @@
                     </select>
                   </div>
 
+                  
+                  <div class="form-group col-lg-2">
+                    <label>Gender</label>
+                    <select name="gender" id="gender" class="form-control form-control-sm" required>
+                      <option value="">Select Gender</option>
+                      <option value="All" @selected($announcement->gender == 'All') >All Gender</option>
+                      <option value="MALE" @selected($announcement->gender == 'MALE')>MALE</option>
+                      <option value="FEMALE" @selected($announcement->gender == 'FEMALE')>FEMALE</option>
+                    </select>
+                  </div>
+
 
                    <div class="form-group col-lg-2">
                     <label>Section</label>
@@ -105,14 +112,6 @@
                   </div>
                 
 
-                  <div class="form-group col-lg-2">
-                    <label>Gender</label>
-                    <select name="gender" id="gender" class="form-control form-control-sm" required>
-                      <option value="All" @selected($announcement->gender == 'All') >All Gender</option>
-                      <option value="MALE" @selected($announcement->gender == 'MALE')>MALE</option>
-                      <option value="FEMALE" @selected($announcement->gender == 'FEMALE')>FEMALE</option>
-                    </select>
-                  </div>
 
                   <div class="form-group col-lg-4">
                     <label>Students</label>
@@ -159,9 +158,4 @@
 </div>
 @endsection
 
-@section('js')
-<script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
-<script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
-<script>
-</script>
-@endsection
+

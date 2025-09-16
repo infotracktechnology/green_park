@@ -12,6 +12,8 @@
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
+  <link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}" />
+  <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
   .select2{
@@ -233,18 +235,8 @@
   <script src="{{asset('js/app.min.js')}}"></script>
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      $('.select').each(function () {
-        new TomSelect(this, {
-          create: true,
-          plugins: ['remove_button'],
-          sortField: { field: "text", direction: "asc" }
-        });
-      });
-    });
-  </script>
+  <script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
+  <script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
   <script>
     window.addEventListener("pageshow", function (event) {
         if (event.persisted) {
@@ -370,11 +362,20 @@ course.change(() => {
     }
   });
 
-  batch.change(()=>{
-    if(branch.val()===null || type.val()===null || batch.val()===null || category.val()===null) return;
-    fetchData({ category: category.val(), batch: batch.val(), type: type.val()?.join(','), branch: branch.val()?.join(','), course: course.val() })
-      .done(data=> populate(section,data,{placeholder:'Select Section',addAll:true}));
-  });
+const updateSections = ()=>{
+  if(branch.val()===null || type.val()===null) return;
+  fetchData({
+    category: category.val(),
+    batch: batch.val(),
+    type: type.val()?.join(','),
+    branch: branch.val()?.join(','),
+    course: course.val(),
+    gender: gender.val()
+  }).done(data => populate(section, data, { placeholder: 'Select Section', addAll: true }));
+};
+
+gender.change(updateSections);
+batch.change(updateSections);
 
   window.onload = updateVisibility;
 </script>

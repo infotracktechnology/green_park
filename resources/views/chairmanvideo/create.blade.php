@@ -2,43 +2,6 @@
 
 @section('title', ' Chairman Video')
 @section('css')
-<style>
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #6777ef; 
-        color: #fff; 
-        border: none; 
-        padding: 5px 10px; 
-        margin: 5px 5px 0 0; 
-        border-radius: 3px; 
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        display: none; 
-    }
-
-    .select2-container--default .select2-selection--single {
-        border-color: #6777ef;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: #6777ef transparent transparent transparent;
-    }
-
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #6777ef;
-        color: #fff;
-    }
-
-    .select2-container--default .select2-selection--multiple {
-        border: 1px solid #6777ef;
-        min-height: 38px;
-        padding: 0;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-        padding: 0 5px;
-    }
-</style>
 @endsection
 @section('main')
 <div class="main-content">
@@ -55,55 +18,111 @@
                                 <h6 class="col-deep-purple">Add Video</h6>
                              </div>
                              
-                             <div class="form-group col-lg-3">
-                                <label for="academic_year">Academic Year</label>
-                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
-                                    {{-- <option value="">Select Academic Year</option> --}}
-                                    @foreach ($academicyear as $row)
-                                        <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                 <div class="form-group col-lg-3">
+                    <label for="academic_year">Academic Year</label>
+                    <select name="academic_year" id="academic_year" class="form-control form-control-sm" required>
+                      @foreach ($academicyear as $row)
+                      <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                   <div class="form-group col-lg-3">
+                    <label>User Type</label>
+                    <select name="usertype" id="usertype" class="form-control form-control-sm" required>
+                      <option value="GROUP">GROUP</option>
+                      <option value="INDIVIDUAL">INDIVIDUAL STUDENT</option>
+                    </select>
+                   </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Course</label>
+                    <select name="course" id="course" class="form-control form-control-sm" required>
+                      <option value="">Select Course</option>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}">{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label for="branch">Branch</label>
+                    <select name="branch[]" id="branch" class="select2" multiple required>
+                      @foreach ($branches as $branch)
+                      <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Coaching Type</label>
+                    <select name="coaching_type[]" id="coaching_type" class="select2" multiple required>
+                      @foreach ($coachingtype as $row)
+                      <option value="{{$row}}">{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  
+                   <div class="form-group col-lg-2">
+                    <label>H/D</label>
+                    <select name="category" id="category" class="form-control form-control-sm">
+                      <option value="">Select H/D</option>
+                      @foreach ($hostel as $row)
+                      <option value="{{$row}}">{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
 
+                  <div class="form-group col-lg-2">
+                    <label>Batch</label>
+                    <select name="batch" id="batch" class="form-control form-control-sm">
+                      <option value="">Select Batch</option>
+                      @foreach ($batch as $row)
+                      <option value="{{$row}}">{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
+                  <div class="form-group col-lg-2">
+                    <label>Gender</label>
+                    <select name="gender" id="gender" class="form-control form-control-sm" required>
+                      <option value="">Select Gender</option>
+                      <option value="All">All Gender</option>
+                      <option value="MALE">MALE</option>
+                      <option value="FEMALE">FEMALE</option>
+                    </select>
+                  </div>
+
+
+                   <div class="form-group col-lg-2">
+                    <label>Section</label>
+                    <select name="section" id="section" class="form-control form-control-sm">
+                    </select>
+                  </div>
+                
+
+                  <div class="form-group col-lg-4">
+                    <label>Students</label>
+                    <select name="students" id="students" class="form-control form-control-sm select2" required>
+                    </select>
+                  </div>
 
                              <div class="form-group col-lg-4">
-                                <label for="branch_id">Branch</label>
-                                <select name="branch_id[]" id="branch_id" class="select2 form-control " multiple="multiple" required>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group col-lg-5">
-                                <label>Coaching Type</label>
-                                <select name="coaching_type[]" id="coaching_type" class="select2 form-control form-control-sm" multiple="multiple" required>
-                                    @foreach ($coachingtype as $row)
-                                    <option value="{{$row}}">{{$row}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                             <div class="form-group col-lg-3">
-                                <label>Gender</label>
-                                <select name="gender" id="gender" class="form-control form-control-sm" required>
-                                   <option value="Male,Female">All</option>
-                                   <option value="Male">Male</option>
-                                   <option value="Female">Female</option>
-                                </select>
-                             </div>
-                             <div class="form-group col-lg-3">
                                 <label for="title">Title</label>
                                 <input type="text" name="title" id="title" class="form-control form-control-sm" required>
                             </div>
-                            <div class="form-group col-lg-4">
+                            <div class="form-group col-lg-3">
                                 <label for="link">Video ID</label>
                                 <input type="number" name="video_id" id="video_id" class="form-control form-control-sm" required>
                             </div>
-                            <div class="form-group col-lg-4">
+
+                            {{-- <div class="form-group col-lg-4">
                                 <label for="attachment">Attachment</label>
                                 <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" onchange="saveAs('assets/attachments', this)">
-                            </div>
+                            </div> --}}
+
                             <div class="form-group col-lg-12">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                              </div>

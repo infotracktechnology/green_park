@@ -15,17 +15,12 @@ class AnnouncementController extends Controller
 
     public function index(Request $request)
     {
-        $academic_years = AcademicYear::all();
-        $branches = Branch::all();
-        $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
-    
         $announcements = Announcement::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
                 $query->where('branch', 'like' , '%'.auth()->user()->branch.'%');
             })->get();
            
-    
-        return view('announcement.index', compact('announcements', 'branches', 'branchList', 'academic_years'));
+        return view('announcement.index', compact('announcements'));
     }
     
     public function create()
@@ -53,13 +48,13 @@ public function store(Request $request,FcmServiceProvider $fcm)
 
     $announcement = Announcement::create($data);
 
-    //  $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->whereNotNull('device_token')->get()->map(function ($student) use ($fcm) {
-    //     return $student->device_token;
-    // })->toArray();
+     $students = $announcement->StudentList()->map(function ($student) use ($fcm) {
+        return $student->device_token;
+    })->toArray();
 
-    // if(!empty($students)) {
-    //     $fcm->sendMulticast($students,"Announcement", $request->title);
-    // }
+    if(!empty($students)) {
+        $fcm->sendMulticast($students,"Announcement", $request->title);
+    }
 
     return to_route('announcement.index')->with('success', 'Announcement created successfully.');
 }
@@ -68,7 +63,7 @@ public function edit(Request $request, Announcement $announcement)
 {
     $type = Student::StudentFilterQuery($announcement->branch,$announcement->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-    $section = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch)->select('section')->distinct()->get()->pluck('section')->toArray();
+    $section = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch,$announcement->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
 
     $students = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,null,null)->get()->pluck('student_name','student_id')->toArray();
   

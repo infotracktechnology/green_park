@@ -2,8 +2,6 @@
 @section('title', ' Announcement') 
 
 @section('css')
-<link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}" />
-<link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
 @endsection 
 
 @section('main')
@@ -90,6 +88,16 @@
                     </select>
                   </div>
 
+                  <div class="form-group col-lg-2">
+                    <label>Gender</label>
+                    <select name="gender" id="gender" class="form-control form-control-sm" required>
+                      <option value="">Select Gender</option>
+                      <option value="All">All Gender</option>
+                      <option value="MALE">MALE</option>
+                      <option value="FEMALE">FEMALE</option>
+                    </select>
+                  </div>
+
 
                    <div class="form-group col-lg-2">
                     <label>Section</label>
@@ -98,14 +106,7 @@
                   </div>
                 
 
-                  <div class="form-group col-lg-2">
-                    <label>Gender</label>
-                    <select name="gender" id="gender" class="form-control form-control-sm" required>
-                      <option value="All" selected>All Gender</option>
-                      <option value="MALE">MALE</option>
-                      <option value="FEMALE">FEMALE</option>
-                    </select>
-                  </div>
+                  
 
                   <div class="form-group col-lg-4">
                     <label>Students</label>
@@ -144,6 +145,4 @@
 @endsection 
 
 @section('js')
-<script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
-<script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
 @endsection
