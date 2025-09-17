@@ -69,8 +69,7 @@
                   
                    <div class="form-group col-lg-2">
                     <label>H/D</label>
-                    <select name="category" id="category" class="form-control form-control-sm">
-                      <option value="">Select H/D</option>
+                    <select name="category[]" id="category" class="select2" multiple>
                       @foreach ($hostel as $row)
                       <option value="{{$row}}">{{$row}}</option>
                       @endforeach
@@ -80,8 +79,7 @@
 
                   <div class="form-group col-lg-2">
                     <label>Batch</label>
-                    <select name="batch" id="batch" class="form-control form-control-sm">
-                      <option value="">Select Batch</option>
+                    <select name="batch[]" id="batch" class="select2" multiple>
                       @foreach ($batch as $row)
                       <option value="{{$row}}">{{$row}}</option>
                       @endforeach
@@ -105,9 +103,6 @@
                     </select>
                   </div>
                 
-
-                  
-
                   <div class="form-group col-lg-4">
                     <label>Students</label>
                     <select name="students" id="students" class="form-control form-control-sm select2" required>

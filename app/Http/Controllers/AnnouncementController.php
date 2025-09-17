@@ -33,17 +33,15 @@ public function store(Request $request,FcmServiceProvider $fcm)
 {
    $data = $request->all();
 
-    foreach (['coaching_type','branch'] as $field) {
+    foreach (['coaching_type','branch','batch','category'] as $field) {
        $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
    }
 
    $data['student_ids'] = [];
    if ($request->has('attachment')) {
         $fileName = time() . '.' . $request->attachment->extension();
-        $request->attachment->move(public_path('assets/attachments'), $fileName);
-        $data['attachment'] = 'assets/attachments/' . $fileName;
-    } else {
-        $data['attachment'] = null;
+        $request->attachment->move('assets/attachments', $fileName);
+        $data['attachment'] = 'assets/attachments/'.$fileName;
     }
 
     $announcement = Announcement::create($data);
@@ -63,7 +61,7 @@ public function edit(Request $request, Announcement $announcement)
 {
     $type = Student::StudentFilterQuery($announcement->branch,$announcement->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-    $section = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch,$announcement->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+    $section = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch,$announcement->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
     $students = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,null,null)->get()->pluck('student_name','student_id')->toArray();
   
@@ -76,17 +74,15 @@ public function update(Request $request, Announcement $announcement)
 {
     $data = $request->all();
 
-   foreach (['coaching_type','branch'] as $field) {
+   foreach (['coaching_type','branch','batch','category'] as $field) {
        $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
    }
 
    $data['student_ids'] = [];
    if ($request->has('attachment')) {
         $fileName = time() . '.' . $request->attachment->extension();
-        $request->attachment->move(public_path('assets/attachments'), $fileName);
-        $data['attachment'] = 'assets/attachments/' . $fileName;
-    } else {
-        $data['attachment'] = null;
+        $request->attachment->move('assets/attachments', $fileName);
+        $data['attachment'] = 'assets/attachments/'.$fileName;
     }
 
    $announcement->update($data);

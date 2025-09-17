@@ -365,8 +365,8 @@ course.change(() => {
 const updateSections = ()=>{
   if(branch.val()===null || type.val()===null) return;
   fetchData({
-    category: category.val(),
-    batch: batch.val(),
+    category: category.val()?.join(','),
+    batch: batch.val()?.join(','),
     type: type.val()?.join(','),
     branch: branch.val()?.join(','),
     course: course.val(),

@@ -168,20 +168,21 @@ class Student extends Authenticatable
     }
     public static function StudentFilterQuery($branch,$course,$type=null,$category=null,$batch=null,$gender=null){
         $query = self::query();
+        if($course){
+            $query->where('course', $course);
+        }
         if($branch){
             $query->whereIn('campus', explode(',', $branch));
         }
         if($type){
-            $query->where('coaching_type', explode(',',$type));
+            $query->whereIn('coaching_type', explode(',',$type));
         }
-        if($course){
-            $query->where('course', $course);
-        }
+        
         if($category){
-            $query->where('hostel_dayscholar', $category);
+            $query->whereIn('hostel_dayscholar', explode(',', $category));
         }
         if($batch){
-            $query->where('batch', $batch);
+            $query->whereIn('batch', explode(',', $batch));
         }
         if($gender && $gender != 'All'){
             $query->where('gender', $gender);
