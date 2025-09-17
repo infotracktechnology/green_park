@@ -8,23 +8,19 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Providers\FcmServiceProvider;
+use App\Http\Controllers\HomeController;
 
 class AnnouncementController extends Controller
 {
 
     public function index(Request $request)
     {
-        $academic_years = AcademicYear::all();
-        $branches = Branch::all();
-        $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
-    
         $announcements = Announcement::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
                 $query->where('branch', 'like' , '%'.auth()->user()->branch.'%');
             })->get();
            
-    
-        return view('announcement.index', compact('announcements', 'branches', 'branchList', 'academic_years'));
+        return view('announcement.index', compact('announcements'));
     }
     
     public function create()
@@ -33,27 +29,24 @@ class AnnouncementController extends Controller
         return view('announcement.create');
     }
 
-    public function store(Request $request,FcmServiceProvider $fcm)
+public function store(Request $request,FcmServiceProvider $fcm)
 {
-    $announcement = new Announcement();
-    $announcement->academic_year = $request->academic_year;
-    $announcement->branch = implode(',', $request->branch);
-    $announcement->coaching_type = implode(',', $request->coaching_type);
-    $announcement->gender = $request->gender;
-    $announcement->title = $request->title;
-    $announcement->content = $request->content;
-    $announcement->student_ids = [];
+   $data = $request->all();
 
-    if ($request->has('attachment')) {
+    foreach (['coaching_type','branch','batch','category'] as $field) {
+       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+   }
+
+   $data['student_ids'] = [];
+   if ($request->has('attachment')) {
         $fileName = time() . '.' . $request->attachment->extension();
-        $request->attachment->move(public_path('assets/attachments'), $fileName);
-        $announcement->attachment = 'assets/attachments/' . $fileName;
-    } else {
-        $announcement->attachment = null;
+        $request->attachment->move('assets/attachments', $fileName);
+        $data['attachment'] = 'assets/attachments/'.$fileName;
     }
-    $announcement->category = in_array('Offline', $request->coaching_type) ? $request->category : null;
-    $announcement->save();
-    $students = Student::whereIn('coaching_type', $request->coaching_type)->whereIn('campus', $request->branch)->whereNotNull('device_token')->get()->map(function ($student) use ($fcm) {
+
+    $announcement = Announcement::create($data);
+
+     $students = $announcement->StudentList()->map(function ($student) use ($fcm) {
         return $student->device_token;
     })->toArray();
 
@@ -66,42 +59,34 @@ class AnnouncementController extends Controller
 
 public function edit(Request $request, Announcement $announcement)
 {
-   
-    $academicyear = AcademicYear::all(); 
-    $selectedCoachingTypes = explode(',', $announcement->coaching_type);
+    $type = Student::StudentFilterQuery($announcement->branch,$announcement->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-    return view('announcement.edit', compact('announcement',  'academicyear', 'selectedCoachingTypes'));
+    $section = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,$announcement->category,$announcement->batch,$announcement->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+
+    $students = Student::StudentFilterQuery($announcement->branch,$announcement->course,$announcement->type,null,null)->get()->pluck('student_name','student_id')->toArray();
+  
+
+    return view('announcement.edit', compact('announcement','type','section','students'));
 }
 
 
 public function update(Request $request, Announcement $announcement)
 {
-    $announcement->academic_year = $request->academic_year;
-    $announcement->branch = implode(',', $request->branch);
-    $announcement->coaching_type = implode(',', $request->coaching_type);
-    $announcement->gender = $request->gender;
-    $announcement->title = $request->title;
-    $announcement->content = $request->content;
+    $data = $request->all();
 
-    if ($request->hasFile('attachment')) {
-        if ($announcement->attachment && file_exists(public_path($announcement->attachment))) {
-            unlink(public_path($announcement->attachment));
-        }
+   foreach (['coaching_type','branch','batch','category'] as $field) {
+       $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+   }
 
-        $file = $request->file('attachment');
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('assets/attachments'), $filename);
-        $announcement->attachment = 'assets/attachments/' . $filename;
+   $data['student_ids'] = [];
+   if ($request->has('attachment')) {
+        $fileName = time() . '.' . $request->attachment->extension();
+        $request->attachment->move('assets/attachments', $fileName);
+        $data['attachment'] = 'assets/attachments/'.$fileName;
     }
 
-    if (in_array('Offline', $request->coaching_type)) {
-        $announcement->category = $request->category;
-    } else {
-        $announcement->category = null;
-    }
-
-    $announcement->save();
-
+   $announcement->update($data);
+    
     return redirect()->route('announcement.index')->with('success', 'Announcement details successfully updated.');
 }
 
@@ -121,12 +106,9 @@ public function destroy($id)
 
     public function notification(Request $request)
     {
-    $announcements = auth()->user()->announcement();
-
+    $student = Student::where('student_id', auth()->user()->student_id)->first();
+    $announcements = Announcement::ForStudent($student)->latest()->get();
     return view('student.notification', compact('announcements'));
     }
-
-    
-
 
 }

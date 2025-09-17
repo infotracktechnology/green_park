@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\AcademicYear;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\Chairmanvideo;
 use Illuminate\Support\Facades\DB;
@@ -12,19 +13,13 @@ class ChairmanVideoController extends Controller
 {
     public function index()
 {
-    $academic_years = AcademicYear::all();
-    $branches = Branch::all();
-    $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
 
     $chairmanvideos = Chairmanvideo::where('academic_year', $this->academic_year)
     ->when(auth()->user()->branch, function ($query) {
-        $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+        $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
     })
     ->get();
-
-
-
-    return view('chairmanvideo.index', compact('chairmanvideos', 'branches', 'branchList'));
+    return view('chairmanvideo.index', compact('chairmanvideos'));
 }
 
     public function create()
@@ -34,53 +29,50 @@ class ChairmanVideoController extends Controller
     }
     public function store(Request $request)
     {
-        $chairmanvideos = new Chairmanvideo();
-        $chairmanvideos->academic_year = $request->academic_year;
-        $chairmanvideos->branch_id = implode(',', $request->branch_id);
-         $chairmanvideos->coaching_type = implode(',', $request->coaching_type);
-        $chairmanvideos->gender = $request->gender;
-        $chairmanvideos->title = $request->title;
-        $chairmanvideos->video_id = $request->video_id;
+       $data = $request->all();
+
+        foreach (['coaching_type','branch'] as $field) {
+         $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
         if ($request->hasFile('attachment')) {
             $fileName = time() . '.' . $request->attachment->extension();
             $request->attachment->move(public_path('chairman/video'), $fileName);
             $chairmanvideos->attachment = 'chairman/video/' . $fileName;
-        } else {
-            $chairmanvideos->attachment = null;
-        }
-        $chairmanvideos->save();
-        return redirect()->route('chairmanvideo.index')
-            ->with('success', 'Chairman video created successfully.');
+        } 
+
+        $chairmanvideo = Chairmanvideo::create($data);
+        return redirect()->route('chairmanvideo.index')->with('success', 'Chairman video created successfully.');
     }
 
  public function edit(Request $request, Chairmanvideo $chairmanvideo)
-    {
-       
-        return view('chairmanvideo.edit', compact('chairmanvideo'));
- }
- public function update(Request $request, $id)
 {
-    $chairmanvideo = Chairmanvideo::findOrFail($id);
-    $chairmanvideo->academic_year = $request->academic_year;
-    $chairmanvideo->title = $request->title;
-    $chairmanvideo->video_id = $request->video_id;
-    $chairmanvideo->gender = $request->gender;
-    $chairmanvideo->coaching_type = implode(',', $request->coaching_type);
-    $chairmanvideo->branch_id = implode(',', $request->branch_id);
+    $type = Student::StudentFilterQuery($chairmanvideo->branch,$chairmanvideo->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-    if ($request->hasFile('attachment')) {
+    $section = Student::StudentFilterQuery($chairmanvideo->branch,$chairmanvideo->course,$chairmanvideo->type,$chairmanvideo->category,$chairmanvideo->batch,$chairmanvideo->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+
+    $students = Student::StudentFilterQuery($chairmanvideo->branch,$chairmanvideo->course,$chairmanvideo->type,null,null)->get()->pluck('student_name','student_id')->toArray();
        
+        return view('chairmanvideo.edit', compact('chairmanvideo','type','section','students'));
+ }
+ public function update(Request $request,Chairmanvideo $chairmanvideo)
+{
+    $data = $request->all();
+
+     foreach (['coaching_type','branch'] as $field) {
+         $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+     }
+     
+    if ($request->hasFile('attachment')) {
         if ($chairmanvideo->attachment && file_exists(public_path($chairmanvideo->attachment))) {
             unlink(public_path($chairmanvideo->attachment));
         }
-
         $fileName = time() . '.' . $request->attachment->extension();
         $request->attachment->move(public_path('chairman/video'), $fileName);
         $chairmanvideo->attachment = 'chairman/video/' . $fileName;
     }
 
-  
-    $chairmanvideo->save();
+    $chairmanvideo->update($data);
 
     return redirect()->route('chairmanvideo.index')->with('success', 'Video updated successfully!');
 }

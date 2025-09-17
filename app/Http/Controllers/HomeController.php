@@ -20,70 +20,69 @@ use App\Models\ParentConcern;
 class HomeController extends Controller
 {
     public function index(Request $request){
-        $data = Branch::when(auth()->user()->branch, function ($query) {$query->where('id', auth()->user()->branch);})->get();
-        
-        $boys = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Male')->count();
+        $branchId = auth()->user()->branch;
+        $today = date('Y-m-d');
 
-        $girls = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->where('gender', 'Female')->count();
+        $data = Branch::when($branchId, fn($q) => $q->where('id', $branchId))->get();
+        $students = Student::when($branchId, fn($q) => $q->where('campus', $branchId))->get();
+        $boys = $students->where('gender', 'MALE')->count();
+        $girls = $students->where('gender', 'FEMALE')->count();
+        $total = $students->count();
 
-        $total = Student::when(auth()->user()->branch, function ($query) {$query->where('campus', auth()->user()->branch);})->count();
+        $present = Attendance::when($branchId, fn($q) => $q->where('branch_id', $branchId))
+        ->where('status', 'P')->where('attendance_date', $today)->distinct('student_id')->count();
 
-        $present = Attendance::when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->where('status', 'P')->where('attendance_date', date('Y-m-d'))->distinct('student_id')->count();
+         $staffs = collect(Staff::select('department')->when($branchId, function ($query) {$query->where('branch_id', $branchId);})->get())->groupBy('department');
 
-        $staffs = collect(Staff::select('department')->when(auth()->user()->branch, function ($query) {$query->where('branch_id', auth()->user()->branch);})->get())->groupBy('department');
+    $concerns = ParentConcern::all();
 
-        $concerns = ParentConcern::all();
+    $announcement = $data->map(fn($item) => [
+        'branch' => $item->name,
+        'count'  => Announcement::where('academic_year', $this->academic_year)
+            ->where('branch', 'like', "%{$item->id}%")
+            ->count()
+    ]);
 
-        $announcement = $data->map(function($item) {
-          $count = Announcement::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count();
-          return ['branch' => $item->name, 'count' => $count];
-        });
+    $chairman = $data->map(fn($item) => [
+        'branch' => $item->name,
+        'count'  => Chairmanvideo::where('academic_year', $this->academic_year)
+            ->where('branch', 'like', "%{$item->id}%")
+            ->count()
+    ]);
 
-         $chairman = $data->map(function($item) {
-          $count = Chairmanvideo::where('academic_year', $this->academic_year)->where('branch_id', 'like', "%{$item->id}%")->count();
-          return ['branch' => $item->name, 'count' => $count];
-        });
-    
      return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
     }
     
 
-    public function parent_concern(Request $request)
-    {
-        $parentconcerns = DB::table('parent_concern')->where('status', '!=', 'Closed')->get();
+    public function parent_concern(Request $request){
 
-        if ($request->has('submit')) {
-            $updateData = [
-                'status' => $request->status,
-            ];
+    $parentconcerns = ParentConcern::where('status', '!=', 'Closed')->get();
 
-            if ($request->status === 'Closed') {
-                if ($request->hasFile('file')) {
-                    $parentconcern = DB::table('parent_concern')->where('id', $request->id)->first();
+    if ($request->has('submit')) {
+        $parentconcern = ParentConcern::findOrFail($request->id);
+        $updateData = ['status' => $request->status];
 
-                    if ($parentconcern && $parentconcern->file) {
-                        $oldFilePath = $parentconcern->file;
-                        if (file_exists($oldFilePath)) {
-                            unlink($oldFilePath);
-                        }
-                    }
-
-                    $file = $request->file('file');
-                    $fileName = time() . '_' . $file->getClientOriginalName();
-                    $file->move('uploads/concern', $fileName);
-                    $updateData['file'] = 'uploads/concern/'.$fileName;
+        if ($request->status === 'Closed') {
+            if ($request->hasFile('file')) {
+                if ($parentconcern->file && file_exists($parentconcern->file)) {
+                    unlink($parentconcern->file);
                 }
-
-                $updateData['remark'] = $request->remark;
+                $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
+                $path = $request->file('file')->move('uploads/concern', $fileName);
+                $updateData['file'] = $path;
             }
 
-           ParentConcern::where('id', $request->id)->update($updateData);
-
-            return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
+            $updateData['remark'] = $request->remark;
         }
 
-        return view('announcement.parent_concern', compact('parentconcerns'));
+        $parentconcern->update($updateData);
+
+        return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
     }
+
+    return view('announcement.parent_concern', compact('parentconcerns'));
+}
+
 
 
 
@@ -188,9 +187,24 @@ class HomeController extends Controller
         return view('studentmenu.student', compact('menus','menu_student','types','students'));
     }
 
-    public function notify(FcmServiceProvider  $fcm)
+    public function Filter(Request $request)
     {
-        
+         if($request->has('gender')) {
+            $section = Student::StudentFilterQuery($request->branch,$request->course,$request->type,$request->category,$request->batch,$request->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section');
+            return response()->json($section);
+        }
+
+        if($request->has('type')) {
+            $students = Student::StudentFilterQuery($request->branch,$request->course,$request->type,null,null)->get()->pluck('student_name','student_id');
+            return response()->json($students);
+        }
+
+        if($request->has('branch')) {
+            $type = Student::StudentFilterQuery($request->branch,$request->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type');
+            return response()->json($type);
+        }
+
+       
     }
 
     public function dashboardGender(Request $request)
@@ -243,6 +257,8 @@ class HomeController extends Controller
         $announcements = $query->get();
         return response()->json(['announcements' => $announcements]);
     }
+
+    
 
 
 }

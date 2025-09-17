@@ -30,57 +30,57 @@
                   </div>
                   <div class="col-12">
                   <div class="table-responsive">
-    <table class="table table-striped table-sm" id="myTable">
-        <thead>
+     <table class="table table-striped table-sm" id="myTable">
   
-            <tr role="row">
-              <th>Academic Year </th>
-            <th>Branch </th>
-              <th>Coaching Type</th>
-              <th>Gender</th>
-              <th>Title</th>
-             <th>Video Id</th>
-             <th>Edit </th>
-              <th>Delete </th>
-            </tr>
-      
-            </thead>
-           <tbody>
-                @foreach ($chairmanvideos as $chairmanvideo)
-                <tr>
-                  <td>{{$chairmanvideo->academic_year}}</td>
-                  <td>
-                    @php
-                        $branchNames = collect(explode(',', $chairmanvideo->branch_id))
-                            ->map(fn($branchId) => optional(app\Models\Branch::find(trim($branchId)))->name)
-                            ->filter()
-                            ->implode(', ');
-                    @endphp
-                    {{ $branchNames }}
-                </td>
-                  <td>{{$chairmanvideo->coaching_type}}</td>
-                  <td>{{$chairmanvideo->gender}}</td>
-                  <td>{{$chairmanvideo->title}}</td>
-                 <td>{{$chairmanvideo->video_id}}</td>
-                </td> 
-                <td>
-                    <a href="{{ route('chairmanvideo.edit', $chairmanvideo->id) }}" class="btn btn-primary">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                </td>
-              <td>
-                   <form action="{{ route('chairmanvideo.destroy', $chairmanvideo->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this video?')" class="d-inline">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="btn btn-danger">
-                         <i class="fas fa-trash"></i>
-                      </button>
-                   </form>
-                </td>
-             </tr>
-             @endforeach
-            </tbody> 
-        </table>
+      <thead>
+  
+        <tr role="row">
+          <th>Academic Year </th>
+          <th>User Type</th>
+          <th>Course</th>
+          <th>Branch </th>
+          <th>Coaching Type</th>
+          <th>H/D</th>
+          <th>Section</th>
+          <th>Batch</th>
+          <th>Title</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+  
+        </thead>
+  
+        <tbody>
+          @foreach ($chairmanvideos as $chairmanvideo)
+          <tr>
+            <td>{{ $chairmanvideo->academic_year }}</td> 
+            <td>{{ $chairmanvideo->usertype }}</td>
+            <td>{{ $chairmanvideo->course }}</td>
+            <td>{{ $chairmanvideo->branchNames() }}</td>
+            <td>{{ $chairmanvideo->coaching_type}}</td>
+            <td>{{ $chairmanvideo->category}}</td>
+            <td>{{ $chairmanvideo->section}}</td>
+            <td>{{ $chairmanvideo->batch}}</td>
+            <td>{{ $chairmanvideo->title}}</td>
+           
+            <td>
+              <a href="{{ route('chairmanvideo.edit', $chairmanvideo->id) }}" class="btn btn-warning text-white">
+                 <i class="fas fa-edit"></i>
+              </a>
+           </td>
+           <td>
+              <form action="{{ route('chairmanvideo.destroy', $chairmanvideo->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this branch?')">
+                 @csrf
+                 @method('DELETE')
+                 <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i>
+                 </button>
+              </form>
+           </td>
+        </tr>
+        @endforeach
+          
+        </tbody>
       </table>
                   </div>
               </div>

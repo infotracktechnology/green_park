@@ -12,19 +12,14 @@
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
-  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}" />
+  <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <style>
-    .select2 {
-      width: 100% !important;
-    }
-
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-  </style>
+<style>
+  .select2{
+    width: 100% !important;
+  }
+</style>
   @yield('css')
 </head>
 <body>
@@ -198,6 +193,7 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
                 <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
+                 <li><a href="{{ route('report.attendance') }}" class="nav-link">Daily Attendance Report</a></li>
               </ul>
             </li>
 
@@ -239,19 +235,8 @@
   <script src="{{asset('js/app.min.js')}}"></script>
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      $('.select').each(function () {
-        new TomSelect(this, {
-          create: true,
-          plugins: ['remove_button'],
-          sortField: { field: "text", direction: "asc" }
-        });
-      });
-    });
-  </script>
+  <script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
+  <script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
   <script>
     window.addEventListener("pageshow", function (event) {
         if (event.persisted) {
@@ -259,10 +244,140 @@
         }
     });
 </script>
-{{-- <script>
-    $(document).on('contextmenu', event => event.preventDefault());
-    $(document).on('mousedown', event => event.preventDefault());
-</script> --}}
   @yield('js')
+
+<script>
+  const course   = $('#course');
+  const branch   = $('#branch');
+  const type     = $('#coaching_type');
+  const section  = $('#section');
+  const batch    = $('#batch');
+  const category = $('#category');
+  const usertype = $('#usertype');
+  const gender   = $('#gender');
+  const students = $('#students');
+
+  const fetchData = (params) => $.get('{{ route("filter") }}', params);
+
+  const populate = ($el, data=[], {placeholder='', addAll=false}={})=>{
+    let html = placeholder ? `<option value="">${placeholder}</option>` : '';
+    if(addAll && Array.isArray(data) && data.length) {
+      html += `<option value="${data.join(',')}">All</option>`;
+    }
+    Array.isArray(data)
+      ? data.forEach(v=> html += `<option value="${v}">${v}</option>`)
+      : $.each(data,(k,v)=> html += `<option value="${k}">${v}</option>`);
+    $el.html(html);
+  };
+
+  const togglefield = ($el, show=true)=>{
+    $el.closest('.form-group').toggle(show);
+    $el.prop('required', show);
+    if(!show) $el.val('');
+  };
+
+  const updateVisibility = ()=>{
+    const u = usertype.val();
+    const t = type.val() || [];
+    const c = course.val();
+    const b = (branch.val() || []).map(v=>parseInt(v));
+
+    togglefield(students, u === 'INDIVIDUAL');
+    togglefield(gender,   u !== 'INDIVIDUAL');
+
+    const hasOffline = t.some(v => v.includes('OFFLINE'));
+    if(hasOffline && u === 'GROUP'){
+      if(['NEET','JEE'].includes(c)){
+        if(b.some(x=>[1,4,5].includes(x))){
+          [category,batch,section].forEach(f=>togglefield(f,true));
+        } else if(b.some(x=>[3,6].includes(x))){
+          togglefield(category,false);
+          [batch,section].forEach(f=>togglefield(f,true));
+        } else {
+          togglefield(category,false);
+          togglefield(batch,false);
+          togglefield(section,true);
+        }
+      } else {
+        togglefield(category,false);
+        togglefield(batch,false);
+        togglefield(section,true);
+      }
+    } else {
+      [category,batch,section].forEach(f=>togglefield(f,false));
+    }
+  };
+
+ 
+course.change(() => {
+  const c = course.val();
+  if (typeof originalBranchOptions === 'undefined') {
+    originalBranchOptions = branch.find('option').clone();
+  }
+  branch.select2('destroy');
+  branch.empty();
+  if(['XI-OB','XII-OB'].includes(c)) {
+    originalBranchOptions.each(function() {
+      const value = $(this).val();
+      if(!['1','4','5'].includes(value)) {
+        branch.append($(this).clone());
+      }
+    });
+  } else {
+    branch.append(originalBranchOptions.clone());
+  }
+  branch.select2();
+  branch.val('').trigger('change');
+  populate(type);
+  populate(section, [], {placeholder: 'Select Section'});
+});
+
+  branch.change(()=>{
+    if(branch.val()==='') return;
+    fetchData({ course: course.val(), branch: branch.val().join(',') })
+      .done(data=> populate(type,data));
+  });
+
+  const resetFields = ()=>{ 
+    course.val('').trigger('change'); 
+    branch.val('').trigger('change'); 
+    type.val('').trigger('change'); 
+    students.html(''); 
+  };
+
+  usertype.change(()=>{
+    resetFields();
+    updateVisibility();
+  });
+
+  type.change(()=>{
+    updateVisibility();
+    if(usertype.val()==='INDIVIDUAL'){
+      fetchData({ type: type.val()?.join(','), branch: branch.val()?.join(','), course: course.val() })
+        .done(data=>{
+          let options = '';
+          $.each(data, (k, v) => options += `<option value="${k}">${k}-${v}</option>`);
+          students.html(options);
+        });
+    }
+  });
+
+const updateSections = ()=>{
+  if(branch.val()===null || type.val()===null) return;
+  fetchData({
+    category: category.val()?.join(','),
+    batch: batch.val()?.join(','),
+    type: type.val()?.join(','),
+    branch: branch.val()?.join(','),
+    course: course.val(),
+    gender: gender.val()
+  }).done(data => populate(section, data, { placeholder: 'Select Section', addAll: true }));
+};
+
+gender.change(updateSections);
+batch.change(updateSections);
+
+  window.onload = updateVisibility;
+</script>
 </body>
 </html>

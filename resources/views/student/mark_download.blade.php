@@ -1,148 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>Mark Sheet</title>
-    <style type="text/css">
-        body {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 12px;
-            line-height: 25px;
-            margin: 15px;
-            padding: 0;
-        }
-        
-        h3, h5 {
-            text-align: center;
-            margin: 10px 0;
-        }
-        
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-bottom: 0px;
-        }
-        
-        .table th, .table thead th, .table td {
-            border: 1px solid #2e2e2e;
-            padding: 0px 4px;
-            font-size: 12px;
-            text-align: center;
-        }
-        
-        .break:before, .break:after {
-            display: block!important;
-        }
-        
-        .break {
-            page-break-after: always;
-        }
-        
-        tr {
-            page-break-inside: avoid;
-        }
-        
-        .student-info {
-            font-size: 13px;
-            margin-bottom: 10px;
-        }
-        
-        .student-info td {
-            padding: 5px;
-        }
-        
-        .tables-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin: 0 -5px;
-        }
-        
-        .answer-table {
-            margin: 2px;
-            box-sizing: border-box;
-        }
-        
-        @media print {
-            body {
-                margin: 0;
-                padding: 0;
-            }
-            
-            .tables-container {
-                page-break-inside: avoid;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Mark Sheet</title>
+  <script src="{{asset('js/app.min.js')}}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"></script>
 </head>
 <body>
-    <h3>GREEN PARK COACHING CENTRE, NAMAKKAL</h3>
-    <h5>CHECK THE ANSWERS THAT YOU MARKED</h5>
-    
-    <table class="student-info">
-        <tr>
-            <td width="50%">Student Name: <?php echo auth()->user()->student_name; ?></td>
-            <td width="50%">Exam Date: <?php echo $exam->exam_date; ?></td>
-        </tr>
-        <tr>
-            <td width="50%">Subject: <?php echo $exam->name; ?></td>
-            <td width="50%">User Name: <?php echo auth()->user()->user_name; ?></td>
-        </tr>
-        <tr>
-            <td colspan="2">Test ID: <?php echo $exam->id; ?></td>
-        </tr>
-    </table>
-    
-    <div class="tables-container">
-        @foreach($answers as $answer)
-        <div class="answer-table" style="width: {{ (100/$answers->count()) - 2 }}%;">
-            <table class="table">
-                <tr>
-                    <th>QNo</th>
-                    <th>Key</th>
-                    <th>Ans</th>
-                    <th>Res</th>
-                </tr>
-                @foreach($answer as $key=>$item)
-                <tr>
-                    <?php
-                    $mark = '';
-                    if($item->answer_key == "DEL"){
-                        $mark = 'DEL';
-                    }
-                    else {
-                        $mark = $item->mark == 4 ? 'C' : ($item->mark == -1 ? 'W' : 'L');
-                    }
-                    ?>
-                    <td>{{ $item->q_no }}</td>
-                    <td>{{ $item->answer_key==null ? 0 : $item->answer_key }}</td>
-                    <td>{{ $item->answer }}</td>
-                    <td>{{ $mark }}</td>
-                </tr>
-                @endforeach
-            </table>
-        </div>
-        @endforeach
-    </div>
+  <script>
+    const exam = {
+      id: "{{ $exam->id }}",
+      name: "{{ $exam->name }}",
+      exam_date: "{{ $exam->exam_date }}"
+    };
+    const student = {
+      name: "{{ auth()->user()->student_name }}",
+      username: "{{ auth()->user()->user_name }}"
+    };
+    const answers = @json($answers);
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script type="text/javascript">
-      var opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: "{{ $exam->name }}-{{ $exam->exam_date }}.pdf",
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-        };
-        
-        html2pdf()
-            .set(opt)
-            .from(document.body)
-            .save()
-            .then(function(){
-                window.location.href="{{ route('student.marksheet') }}";
-            });
-    </script>
+    function getAnswerRows(answerGroup) {
+      const rows = [["QNo", "Key", "Ans", "Res"]]; 
+      $.each(answerGroup, function (index, item) {
+        let mark = '';
+        if (item.answer_key === "DEL") mark = "DEL";
+        else mark = item.mark == 4 ? "C" : (item.mark == -1 ? "W" : "L");
+        rows.push([
+          item.q_no,
+          item.answer_key ?? "0",
+          item.answer ?? "",
+          mark
+        ]);
+      });
+      return rows;
+    }
+
+    function styledTable(body) {
+      return {
+        table: { body },
+        fontSize: 10,
+        layout: {
+          paddingTop: () => 0,
+          paddingBottom: () => 0,
+        },
+        margin: [0,2,0,2]
+      };
+    }
+
+    const tables = answers.map(ansGroup => styledTable(getAnswerRows(ansGroup)));
+    const docDefinition = {
+      content: [
+        { text: "GREEN PARK COACHING CENTRE, NAMAKKAL", style: "header" },
+        { text: "CHECK THE ANSWERS THAT YOU MARKED", style: "subheader" },
+        {
+          table: {
+            widths: ["50%","50%"],
+            body: [
+              [`Student Name: ${student.name}`, `Exam Date: ${exam.exam_date}`],
+              [`Subject: ${exam.name}`, `User Name: ${student.username}`],
+              [{ text:`Test ID: ${exam.id}`, colSpan: 2 }, {}]
+            ]
+          },
+          layout: "noBorders",
+          fontSize: 10,
+          margin: [0,5,0,10]
+        },
+        {
+         columns: tables.map(tbl => ({ width: `${100/answers.length}%`, stack: [tbl] }))
+        }
+      ],
+      styles: {
+        header: { fontSize: 14, bold: true, alignment: "center", margin:[0,0,0,5] },
+        subheader: { fontSize: 12, bold: true, alignment: "center", margin:[0,0,0,10] }
+      },
+      defaultStyle: { font: "Roboto" }
+    };
+
+    pdfMake.createPdf(docDefinition).download(`${exam.name}-${exam.exam_date}.pdf`, () => {
+      window.location.href = "{{ route('student.marksheet') }}";
+    });
+  </script>
 </body>
-</htm
+</html>

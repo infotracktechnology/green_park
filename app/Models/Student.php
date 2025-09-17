@@ -41,40 +41,16 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
-            $maxId = self::max('student_id') ?: 0;
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
-            $model->student_id = ($maxId + 1);
-            $model->user_name = 'L'.$model->student_id;
+            $model->user_name = self::generateName($model->coaching_type,$model->student_id);
         });
         // static::created(function ($model) {
           
         //     $model->save();
         // });
     }
-   public function announcement()
-   {
-       return Announcement::where('branch', 'like', "%{$this->campus}%")
-           ->where('coaching_type', 'like', "%{$this->coaching_type}%")
-           ->where('academic_year', $this->academic_year)
-           ->where(function ($query) {
-               $query->where('gender', $this->gender)
-                     ->orWhere('gender', 'All');
-           })
-           ->latest()
-           ->get();
-   }
 
-   public function announcement_count(){
-
-       return Announcement::where('branch', 'like', "%{$this->campus}%")
-           ->where('coaching_type', 'like', "%{$this->coaching_type}%")
-           ->where('academic_year', $this->academic_year)
-           ->whereJsonDoesntContain('student_ids', $this->student_id)
-           ->where(function ($query) { 
-            $query->where('gender', $this->gender)->orWhere('gender', 'All');
-            })->count();
-   }
 
     function chairmanvideo()
     {
@@ -189,6 +165,29 @@ class Student extends Authenticatable
             'present_days' => $presentDays,
             'percentage' => $percentage,
         ];
+    }
+    public static function StudentFilterQuery($branch,$course,$type=null,$category=null,$batch=null,$gender=null){
+        $query = self::query();
+        if($course){
+            $query->where('course', $course);
+        }
+        if($branch){
+            $query->whereIn('campus', explode(',', $branch));
+        }
+        if($type){
+            $query->whereIn('coaching_type', explode(',',$type));
+        }
+        
+        if($category){
+            $query->whereIn('hostel_dayscholar', explode(',', $category));
+        }
+        if($batch){
+            $query->whereIn('batch', explode(',', $batch));
+        }
+        if($gender && $gender != 'All'){
+            $query->where('gender', $gender);
+        }
+        return $query;
     }
    
 }

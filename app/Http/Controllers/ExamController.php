@@ -133,7 +133,7 @@ class ExamController extends Controller
             $answer = $status == 'que-save' || $status == 'que-save-mark' ? $request->question[$i] : 0;
 
             $data = ['test_id' => $request->test_id,'student_id' => $student_id,'subject' => $subject,'q_no' => $i,
-            'answer' => $answer,'status' => $status];
+            'answer' => $answer,'status' => $status,'academic_year' => $this->academic_year];
 
             if(!isset($exam_answers[$i])){ 
                 DB::table('exam_answer')->insert($data);
@@ -185,7 +185,7 @@ class ExamController extends Controller
 }
  
     function Save(Request $request){
-        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->student_id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status];
+        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->student_id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status,'academic_year' => $this->academic_year];
         $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
         if($answer){
             DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
@@ -389,6 +389,7 @@ class ExamController extends Controller
                 $q_no = $answer["q$i"];
                 $subject = $this->determineSubject($i, $phy_start, $phy_end, $chem_start, $chem_end, $bot_start, $bot_end, $zoo_start, $zoo_end);
                 DB::table('exam_answer')->insert([
+                    'academic_year' => $this->academic_year,
                     'student_id' => $answer['student_id'],
                     'test_id' => $answer['test_id'],
                     'q_no' => $i,
@@ -456,7 +457,7 @@ class ExamController extends Controller
         $originalFileName = $request->file('answer_key')->getClientOriginalName();
         $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
         foreach ($answers as $answer) {
-           $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->get();
+           $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
         foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
@@ -508,7 +509,7 @@ class ExamController extends Controller
 
     function deleteOfflineKey($id,$test_id){
         DB::table('key_log')->where('id', $id)->delete();
-        DB::table('exam_answer')->where('test_id', $test_id)->delete();
+        DB::table('exam_answer')->where('test_id', $test_id)->where('academic_year', $this->academic_year)->where('mode', 'OMR')->delete();
         return redirect()->route('exam.offline.index')->with('success', 'Answer key log deleted successfully.');
     }
 

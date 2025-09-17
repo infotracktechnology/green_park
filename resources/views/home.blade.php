@@ -1,176 +1,33 @@
 @extends('layouts.app')
- @section('title', 'Dashboard')
- @section('css')
- <style>
-    .cursor-pointer{
-        cursor: pointer;
+@section('title', 'Dashboard')
+@section('css')
+<style>
+    .cursor-pointer {
+        cursor: pointer !important;
     }
-    .underline{
+    .underline {
         text-decoration: underline;
     }
-
     .card-header {
-            background: #277bff !important;
-        }
-
-    
- </style>
- <style>
-        .announcement-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            overflow: hidden;
-            height: 100%;
-        }
-        .filter-section {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-bottom: 1px solid #e9ecef;
-        }
-    
-
-        .date-slider-container {
-            display: flex;
-            align-items: center;
-            background-color: #e9f7fe;
-            padding: 10px 5px;
-        }
-
-        .date-slider {
-            flex: 1;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
-            scrollbar-width: none;  /* Hide scrollbar for Firefox */
-        }
-
-        .date-slider::-webkit-scrollbar {
-            display: none; /* Hide scrollbar for Chrome, Safari and Opera */
-        }
-
-        .date-slider-inner {
-            display: flex;
-            flex-wrap: nowrap;
-            padding: 0 10px;
-        }
-
-        .slider-nav {
-            background: #17a2b8;
-            border: none;
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            z-index: 10;
-        }
-
-        .slider-nav:hover {
-            background: #138496;
-            transform: scale(1.1);
-        }
-
-        .slider-nav:disabled {
-            background: #b8d4da;
-            cursor: not-allowed;
-            transform: scale(1);
-}
-        .date-item {
-            flex: 0 0 auto;
-            width: 70px;
-            text-align: center;
-            padding: 10px 5px;
-            margin: 0 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .date-item:hover {
-            background-color: #d1ecf1;
-        }
-        .date-item.active {
-            background-color: #17a2b8;
-            color: white;
-        }
-        .date-month {
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        .date-day {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-        .date-number {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .announcement-list {
-            height: 300px;
-            overflow-y: auto;
-        }
-        .announcement-item {
-            border-left: 4px solid #17a2b8;
-            transition: all 0.3s;
-        }
-        .announcement-item:hover {
-            background-color: #f8f9fa;
-            transform: translateX(5px);
-        }
-        .attachment-icon {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        .coaching-badge {
-            font-size: 0.75rem;
-        }
-      
-        .announcement-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .announcement-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .announcement-list::-webkit-scrollbar-thumb {
-            background: #aaa;
-            border-radius: 10px;
-        }
-        
-        .custom-range-container {
-            display: none;
-            margin-top: 10px;
-        }
-        .date-range-inputs {
-            display: flex;
-            gap: 10px;
-        }
-        .date-range-inputs .form-group {
-            flex: 1;
-        }
-        .overflow_scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .overflow_scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .overflow_scrollbar::-webkit-scrollbar-thumb {
-            background: #aaa;
-            border-radius: 10px;
-        }
-        
-    </style>
- @endsection
- @section('main')
+        background: #277bff !important;
+    }
+    .overflow_scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .overflow_scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .overflow_scrollbar::-webkit-scrollbar-thumb {
+        background: #aaa;
+        border-radius: 10px;
+    }
+</style>
+@endsection
+@section('main')
 <div class="main-content">
   <section class="section">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="card">
             <div class="card-header">
                 <h4 class="text-white">Students</h4>
@@ -204,8 +61,8 @@
                                     </td>
                                     <td class="text-start">{{ $branchs->name }}</td>
                                     <td class="text-warning">{{ $branchs->student->count() }}</td>
-                                    <td class="text-primary">{{ $branchs->student->where('gender', 'Male')->count() }}</td>
-                                    <td class="col-pink">{{ $branchs->student->where('gender', 'Female')->count() }}</td>
+                                    <td class="text-primary">{{ $branchs->student->where('gender', 'MALE')->count() }}</td>
+                                    <td class="col-pink">{{ $branchs->student->where('gender', 'FEMALE')->count() }}</td>
                                 </tr>
 
                                 <tr class="collapse" id="collapse-{{ Str::slug($branchs->name) }}">
@@ -218,8 +75,8 @@
                                                         <td>{{ $key == '' ? '-' : $key }}</td>
                                                         
                                                         <td class="fw-bold cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="all">{{ $section->count() }}</td>
-                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Male">{{ $section->where('gender', 'Male')->count() }}</td>
-                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Female">{{ $section->where('gender', 'Female')->count() }}</td>
+                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="MALE">{{ $section->where('gender', 'MALE')->count() }}</td>
+                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="FEMALE">{{ $section->where('gender', 'FEMALE')->count() }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -235,7 +92,7 @@
         </div>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="card">
             <div class="card-header">
                 <h4 class="text-white">Attendance</h4>
@@ -263,9 +120,9 @@
 
                         <tbody id="collapse-tbody" class="collapse show">
                             @foreach($data as $key => $branchs)
-                        <?php
-                        $branch_present = $branchs->attendance->where('attendance_date', today())->where('status', 'P')->unique('student_id')->count();
-                        ?>
+                                @php
+                                    $branch_present = $branchs->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->unique('student_id')->count();
+                                @endphp
                                 <tr class="bg-light fw-bold cursor-pointer" data-toggle="collapse" data-target="#attendance-{{ Str::slug($branchs->name) }}" aria-expanded="false">
                                     <td>
                                         <i class="fas fa-plus-circle text-success toggle-icon"></i>
@@ -280,17 +137,17 @@
                                     <td colspan="5">
                                         <table class="table table-sm mb-0 table-striped attendance-table">
                                             <tbody>
-                                                @foreach($branchs->student->groupBy('section') as $key => $section)
-                        <?php
-                        $section_present = $branchs->attendance->where('attendance_date', today())->where('status', 'P')->where('section', $key)->unique('student_id')->count();
-                        ?>
+                                                @foreach($branchs->student->groupBy('section') as $section_key => $section)
+                                                    @php
+                                                        $section_present = $branchs->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->where('section', $section_key)->unique('student_id')->count();
+                                                    @endphp
                                                     <tr>
                                                         <td></td>
-                                                        <td>{{ $key == '' ? '-' : $key }}</td>
+                                                        <td>{{ $section_key == '' ? '-' : $section_key }}</td>
                                                         
-                                                        <td class="fw-bold cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="all">{{ $section->count() }}</td>
-                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Male">{{ $section_present }}</td>
-                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $key }}" data-campus="{{ $branchs->id }}" data-gender="Female">{{ $section->count() - $section_present }}</td>
+                                                        <td class="fw-bold cursor-pointer underline" data-section="{{ $section_key }}" data-campus="{{ $branchs->id }}" data-gender="all">{{ $section->count() }}</td>
+                                                        <td class="text-primary cursor-pointer underline" data-section="{{ $section_key }}" data-campus="{{ $branchs->id }}" data-gender="MALE">{{ $section_present }}</td>
+                                                        <td class="text-pink cursor-pointer underline" data-section="{{ $section_key }}" data-campus="{{ $branchs->id }}" data-gender="FEMALE">{{ $section->count() - $section_present }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -305,8 +162,6 @@
             
         </div>
       </div>
-
-
 
 <div class="col-md-4">
   <div class="card shadow-sm border-0 rounded-3">
@@ -402,8 +257,6 @@
 </div>
 </div>
 
-
-
 <div class="col-md-4">
   <div class="card shadow-sm border-0 rounded-3">
     <div class="card-header text-white rounded-top-3">
@@ -452,12 +305,9 @@
 </div>
 </div>
 
-
-
-
-
     </div>
   </section>
+
   <div class="modal fade" id="studentInfoModal" tabindex="-1" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
       <div class="modal-content bg-white rounded shadow">
@@ -475,114 +325,100 @@
       </div>
     </div>
   </div>
+
 </div>
 @endsection
 
 @section('js')
-
 <script>
+    const modal = $('#studentInfoModal');
+    const modalBody = $('#studentInfoModalBody');
+    const modalLabel = $('#studentInfoModalLabel');
 
-$(document).ready(function() {
-    let modal = $('#studentInfoModal');
-    let modalbody = $('#studentInfoModalBody');
-    let modalLabel = $('#studentInfoModalLabel');
-    $('#teachingStaffTable, #nonTeachingStaffTable').on('click', 'td', function() {
+    function populateModal(title, data, headers, rowMapper) {
+        modalBody.empty();
+        modalLabel.text(title);
+        const table = $('<table class="table table-striped table-bordered table-hover"></table>');
+        const thead = $('<thead class="thead-dark"></thead>');
+        const tbody = $('<tbody></tbody>');
+        const trHead = $('<tr></tr>');
+
+        headers.forEach(header => {
+            trHead.append(`<th scope="col">${header}</th>`);
+        });
+        thead.append(trHead);
+
+        data.forEach((item, index) => {
+            const tr = $('<tr></tr>');
+            const rowData = rowMapper(item, index);
+            rowData.forEach(cell => {
+                tr.append(`<td>${cell || '-'}</td>`);
+            });
+            tbody.append(tr);
+        });
+
+        table.append(thead);
+        table.append(tbody);
+        modalBody.append(table);
+        modal.modal('show');
+    }
+
+
+    $('#teachingStaffTable, #nonTeachingStaffTable').on('click', 'td[data-department]', function() {
         const department = $(this).data('department');
-        if (!department) {
-            return;
-        }
-        if (department) {
-            $.ajax({
-                url: "{{ route('dashboard.staff') }}",
-                type: 'GET',
-                data: { department: department },
-                success: function(response) {
-                    modalbody.empty();
-                    modalLabel.text(`${department}`);
-                    const table = $('<table class="table table-striped table-bordered table-hover"></table>');
-                    const thead = $('<thead class="thead-dark"></thead>');
-                    const tbody = $('<tbody></tbody>');
-                    const trHead = $('<tr></tr>');
-                    trHead.append('<th scope="col">#</th>');
-                    trHead.append('<th scope="col">Name</th>');
-                    trHead.append('<th scope="col">Gender</th>');
-                    trHead.append('<th scope="col">Designation</th>');
-                    trHead.append('<th scope="col">Department</th>');
-                    trHead.append('<th scope="col">Branch</th>');
-                    thead.append(trHead);
-                    response.staffs.forEach((staff, index) => {
-                        const tr = $('<tr></tr>');
-                        tr.append(`<td>${index + 1 || '-'}</td>`);
-                        tr.append(`<td>${staff.name || '-'}</td>`);
-                        tr.append(`<td>${staff.gender || '-'}</td>`);
-                        tr.append(`<td>${staff.designation || '-'}</td>`);
-                        tr.append(`<td>${staff.department || '-'}</td>`);
-                        tr.append(`<td>${staff.branch.name || '-'}</td>`);
-                        tbody.append(tr);
-                    });
-                    table.append(thead);
-                    table.append(tbody);
-                    modalbody.append(table);
-                    modal.modal('show');
-                },
-                error: function(xhr) {
-                    alert('An error occurred while fetching teaching staff information.');
-                }
-            })
-        }
+        if (!department) return;
+
+        $.ajax({
+            url: "{{ route('dashboard.staff') }}",
+            type: 'GET',
+            data: { department: department },
+            success: function(response) {
+                const headers = ['#', 'Name', 'Gender', 'Designation', 'Department', 'Branch'];
+                const rowMapper = (staff, index) => [
+                    index + 1,
+                    staff.name,
+                    staff.gender,
+                    staff.designation,
+                    staff.department,
+                    staff.branch ? staff.branch.name : '-'
+                ];
+                populateModal(department, response.staffs, headers, rowMapper);
+            },
+            error: function() {
+                alert('An error occurred while fetching teaching staff information.');
+            }
+        });
     });
-    $('.students-table').on("click", "td", function(){
-    
-    const section = $(this).data("section") == '' ? '-' : $(this).data("section");
-    const campus = $(this).data("campus");
-    const gender = $(this).data("gender");
-    
-    if (!section || !campus || !gender) {
-            return;
-        }
+
+    $('.students-table').on("click", "td[data-section][data-campus][data-gender]", function() {
+        const section = $(this).data("section") === '' ? '-' : $(this).data("section");
+        const campus = $(this).data("campus");
+        const gender = $(this).data("gender");
+
+        if (!section || !campus || !gender) return;
 
         $.ajax({
             url: "{{ route('dashboard.gender') }}",
             type: "GET",
             data: { section: section, campus: campus, gender: gender },
             success: function(response) {
-
-                modalbody.empty();
-                modalLabel.text(`${section} - ${gender == 'all' ? 'All' : gender}`);
-                    const table = $('<table class="table table-striped table-bordered table-hover"></table>');
-                    const thead = $('<thead class="thead-dark"></thead>');
-                    const tbody = $('<tbody></tbody>');
-                    const trHead = $('<tr></tr>');
-                    trHead.append('<th scope="col">#</th>');
-                    trHead.append('<th scope="col">ID</th>');
-                    trHead.append('<th scope="col">Name</th>');
-                    trHead.append('<th scope="col">Section</th>');
-                    trHead.append('<th scope="col">Type</th>');
-                    trHead.append('<th scope="col">Gender</th>');
-                    trHead.append('<th scope="col">Campus</th>');
-                    thead.append(trHead);
-                    response.students.forEach((student, index) => {
-                        const tr = $('<tr></tr>');
-                        tr.append(`<td>${index + 1 || '-'}</td>`);
-                        tr.append(`<td>${student.student_id || '-'}</td>`);
-                        tr.append(`<td>${student.student_name || '-'}</td>`);
-                        tr.append(`<td>${student.section || '-'}</td>`);
-                        tr.append(`<td>${student.coaching_type || '-'}</td>`);
-                        tr.append(`<td>${student.gender || '-'}</td>`);
-                        tr.append(`<td>${student.branch.name || '-'}</td>`);
-                        tbody.append(tr);
-                    });
-                    table.append(thead);
-                    table.append(tbody);
-                    modalbody.append(table);
-                    modal.modal('show');
+                const title = `${section} - ${gender === 'all' ? 'All' : gender}`;
+                const headers = ['#', 'ID', 'Name', 'Section', 'Type', 'Gender', 'Campus'];
+                const rowMapper = (student, index) => [
+                    index + 1,
+                    student.student_id,
+                    student.student_name,
+                    student.section,
+                    student.coaching_type,
+                    student.gender,
+                    student.branch ? student.branch.name : '-'
+                ];
+                populateModal(title, response.students, headers, rowMapper);
             },
-            error: function(xhr) {
+            error: function() {
                 alert('An error occurred while fetching student information.');
             }
         });
     });
-});
 </script>
-
 @endsection

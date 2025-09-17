@@ -2,8 +2,9 @@
 
 @section('title', 'Examinations')
 @section('css')
-
-@endsection
+<link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}" />
+<link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
+@endsection 
 
 @section('main')
 <div class="main-content">
@@ -34,7 +35,7 @@
 
                               <div class="form-group col-lg-3">
                                 <label>Branch</label>
-                                <select name="branch_id[]" class="select" multiple required>
+                                <select name="branch_id[]" class="select2" multiple required>
                                     <option value="">Select Branch</option>
                                     <option value="{{ $branches->implode('id', ',') }}">All</option>
                                     @foreach ($branches as $branch)
@@ -47,22 +48,18 @@
                               <div class="form-group col-lg-3">
                                  <label>Coaching Type</label>
 
-                                 <select name="coaching_type[]" id="coaching_type" class="select" multiple required>
+                                 <select name="coaching_type[]" id="coaching_type" class="select2" multiple required>
                                     <option value="">Select Coaching Type</option>
-                                    <option value="Offline,Online Recorded,Online Live,Test Series,11,12">All</option>
-                                    <option value="Offline">Offline</option>
-                                    <option value="Online Recorded">Online Recorded</option>
-                                    <option value="Online Live">Online Live</option>
-                                    <option value="Test Series">Test Series</option>
-                                    <option value=" XI - OB"> XI - OB</option>
-                                    <option value=" XII - OB"> XII - OB</option>
+                                     @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}">{{$row}}</option>
+                                    @endforeach
                                  </select>
                               </div>
 
                               <div class="form-group col-lg-3">
                                 <label>Category</label>
-                                <select name="category" id="category" class="form-control form-control-sm"  required>
-                                    <option value="all">All</option>
+                                <select name="testcategory" class="form-control form-control-sm"  required>
+                                    {{-- <option value="all">All</option> --}}
                                     <option value="Cumulative Test">Cumulative Test</option>
                                     <option value="Grand Test">Grand Test</option>
                                     <option value="Physics (Weekend)">Physics (Weekend)</option>
@@ -229,6 +226,8 @@
 </div>
 @endsection
 @section('js')
+<script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
+<script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const subjects = [

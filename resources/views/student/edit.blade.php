@@ -29,6 +29,16 @@
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div class="form-group col-lg-3">
+                               <label>Course</label>
+                                <select name="course" id="course" class="form-control form-control-sm" onchange="handleType(this);" required>
+                                    <option value="">Select Course</option>
+                                    @foreach ($course as $row)
+                                    <option value="{{$row}}" @selected($row == $Student->course)>{{$row}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             
                            
                             <div class="form-group col-lg-3">
@@ -48,14 +58,11 @@
         
                            <div class="form-group col-lg-3">
                                <label>Coaching Type</label>
-                                <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" onchange="hostel(this.value)"  >
+                                <select name="coaching_type" id="coaching_type" class="form-control form-control-sm type" onchange="hostel(this.value)"  >
                                     <option value="">Select Coaching Type</option>
-                                    <option value="Offline" @if($Student->coaching_type == 'Offline') selected @endif>Offline</option>
-                                    <option value="Online Recorded" @if($Student->coaching_type == 'Online Recorded') selected @endif>Online Recorded</option>
-                                    <option value="Online Live" @if($Student->coaching_type == 'Online Live') selected @endif>Online Live</option>
-                                    <option value="Test Series" @if($Student->coaching_type == 'Test Series') selected @endif>Test Series</option>
-                                    <option value="XI - OB" @if($Student->coaching_type == 'XI - OB') selected @endif>XI - OB</option>
-                                     <option value="XII - OB" @if($Student->coaching_type == 'XII - OB') selected @endif>XII - OB</option>
+                                    @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}" @selected($row == $Student->coaching_type)>{{$row}}</option>
+                                    @endforeach
                                 </select>
                             </div>
         
@@ -63,8 +70,9 @@
                                <label>Hostel/Day Scholar</label>
                                 <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" >
                                     <option value="">Select Option</option>
-                                    <option value="Hostel" @if($Student->hostel_dayscholar == 'Hostel') selected @endif>Hostel</option>
-                                    <option value="Dayscholar" @if($Student->hostel_dayscholar == 'Dayscholar') selected @endif>Dayscholar</option>
+                                    @foreach ($hostel as $row)
+                                    <option value="{{$row}}" @selected($row == $Student->hostel_dayscholar)>{{$row}}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -73,31 +81,19 @@
                                 <select name="ac_nonac" class="form-control form-control-sm" id="ac-nonac-select" >
                                     <option value="">Select AC/Non AC</option>
                                     <option value="AC" @if($Student->ac_nonac == 'AC') selected @endif>AC</option>
-                                    <option value="Non AC" @if($Student->ac_nonac == 'Non AC') selected @endif>Non AC</option>
+                                    <option value="NON AC" @if($Student->ac_nonac == 'NON AC') selected @endif>NON AC</option>
                                 </select>
                             </div>
         
                             
                             
         
-                            {{-- <div class="form-group col-lg-3">
-                                <label for="ph_no1">Mobile No 1</label>
-                                <input type="number" name="ph_no1" id="ph_no1" value="{{ old('ph_no1', $Student->ph_no1) }}" class="form-control form-control-sm digits" >
-                              
-                            </div>
-                            
-                            <div class="form-group col-lg-3">
-                                <label for="ph_no2">Mobile No 2</label>
-                                <input type="number" name="ph_no2" id="ph_no2" value="{{ old('ph_no2', $Student->ph_no2) }}" class="form-control form-control-sm digits">
-                               
-                            </div> --}}
-        
                             <div class="form-group col-lg-3">
                                 <label>Gender</label>
                                 <select name="gender" class="form-control form-control-sm"  >
                                     <option value="">Select Gender</option>
-                                    <option value="Male" @if($Student->gender == 'Male') selected @endif>Male</option>
-                                    <option value="Female" @if($Student->gender == 'Female') selected @endif>Female</option>
+                                    <option value="MALE" @if($Student->gender == 'MALE') selected @endif>MALE</option>
+                                    <option value="FEMALE" @if($Student->gender == 'FEMALE') selected @endif>FEMALE</option>
                                     <option value="Other" @if($Student->gender == 'Other') selected @endif>Other</option>
                                 </select>
                             </div>
@@ -155,15 +151,7 @@
                             
 
                 
-                            {{-- <div class="form-group col-lg-3">
-                                <label>Admission Opted For</label>
-                                 <select name="admission_opted_for" class="form-control form-control-sm"  >
-                                     <option value="">Select Coaching Type</option>
-                                     <option value="Online" @if($Student->admission_opted_for == 'Online') selected @endif>Online</option>
-                                     <option value="Offline" @if($Student->admission_opted_for == 'Offline') selected @endif>Offline</option>
-                                 </select>
-                             </div>
-         --}}
+                 
                           
         
         
@@ -185,11 +173,7 @@
 
 
                          
-{{--          
-                             <div class="form-group col-lg-3">
-                                <label>Age</label>
-                                 <input type="number" name="age" value="{{$Student->age}}" class="form-control form-control-sm" >
-                            </div> --}}
+
         
         
                           
@@ -201,9 +185,7 @@
     </div>
 </div>
 
-                             {{-- @error('aadhar_card_no')
-                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                             @enderror --}}
+                           
 
         
                           
@@ -471,18 +453,7 @@
                         <h3>Mark Details</h3>
                         <fieldset class="row">
                             
-                            {{-- <div class="form-group col-lg-4">
-                                <label>Subject 1</label>
-                                <select name="S1" class="form-control form-control-sm" >
-                                    <option value="">Select Subject</option>
-                                    <option value="ENGLISH" {{ $Student->S1 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                    <option value="PHYSICS" {{ $Student->S1 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                    <option value="CHEMISTRY" {{ $Student->S1 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                    <option value="BIOLOGY" {{ $Student->S1 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                                </select>
-                            
-                            </div> --}}
-
+                         
 
                             <div class="form-group col-lg-4">
                                 <label>Subject 1</label>
@@ -500,28 +471,12 @@
                             <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}"  max="100" class="form-control form-control-sm" >
                         </div>
 
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Maximum Marks of S1</label>
-                            <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}" class="form-control form-control-sm" >
-                        </div> --}}
-
       <div class="form-group col-lg-4">
     <label>Marks Obtained in S1</label>
     <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$Student->S1_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
 
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Subject 2</label>
-                            <select name="S2" class="form-control form-control-sm" >
-                                <option value="">Select Subject</option>
-                                <option value="ENGLISH" {{ $Student->S2 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                <option value="PHYSICS" {{ $Student->S2 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                <option value="CHEMISTRY" {{ $Student->S2 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                <option value="BIOLOGY" {{ $Student->S2 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                            </select>
-                        </div> --}}
-
-
+                       
 
                         <div class="form-group col-lg-4">
                             <label>Subject 2</label>
@@ -537,19 +492,6 @@
     <label>Marks Obtained in S2</label>
     <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$Student->S2_obtained_mark}}" class="form-control form-control-sm"  oninput="calculateTotal()">
 </div>
-
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Subject 3</label>
-                            <select name="S3" class="form-control form-control-sm" >
-                                <option value="">Select Subject</option>
-                                <option value="ENGLISH" {{ $Student->S3 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                <option value="PHYSICS" {{ $Student->S3 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                <option value="CHEMISTRY" {{ $Student->S3 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                <option value="BIOLOGY" {{ $Student->S3 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                            </select>
-                        </div> --}}
-
-
 
                         <div class="form-group col-lg-4">
                             <label>Subject 3</label>
@@ -568,18 +510,7 @@
 </div>
 
 
-                        {{-- <div class="form-group col-lg-4">
-                            <label>Subject 4</label>
-                            <select name="S4" class="form-control form-control-sm" >
-                                <option value="">Select Subject</option>
-                                <option value="ENGLISH" {{ $Student->S4 == 'ENGLISH' ? 'selected' : '' }}>English</option>
-                                <option value="PHYSICS" {{ $Student->S4 == 'PHYSICS' ? 'selected' : '' }}>Physics</option>
-                                <option value="CHEMISTRY" {{ $Student->S4 == 'CHEMISTRY' ? 'selected' : '' }}>Chemistry</option>
-                                <option value="BIOLOGY" {{ $Student->S4 == 'BIOLOGY' ? 'selected' : '' }}>Biology</option>
-                            </select>
-                        </div> --}}
-
-
+                     
                         <div class="form-group col-lg-4">
                             <label>Subject 4</label>
                             <input type="text" name="S4" value="{{ $Student->S4
@@ -692,23 +623,23 @@
 <script>
 
 
-    function hostel(type){
-        document.getElementById('hostel_dayscholar').value = '';
-        if(type == 'Offline'){
-            document.getElementById('hostel_dayscholar').disabled = false;
-        }else{
-            document.getElementById('hostel_dayscholar').disabled = true;
-        }
-    }
-    // Initial check if the page loads with a predefined value
-    window.onload = function() {
-        var selectedCoachingType = document.getElementById('coaching_type').value;
-        var hostelSelect = document.getElementById('hostel_dayscholar');
+    // function hostel(type){
+    //     document.getElementById('hostel_dayscholar').value = '';
+    //     if(type == 'OFFLINE'){
+    //         document.getElementById('hostel_dayscholar').disabled = false;
+    //     }else{
+    //         document.getElementById('hostel_dayscholar').disabled = true;
+    //     }
+    // }
+
+    // window.onload = function() {
+    //     var selectedCoachingType = document.getElementById('coaching_type').value;
+    //     var hostelSelect = document.getElementById('hostel_dayscholar');
         
-        if (selectedCoachingType !== 'Offline') {
-            hostelSelect.disabled = true;  // Disable if the value is not "Offline"
-        }
-    };
+    //     if (selectedCoachingType !== 'OFFLINE') {
+    //         hostelSelect.disabled = true;  
+    //     }
+    // };
 
     function  City(state) {
       if(!state) return;
@@ -784,71 +715,7 @@
         acNonAcSelect.val(''); // Reset value to null when campus is not GPCC on page load
     }
 });
-
-
-$('.steps ul li').addClass('done').removeClass('disabled');
-    'use strict';
-
-    // Real-time input validation
-    // $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').on('input', function () {
-    //     let input = $(this).val();
-    //     let nameRegex = /^[a-zA-Z .]*$/;  // Allow alphabets, spaces, and dots
-    //     let phoneRegex = /^[0-9]{10}$/;  // Only 10 digits allowed for phone numbers
-    //     let aadharRegex = /^[0-9]{12}$/;  // 12 digits for Aadhar card
-
-    //     if ($(this).attr('id') == 'student_name' || $(this).attr('id') == 'father_name' || $(this).attr('id') == 'mother_name') {
-    //         if (!nameRegex.test(input)) {
-    //             $(this).addClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('Only alphabets, spaces, and dots are allowed');
-    //         } else {
-    //             $(this).removeClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('');
-    //         }
-    //     }
-
-        // For phone numbers: only 10 digits allowed
-    //     if ($(this).attr('id') == 'ph_no1' || $(this).attr('id') == 'ph_no2' || $(this).attr('id') == 'father_ph_no' || $(this).attr('id') == 'mother_ph_no' || $(this).attr('id') == 'student_whatsapp_no' || $(this).attr('id') == 'parent_whatsapp_no') {
-    //         if (!phoneRegex.test(input)) {
-    //             $(this).addClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('Phone numbers must be exactly 10 digits');
-    //         } else {
-    //             $(this).removeClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('');
-    //         }
-    //     }
-
-    //     if ($(this).attr('id') == 'aadhar_card_no') {
-    //         if (!aadharRegex.test(input)) {
-    //             $(this).addClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('Aadhar card number should be exactly 12 digits');
-    //         } else {
-    //             $(this).removeClass('is-invalid');
-    //             $(this).next('.invalid-feedback').text('');
-    //         }
-    //     }
-    // });
-
-    // Prevent form submission if invalid
-//     $('#wizard_with_validation').on('submit', function (e) {
-//         let isFormValid = true;
-
-//         // Validate all inputs again before submitting
-//         $('#student_name, #ph_no1, #ph_no2, #father_name, #father_ph_no, #mother_name, #mother_ph_no, #aadhar_card_no, #student_whatsapp_no, #parent_whatsapp_no').each(function () {
-//             $(this).trigger('input'); // Trigger input event to revalidate the field
-//             if ($(this).hasClass('is-invalid')) {
-//                 isFormValid = false;
-//             }
-//         });
-
-//         if (!isFormValid) {
-//             e.preventDefault();
-//             alert('Please correct the errors before submitting the form.');
-//         }
-//     });
-// });
-
-
-  
+$('.steps ul li').addClass('done').removeClass('disabled');  
 </script>
 
 @endsection

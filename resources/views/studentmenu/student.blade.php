@@ -25,7 +25,6 @@
 
                             <div class="form-group col-lg-4">
                                 <label for="branch">Branch</label>
-                                
                                 <select name="branch" id="branch" class="form-control form-control-sm" required>
                                     <option value="">-- Choose Branch --</option>
                                     @foreach ($branches as $branch)
@@ -33,15 +32,15 @@
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="form-group col-lg-4">
                                 <label for="branch">Coaching Type</label>
                                 <select name="type" id="type" class="form-control form-control-sm" required>
                                     <option value="">-- Choose Coaching Type --</option>
-                                    @foreach ($types as $type)
-                                        <option value="{{ $type->coaching_type }}" @selected($type->coaching_type == request('type'))>{{ $type->coaching_type }}</option>
+                                     @foreach ($coachingtype as $row)
+                                    <option value="{{$row}}" @selected($row == request('type'))>{{$row}}</option>
                                     @endforeach
                                 </select>
-
                             </div>
 
                             <div class="form-group col-lg-4">
@@ -52,7 +51,6 @@
                                         <option value="{{ $student->student_id }}" @selected($student->student_id == request('student'))>{{ $student->user_name }} - {{ $student->student_name }}</option>
                                     @endforeach
                                 </select>
-
                             </div>
 
                         @foreach($menus as $key => $field)

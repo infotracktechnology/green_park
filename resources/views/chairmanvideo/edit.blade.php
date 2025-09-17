@@ -2,43 +2,6 @@
 
 @section('title', 'Edit Chairman Video')
 @section('css')
-<style>
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #6777ef; 
-        color: #fff; 
-        border: none; 
-        padding: 5px 10px; 
-        margin: 5px 5px 0 0; 
-        border-radius: 3px; 
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        display: none; 
-    }
-
-    .select2-container--default .select2-selection--single {
-        border-color: #6777ef;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: #6777ef transparent transparent transparent;
-    }
-
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #6777ef;
-        color: #fff;
-    }
-
-    .select2-container--default .select2-selection--multiple {
-        border: 1px solid #6777ef;
-        min-height: 38px;
-        padding: 0;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-        padding: 0 5px;
-    }
-</style>
 @endsection
 
 @section('main')
@@ -58,46 +21,111 @@
                              </div>
                              
 
-                             <div class="form-group col-lg-3">
+                            <div class="form-group col-lg-3">
                                 <label for="academic_year">Academic Year</label>
-                                <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
-                                    {{-- <option value="">Select Academic Year</option> --}}
+                                <select name="academic_year" id="academic_year" class="form-control form-control-sm" required>
                                     @foreach ($academicyear as $row)
-                                        <option value="{{ $row->academic_year }}" {{ $chairmanvideo->academic_year == $row->academic_year ? 'selected' : '' }}>{{ $row->academic_year }}</option>
+                                    <option value="{{ $row->academic_year }}" @selected($row->academic_year == $chairmanvideo->academic_year)>
+                                        {{ $row->academic_year }}
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>
 
 
+                    <div class="form-group col-lg-3">
+                    <label>User Type</label>
+                    <select name="usertype" id="usertype" class="form-control form-control-sm" required>
+                      <option value="GROUP" @selected($chairmanvideo->usertype == 'GROUP')>GROUP</option>
+                      <option value="INDIVIDUAL" @selected($chairmanvideo->usertype == 'INDIVIDUAL')>INDIVIDUAL STUDENT</option>
+                    </select>
+                   </div>
 
 
-                             <div class="form-group col-lg-4">
-                                <label for="branch_id">Branch</label>
-                                <select name="branch_id[]" id="branch_id" class="select2 form-control " multiple="multiple" required>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}" {{ in_array($branch->id, explode(',', $chairmanvideo->branch_id)) ? 'selected' : '' }}>{{ $branch->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    <div class="form-group col-lg-3">
+                    <label>Course</label>
+                    <select name="course" id="course" class="form-control form-control-sm" required>
+                      <option value="">Select Course</option>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}" @selected($row == $chairmanvideo->course)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
-                            <div class="form-group col-lg-4">
-                                <label>Coaching Type</label>
-                                <select name="coaching_type[]" class="form-control form-control-sm select2" multiple required>
-                                    @foreach(['Offline', 'Online Recorded', 'Online Live', 'Test Series', 'XI - OB',' XII - OB'] as $type)
-                                        <option value="{{ $type }}" {{ in_array($type, explode(',', $chairmanvideo->coaching_type)) ? 'selected' : '' }}>
-                                            {{ $type }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                             <div class="form-group col-lg-3">
-                                <label>Gender</label>
-                                <select name="gender" id="gender" class="form-control form-control-sm" required>
-                                   <option value="Male,Female" {{ $chairmanvideo->gender == 'Male,Female' ? 'selected' : '' }}>All</option>
-                                   <option value="Male" {{ $chairmanvideo->gender == 'Male' ? 'selected' : '' }}>Male</option>
-                                   <option value="Female" {{ $chairmanvideo->gender == 'Female' ? 'selected' : '' }}>Female</option>
-                                </select>
-                             </div>
+                  <div class="form-group col-lg-3">
+                    <label for="branch">Branch</label>
+                    <select name="branch[]" id="branch" class="select2" multiple required>
+                      @foreach ($branches as $branch)
+                      <option value="{{ $branch->id }}" @selected(in_array($branch->id, explode(',',$chairmanvideo->branch)))>{{ $branch->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Coaching Type</label>
+                    <select name="coaching_type[]" id="coaching_type" class="select2" multiple required>
+                      @foreach ($type as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $chairmanvideo->coaching_type)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  
+                   <div class="form-group col-lg-2">
+                    <label>H/D</label>
+                    <select name="category" id="category" class="form-control form-control-sm">
+                      <option value="">Select H/D</option>
+                      @foreach ($hostel as $row)
+                      <option value="{{$row}}" @selected($row == $chairmanvideo->category)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-lg-2">
+                    <label>Batch</label>
+                    <select name="batch" id="batch" class="form-control form-control-sm">
+                      <option value="">Select Batch</option>
+                      @foreach ($batch as $row)
+                      <option value="{{$row}}" @selected($row == $chairmanvideo->batch)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  
+                  <div class="form-group col-lg-2">
+                    <label>Gender</label>
+                    <select name="gender" id="gender" class="form-control form-control-sm" required>
+                      <option value="">Select Gender</option>
+                      <option value="All" @selected($chairmanvideo->gender == 'All') >All Gender</option>
+                      <option value="MALE" @selected($chairmanvideo->gender == 'MALE')>MALE</option>
+                      <option value="FEMALE" @selected($chairmanvideo->gender == 'FEMALE')>FEMALE</option>
+                    </select>
+                  </div>
+
+
+                   <div class="form-group col-lg-2">
+                    <label>Section</label>
+                    <select name="section" id="section" class="form-control form-control-sm">
+                    <option value="">Select Section</option>
+                    <option value="{{ implode(',', $section)}}" @selected(implode(',', $section) == $chairmanvideo->section)>All</option>
+                    @foreach ($section as $row)
+                      <option value="{{$row}}" @selected($row == $chairmanvideo->section)>{{$row}}</option>
+                    @endforeach
+                    </select>
+                  </div>
+                
+
+
+                  <div class="form-group col-lg-4">
+                    <label>Students</label>
+                    <select name="students" id="students" class="form-control form-control-sm select2" required>
+                    @foreach ($students as $k => $row)
+                      <option value="{{$k}}" @selected($k == $chairmanvideo->students)>{{$k}} - {{$row}}</option>
+                    @endforeach
+                    </select>
+                  </div>
+                             
                              <div class="form-group col-lg-3">
                                 <label for="title">Title</label>
                                 <input type="text" name="title" id="title" class="form-control form-control-sm" value="{{ $chairmanvideo->title }}" required>
@@ -106,7 +134,8 @@
                                 <label for="video_id">Video ID</label>
                                 <input type="number" name="video_id" id="video_id" class="form-control form-control-sm" value="{{ $chairmanvideo->video_id }}" required>
                             </div>
-                            <div class="form-group col-lg-4">
+
+                            {{-- <div class="form-group col-lg-4">
                                 <label for="attachment">Attachment</label>
                                 <input type="file" name="attachment" id="attachment" class="form-control form-control-sm">
                                 <div class="mt-2">
@@ -116,7 +145,8 @@
                                     </a>
                                 @endif
                                 </div>
-                            </div>
+                            </div> --}}
+
                             <div class="form-group col-lg-12">
                                 <button type="submit" class="btn btn-primary">Update</button>
                              </div>
