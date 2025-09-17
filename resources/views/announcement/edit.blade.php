@@ -69,10 +69,9 @@
                   
                    <div class="form-group col-lg-2">
                     <label>H/D</label>
-                    <select name="category" id="category" class="form-control form-control-sm">
-                      <option value="">Select H/D</option>
+                    <select name="category[]" id="category" class="select2" multiple>
                       @foreach ($hostel as $row)
-                      <option value="{{$row}}" @selected($row == $announcement->category)>{{$row}}</option>
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->category)))>{{$row}}</option>
                       @endforeach
                     </select>
                   </div>
@@ -80,10 +79,9 @@
 
                   <div class="form-group col-lg-2">
                     <label>Batch</label>
-                    <select name="batch" id="batch" class="form-control form-control-sm">
-                      <option value="">Select Batch</option>
+                    <select name="batch[]" id="batch" class="select2" multiple>
                       @foreach ($batch as $row)
-                      <option value="{{$row}}" @selected($row == $announcement->batch)>{{$row}}</option>
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $announcement->batch)))>{{$row}}</option>
                       @endforeach
                     </select>
                   </div>

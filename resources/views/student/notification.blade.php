@@ -66,14 +66,14 @@
                                     </div>
                                 </div>
                                 <div class="notice-board-item-title mt-2">
-                                    <i class="fas fa-heading"></i> <strong>Title :</strong> {{ $announcement->title }}
+                                    <strong>Title :</strong><span class="col-deep-purple">{{ $announcement->title }}</span>
                                 </div>
                                 <div class="notice-board-item-content">
                                     <i class="fas fa-align-left"></i> <strong>Content :</strong> {!! $announcement->content !!}
                                 </div>
                                 <div class="notice-board-item-date mt-2">
                                     @if($announcement->attachment)
-                                        <a href="{{ env('APP_URL') }}public/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer">
+                                        <a href="{{ env('APP_URL') }}/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer">
                                             <i class="fas fa-paperclip"></i> Attachment
                                         </a>
                                     @endif
