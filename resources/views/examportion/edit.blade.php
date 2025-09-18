@@ -22,12 +22,12 @@
                   <div class="form-group col-lg-3">
                     <label for="academic_year">Academic Year</label>
                     <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
-                      {{-- <option value="">Select Academic Year</option> --}}
                       @foreach ($academicyear as $row)
                       <option value="{{ $row->academic_year }}">{{ $row->academic_year }}</option>
                       @endforeach
                     </select>
                   </div>
+
 
                   <div class="form-group col-lg-4">
                     <label for="branch_id">Branch</label>
@@ -37,6 +37,7 @@
                       @endforeach
                     </select>
                   </div>
+
                   <div class="form-group col-lg-5">
                     <label>Coaching Type</label>
                     <select name="coaching_type[]" id="coaching_type" class="select2 form-control form-control-sm" multiple="multiple" required>
@@ -45,14 +46,17 @@
                       @endforeach
                     </select>
                   </div>
+
                   <div class="form-group col-lg-3">
                     <label for="title">Title</label>
                     <input type="text" name="title" id="title" class="form-control form-control-sm" required>
                   </div>
+
                   <div class="form-group col-lg-4">
                     <label for="attachment">Attachment <span class="text-danger">*PDF only</span></label>
                     <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" required accept=".pdf">
                   </div>
+                  
                   <div class="form-group col-lg-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
                   </div>

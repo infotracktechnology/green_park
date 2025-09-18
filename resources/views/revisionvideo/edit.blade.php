@@ -139,10 +139,9 @@
                     <label>Subject</label>
                     <select name="subject" class="form-control form-control-sm" required>
                       <option value="">Select Subject</option>
-                      <option value="physics" @selected($revisionvideo->subject == 'physics')>Physics</option>
-                      <option value="chemistry" @selected($revisionvideo->subject == 'chemistry')>Chemistry</option>
-                      <option value="zoology" @selected($revisionvideo->subject == 'zoology')>Zoology</option>
-                      <option value="botany" @selected($revisionvideo->subject == 'botany')>Botany</option>
+                       @foreach (['PHYSICS', 'CHEMISTRY', 'ZOOLOGY', 'BOTANY'] as $row)
+                      <option value="{{$row}}" @selected($row==$revisionvideo->subject)>{{$row}}</option>
+                      @endforeach
                     </select>
                   </div>
 
