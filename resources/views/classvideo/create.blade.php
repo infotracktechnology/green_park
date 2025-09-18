@@ -130,10 +130,9 @@
                     <label>Subject</label>
                     <select name="subject" class="form-control form-control-sm" required>
                       <option value="">Select Subject</option>
-                      <option value="physics">Physics</option>
-                      <option value="chemistry">Chemistry</option>
-                      <option value="zoology">Zoology</option>
-                      <option value="botany">Botany</option>
+                      @foreach (['PHYSICS', 'CHEMISTRY', 'ZOOLOGY', 'BOTANY'] as $row)
+                      <option value="{{$row}}">{{$row}}</option>
+                      @endforeach
                     </select>
                   </div>
 
