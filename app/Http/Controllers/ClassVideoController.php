@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -11,73 +12,79 @@ class ClassVideoController extends Controller
 {
     public function index()
     {
-        $academic_years = AcademicYear::all();
         $classvideos = ClassVideo::where('academic_year', $this->academic_year)
-        ->when(auth()->user()->branch, function ($query) {
-          
-        })
-        ->get();
-    
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+            })->get();
+
         return view('classvideo.index', compact('classvideos'));
     }
-    
+
 
     public function create()
-    { 
+    {
         return view('classvideo.create');
     }
 
     public function store(Request $request)
     {
-    
-        try {
-            ClassVideo::create($request->all());
-            return redirect()->route('classvideo.index')->with('success', 'Class video added successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to add class video! ' . $e->getMessage());
+        $data = $request->all();
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
+
+        ClassVideo::create($data);
+        return redirect()->route('classvideo.index')->with('success', 'Video created successfully.');
     }
-    
-        public function destroy($id){
-        $video = ClassVideo::findOrFail($id);
-        $video->delete();
+
+    public function destroy(ClassVideo $classvideo)
+    {
+        $classvideo->delete();
         return redirect()->route('classvideo.index')->with('success', 'Video deleted successfully!');
     }
 
     public function bulkDelete(Request $request)
     {
         $ids = $request->ids;
-    
+
         if (!$ids) {
             return response()->json(['success' => false, 'message' => 'No videos selected.'], 400);
         }
         ClassVideo::whereIn('id', $ids)->delete();
         return response()->json(['success' => true, 'message' => 'Videos deleted successfully.']);
     }
-    
 
-    public function edit($id){
-    $classvideo = ClassVideo::findOrFail($id);
-    return view('classvideo.edit', compact('classvideo'));
-}
 
-public function update(Request $request, $id)
-{
-    
-    try {
-        $classvideo = ClassVideo::findOrFail($id);
-        $classvideo->update($request->all());
-        return redirect()->route('classvideo.index')->with('success', 'Class video updated successfully!');
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Failed to update class video! ' . $e->getMessage());
+    public function edit(ClassVideo $classvideo)
+    {
+        $type = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+
+        $section = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, $classvideo->type, $classvideo->category, $classvideo->batch, $classvideo->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, $classvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+
+        return view('classvideo.edit', compact('classvideo', 'type', 'section', 'students'));
     }
-}
+
+    public function update(Request $request, ClassVideo $classvideo)
+    {
+        $data = $request->all();
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
+        $classvideo->update($data);
+        return redirect()->route('classvideo.index')->with('success', 'Video updated successfully.');
+    }
 
 
     public function classvideo(Request $request)
     {
         $subject = $request->subject ?? 0;
-        $classvideos = auth()->user()->classvideo($subject);
+        $student = Student::where('student_id', auth()->user()->student_id)->first();
+        $classvideos = ClassVideo::ForStudent($student, $subject);
         $classvideos = $classvideos->groupBy('period');
         return view('student.classvideo', compact('classvideos', 'subject'));
     }
@@ -88,59 +95,41 @@ public function update(Request $request, $id)
     }
     public function upload(Request $request)
     {
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filePath = $file->getRealPath();
-    
-            // Open and read the CSV file
-            $csvData = array_map('str_getcsv', file($filePath));
-            $header = array_shift($csvData); // Extract headers
-    
-            foreach ($csvData as $row) {
-                $data = array_combine($header, $row);
+        $data = $request->except('file', '_token');
+        $classVideos = [];
 
-                if(!isset($data['subject']) || !isset($data['video_id'])){
-                    return redirect()->back()->with('error', 'Subject, Chapter and Video ID fields are required.');
-                }
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+        $file = $request->file('file');
+        $csvData = array_map('str_getcsv', file($file->getRealPath()));
 
-    
-                // $s_no = intval(trim($data['s_no'] ?? 0)); // Ensure integer value
-                $subject = trim($data['subject'] ?? 'Unknown');
-                $chapter = trim($data['chapter'] ?? 'Unknown');
-                $period = trim($data['period'] ?? '0'); // Period can still be a string or numeric
-                $video_id = trim($data['video_id'] ?? '0');
-                $academic_year = $request->academic_year ?? $this->academic_year;
-    
-                ClassVideo::create([
-                   
-                    'subject' => $subject,
-                    'chapter' => $chapter,
-                    'period' => $period,
-                    'video_id' => $video_id,
-                    'academic_year' => $academic_year
-                ]);
+        if (empty($csvData)) {
+            return back()->with('error', 'CSV file is empty.');
+        }
+
+        $header = array_map('trim', array_shift($csvData));
+
+        foreach ($csvData as $row) {
+            $row = array_map('trim', $row);
+            $record = array_combine($header, $row);
+            if (empty($record['subject']) || empty($record['video_id'])) {
+                return back()->with('error', 'Subject and Video ID fields are required.');
             }
-    
-            return redirect()->back()->with('success', 'Class videos uploaded successfully!');
+            $classVideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown']);
         }
-    
-        return redirect()->back()->with('error', 'No file selected for upload.');
+
+        ClassVideo::insert($classVideos);
+        return redirect()->route('classvideo.index')->with('success', 'Class videos uploaded successfully.');
     }
-    
-    public function schedule(Request $request){
 
-
+    public function schedule(Request $request)
+    {
         $ClassVideo = ClassVideo::whereIn('id', $request->ids)->update(['start_at' => $request->start_at, 'end_at' => $request->end_at]);
-        if($ClassVideo){
+        if ($ClassVideo) {
             return response()->json(['status' => true, 'message' => 'Class video scheduled successfully.']);
-        }
-        else{
+        } else {
             return response()->json(['status' => false, 'message' => 'Failed to schedule class video.']);
         }
     }
-
-   
-    
 }
-
-

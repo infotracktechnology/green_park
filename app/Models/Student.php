@@ -51,11 +51,6 @@ class Student extends Authenticatable
         // });
     }
 
-
-    function chairmanvideo()
-    {
-        return Chairmanvideo::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('gender', 'like', "%$this->gender%")->where('academic_year', $this->academic_year)->latest()->first();
-    }
     function examportion()
     {
         return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year);
@@ -86,13 +81,6 @@ class Student extends Authenticatable
         return Achievement::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->get();
     }
 
-
-
-    public function classvideo($subject = ''){
-        $datetime = date('Y-m-d H:i:s');
-        return ClassVideo::where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->where('academic_year', $this->academic_year)->get();
-    }
-    
 
     public function discussionvideos($subject = '')
     {
