@@ -7,6 +7,7 @@ use App\Models\Exam;
 use Illuminate\Http\Request;
 use App\Models\Examportion;
 use App\Models\Branch;
+use App\Models\Student;
 use App\Models\AcademicYear;
 
 use Illuminate\Support\Facades\DB;
@@ -15,60 +16,89 @@ class ExamPortionController extends Controller
 {
     public function index()
     {
-        $academic_years = AcademicYear::all();
         $examportions = Examportion::where('academic_year', $this->academic_year)
-        ->when(auth()->user()->branch, function ($query) {
-            $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-        })
-        ->get();
-    
-        $examportions = Examportion::latest()->get();
-        $branches = Branch::all();
-        $branchList = DB::table('branch')->pluck('name', 'id')->toArray();
-        return view('examportion.index', compact('examportions', 'branches', 'branchList'));
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+            })
+            ->get();
+
+        return view('examportion.index', compact('examportions'));
     }
     public function create()
     {
 
-        $academicyear = AcademicYear::all();
-      
         return view('examportion.create');
     }
     public function store(Request $request)
     {
         $data = $request->except('attachment');
-        $data['branch_id'] = implode(',', $request->branch_id);
-        $data['coaching_type'] = implode(',', $request->coaching_type);
-        $data['academic_year'] = $request->academic_year; 
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
         if ($request->hasFile('attachment')) {
-            $originalName = $request->file('attachment')->getClientOriginalName(); // Get original filename
-            $fileName = time() . '_' . $originalName; // Add timestamp to avoid conflicts
-            $request->file('attachment')->move(public_path('assets/attachments'), $fileName);
-            $data['attachment'] = 'assets/attachments/' . $fileName;
+            $originalName = $request->file('attachment')->getClientOriginalName();
+            $fileName = time().'_'.$originalName;
+            $request->file('attachment')->move('assets/examportion',$fileName);
+            $data['attachment'] = 'assets/examportion/'.$fileName;
         } else {
             $data['attachment'] = null;
         }
-        
+
         Examportion::create($data);
         return to_route('examportion.index')->with('success', 'Examportion created successfully');
     }
-    
+
+    public function edit(Examportion $examportion)
+    {
+        $type = Student::StudentFilterQuery($examportion->branch, $examportion->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+
+        $section = Student::StudentFilterQuery($examportion->branch, $examportion->course, $examportion->type, $examportion->category, $examportion->batch, $examportion->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($examportion->branch, $examportion->course, $examportion->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+
+        return view('examportion.edit', compact('examportion', 'type', 'section', 'students'));
+    }
+
+    public function update(Request $request, Examportion $examportion)
+    {
+        $data = $request->except('attachment');
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
+         if ($request->hasFile('attachment')) {
+            $originalName = $request->file('attachment')->getClientOriginalName();
+            $fileName = time().'_'.$originalName;
+            $request->file('attachment')->move('assets/examportion',$fileName);
+            $data['attachment'] = 'assets/examportion/'.$fileName;
+        } else {
+            $data['attachment'] = null;
+        }
+
+        $examportion->update($data);
+        return redirect()->route('examportion.index')->with('success', 'Examportion updated successfully.');
+    }
+
+
     public function destroy(Request $request, Examportion $examportion)
     {
-       
+
         if ($examportion->attachment && file_exists(public_path($examportion->attachment))) {
             unlink(public_path($examportion->attachment));
         }
         $examportion->delete();
-    
+
         session()->flash('success', 'Examportion deleted successfully');
         return to_route('examportion.index');
     }
-    
+
     public function examportion(Request $request)
     {
         $examportions = auth()->user()->examportion()->get();
-       
+
         return view('student.examportion', compact('examportions'));
     }
 }

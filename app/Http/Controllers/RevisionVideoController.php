@@ -107,6 +107,6 @@ class RevisionVideoController extends Controller
 
         RevisionVideo::whereIn('id', $ids)->delete();
 
-        return response()->json(['message' => 'Selected videos deleted successfully!'], 200);
+        return response()->json(['message' => RevisionVideo::whereIn('id', $ids)], 200);
     }
 }
