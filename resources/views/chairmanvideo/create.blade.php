@@ -5,20 +5,20 @@
 @endsection
 @section('main')
 <div class="main-content">
-   <section class="section">
-      <div class="section-body"> 
-          <div class="row">
-              <div class="col-12">
-                  <div class="card card-primary" x-data="app">
-                     <form method="post" id="myForm" action="{{ route('chairmanvideo.store') }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="card-body">
-                           <div class="row">
-                            <div class="col-md-12 col-sm-12 mb-3">
-                                <h6 class="col-deep-purple">Add Video</h6>
-                             </div>
-                             
-                 <div class="form-group col-lg-3">
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12">
+          <div class="card card-primary" x-data="app">
+            <form method="post" id="myForm" action="{{ route('chairmanvideo.store') }}" enctype="multipart/form-data">
+              @csrf
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12 col-sm-12 mb-3">
+                    <h6 class="col-deep-purple">Add Video</h6>
+                  </div>
+
+                  <div class="form-group col-lg-3">
                     <label for="academic_year">Academic Year</label>
                     <select name="academic_year" id="academic_year" class="form-control form-control-sm" required>
                       @foreach ($academicyear as $row)
@@ -27,13 +27,13 @@
                     </select>
                   </div>
 
-                   <div class="form-group col-lg-3">
+                  <div class="form-group col-lg-3">
                     <label>User Type</label>
                     <select name="usertype" id="usertype" class="form-control form-control-sm" required>
                       <option value="GROUP">GROUP</option>
                       <option value="INDIVIDUAL">INDIVIDUAL STUDENT</option>
                     </select>
-                   </div>
+                  </div>
 
                   <div class="form-group col-lg-3">
                     <label>Course</label>
@@ -63,11 +63,10 @@
                     </select>
                   </div>
 
-                  
-                   <div class="form-group col-lg-2">
+
+                  <div class="form-group col-lg-2">
                     <label>H/D</label>
-                    <select name="category" id="category" class="form-control form-control-sm">
-                      <option value="">Select H/D</option>
+                    <select name="category[]" id="category" class="select2" multiple>
                       @foreach ($hostel as $row)
                       <option value="{{$row}}">{{$row}}</option>
                       @endforeach
@@ -77,8 +76,7 @@
 
                   <div class="form-group col-lg-2">
                     <label>Batch</label>
-                    <select name="batch" id="batch" class="form-control form-control-sm">
-                      <option value="">Select Batch</option>
+                    <select name="batch[]" id="batch" class="select2" multiple>
                       @foreach ($batch as $row)
                       <option value="{{$row}}">{{$row}}</option>
                       @endforeach
@@ -96,12 +94,12 @@
                   </div>
 
 
-                   <div class="form-group col-lg-2">
+                  <div class="form-group col-lg-2">
                     <label>Section</label>
                     <select name="section" id="section" class="form-control form-control-sm">
                     </select>
                   </div>
-                
+
 
                   <div class="form-group col-lg-4">
                     <label>Students</label>
@@ -109,30 +107,27 @@
                     </select>
                   </div>
 
-                             <div class="form-group col-lg-4">
-                                <label for="title">Title</label>
-                                <input type="text" name="title" id="title" class="form-control form-control-sm" required>
-                            </div>
-                            <div class="form-group col-lg-3">
-                                <label for="link">Video ID</label>
-                                <input type="number" name="video_id" id="video_id" class="form-control form-control-sm" required>
-                            </div>
-
-                            {{-- <div class="form-group col-lg-4">
-                                <label for="attachment">Attachment</label>
-                                <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" onchange="saveAs('assets/attachments', this)">
-                            </div> --}}
-
-                            <div class="form-group col-lg-12">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                             </div>
-                            </div>
-                        </div>
-                     </form>
+                  <div class="form-group col-lg-4">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" class="form-control form-control-sm" required>
                   </div>
+                  <div class="form-group col-lg-3">
+                    <label for="link">Video ID</label>
+                    <input type="number" name="video_id" id="video_id" class="form-control form-control-sm" required>
+                  </div>
+
+
+                  <div class="form-group col-lg-12">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                  
+                </div>
               </div>
+            </form>
           </div>
+        </div>
       </div>
-   </section>
+    </div>
+  </section>
 </div>
 @endsection

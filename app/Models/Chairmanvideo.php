@@ -21,7 +21,7 @@ class Chairmanvideo extends Model
         return Branch::whereIn('id', explode(',', $this->branch))->get()->implode('name', '/');
     }
 
-    public static function ForStudent(Student $student)
+public static function ForStudent(Student $student)
 {
     return self::query()
         ->where('usertype', 'INDIVIDUAL')
@@ -34,9 +34,9 @@ class Chairmanvideo extends Model
                 ->when($student->coaching_type === 'OFFLINE', function ($q) use ($student) {
                     if (in_array($student->course, ['NEET', 'JEE'])) {
                         if (in_array($student->campus, [1, 4, 5])) {
-                            $q->where('category', $student->hostel_dayscholar);
+                            $q->where('category', 'like', "%{$student->hostel_dayscholar}%");
                         }
-                        $q->where('batch', $student->batch);
+                        $q->where('batch', 'like', "%{$student->batch}%");
                     }
                     $q->where('section', 'like', "%{$student->section}%");
                 })->whereIn('gender', [$student->gender, 'All']);
@@ -58,6 +58,8 @@ public function StudentList()
     $coachingTypes = explode(',', $this->coaching_type ?? '');
     $branches = explode(',', $this->branch ?? '');
     $sections = explode(',', $this->section ?? '');
+    $category = explode(',', $this->category ?? '');
+    $batch = explode(',', $this->batch ?? '');
 
     $query->where('academic_year', $this->academic_year)
         ->where('course', $this->course)
@@ -68,9 +70,9 @@ public function StudentList()
         $query->whereIn('section', $sections);
         if (in_array($this->course, ['NEET', 'JEE'])) {
             if (array_intersect([1, 4, 5], $branches)) {
-                $query->where('hostel_dayscholar', $this->category);
+                $query->whereIn('hostel_dayscholar', $category);
             }
-            $query->where('batch', $this->batch);
+            $query->whereIn('batch', $batch);
         }
     }
 

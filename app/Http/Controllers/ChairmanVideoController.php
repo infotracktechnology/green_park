@@ -31,7 +31,7 @@ class ChairmanVideoController extends Controller
     {
        $data = $request->all();
 
-        foreach (['coaching_type','branch'] as $field) {
+        foreach (['coaching_type','branch','category','batch'] as $field) {
          $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
@@ -59,7 +59,7 @@ class ChairmanVideoController extends Controller
 {
     $data = $request->all();
 
-     foreach (['coaching_type','branch'] as $field) {
+     foreach (['coaching_type','branch','category','batch'] as $field) {
          $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
      }
      
@@ -84,8 +84,8 @@ class ChairmanVideoController extends Controller
     }
     public function chairmanvideo(Request $request)
     {
-        $chairmanvideo = auth()->user()->chairmanvideo();
-       
+        $student = Student::where('student_id',auth()->user()->student_id)->first();
+        $chairmanvideo = Chairmanvideo::ForStudent($student)->latest()->first();
        return view('student.chairmanvideo', compact('chairmanvideo'));
     }
 
