@@ -76,6 +76,7 @@
                     <tr>
                       <th><input type="checkbox" id="checkAll" /></th>
                       <th>Academic Year</th>
+                      <th>User Type</th>
                       <th>Course</th>
                       <th>Branch </th>
                       <th>Coaching Type</th>
@@ -95,6 +96,7 @@
                     <tr>
                       <td><input type="checkbox" class='ids' name="ids[]" value="{{$classvideo->id}}" /></td>
                       <td>{{$classvideo->academic_year}}</td>
+                      <td>{{$classvideo->usertype}}</td>
                       <td>{{$classvideo->course}}</td>
                       <td>{{$classvideo->branchNames()}}</td>
                       <td>{{$classvideo->coaching_type}}</td>

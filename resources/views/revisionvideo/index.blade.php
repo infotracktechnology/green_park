@@ -47,6 +47,7 @@
                     <tr>
                       <th><input type="checkbox" id="selectAllRevision"></th>
                       <th>Academic Year</th>
+                      <th>User Type</th>
                       <th>Course</th>
                       <th>Branch </th>
                       <th>Coaching Type</th>
@@ -65,6 +66,7 @@
                     <tr>
                       <td><input type="checkbox" class="checked_ids_revision" name="ids[]" value="{{ $row->id }}"></td>
                       <td>{{ $row->academic_year }}</td>
+                      <td>{{ $row->usertype }}</td>
                       <td>{{ $row->course }}</td>
                       <td>{{ $row->branchNames() }}</td>
                       <td>{{ $row->coaching_type }}</td>
