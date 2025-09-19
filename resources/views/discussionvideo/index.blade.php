@@ -41,13 +41,15 @@
                     <thead>
                       <tr>
                         <th><input type="checkbox" id="selectAll"></th>
-                        <th>#</th>
                         <th>Academic Year</th>
-                        <th>Branch</th>
+                        <th>User Type</th>
+                        <th>Course</th>
+                        <th>Branch </th>
                         <th>Coaching Type</th>
-                        <th>Subject</th>
-                        <th>Title</th>
+                        <th>H/D</th>
+                        <th>Batch</th>
                         <th>Part</th>
+                        <th>Subject</th>
                         <th>Video Id</th>
                         <th>Start At</th>
                         <th>End At</th>
@@ -59,27 +61,25 @@
                       @foreach ($discussionvideos as $discussionvideo)
                       <tr>
                         <td><input type="checkbox" class="checked_ids" name="ids[]" value="{{ $discussionvideo->id }}"></td>
-
-                        <td>{{ $discussionvideo->id }}</td>
-                        <td>{{ $discussionvideo->academic_year }}</td>
-                        <td>
-                          @php
-                          $branchNames = \App\Models\Branch::whereIn('id', explode(',', $discussionvideo->branch))->pluck('name')->toArray();
-                          @endphp
-                          {{ implode(', ', $branchNames) }}
-                        </td>
-                        <td>{{ implode(', ', explode(',', $discussionvideo->coaching_type)) }}</td>
-                        <td>{{ $discussionvideo->subject }}</td>
-                        <td>{{ $discussionvideo->title }}</td>
+                        <td>{{ $discussionvideo->academic_year}}</td>
+                        <td>{{ $discussionvideo->usertype}}</td>
+                        <td>{{ $discussionvideo->course}}</td>
+                        <td>{{ $discussionvideo->branchNames()}}</td>
+                        <td>{{ $discussionvideo->coaching_type}}</td>
+                        <td>{{ $discussionvideo->category}}</td>
+                        <td>{{ $discussionvideo->batch}}</td>
                         <td>{{ $discussionvideo->part }}</td>
+                        <td>{{ $discussionvideo->subject }}</td>
                         <td>{{ $discussionvideo->video_id }}</td>
                         <td>{{ $discussionvideo->start_at }}</td>
                         <td>{{ $discussionvideo->end_at }}</td>
                         <td>
-                          <a href="{{route('discussionvideo.edit', $discussionvideo->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                          <a href="{{ route('discussionvideo.edit', $discussionvideo->id) }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                          </a>
                         </td>
                         <td>
-                          <form action="{{ route('discussionvideo.destroy', $discussionvideo->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                          <form action="{{ route('discussionvideo.destroy', $discussionvideo->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this video?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">

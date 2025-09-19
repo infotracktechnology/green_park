@@ -22,17 +22,16 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $students = [];
-        if($request->has('course')) {
-            $students = Student::when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%'.auth()->user()->branch.'%'))->where('course', $request->course)->get();
+        if ($request->has('course')) {
+            $students = Student::when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))->where('course', $request->course)->get();
         }
-            
+
         return view('student.index', compact('students'));
     }
 
 
     public function create(Request $request)
     {
-        // $branches = DB::table('branch')->select('id', 'name')->get();
         if ($request->has('city')) {
             $pincodes = DB::table('district_list')->where('District', $request->city)->select('Pincode')->get();
             return response()->json($pincodes);
@@ -52,12 +51,11 @@ class StudentController extends Controller
 
     public function edit(Request $request, Student $Student)
     {
-        // $branches = DB::table('branch')->select('id', 'name')->get();
         $districts = DB::table('district_list')->where('State', $Student->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
 
-        return view('student.edit', compact( 'districts', 'states', 'pincodes', 'Student'));
+        return view('student.edit', compact('districts', 'states', 'pincodes', 'Student'));
     }
 
 
@@ -115,112 +113,114 @@ class StudentController extends Controller
         return view('student.profile');
     }
     public function home()
-{
-    
-    if (!Auth::check() || !Auth::user()->student_id) {
-        abort(403, 'Unauthorized or missing student ID.');
+    {
+
+        if (!Auth::check() || !Auth::user()->student_id) {
+            abort(403, 'Unauthorized or missing student ID.');
+        }
+
+        $studentId = Auth::user()->student_id;
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+
+
+        $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
+            ->where('student_id', $studentId)
+            ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
+            ->distinct();
+
+        $stats = DB::query()
+            ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
+            ->selectRaw("
+            -- Logic for Total Days: Count the unique days.
+            COUNT(DISTINCT attendance_date) as total_days,
+            
+            -- Logic for Present Days: Sum 0.5 for every 'P' status.
+            SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days
+        ")
+            ->first();
+
+
+        $totalDaysInMonth = $stats->total_days ?? 0;
+        $presentDaysInMonth = $stats->present_days ?? 0;
+
+        $percentage = $totalDaysInMonth > 0
+            ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2)
+            : 0;
+
+        return view('student.home', [
+            'totalDays' => $totalDaysInMonth,
+            'presentDays' => $presentDaysInMonth,
+            'attendancePercentage' => $percentage,
+        ]);
     }
 
-    $studentId = Auth::user()->student_id;
-    $startOfMonth = now()->startOfMonth();
-    $endOfMonth = now()->endOfMonth();
 
-    
-    $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
-        ->where('student_id', $studentId)
-        ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
-        ->distinct();
 
-    $stats = DB::query()
-        ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
-        ->selectRaw("
+    public function dashboard()
+    {
+        $coachingType = auth()->user()->coaching_type;
+        $branchId = auth()->user()->branch_id;
+
+        $exam = Exam::where('start_at', '>', now())
+            ->where('coaching_type', 'LIKE', "%$coachingType%")
+            ->where('branch_id', 'LIKE', "%$branchId%")
+            ->orderBy('start_at', 'asc')
+            ->first();
+
+        $examStartTime = $exam ? $exam->start_at->toIso8601String() : null;
+
+        $studentId = Auth::user()->student_id;
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+
+
+        $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
+            ->where('student_id', $studentId)
+            ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
+            ->distinct();
+
+        $stats = DB::query()
+            ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
+            ->selectRaw("
             -- Logic for Total Days: Count the unique days.
             COUNT(DISTINCT attendance_date) as total_days,
             
             -- Logic for Present Days: Sum 0.5 for every 'P' status.
             SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days
         ")
-        ->first();
-
-   
-    $totalDaysInMonth = $stats->total_days ?? 0;
-    $presentDaysInMonth = $stats->present_days ?? 0;
-
-    $percentage = $totalDaysInMonth > 0 
-                  ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2) 
-                  : 0;
-
-    return view('student.home', [
-        'totalDays' => $totalDaysInMonth,
-        'presentDays' => $presentDaysInMonth,
-        'attendancePercentage' => $percentage,
-    ]);
-}
+            ->first();
 
 
-   
-public function dashboard()
-{
-    $coachingType = auth()->user()->coaching_type;
-    $branchId = auth()->user()->branch_id;
+        $totalDaysInMonth = $stats->total_days ?? 0;
+        $presentDaysInMonth = $stats->present_days ?? 0;
 
-    $exam = Exam::where('start_at', '>', now())
-        ->where('coaching_type', 'LIKE', "%$coachingType%")
-        ->where('branch_id', 'LIKE', "%$branchId%")
-        ->orderBy('start_at', 'asc')
-        ->first();
+        $percentage = $totalDaysInMonth > 0
+            ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2)
+            : 0;
 
-    $examStartTime = $exam ? $exam->start_at->toIso8601String() : null; 
-
-     $studentId = Auth::user()->student_id;
-    $startOfMonth = now()->startOfMonth();
-    $endOfMonth = now()->endOfMonth();
-
-    
-    $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
-        ->where('student_id', $studentId)
-        ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
-        ->distinct();
-
-    $stats = DB::query()
-        ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
-        ->selectRaw("
-            -- Logic for Total Days: Count the unique days.
-            COUNT(DISTINCT attendance_date) as total_days,
-            
-            -- Logic for Present Days: Sum 0.5 for every 'P' status.
-            SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days
-        ")
-        ->first();
-
-   
-    $totalDaysInMonth = $stats->total_days ?? 0;
-    $presentDaysInMonth = $stats->present_days ?? 0;
-
-    $percentage = $totalDaysInMonth > 0 
-                  ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2) 
-                  : 0;
-
-    return view('dashboards.studentdashboard', compact('examStartTime', 'totalDaysInMonth', 'presentDaysInMonth', 'percentage'));
-}
-    function marksheet(Request $request){
+        return view('dashboards.studentdashboard', compact('examStartTime', 'totalDaysInMonth', 'presentDaysInMonth', 'percentage'));
+    }
+    function marksheet(Request $request)
+    {
         $sid = auth()->user()->student_id;
         $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
-       return view('student.marksheet',compact('tests'));
+        return view('student.marksheet', compact('tests'));
     }
 
-    function mark_subject(Request $request, $test_id){
+    function mark_subject(Request $request, $test_id)
+    {
         $sid = auth()->user()->student_id;
         $test = DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject FROM `exam_answer` where test_id=$test_id and student_id=$sid group by subject");
-        return view('student.mark_subject',compact('test'));
-        
+        return view('student.mark_subject', compact('test'));
     }
-    function mark_download(Request $request, $test_id){
+    function mark_download(Request $request, $test_id)
+    {
         $sid = auth()->user()->student_id;
         $answers = DB::table('exam_answer')->where('test_id', $test_id)->where('student_id', $sid)->orderBy('q_no')->get();
         $answers = $answers->chunk(45);
         $exam = DB::table('exam')->where('id', $test_id)->selectRaw("name,id,DATE_FORMAT(start_at, '%d-%m-%Y')exam_date")->first();
-        return view('student.mark_download',compact('answers','exam'));
+        return view('student.mark_download', compact('answers', 'exam'));
     }
 
 
@@ -228,7 +228,7 @@ public function dashboard()
     public function getExamStartTime()
     {
         $exam = Exam::latest()->first(); // Get the latest exam (modify as needed)
-        
+
         if (!$exam || !$exam->start_at) {
             return response()->json(['error' => 'Exam start time not found'], 404);
         }
@@ -239,25 +239,11 @@ public function dashboard()
     }
 
 
-    public function discussionvideo(Request $request)
-    {
-        $subject = $request->subject ?? 0;
-        $discussionvideos = auth()->user()->discussionvideos($subject);
-        $discussionvideos = $discussionvideos->groupBy('part');
-        
-        return view('student.discussionvideo', compact('discussionvideos', 'subject'));
-    }
-
-    // public function attendance()
-    // {
-    //     return view('student.attendance');
-    // }
-    
     public function attendance()
-{
-    $student_id = Auth::user()->student_id;
-    $attendance = DB::table('attendance')
-        ->selectRaw("
+    {
+        $student_id = Auth::user()->student_id;
+        $attendance = DB::table('attendance')
+            ->selectRaw("
             student_id,
             DATE_FORMAT(attendance_date, '%Y-%m') AS month,
             GROUP_CONCAT(timing) AS timings,
@@ -265,19 +251,15 @@ public function dashboard()
             COUNT(DISTINCT attendance_date) AS total_days,
             SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days
         ")
-        ->where('student_id', $student_id)
-        ->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")
-        ->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")
-        ->get();
+            ->where('student_id', $student_id)
+            ->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")
+            ->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")
+            ->get();
 
-    $total_present = $attendance->sum('present_days');
-    $total_days = $attendance->sum('total_days');
-    $percentage = $total_days > 0 ? round(($total_present / $total_days) * 100, 2) : 0;
+        $total_present = $attendance->sum('present_days');
+        $total_days = $attendance->sum('total_days');
+        $percentage = $total_days > 0 ? round(($total_present / $total_days) * 100, 2) : 0;
 
-    return view('student.attendance', compact('attendance', 'total_present', 'total_days', 'percentage'));
+        return view('student.attendance', compact('attendance', 'total_present', 'total_days', 'percentage'));
+    }
 }
-
-}
-
-
-

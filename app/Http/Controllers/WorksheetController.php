@@ -13,96 +13,72 @@ class WorksheetController extends Controller
     {
         $worksheets = Worksheet::when($this->academic_year, function ($query) {
             $query->where('academic_year', $this->academic_year);
-        })
-        ->when(auth()->user()->branch, function ($query) {
+        })->when(auth()->user()->branch, function ($query) {
             $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-        })
-        ->latest()
-        ->get();
-    
+        })->latest()->get();
+
         return view('worksheet.index', compact('worksheets'));
     }
 
     public function create()
     {
-        $academicyear = AcademicYear::all();
-      
+
         return view('worksheet.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'branch' => 'required|array',
-            'coaching_type' => 'required|array',
-            'file' => 'required|file|mimes:pdf|max:2048',
-        ]);
-    
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-  
-        $filePath = $file->move('worksheet', $fileName);
-     
-        
-        $branchData = implode(',', $request->branch);
-        $coachingTypeData = implode(',', $request->coaching_type);
-    
-        Worksheet::create([
-            'title' => $request->title,
-            'academic_year' => $request->academic_year,
-            'branch' => $branchData,
-            'coaching_type' => $coachingTypeData,
-            'file_path' => $filePath,
-        ]);
-    
-    
+        $data = $request->except('file');
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
+        if ($request->hasFile('file')) {
+            $originalName = $request->file('file')->getClientOriginalName();
+            $fileName = time() . '_' . $originalName;
+            $request->file('file')->move('worksheet', $fileName);
+            $data['file_path'] = 'worksheet/' . $fileName;
+        }
+
+        Worksheet::create($data);
 
         return redirect()->route('worksheet.index')->with('success', 'Worksheet created successfully.');
     }
 
     public function edit(Worksheet $worksheet)
     {
-        
-        $academicyear = AcademicYear::all();
-    
-        
-    
-        return view('worksheet.edit', compact('worksheet',  'academicyear'));
+        $type = Student::StudentFilterQuery($worksheet->branch, $worksheet->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+
+        $section = Student::StudentFilterQuery($worksheet->branch, $worksheet->course, $worksheet->type, $worksheet->category, $worksheet->batch, $worksheet->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($worksheet->branch, $worksheet->course, $worksheet->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+
+
+        return view('worksheet.edit', compact('worksheet'));
     }
-    
+
 
     public function update(Request $request, Worksheet $worksheet)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'branch' => 'required|array',
-            'coaching_type' => 'required|array',
-            'file' => 'nullable|file|mimes:pdf|max:2048',
-        ]);
-    
-        $filePath = $worksheet->file_path; 
-    
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->move('worksheet', $fileName);
+        $data = $request->except('file');
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
-    
-        $branchData = implode(',', $request->branch);
-        $coachingTypeData = implode(',', $request->coaching_type);
-    
-        $worksheet->update([
-            'title' => $request->title,
-            'academic_year' => $request->academic_year,
-            'branch' => $branchData,
-            'coaching_type' => $coachingTypeData,
-            'file_path' => $filePath,
-        ]);
-    
+
+        if ($request->hasFile('file')) {
+            $originalName = $request->file('file')->getClientOriginalName();
+            $fileName = time() . '_' . $originalName;
+            $request->file('file')->move('worksheet', $fileName);
+            $data['file_path'] = 'worksheet/' . $fileName;
+        }
+
+        $worksheet->update($data);
+
         return redirect()->route('worksheet.index')->with('success', 'Worksheet updated successfully.');
     }
-    
+
 
     public function destroy(Worksheet $worksheet)
     {
@@ -110,18 +86,10 @@ class WorksheetController extends Controller
         return redirect()->route('worksheet.index')->with('success', 'Worksheet deleted.');
     }
 
-    // public function worksheet(Student $student)
-    // {
-    //     // $worksheet = auth('student')->user()->worksheet();
-    //     return view('student.worksheet');
-    // }
-
-
-
     public function worksheet()
-{
-    $worksheets = auth('student')->user()->worksheet();
-    return view('student.worksheet', compact('worksheets'));
-}
-
+    {
+        $student = Student::where('student_id', auth('student')->user()->student_id)->first();
+        $worksheets = Worksheet::ForStudent($student);
+        return view('student.worksheet', compact('worksheets'));
+    }
 }

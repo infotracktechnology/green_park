@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student,Chairmanvideo,Announcement,Examportion,RevisionVideo,TimetableAssign,SickRoomEntry,Exam};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo,Download,Worksheet};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,7 +34,7 @@ Route::group(['prefix' => 'v2'], function () {
         $student->total_attendance_days = $attendanceStats->total_days;
         $student->present_attendance_days = $attendanceStats->present_days;
         $student->branch_name = $student->branch->name ?? 'N/A';
-    return response()->json($student);
+        return response()->json($student);
     });
 
     Route::get('/chairmanvideo/{student_id}',  function (Request $request, $student_id) {
@@ -53,37 +53,34 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::find($id);
         if ($announcement) {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            $announcement->attachment = "public/".$announcement->attachment;
+            $announcement->attachment = "public/" . $announcement->attachment;
         }
         return response()->json($announcement);
     });
 
-     Route::get('/announcement/count/{student_id}', function (Request $request, $student_id) {
-         $student = Student::where('student_id', $student_id)->first();
-         $announcement = Announcement::ForStudent($student)->whereJsonDoesntContain('student_ids', $this->student_id)->count();
+    Route::get('/announcement/count/{student_id}', function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
+        $announcement = Announcement::ForStudent($student)->whereJsonDoesntContain('student_ids', $this->student_id)->count();
         return response()->json(['count' => $announcement]);
     });
 
-     Route::post('/announcement', function (Request $request) {
-       $announcement = Announcement::find($request->id);
-       $student_ids = $announcement->student_ids ? $announcement->student_ids : [];
-       if(!in_array($request->student_id, $student_ids)){
-       $student_ids[] = $request->student_id;
-       $announcement->student_ids = $student_ids;
-       $announcement->save();
-       }
-       return response()->json($announcement);
+    Route::post('/announcement', function (Request $request) {
+        $announcement = Announcement::find($request->id);
+        $student_ids = $announcement->student_ids ? $announcement->student_ids : [];
+        if (!in_array($request->student_id, $student_ids)) {
+            $student_ids[] = $request->student_id;
+            $announcement->student_ids = $student_ids;
+            $announcement->save();
+        }
+        return response()->json($announcement);
     });
 
     Route::get('/examportion/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $examportion = $student->examportion()->get()->map(function ($examportion) {
-            $examportion->attachment = "public/".$examportion->attachment;
-            return $examportion;
-        });
+        $examportion = Examportion::ForStudent($student);
         return response()->json($examportion);
     });
-    
+
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
         $results = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$student_id and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
         $results = count($results) > 0 ? $results : [];
@@ -91,52 +88,52 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/marksheet/{student_id}/{exam}', function (Request $request, $student_id, Exam $exam) {
-         $student = Student::where('student_id', $student_id)->select('student_name', 'user_name')->first();
-         $answers = DB::table('exam_answer')->where('test_id', $exam->id)->where('student_id', $student_id)->orderBy('q_no')->get()->map(function ($answer) {
-             return [
-                 'q_no' => $answer->q_no,
-                 'answer_key' => $answer->answer_key,
-                 'answer' => $answer->answer,
-                 'mark' => $answer->answer_key == 'DEL' ? 'DEL' : ($answer->mark == 4 ? 'C' : ($answer->mark == -1 ? 'W' : 'L'))
-             ];
-         })->chunk(45);
+        $student = Student::where('student_id', $student_id)->select('student_name', 'user_name')->first();
+        $answers = DB::table('exam_answer')->where('test_id', $exam->id)->where('student_id', $student_id)->orderBy('q_no')->get()->map(function ($answer) {
+            return [
+                'q_no' => $answer->q_no,
+                'answer_key' => $answer->answer_key,
+                'answer' => $answer->answer,
+                'mark' => $answer->answer_key == 'DEL' ? 'DEL' : ($answer->mark == 4 ? 'C' : ($answer->mark == -1 ? 'W' : 'L'))
+            ];
+        })->chunk(45);
 
-         return response()->json(['answers' => $answers,'subject'=>$exam->name,'exam_date'=>$exam->exam_date,'test_id'=>$exam->id,'student'=>$student]);
+        return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'test_id' => $exam->id, 'student' => $student]);
     });
-    
-    Route::get('/questionkey/{student_id}', function (Request $request,$student_id) {
+
+    Route::get('/questionkey/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $questionkey = $student->questionkey();
+        $questionkey = QuestionKey::ForStudent($student);
         return response()->json($questionkey);
     });
 
-    Route::get('/answerkey/{student_id}', function (Request $request,$student_id) {
+    Route::get('/answerkey/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $answerkey = $student->answerkey();
+        $answerkey = AnswerKey::ForStudent($student);
         return response()->json($answerkey);
     });
 
     Route::get('/downloads/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $downloads = $student->downloads();
+        $downloads = Download::ForStudent($student);
         return response()->json($downloads);
     });
 
     Route::get('/classvideos/{student_id}/{subject}/{period}', function ($student_id, $subject, $period) {
         $student = Student::where('student_id', $student_id)->first();
-        $classvideos = $student->classvideo($subject)->where('period', $period);
+        $classvideos = ClassVideo::ForStudent($student, $subject)->where('period', $period);
         return response()->json($classvideos);
     });
 
     Route::get('/classvideos/subject', function (Student $student) {
-        $subjects = ['physics', 'chemistry', 'botany', 'zoology'];
+        $subjects = ['PHYSICS', 'CHEMISTRY', 'BOTANY', 'ZOOLOGY'];
         return response()->json($subjects);
     });
 
 
     Route::get('/discussionvideo/{student_id}/{subject}', function ($student_id, $subject) {
         $student = Student::where('student_id', $student_id)->first();
-        $discussionvideos = $student->discussionvideos($subject);
+        $discussionvideos = DiscussionVideo::ForStudent($student, $subject);
         $discussionvideos = $discussionvideos->groupBy('part');
         return response()->json($discussionvideos);
     });
@@ -145,13 +142,13 @@ Route::group(['prefix' => 'v2'], function () {
     Route::get('revisionvideos/{student_id}', function ($student_id) {
         $datetime = date('Y-m-d H:i:s');
         $student = Student::where('student_id', $student_id)->first();
-        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->where('academic_year', $student->academic_year)->get();
+        $revisionvideos = RevisionVideo::ForStudent($student);
         return response()->json($revisionvideos);
     });
 
     Route::get('/worksheet/{student_id}', function ($student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $worksheet = $student->worksheet();
+        $worksheet = Worksheet::ForStudent($student);
         return response()->json($worksheet);
     });
 
@@ -163,14 +160,14 @@ Route::group(['prefix' => 'v2'], function () {
 
 
     Route::get('/timetable/{branch_id}/{section}', function ($branch_id, $section) {
-      $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first();
-      return response()->json($periods->periods ?? []);
+        $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first();
+        return response()->json($periods->periods ?? []);
     });
 
     Route::get('/attendance/{student_id}', function ($student_id) {
-      $monthwise = DB::table('attendance')->where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
-      $daywise = DB::table('attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
-      return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
+        $monthwise = DB::table('attendance')->where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
+        $daywise = DB::table('attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
+        return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
     });
 
     Route::post('/parent_concern', function (Request $request) {
@@ -178,7 +175,7 @@ Route::group(['prefix' => 'v2'], function () {
         if ($request->has('attachment') && $request->attachment != null) {
             $fileName = time() . '-' . $request->attachment->getClientOriginalName();
             $request->attachment->move('uploads/concern', $fileName);
-            $data['attachment'] = 'uploads/concern/'.$fileName;
+            $data['attachment'] = 'uploads/concern/' . $fileName;
         }
         $parent_concern = DB::table('parent_concern')->insert($data);
         return response()->json($parent_concern);
@@ -187,7 +184,7 @@ Route::group(['prefix' => 'v2'], function () {
         $parent_concern = DB::table('parent_concern')->where('student_id', $student_id)->get();
         return response()->json($parent_concern ?? []);
     });
-   
+
     Route::get('/sickroomentry/{student_id}', function ($student_id) {
         $sickroomentry = SickRoomEntry::where('student_id', $student_id)->get();
         return response()->json($sickroomentry);
@@ -196,14 +193,14 @@ Route::group(['prefix' => 'v2'], function () {
         $monthwise = DB::table('hostel_attendance')->where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
         $daywise = DB::table('hostel_attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
         return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
-      });
+    });
 
-      Route::post('/document_upload', function (Request $request) {
+    Route::post('/document_upload', function (Request $request) {
         $data = $request->all();
         if ($request->has('attachment') && $request->attachment != null) {
             $fileName = time() . '-' . $request->attachment->getClientOriginalName();
             $request->attachment->move('documents', $fileName);
-            $data['file'] = 'documents/'.$fileName;
+            $data['file'] = 'documents/' . $fileName;
         }
         $parent_concern = DB::table('documents')->insert($data);
         return response()->json($parent_concern);
@@ -213,5 +210,4 @@ Route::group(['prefix' => 'v2'], function () {
         $student = Student::where('student_id', $student_id)->update(['device_token' => $device_token]);
         return response()->json($student);
     });
-
 });

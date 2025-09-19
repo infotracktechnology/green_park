@@ -12,122 +12,97 @@ use App\Models\AcademicYear;
 class DownloadController extends Controller
 {
 
-    public function index() 
-    { 
-        $academicyear = AcademicYear::all();
-        $download = Download::where('academic_year', $this->academic_year)
-        ->when(auth()->user()->branch, function ($query) {
-            $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-        })
-        ->get();
-        
-        return view('download.index',compact('download'));
+    public function index()
+    {
+        $downloads = Download::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+            })->get();
+
+        return view('download.index', compact('downloads'));
     }
 
     public function create()
     {
         $academicyear = AcademicYear::all();
-     
+
         return view('download.create');
     }
- 
 
-   
+
+
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'branch' => 'required|array',
-            'coaching_type' => 'required|array',
-            'file' => 'required|file|mimes:pdf|max:2048',
-        ]);
-    
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-  
-        $filePath = $file->move('download', $fileName);
-     
-        // Convert array to comma-separated string
-        $branchData = implode(',', $request->branch);
-        $coachingTypeData = implode(',', $request->coaching_type);
-    
-        Download::create([
-            'title' => $request->title,
-            'academic_year' => $request->academic_year,
-            'branch' => $branchData,
-            'coaching_type' => $coachingTypeData,
-            'file_path' => $filePath,
-        ]);
-    
-    
+        $data = $request->except('file');
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
+        if ($request->hasFile('file')) {
+            $originalName = $request->file('file')->getClientOriginalName();
+            $fileName = time() . '_' . $originalName;
+            $request->file('file')->move('download', $fileName);
+            $data['file_path'] = 'download/' . $fileName;
+        }
+
+        Download::create($data);
+
         return redirect()->route('download.index')->with('success', 'Answer Key added successfully!');
     }
-    
 
-    
-    public function edit($id)
+
+
+    public function edit(Download $download)
     {
-        $download = Download::findOrFail($id);
-      
-        return view('download.edit', compact('download'));
+        $type = Student::StudentFilterQuery($download->branch, $download->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+
+        $section = Student::StudentFilterQuery($download->branch, $download->course, $download->type, $download->category, $download->batch, $download->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($download->branch, $download->course, $download->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+
+        return view('download.edit', compact('download', 'type', 'section', 'students'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Download $download)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'branch' => 'required|array',
-            'coaching_type' => 'required|array',
-            'file' => 'nullable|file|mimes:pdf|max:2048',
-        ]);
-    
-        $download = Download::findOrFail($id);
-    
-        if ($request->hasFile('file')) {
-            $oldFilePath = storage_path('app/public/' . $download->file_path);
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-    
-            $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->move('download', $fileName);
-    
-            $download->file_path = 'download/'.$fileName;
+        $data = $request->except('file');
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
-    
-        // Convert arrays to comma-separated strings
-        $download->title = $request->title;
-        $download->academic_year = $request->academic_year;
-        $download->branch = implode(',', $request->branch);
-        $download->coaching_type = implode(',', $request->coaching_type);
-        $download->save();
-    
+
+        if ($request->hasFile('file')) {
+            $originalName = $request->file('file')->getClientOriginalName();
+            $fileName = time() . '_' . $originalName;
+            $request->file('file')->move('download', $fileName);
+            $data['file_path'] = 'download/' . $fileName;
+        }
+
+        $download->update($data);
+
         return redirect()->route('download.index')->with('success', 'Answer Key updated successfully!');
     }
-    
 
-    public function destroy($id)
+
+    public function destroy(Download $download)
     {
-        $download = Download::findOrFail($id);
-        $filePath = public_path($download->file_path); // Correct file path
-    
-        if (file_exists($filePath)) {
-            unlink($filePath);
+        if (file_exists($download->file_path)) {
+            unlink($download->file_path);
         }
-    
+
         $download->delete();
-    
+
         return redirect()->route('download.index')->with('success', 'Answer Key deleted successfully!');
     }
-    
 
-    
 
-    public function download(Student $student)
+
+
+    public function download()
     {
-        $download = auth('student')->user()->downloads();
-        return view('student.download', compact('download'));
+        $student = Student::where('student_id', auth('student')->user()->student_id)->first();
+        $downloads = Download::ForStudent($student);
+        return view('student.download', compact('downloads'));
     }
-     
 }
