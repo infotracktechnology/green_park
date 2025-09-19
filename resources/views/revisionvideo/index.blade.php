@@ -208,7 +208,6 @@
               type: "POST",
               data: {
                   _token: "{{ csrf_token() }}",
-                  _method: "DELETE",
                   ids: selectedIds.join(",")
               },
               success: function (response) {

@@ -18,12 +18,12 @@ class ExamController extends Controller
     {
         $tests = Exam::latest()->take(25)->get();
         $tests = Exam::where('academic_year', $this->academic_year)
-        ->when(auth()->user()->branch, function ($query) {
-            $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-        })
-        ->latest()
-        ->get();
-    
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+            })
+            ->latest()
+            ->get();
+
 
 
 
@@ -47,7 +47,7 @@ class ExamController extends Controller
             ->groupBy('e.id')
             ->get();
 
-  
+
         $tests = $tests->map(function ($test) use ($exams) {
             $exam = $exams->firstWhere('exam_id', $test->id);
             $test->student_count = $exam ? $exam->student_count : 0;
@@ -59,7 +59,7 @@ class ExamController extends Controller
 
     public function create()
     {
-      
+
         return view('exam.create');
     }
 
@@ -75,20 +75,20 @@ class ExamController extends Controller
         $data['branch_id'] = implode(',', $request->branch_id);
         $data['coaching_type'] = implode(',', $request->coaching_type);
         $data['status'] = 'preview';
-    
+
         $questions = [];
-    
+
         foreach (['physics', 'chemistry', 'botany', 'zoology'] as $subject) {
             if ($request->hasFile($subject."_files")) {
-                foreach ($request->file($subject."_files") as $key => $file) {
+                foreach ($request->file($subject . "_files") as $key => $file) {
                     $q_no = $key + 1;
-                    $filename = $request->id.'-'.$subject.'-'.$q_no.'.'.$file->getClientOriginalExtension();
+                    $filename = time().'-'.$subject.'-'.$q_no.'.'.$file->getClientOriginalExtension();
                     $file->move('questions', $filename);
-                    $questions[] = ['subject' => $subject, 'image' => "questions/" . $filename];
+                    $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/".$filename];
                 }
             }
         }
-      
+
         $data['questions'] = $questions;
         Exam::create($data);
         session()->flash('success', 'Test created successfully');
@@ -97,7 +97,7 @@ class ExamController extends Controller
 
     public function edit(Request $request, Exam $exam)
     {
-       
+
         return view('exam.edit', compact('exam'));
     }
 
@@ -132,24 +132,30 @@ class ExamController extends Controller
             $subject = $request->subject[$i] ?? null;
             $answer = $status == 'que-save' || $status == 'que-save-mark' ? $request->question[$i] : 0;
 
-            $data = ['test_id' => $request->test_id,'student_id' => $student_id,'subject' => $subject,'q_no' => $i,
-            'answer' => $answer,'status' => $status,'academic_year' => $this->academic_year];
+            $data = [
+                'test_id' => $request->test_id,
+                'student_id' => $student_id,
+                'subject' => $subject,
+                'q_no' => $i,
+                'answer' => $answer,
+                'status' => $status,
+                'academic_year' => $this->academic_year
+            ];
 
-            if(!isset($exam_answers[$i])){ 
+            if (!isset($exam_answers[$i])) {
                 DB::table('exam_answer')->insert($data);
             }
-
         }
-        
 
-     return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.index');
+
+        return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.index');
     }
 
 
 
 
     function destroy(Request $request, Exam $exam)
-    {  
+    {
         foreach ($exam->questions as $key => $question) {
             unlink($question['image']);
         }
@@ -166,30 +172,31 @@ class ExamController extends Controller
         if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
             return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
         }
-        
+
         return view('student.instruction', compact('test_id'));
     }
     function student_exam(Request $request, $test_id)
-{
-    $exam = Exam::findOrFail(base64_decode($test_id));
-    $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
-    $maxQuestions = $answers->first()->q_no ?? 0;
-    $answers = $answers->keyBy('q_no');
-    $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
+    {
+        $exam = Exam::findOrFail(base64_decode($test_id));
+        $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
+        $maxQuestions = $answers->first()->q_no ?? 0;
+        $answers = $answers->keyBy('q_no');
+        $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
 
-    if ($second < 0) {
-       return redirect()->route('studentdashboard')->with('error', 'Exam Time is up!');
+        if ($second < 0) {
+            return redirect()->route('studentdashboard')->with('error', 'Exam Time is up!');
+        }
+
+        return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
     }
 
-    return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
-}
- 
-    function Save(Request $request){
-        $data = ['test_id' => $request->test_id,'student_id' => auth()->user()->student_id,'subject' => $request->subject,'q_no' => $request->q_no,'answer' => $request->answer,'status' => $request->status,'academic_year' => $this->academic_year];
+    function Save(Request $request)
+    {
+        $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year];
         $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
-        if($answer){
+        if ($answer) {
             DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
-        }else{
+        } else {
             DB::table('exam_answer')->insert($data);
         }
 
@@ -340,76 +347,55 @@ class ExamController extends Controller
     public function offline()
     {
         $offline_logs = DB::table('key_log')->where('type', 'offline_key')->latest()->take(10)->get();
-        return view('exam.offline',compact('offline_logs'));
+        return view('exam.offline', compact('offline_logs'));
     }
 
     public function offlineUpload(Request $request, ImportController $import)
     {
-    
         $request->validate([
             'offline' => 'required|mimes:csv,txt|max:1024',
         ]);
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
-         if (!isset($answers[0]['test_id']) && !isset($answers[0]['student_id'])) {
+
+        if (empty($answers) || !isset($answers[0]['test_id'], $answers[0]['student_id'])) {
             return back()->with('error', 'File is not in the template format.');
         }
-        
+
         foreach ($answers as $answer) {
-        $exam = Exam::find($answer['test_id']);
+            $exam = Exam::find($answer['test_id']);
 
-        if (!$exam) {
-            return back()->with('error', 'Exam with ID ' . $answer['test_id'] . ' not found.');
-        }
-
-        if($answer['mode']!=='OMR') {
-            continue;
-        }
-        
-    $exam_answer = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->first();
-
-        if ($exam_answer) {
-            continue;
-        }
-       
-
-        $total_questions = $exam->total_questions;
-
-        $phy_start = is_null($exam->phy_start) ? 0 : $exam->phy_start;
-        $chem_start = is_null($exam->chem_start) ? 0 : $exam->chem_start;
-        $bot_start = is_null($exam->bot_start) ? 0 : $exam->bot_start;
-        $zoo_start = is_null($exam->zoo_start) ? 0 : $exam->zoo_start;
-
-        $phy_end = is_null($exam->phy_end) ? 0 : $exam->phy_end;
-        $chem_end = is_null($exam->chem_end) ? 0 : $exam->chem_end;
-        $bot_end = is_null($exam->bot_end) ? 0 : $exam->bot_end;
-        $zoo_end = is_null($exam->zoo_end) ? 0 : $exam->zoo_end;
-
-            for ($i = 1; $i <= $total_questions; $i++) {
-                $q_no = $answer["q$i"];
-                $subject = $this->determineSubject($i, $phy_start, $phy_end, $chem_start, $chem_end, $bot_start, $bot_end, $zoo_start, $zoo_end);
-                DB::table('exam_answer')->insert([
-                    'academic_year' => $this->academic_year,
-                    'student_id' => $answer['student_id'],
-                    'test_id' => $answer['test_id'],
-                    'q_no' => $i,
-                    'subject' => $subject,
-                    'answer' => $q_no,
-                    'mode' => "OMR",
-                ]);
-            
+            if (!$exam) {
+                return back()->with('error', "Exam with ID {$answer['test_id']} not found.");
             }
+
+            if (($answer['mode']) !== 'OMR') {
+                continue;
+            }
+
+            $exists = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->exists();
+
+            if ($exists) {
+                continue;
+            }
+
+            $record = [];
+
+            for ($i = 1; $i <= $exam->total_questions; $i++) {
+                $subject = $this->determineSubject($i, $exam->phy_start, $exam->phy_end, $exam->chem_start, $exam->chem_end, $exam->bot_start, $exam->bot_end, $exam->zoo_start, $exam->zoo_end);
+                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
+            }
+            $exam_answer = DB::table('exam_answer')->insert($record);
         }
 
-        $originalFileName = $request->file('offline')->getClientOriginalName();
-        $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
-        $filename = date('Y-m-d H-i-s').$originalFileName;
-        $request->offline->move('answer_key',$filename);
-        $path = 'answer_key/'.$filename;
-        
-        DB::table('key_log')->insert([
-            'file_name' => $originalFileName,
-            'upload_time' => $uploadTime,
+        $file = $request->file('offline');
+        $originalName = $file->getClientOriginalName();
+        $filename = now()->format('Y-m-d H-i-s') . '-' . $originalName;
+        $path = $file->storeAs('answer_key', $filename, 'public');
+
+        DB::table('key_log')->create([
+            'file_name' => $originalName,
+            'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
             'path' => $path,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
@@ -417,22 +403,18 @@ class ExamController extends Controller
             'type' => 'offline_key',
         ]);
 
-        return back()->with('success', 'Offline File uploaded successfully.');
+        return back()->with('success', 'Offline file uploaded successfully.');
     }
 
-    public function determineSubject($question, $phyStart, $phyEnd, $chemStart, $chemEnd, $botStart, $botEnd, $zooStart, $zooEnd){
-
-        if ($phyStart <= $question && $question <= $phyEnd && $phyEnd != 0) {
-            return 'physics';
-        } elseif ($chemStart <= $question && $question <= $chemEnd && $chemEnd != 0) {
-            return 'chemistry';
-        } elseif ($botStart <= $question && $question <= $botEnd && $botEnd != 0) {
-            return 'botany';
-        } elseif ($zooStart <= $question && $question <= $zooEnd && $zooEnd != 0) {
-            return 'zoology';
-        } else {
-            return 'NULL';
-        }
+    public function determineSubject($question, $phyStart, $phyEnd, $chemStart, $chemEnd, $botStart, $botEnd, $zooStart, $zooEnd)
+    {
+        return match (true) {
+            $phyStart && $question >= $phyStart && $question <= $phyEnd => 'PHYSICS',
+            $chemStart && $question >= $chemStart && $question <= $chemEnd => 'CHEMISTRY',
+            $botStart && $question >= $botStart && $question <= $botEnd => 'BOTANY',
+            $zooStart && $question >= $zooStart && $question <= $zooEnd => 'ZOOLOGY',
+            default => 'NULL',
+        };
     }
 
     public function answerKey()
@@ -443,71 +425,72 @@ class ExamController extends Controller
 
     public function uploadAnswerKey(Request $request, ImportController $import)
     {
-       
+
         $request->validate([
             'answer_key' => 'required|max:1024',
         ]);
 
         $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
-     if (!isset($answers[0]['test_id'])) {
+        if (!isset($answers[0]['test_id'])) {
             return back()->with('error', 'File is not in the correct format.');
         }
-    
-       
+
+
         $originalFileName = $request->file('answer_key')->getClientOriginalName();
         $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
         foreach ($answers as $answer) {
-           $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
-        foreach ($exam_answers as $row) {
+            $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
+            foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
-                
-                if(array_sum($ans_key) > 0){
+
+                if (array_sum($ans_key) > 0) {
                     $mark = in_array($row->answer, $ans_key) ? 4 : -1;
                     $answer_key = $ans;
-                }
-                else
-                {
+                } else {
                     $mark = NULL;
                     $answer_key = "DEL";
                 }
 
-              DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);
+                DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);
             }
         }
-        $filename = date('Y-m-d H-i-s').$originalFileName;
-        $request->answer_key->move('answer_key',$filename);
-        $path = 'answer_key/'.$filename;
+        $filename = date('Y-m-d H-i-s') . $originalFileName;
+        $request->answer_key->move('answer_key', $filename);
+        $path = 'answer_key/' . $filename;
 
         DB::table('key_log')->insert([
-                'file_name' => $originalFileName,
-                'upload_time' => $uploadTime,
-                'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
-                'path' => $path,
-                'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
-                'no_rows' => count($answers),
-                'type' => 'answer_key',
+            'file_name' => $originalFileName,
+            'upload_time' => $uploadTime,
+            'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
+            'path' => $path,
+            'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+            'no_rows' => count($answers),
+            'type' => 'answer_key',
         ]);
 
-     return redirect()->back()->with('success', 'Answer key uploaded successfully.');
+        return redirect()->back()->with('success', 'Answer key uploaded successfully.');
     }
 
-    function Dump_Report(Request $request){
+    function Dump_Report(Request $request)
+    {
         $test_name = $request->test_name ?? '';
         $tests = Exam::groupBy('name')->get();
         $test_ids = Exam::where('name', $test_name)->implode('id', ',');
         $test_ids = $test_ids != '' ? $test_ids : 0;
 
         $results = DB::select("SELECT test_id,a.student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.student_id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
-        return view('exam.dump_report',compact('test_name','results','tests','test_ids'));
+        return view('exam.dump_report', compact('test_name', 'results', 'tests', 'test_ids'));
     }
 
-    function deleteAnswerKey($id,$test_id){
+    function deleteAnswerKey($id, $test_id)
+    {
         DB::table('key_log')->where('id', $id)->delete();
         return redirect()->route('exam.answerkey')->with('success', 'Answer key log deleted successfully.');
     }
 
-    function deleteOfflineKey($id,$test_id){
+    function deleteOfflineKey($id, $test_id)
+    {
         DB::table('key_log')->where('id', $id)->delete();
         DB::table('exam_answer')->where('test_id', $test_id)->where('academic_year', $this->academic_year)->where('mode', 'OMR')->delete();
         return redirect()->route('exam.offline.index')->with('success', 'Answer key log deleted successfully.');
@@ -515,11 +498,11 @@ class ExamController extends Controller
 
     function csv_download($test_ids, Request $request)
     {
-    
+
         $testIdsArray = explode(',', $test_ids);
         $testIdsArray = array_map('intval', $testIdsArray);
         $testIdsString = implode(',', $testIdsArray);
-    
+
         $results = DB::table('exam_answer as a')
             ->join('student as b', 'a.student_id', '=', 'b.student_id')
             ->join('branch as c', 'b.campus', '=', 'c.id')
@@ -539,11 +522,11 @@ class ExamController extends Controller
             ->groupBy('a.student_id')
             ->orderByDesc('mark')
             ->get();
-    
-      
-    
+
+
+
         $subjects = explode(',', $results[0]->subjects);
-    
+
         $headers = [
             'S.NO',
             'SID',
@@ -554,7 +537,7 @@ class ExamController extends Controller
             'Coach Type',
             'SEC',
         ];
-    
+
         foreach ($subjects as $subject) {
             $headers[] = $subject . ' R';
             $headers[] = $subject . ' W';
@@ -562,9 +545,9 @@ class ExamController extends Controller
             $headers[] = $subject . ' TOT';
         }
         $headers[] = 'Net Total';
-    
+
         $csvData = [$headers];
-    
+
         foreach ($results as $key => $result) {
             $row = [
                 $key + 1,
@@ -576,7 +559,7 @@ class ExamController extends Controller
                 $result->coaching_type,
                 $result->section,
             ];
-    
+
             $subjectMarks = [];
             foreach ($subjects as $subject) {
                 $marks = DB::table('exam_answer')
@@ -590,21 +573,21 @@ class ExamController extends Controller
                         DB::raw('SUM(mark) as tot')
                     )
                     ->first();
-    
+
                 $subjectMarks[] = $marks->r ?? 0;
                 $subjectMarks[] = $marks->w ?? 0;
                 $subjectMarks[] = $marks->l ?? 0;
                 $subjectMarks[] = $marks->tot ?? 0;
             }
-    
+
             $row = array_merge($row, $subjectMarks);
             $row[] = $result->mark;
-    
+
             $csvData[] = $row;
         }
-    
+
         $filename = "test_report_dump.csv";
-    
+
         return response()->stream(function () use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $line) {
@@ -616,5 +599,4 @@ class ExamController extends Controller
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ]);
     }
-
 }

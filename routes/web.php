@@ -125,10 +125,10 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::post('classvideo/bulk-delete', [ClassVideoController::class, 'bulkDelete'])->name('classvideo.bulk-delete');
 
     Route::resource('discussionvideo', DiscussionVideoController::class);
-    Route::delete('discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
+    Route::post('discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
 
     Route::resource('revisionvideo', RevisionVideoController::class);
-    Route::delete('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
+    Route::post('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
 
     // Other
     Route::resources([

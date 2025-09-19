@@ -12,111 +12,83 @@ class AnswerKeyController extends Controller
 {
     public function index()
     {
-        $academicYears = AcademicYear::all();
-    
-     
-            $answerKeys = AnswerKey::where('academic_year', $this->academic_year)
+        $answerkeys = AnswerKey::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
                 $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
             })
             ->latest()
             ->get();
-    
-        return view('answerkey.index', compact('answerKeys', 'academicYears'));
+
+        return view('answerkey.index', compact('answerkeys'));
     }
-    
+
 
     public function create()
     {
-        $academicYears = AcademicYear::all();
-      
-        return view('answerkey.create', );
+     
+        return view('answerkey.create',);
     }
 
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'branch' => 'required|array',
-            'coaching_type' => 'required|array',
-            'file' => 'required|file|mimes:pdf|max:2048',
-        ]);
+         $data = $request->except('file');
 
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->move('answerkey', $fileName);
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
 
+        if ($request->hasFile('file')) {
+            $originalName = $request->file('file')->getClientOriginalName();
+            $fileName = time().'_'.$originalName;
+            $request->file('file')->move('answer_key',$fileName);
+            $data['file_path'] = 'answer_key/'.$fileName;
+        }
 
-        // Convert array to comma-separated string
-        $branchData = implode(',', $request->branch);
-        $coachingTypeData = implode(',', $request->coaching_type);
-
-        AnswerKey::create([
-            'title' => $request->title,
-            'academic_year' => $request->academic_year,
-            'branch' => $branchData,
-            'coaching_type' => $coachingTypeData,
-            'file_path' => $filePath,
-        ]);
+        AnswerKey::create($data);
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key added successfully!');
     }
 
 
-    public function edit($id)
+    public function edit(AnswerKey $answerkey)
     {
-        $answerKey = AnswerKey::findOrFail($id);
-      
-        return view('answerkey.edit', compact('answerKey'));
+        $type = Student::StudentFilterQuery($answerkey->branch, $answerkey->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+
+        $section = Student::StudentFilterQuery($answerkey->branch, $answerkey->course, $answerkey->type, $answerkey->category, $answerkey->batch, $answerkey->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($answerkey->branch, $answerkey->course, $answerkey->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+
+        return view('answerkey.edit', compact('answerkey', 'type', 'section', 'students'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, AnswerKey $answerkey)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'branch' => 'required|array',
-            'coaching_type' => 'required|array',
-            'file' => 'nullable|file|mimes:pdf|max:2048',
-        ]);
+         $data = $request->except('file');
 
-        $answerKey = AnswerKey::findOrFail($id);
-
-        if ($request->hasFile('file')) {
-            $oldFilePath = storage_path('app/public/' . $answerKey->file_path);
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-
-            $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->move('answerkey', $fileName);
-
-            $answerKey->file_path = 'answerkey/' . $fileName;
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
-        // Convert arrays to comma-separated strings
-        $answerKey->title = $request->title;
-        $answerKey->branch = implode(',', $request->branch);
-        $answerKey->coaching_type = implode(',', $request->coaching_type);
-        $answerKey->academic_year = $request->academic_year;
-        $answerKey->save();
+        if ($request->hasFile('file')) {
+            $originalName = $request->file('file')->getClientOriginalName();
+            $fileName = time().'_'.$originalName;
+            $request->file('file')->move('answer_key',$fileName);
+            $data['file_path'] = 'answer_key/'.$fileName;
+        }
+
+        $answerkey->update($data);
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key updated successfully!');
     }
 
 
-    public function destroy($id)
+    public function destroy(AnswerKey $answerkey)
     {
-        $answerKey = AnswerKey::findOrFail($id);
-
-        $filePath = storage_path('answerKey' . $answerKey->file_path);
-
-        if (file_exists($filePath)) {
-            unlink($filePath);
+        if (file_exists($answerkey->file_path)) {
+            unlink($answerkey->file_path);
         }
-
-        $answerKey->delete();
+        $answerkey->delete();
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key deleted successfully!');
     }
@@ -125,7 +97,8 @@ class AnswerKeyController extends Controller
 
     public function answerkey()
     {
-        $answerKeys = auth('student')->user()->answerkey();
-        return view('student.answerkey', compact('answerKeys'));
+        $student = Student::where('student_id', auth('student')->user()->student_id)->first();
+        $answerkeys = AnswerKey::ForStudent($student);
+        return view('student.answerkey', compact('answerkeys'));
     }
 }

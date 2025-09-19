@@ -60,7 +60,7 @@ class ClassVideoController extends Controller
     {
         $type = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-        $section = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, $classvideo->type, $classvideo->category, $classvideo->batch, $classvideo->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+        $section = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, $classvideo->type, $classvideo->category, $classvideo->batch, $classvideo->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
         $students = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, $classvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
