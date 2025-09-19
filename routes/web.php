@@ -167,7 +167,6 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::get('dashboard', 'dashboard')->name('studentdashboard');
         Route::get('profile', 'profile')->name('student.profile');
         Route::get('home', 'home')->name('student.home');
-        Route::get('discussionvideo', 'discussionvideo')->name('student.discussionvideo');
         Route::get('marksheet', 'marksheet')->name('student.marksheet');
         Route::get('mark/subject/{test_id}', 'mark_subject')->name('student.mark_subject');
         Route::get('mark/download/{test_id}', 'mark_download')->name('student.mark_download');
@@ -177,6 +176,8 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::controller(AnnouncementController::class)->group(function () {
         Route::get('notification', 'notification')->name('student.notification');
     });
+
+    Route::get('discussionvideo', [DiscussionVideoController::class, 'discussionvideo'])->name('student.discussionvideo');
 
     Route::controller(ChairmanVideoController::class)->group(function () {
         Route::get('chairmanvideo', 'chairmanvideo')->name('student.chairmanvideo');

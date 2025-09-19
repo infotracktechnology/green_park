@@ -5,73 +5,6 @@
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
-<style>
-    .answer-key-card {
-        border-radius: 12px;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-        overflow: hidden;
-        transition: transform 0.3s ease-in-out;
-    }
-    .answer-key-card:hover {
-        transform: translateY(-5px);
-    }
-    .card-header {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
-        font-size: 20px;
-        font-weight: bold;
-        padding: 18px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-  
-    .download-btn 
-    {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  
-    color: white;
-    font-weight: 600;
-    font-size: 15px;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    transition: all 0.3s ease-in-out;
-    text-decoration: none;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-}
-
-
-@keyframes bounce {
-    from { transform: translateY(0); }
-    to { transform: translateY(-3px); }
-}
-    .icon-large {
-        font-size: 32px;
-        animation: float 1.5s infinite alternate ease-in-out;
-    }
-    @keyframes float {
-        from { transform: translateY(0px); }
-        to { transform: translateY(-5px); }
-    }
-    .table thead {
-        background-color: #f1f3f5;
-        font-weight: bold;  
-    }
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 123, 255, 0.1);
-        transition: 0.2s ease-in-out;
-    }
-    
-    
-    .file-icon {
-        font-size: 22px;
-    }
-</style>
 @endsection
 
 @section('main')
@@ -82,7 +15,7 @@
               
                 <div class="card answer-key-card">
                     <div class="card-header">
-                        <i class="fas fa-file-alt icon-large"></i> Download
+                       <h4><i style="font-size: 30px;" class="fas fa-file-pdf"></i> Download</h4>
                     </div>
                    
                     <div class="card-body">
@@ -95,14 +28,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($download as  $download)
+                                    @foreach($downloads as  $download)
                                     <tr>
                                         <td>{{ $download->title }}</td>
                                         <td>
+                                            @if($download->file_path)
                                             <a href="{{ env('APP_URL').$download->file_path }}" 
-                                               class="download-btn btn success" download>
+                                               class="btn btn-primary" download>
                                                 <i class="fas fa-file-download"></i> Download
                                             </a>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach
