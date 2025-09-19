@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ' Exam Portion')
+@section('title', 'Exam Portion')
 @section('css')
 
 @endsection
@@ -131,7 +131,7 @@
 
                   <div class="form-group col-lg-4">
                     <label for="attachment">Attachment <span class="text-danger">*PDF only</span></label>
-                    <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" required accept=".pdf">
+                    <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" accept=".pdf">
                   </div>
 
                   <div class="form-group col-lg-12">

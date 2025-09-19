@@ -70,7 +70,7 @@ class RevisionVideoController extends Controller
     {
         $type = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-        $section = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, $revisionvideo->type, $revisionvideo->category, $revisionvideo->batch, $revisionvideo->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+        $section = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, $revisionvideo->type, $revisionvideo->category, $revisionvideo->batch, $revisionvideo->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
         $students = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, $revisionvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
         

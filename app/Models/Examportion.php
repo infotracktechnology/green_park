@@ -10,7 +10,7 @@ class Examportion extends Model
     public $table = 'examportion';
     protected $guarded = [];
 
-      public function branchNames()
+    public function branchNames()
     {
         return Branch::whereIn('id', explode(',', $this->branch))->get()->implode('name', '/');
     }
@@ -39,5 +39,4 @@ class Examportion extends Model
                     ->whereIn('gender', [$student->gender, 'All']);
             })->latest()->get();
     }
-   
 }

@@ -42,8 +42,6 @@ class ExamPortionController extends Controller
             $fileName = time().'_'.$originalName;
             $request->file('attachment')->move('assets/examportion',$fileName);
             $data['attachment'] = 'assets/examportion/'.$fileName;
-        } else {
-            $data['attachment'] = null;
         }
 
         Examportion::create($data);
@@ -54,7 +52,7 @@ class ExamPortionController extends Controller
     {
         $type = Student::StudentFilterQuery($examportion->branch, $examportion->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-        $section = Student::StudentFilterQuery($examportion->branch, $examportion->course, $examportion->type, $examportion->category, $examportion->batch, $examportion->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+        $section = Student::StudentFilterQuery($examportion->branch, $examportion->course, $examportion->type, $examportion->category, $examportion->batch, $examportion->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
         $students = Student::StudentFilterQuery($examportion->branch, $examportion->course, $examportion->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
@@ -74,8 +72,6 @@ class ExamPortionController extends Controller
             $fileName = time().'_'.$originalName;
             $request->file('attachment')->move('assets/examportion',$fileName);
             $data['attachment'] = 'assets/examportion/'.$fileName;
-        } else {
-            $data['attachment'] = null;
         }
 
         $examportion->update($data);
@@ -97,8 +93,8 @@ class ExamPortionController extends Controller
 
     public function examportion(Request $request)
     {
-        $examportions = auth()->user()->examportion()->get();
-
+        $student = Student::where('student_id', auth()->user()->student_id)->first();
+        $examportions = Examportion::ForStudent($student);
         return view('student.examportion', compact('examportions'));
     }
 }

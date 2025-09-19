@@ -49,7 +49,7 @@ class ChairmanVideoController extends Controller
 {
     $type = Student::StudentFilterQuery($chairmanvideo->branch,$chairmanvideo->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-    $section = Student::StudentFilterQuery($chairmanvideo->branch,$chairmanvideo->course,$chairmanvideo->type,$chairmanvideo->category,$chairmanvideo->batch,$chairmanvideo->gender)->select('section')->distinct()->get()->pluck('section')->toArray();
+    $section = Student::StudentFilterQuery($chairmanvideo->branch,$chairmanvideo->course,$chairmanvideo->type,$chairmanvideo->category,$chairmanvideo->batch,$chairmanvideo->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
     $students = Student::StudentFilterQuery($chairmanvideo->branch,$chairmanvideo->course,$chairmanvideo->type,null,null)->get()->pluck('student_name','student_id')->toArray();
        

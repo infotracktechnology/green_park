@@ -23,9 +23,11 @@
                       <tr>
                         <td>{{ $examportion->title }}</td>
                         <td>
-                          <a href="{{ env('APP_URL') }}public/{{ $examportion->attachment }}" target="_blank" rel="noopener noreferrer">
-                            <i class="fas fa-paperclip"></i> Attachment
+                          @if($examportion->attachment)
+                          <a href="{{ env('APP_URL') }}/{{ $examportion->attachment }}" download class="btn btn-primary">
+                             <i class="fas fa-file-download"></i> Download
                         </a>
+                          @endif
                         </td>
                       </tr>
                       @endforeach

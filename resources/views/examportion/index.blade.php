@@ -41,6 +41,7 @@
                         <th>Coaching Type</th>
                         <th>H/D</th>
                         <th>Batch</th>
+                        <th>Attachment</th>
                         <th>Edit</th>
                         <th>Delete</th>
                       </tr>
@@ -56,6 +57,11 @@
                         <td>{{ $examportion->coaching_type }}</td>
                         <td>{{ $examportion->category}}</td>
                         <td>{{ $examportion->batch}}</td>
+                         <td>
+                          @if($examportion->attachment)
+                          <a href="{{ env('APP_URL').'/'.$examportion->attachment }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                          @endif
+                        </td>
                         <td>
                           <a href="{{ route('examportion.edit', $examportion->id) }}" class="btn btn-primary">
                             <i class="fas fa-edit"></i>

@@ -3,13 +3,6 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
-use App\Models\Announcement;
-use App\Models\Branch;
-use App\Models\Chairmanvideo;
-use App\Models\Examportion;
-use App\Models\ExamAnswer;
-use App\Models\AnswerKey;
-use App\Models\QuestionKey;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\DB;
@@ -45,48 +38,9 @@ class Student extends Authenticatable
             $model->password = bcrypt($model->password_1);
             $model->user_name = self::generateName($model->coaching_type,$model->student_id);
         });
-        // static::created(function ($model) {
-          
-        //     $model->save();
-        // });
     }
 
-    function examportion()
-    {
-        return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year);
-    }
-
-    public function answerkey()
-    {
-        return AnswerKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->take(5)->get();
-    }
-
-    public function questionkey()
-    {
-        return QuestionKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->take(5)->get();
-    }
-
-    public function downloads()
-    {
-        return Download::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->get();
-    }
-
-    public function worksheet()
-    {
-        return Worksheet::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->get();
-    }
-
-    public function achievements()
-    {
-        return Achievement::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->get();
-    }
-
-
-    public function discussionvideos($subject = '')
-    {
-        $datetime = date('Y-m-d H:i:s');
-        return DiscussionVideo::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->where('academic_year', $this->academic_year)->get();
-    }
+  
 
     public function fees()
     {
