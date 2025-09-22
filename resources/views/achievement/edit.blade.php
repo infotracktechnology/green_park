@@ -1,236 +1,202 @@
 @extends('layouts.app')
 @section('title', 'Edit NEET Achievement')
-@section('css')
-
-<link rel="stylesheet" href="{{asset('bundles/summernote/summernote-bs4.css')}}">
-<link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}">
-
-<style>
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #6777ef; 
-        color: #fff; 
-        border: none; 
-        padding: 5px 10px; 
-        margin: 5px 5px 0 0; 
-        border-radius: 3px; 
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        display: none; 
-    }
-
-    .select2-container--default .select2-selection--single {
-        border-color: #6777ef;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: #6777ef transparent transparent transparent;
-    }
-
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #6777ef;
-        color: #fff;
-    }
-
-    .select2-container--default .select2-selection--multiple {
-        border: 1px solid #6777ef;
-        min-height: 38px;
-        padding: 0;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-        padding: 0 5px;
-    }
-</style>
-@endsection
 @section('main')
 <div class="main-content">
-    <section class="section">
-        <div class="section-body">
-            <div class="row">
-                <div class="col-12">
-                    <form id="myForm" action="{{ route('achievement.update', $achievement->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <div class="card card-primary">
-                            <div class="card-header">
-                                
-                                <h6 class="col-deep-purple">Edit NEET Achievement</h6>
-                            </div>
-                            <div class="card-body row">
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12">
+          <form id="myForm" action="{{ route('achievement.update', $achievement->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <div class="card card-primary">
+              <div class="card-header">
 
-                                <div class="form-group col-lg-4">
-                                    <label>Academic Year</label>
-                                    <select name="academic_year" class="form-control" required>
-                                        @foreach ($academicyear as $row)
-                                            <option value="{{ $row->academic_year }}" {{ $achievement->academic_year == $row->academic_year ? 'selected' : '' }}>
-                                                {{ $row->academic_year }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                <h6 class="col-deep-purple">Edit NEET Achievement</h6>
+              </div>
+              <div class="card-body row">
 
-                                <div class="form-group col-lg-4">
-                                    <label>Branch</label>
-                                    <select name="branch[]" class="select2 form-control" multiple required>
-                                        @foreach ($branches as $branch)
-                                            <option value="{{ $branch->id }}" {{ in_array($branch->id, explode(',', $achievement->branch)) ? 'selected' : '' }}>
-                                                {{ $branch->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+               <div class="form-group col-lg-3">
+                    <label for="academic_year">Academic Year</label>
+                    <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                      @foreach ($academicyear as $row)
+                      <option value="{{ $row->academic_year }}" @selected($achievement->academic_year == $row->academic_year)>{{ $row->academic_year }}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
-                                <div class="form-group col-lg-4">
-                                    <label>Coaching Type</label>
-                                    <select name="coaching_type[]" class="select2 form-control" multiple required>
-                                        @foreach (['Offline','Online Recorded','Online Live','Test Series',' XI - OB',' - OB'] as $type)
-                                            <option value="{{ $type }}" {{ in_array($type, explode(',', $achievement->coaching_type)) ? 'selected' : '' }}>
-                                                {{ $type }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
 
-                                <div class="form-group col-lg-4">
-                                    <label>Category</label>
-                                    <select name="category[]" id="category" class="select2 form-control form-control-sm" multiple required>
-                                        @php
-                                            $categories = ['Video', 'Image', 'pdf', 'Link'];
-                                        @endphp
-                                        @foreach ($categories as $cat)
-                                            <option value="{{ $cat }}" {{ in_array($cat, $selectedCategories) ? 'selected' : '' }}>{{ $cat }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                
-                                <!-- Video Input -->
-                                <div class="form-group col-lg-4" id="video-input" style="{{ !empty($achievement->video) ? '' : 'display: none;' }}">
-                                    <label for="video">Upload Video <span class="text-danger">(max size: 40MB*)</span></label>
-                                    <input type="file" name="video" id="video" class="form-control form-control-sm" accept="video/*">
-                                    @if($achievement->video)
-                                        <small class="text-muted d-block mt-1">Current: {{ basename($achievement->video) }}</small>
-                                    @endif
-                                    @error('video')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                
-                                <!-- Image Input -->
-                                <div class="form-group col-lg-4" id="image-input" style="{{ !empty($achievement->images) ? '' : 'display: none;' }}">
-                                    <label for="images">Upload Images <span class="text-danger">(max size: 2MB*)</span></label>
-                                    <input type="file" name="images[]" id="images" class="form-control form-control-sm" accept="image/*" multiple>
-                                    @if(!empty($achievement->images))
-                                        <div class="mt-2 text-muted">
-                                            @foreach ($achievement->images as $img)
-                                                <div>Image: {{ basename($img) }}</div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    @error('images.*')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                
-                                <!-- PDF Input -->
-                                <div class="form-group col-lg-4" id="pdf-input" style="{{ !empty($achievement->pdf) ? '' : 'display: none;' }}">
-                                    <label for="pdf">Upload PDF <span class="text-danger">(max size: 3MB*)</span></label>
-                                    <input type="file" name="pdf" id="pdf" class="form-control form-control-sm" accept="application/pdf">
-                                    @if($achievement->pdf)
-                                        <small class="text-muted d-block mt-1">Current: {{ basename($achievement->pdf) }}</small>
-                                    @endif
-                                    @error('pdf')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                
-                                <!-- Link Input -->
-                                <div class="form-group col-lg-4" id="link-input" style="{{ !empty($achievement->link) ? '' : 'display: none;' }}">
-                                    <label for="link">Enter Link</label>
-                                    <input type="url" name="link" id="link" class="form-control form-control-sm" value="{{ $achievement->link }}">
-                                </div>
-                                
-                                
-                             
-                                
+                  <div class="form-group col-lg-3">
+                    <label>User Type</label>
+                    <select name="usertype" id="usertype" class="form-control form-control-sm" required>
+                      <option value="GROUP" @selected($achievement->usertype == 'GROUP')>GROUP</option>
+                      <option value="INDIVIDUAL" @selected($achievement->usertype == 'INDIVIDUAL')>INDIVIDUAL STUDENT</option>
+                    </select>
+                  </div>
 
-                                <!-- Content -->
-                                <div class="form-group col-lg-12">
-                                    <label>Content</label>
-                                    <textarea name="content" class="summernote-simple">{{ $achievement->content }}</textarea>
-                                </div>
 
-                                <div class="form-group col-lg-12">
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                </div>
+                  <div class="form-group col-lg-3">
+                    <label>Course</label>
+                    <select name="course" id="course" class="form-control form-control-sm" required>
+                      <option value="">Select Course</option>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}" @selected($row==$achievement->course)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
-                            </div>
-                        </div>
-                    </form>
+                  <div class="form-group col-lg-3">
+                    <label for="branch">Branch</label>
+                    <select name="branch[]" id="branch" class="select2" multiple required>
+                      @foreach ($branches as $branch)
+                      <option value="{{ $branch->id }}" @selected(in_array($branch->id, explode(',',$achievement->branch)))>{{ $branch->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Coaching Type</label>
+                    <select name="coaching_type[]" id="coaching_type" class="select2" multiple required>
+                      @foreach ($type as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $achievement->coaching_type)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-lg-2">
+                    <label>H/D</label>
+                    <select name="category[]" id="category" class="select2" multiple>
+                      @foreach ($hostel as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $achievement->category)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-lg-2">
+                    <label>Batch</label>
+                    <select name="batch[]" id="batch" class="select2" multiple>
+                      @foreach ($batch as $row)
+                      <option value="{{$row}}" @selected(in_array($row, explode(',', $achievement->batch)))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-lg-2">
+                    <label>Gender</label>
+                    <select name="gender" id="gender" class="form-control form-control-sm" required>
+                      <option value="">Select Gender</option>
+                      <option value="All" @selected($achievement->gender == 'All') >All Gender</option>
+                      <option value="MALE" @selected($achievement->gender == 'MALE')>MALE</option>
+                      <option value="FEMALE" @selected($achievement->gender == 'FEMALE')>FEMALE</option>
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-lg-2">
+                    <label>Section</label>
+                    <select name="section" id="section" class="form-control form-control-sm">
+                      <option value="">Select Section</option>
+                      <option value="{{ implode(',', $section)}}" @selected(implode(',', $section)==$achievement->section)>All</option>
+                      @foreach ($section as $row)
+                      <option value="{{$row}}" @selected($row==$achievement->section)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-lg-4">
+                    <label>Students</label>
+                    <select name="students" id="students" class="form-control form-control-sm select2" required>
+                      @foreach ($students as $k => $row)
+                      <option value="{{$k}}" @selected($k==$achievement->students)>{{$k}} - {{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+
+                <div class="form-group col-lg-4">
+                  <label>Category</label>
+                  <select name="filecategory[]" id="filecategory" class="select2 form-control form-control-sm" multiple required>
+                    @foreach (['Video', 'Image', 'pdf', 'Link'] as $row)
+                    <option value="{{ $row }}" @selected(in_array($row, explode(',', $achievement->filecategory)))>{{ $row }}</option>
+                    @endforeach
+                  </select>
                 </div>
+
+                <!-- Video Input -->
+                <div class="form-group col-lg-4" id="video-input" style="{{ !in_array('Video', explode(',', $achievement->filecategory)) ? 'display: none;' : '' }}">
+                  <label for="video">Upload Video <span class="text-danger">(max size: 40MB*)</span></label>
+                  <input type="file" name="video" id="video" class="form-control form-control-sm" accept="video/*">
+                  <small class="text-muted d-block mt-1">Current: {{ basename($achievement->video) }}</small>
+                </div>
+
+                <!-- Image Input -->
+                <div class="form-group col-lg-4" id="image-input" style="{{ !in_array('Image', explode(',', $achievement->filecategory)) ? 'display: none;' : '' }}">
+                  <label for="images">Upload Images <span class="text-danger">(max size: 2MB*)</span></label>
+                  <input type="file" name="images[]" id="images" class="form-control form-control-sm" accept="image/*" multiple>
+                  <div class="mt-2 text-muted">
+                    @foreach ($achievement->images as $img)
+                    <div>Image: {{ basename($img) }}</div>
+                    @endforeach
+                  </div>
+                </div>
+
+                <!-- PDF Input -->
+                <div class="form-group col-lg-4" id="pdf-input" style="{{ !in_array('pdf', explode(',', $achievement->filecategory)) ? 'display: none;' : '' }}">
+                  <label for="pdf">Upload PDF <span class="text-danger">(max size: 3MB*)</span></label>
+                  <input type="file" name="pdf" id="pdf" class="form-control form-control-sm" accept="application/pdf">
+                  <small class="text-muted d-block mt-1">Current: {{ basename($achievement->pdf) }}</small>
+                </div>
+
+                <!-- Link Input -->
+                <div class="form-group col-lg-4" id="link-input" style="{{ !in_array('Link', explode(',', $achievement->filecategory)) ? 'display: none;' : '' }}">
+                  <label for="link">Enter Link</label>
+                  <input type="url" name="link" id="link" class="form-control form-control-sm" value="{{ $achievement->link }}">
+                </div>
+
+
+
+
+
+                <!-- Content -->
+                <div class="form-group col-lg-12">
+                  <label>Content</label>
+                  <textarea name="content" class="summernote-simple">{{ $achievement->content }}</textarea>
+                </div>
+
+                <div class="form-group col-lg-12">
+                  <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+
+              </div>
             </div>
+          </form>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 </div>
 @endsection
 
 @section('js')
-<script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
-<script src="{{ asset('bundles/select2/dist/js/select2.full.min.js') }}"></script>
-
 <script>
-    $(document).ready(function () {
-        $('.select2').select2();
-        const hasExistingVideo = '{{ !empty($achievement->video) ? 'yes' : '' }}' === 'yes';
-        const hasExistingImages = '{{ !empty($achievement->images) ? 'yes' : '' }}' === 'yes';
-        const hasExistingPDF = '{{ !empty($achievement->pdf) ? 'yes' : '' }}' === 'yes';
-        const hasExistingLink = '{{ !empty($achievement->link) ? 'yes' : '' }}' === 'yes';
-
-        function toggleInputs(selectedOptions) {
-            selectedOptions = selectedOptions || [];
-
-            $('#video-input').toggle(selectedOptions.includes('Video') || hasExistingVideo);
-            $('#image-input').toggle(selectedOptions.includes('Image') || hasExistingImages);
-            $('#pdf-input').toggle(selectedOptions.includes('pdf') || hasExistingpdf);
-            $('#link-input').toggle(selectedOptions.includes('Link') || hasExistingLink);
-        }
-        const initiallySelected = $('#category').val();
-        toggleInputs(initiallySelected);
-
-        $('#category').on('change', function () {
-            const selectedOptions = $(this).val();
-            toggleInputs(selectedOptions);
-        });
-
-        document.getElementById('myForm').addEventListener('submit', function (e) {
-            const videoInput = document.getElementById('video');
-            const imageInputs = document.getElementById('images');
-            const pdfInput = document.getElementById('pdf');
-
-            if (videoInput && videoInput.files[0] && videoInput.files[0].size > 40 * 1024 * 1024) {
-                e.preventDefault();
-                alert('The uploaded video exceeds the maximum allowed size of 40MB.');
-                return;
-            }
-
-            if (imageInputs && imageInputs.files.length > 0) {
-                for (let i = 0; i < imageInputs.files.length; i++) {
-                    if (imageInputs.files[i].size > 2 * 1024 * 1024) {
-                        e.preventDefault();
-                        alert('One or more images exceed the maximum allowed size of 2MB.');
-                        return;
-                    }
-                }
-            }
-
-            if (pdfInput && pdfInput.files[0] && pdfInput.files[0].size > 3 * 1024 * 1024) {
-                e.preventDefault();
-                alert('The uploaded PDF exceeds the maximum allowed size of 3MB.');
-                return;
-            }
-        });
+  document.getElementById('myForm').addEventListener('submit', function (e) {
+    const videoInput = document.getElementById('video');
+    if (videoInput.files[0] && videoInput.files[0].size > 40 * 1024 * 1024) { // 40MB
+   e.preventDefault();
+   alert('The uploaded video exceeds the maximum allowed size of 40MB.');
+    }
     });
+     
+   $('#filecategory').on('change', function() {
+       const selectedOptions = $(this).val();
+       $('#video-input').toggle(selectedOptions.includes('Video'));
+       $('#image-input').toggle(selectedOptions.includes('Image'));
+       $('#pdf-input').toggle(selectedOptions.includes('pdf'));
+       $('#link-input').toggle(selectedOptions.includes('Link'));
+   });
 </script>
-
-
 @endsection

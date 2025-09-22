@@ -26,7 +26,7 @@
 
               <div class="row">
                 <div class="col-md-10 col-sm-12 mb-3">
-                  <h6 class="col-deep-purple">Question Key </h6>
+                  <h6 class="col-deep-purple">Question Paper</h6>
                 </div>
                 <div class="col-md-2 col-sm-12 mb-3">
                   <a href="{{route('questionkey.create')}}" class="btn btn-primary btn-block">Add Question Key</a>
