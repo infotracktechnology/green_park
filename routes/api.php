@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo,Download,Worksheet};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo,Download,Worksheet,Achievement};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -154,7 +154,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/achievements/{student_id}', function ($student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $achievements = $student->achievements();
+        $achievements = Achievement::ForStudent($student);
         return response()->json($achievements);
     });
 

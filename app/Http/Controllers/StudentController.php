@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Announcement;
 use App\Models\Attendance;
-
-
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentController extends Controller
 {
@@ -115,10 +113,6 @@ class StudentController extends Controller
     public function home()
     {
 
-        if (!Auth::check() || !Auth::user()->student_id) {
-            abort(403, 'Unauthorized or missing student ID.');
-        }
-
         $studentId = Auth::user()->student_id;
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
@@ -219,22 +213,23 @@ class StudentController extends Controller
         $sid = auth()->user()->student_id;
         $answers = DB::table('exam_answer')->where('test_id', $test_id)->where('student_id', $sid)->orderBy('q_no')->get();
         $answers = $answers->chunk(45);
-        $exam = DB::table('exam')->where('id', $test_id)->selectRaw("name,id,DATE_FORMAT(start_at, '%d-%m-%Y')exam_date")->first();
-        return view('student.mark_download', compact('answers', 'exam'));
+        $exam = Exam::where('id', $test_id)->selectRaw("name,id")->first();
+        $pdf = Pdf::loadView('pdf.marksheet', compact('answers', 'exam'));
+        return $pdf->download("$exam->name - $sid.pdf");
     }
 
 
 
     public function getExamStartTime()
     {
-        $exam = Exam::latest()->first(); // Get the latest exam (modify as needed)
+        $exam = Exam::latest()->first();
 
         if (!$exam || !$exam->start_at) {
             return response()->json(['error' => 'Exam start time not found'], 404);
         }
 
         return response()->json([
-            'start_at' => Carbon::parse($exam->start_at)->toISOString() // Convert to JS format
+            'start_at' => Carbon::parse($exam->start_at)->toISOString()
         ]);
     }
 
