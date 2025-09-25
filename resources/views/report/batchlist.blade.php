@@ -2,7 +2,16 @@
 @section('title', 'BatchList Report')
 
 @section('css')
-<link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}" />
+<style>
+  thead th{
+    background-color: #56ade8 !important;
+     color: #222 !important;
+  }
+  table th,table td {
+  border: 1px solid #222 !important;
+  height: 0px !important;
+  }
+</style>
 @endsection
 
 @section('main')
@@ -19,7 +28,7 @@
               <div class="row">
                 <div class="col-md-12">
                 <div class="table-responsive">
-                  <table class="table table-striped" id="myTable">
+                  <table class="table">
                     <thead>
                       <tr>
                         <th>Campus</th>

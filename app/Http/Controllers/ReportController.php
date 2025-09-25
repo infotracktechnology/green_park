@@ -8,6 +8,7 @@ use App\Models\Exam;
 use App\Models\Student;
 use App\Models\Announcement;
 use App\Models\Attendance;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -107,7 +108,24 @@ class ReportController extends Controller
 
      public function BatchList(Request $request)
     {
-        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,hostel_dayscholar,batch,section,COUNT(*) as strength,b.id")->groupBy('b.name', 'hostel_dayscholar', 'batch', 'section')->orderBy('b.id')->get();
+        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,hostel_dayscholar,batch,section,COUNT(*) as strength,b.id")->where('academic_year', $this->academic_year)->groupBy('b.name', 'hostel_dayscholar', 'batch', 'section')->orderBy('b.id')->get();
         return view('report.batchlist', compact('report'));
+    }
+     public function SectionList(Request $request)
+    {
+        $branch = $request->branch ?? 0;
+        $course = $request->course ?? 0;
+        $data = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,batch,section,COUNT(*) as total,b.id,concat(gender,'-',hostel_dayscholar)gender,sum(ac_nonac='AC')ac,sum(ac_nonac='NON AC')nonac,sum(board_of_study_XII_std='SB')sb,sum(board_of_study_XII_std='CBSE')cbse,hostel_dayscholar")->where('academic_year', $this->academic_year)->where('b.id', $branch)->where('course', $course)->groupBy('section')->orderBy('hostel_dayscholar')->get();
+        $grouped = $data->groupBy(['gender']);
+
+        if($request->isMethod('post')) {
+        $section = $request->section;
+        $students = Student::where('section', $section)->where('academic_year', $this->academic_year)->get();
+        $branchname = $request->branchname;
+        $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname','section'));
+        return $pdf->stream("$section-$request->view.pdf");
+        }
+
+        return view('report.sectionlist', compact('grouped'));
     }
 }

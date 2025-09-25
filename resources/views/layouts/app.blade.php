@@ -206,6 +206,7 @@
             <ul class="dropdown-menu">
               <li><a href="{{ route('report.log') }}" class="nav-link">Log Report</a></li>
               <li><a href="{{ route('report.batchlist') }}" class="nav-link">BatchList Report</a></li>
+              <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList Report</a></li>
             </ul>
           </li>
 
