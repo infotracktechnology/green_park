@@ -123,7 +123,7 @@ class ReportController extends Controller
         $students = Student::where('section', $section)->where('academic_year', $this->academic_year)->get();
         $branchname = $request->branchname;
         $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname','section'));
-        return $pdf->stream("$section-$request->view.pdf");
+        return $pdf->download("$section-$request->view.pdf");
         }
 
         return view('report.sectionlist', compact('grouped'));
