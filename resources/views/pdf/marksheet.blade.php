@@ -6,15 +6,18 @@
     <title>Mark Sheet</title>
     <style type="text/css">
         body {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 12px;
-            margin: 5px;
+            font-family:Arial, Helvetica, sans-serif;
+            margin: 0;
             padding: 0;
+        }
+
+        @page {
+            margin: 0px 10px 10px 10px !important; 
         }
         
         h2, h4 {
             text-align: center;
-            margin: 5px;
+            margin: 2px 5px;
         }
         
         table {
@@ -25,8 +28,8 @@
         
         .table th, .table thead th, .table td {
             border: 1px solid #2e2e2e;
-            padding: 3px;
-            font-size: 10px;
+            padding: 1px !important;
+            font-size: 12px;
             font-weight: bold;
             text-align: center;
         }
@@ -35,8 +38,6 @@
             font-size: 14px;
             margin: 10px 0px;
         }
-       
-      
     </style>
 </head>
 <body>
@@ -60,8 +61,8 @@
     <table style="width: 100%;">
         <tr>
         @foreach($answers as $answer)
-        <td style="padding: 0px 10px;">
-            <table class="table">
+        <td style="padding: 0px 10px;vertical-align: top;">
+            <table class="table" style="width: {{ 25 * count($answers) }}%;">
                 <tr>
                     <th>QNo</th>
                     <th>Key</th>
