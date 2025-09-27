@@ -40,8 +40,7 @@ class ExamController extends Controller
 
     public function create()
     {
-        $testcategory = Options::firstWhere('type', 'testcategory')?->value;
-        return view('exam.create', compact('testcategory'));
+        return view('exam.create');
     }
 
 
@@ -76,22 +75,21 @@ class ExamController extends Controller
         $type = Student::StudentFilterQuery($exam->branch, $exam->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
         $section = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, $exam->category, $exam->batch, $exam->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
         $students = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
-        $testcategory = Options::firstWhere('type', 'testcategory')?->value;
-
-        return view('exam.edit', compact('exam', 'type', 'section', 'students', 'testcategory'));
+        
+        return view('exam.edit', compact('exam', 'type', 'section', 'students'));
     }
 
     
-    public function TestCategory(Request $request)
-    {
-        $option = Options::firstWhere('type', 'testcategory');
-        $testcategory = $option?->value;
-        if (!in_array($request->category, $testcategory)) {
-            $option->value = array_merge($testcategory, [$request->category]);
-            $option->save();
-        }
-        return redirect()->back()->with('success', 'Test Category added successfully!'); 
-    }
+    // public function TestCategory(Request $request)
+    // {
+    //     $option = Options::firstWhere('type', 'testcategory');
+    //     $testcategory = $option?->value;
+    //     if (!in_array($request->category, $testcategory)) {
+    //         $option->value = array_merge($testcategory, [$request->category]);
+    //         $option->save();
+    //     }
+    //     return redirect()->back()->with('success', 'Test Category added successfully!'); 
+    // }
 
 
     public function update(Request $request, Exam $exam)

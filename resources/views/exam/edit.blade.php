@@ -125,11 +125,7 @@
 
                   <div class="form-group col-lg-3">
                     <label>Test Category</label>
-                    <select name="testcategory" class="form-control form-control-sm" required>
-                      @foreach ($testcategory as $row)
-                      <option value="{{$row}}" @selected($row==$exam->testcategory)>{{$row}}</option>
-                      @endforeach
-                    </select>
+                    <input type="text" name="testcategory" value="{{ $exam->testcategory }}" class="form-control form-control-sm" required>
                   </div>
 
                   <div class="form-group col-lg-2">
