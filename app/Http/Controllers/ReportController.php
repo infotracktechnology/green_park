@@ -19,7 +19,7 @@ class ReportController extends Controller
         $test_name = $request->test_name ?? 0;
 
         if ($request->has('publish')) {
-            $testIds = Exam::where('name', $test_name)->update(['publish' => $request->publish]);
+            $testIds = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->update(['publish' => $request->publish]);
             return view('report.section_exam', compact('sections', 'tests', 'test_name'));
         }
 

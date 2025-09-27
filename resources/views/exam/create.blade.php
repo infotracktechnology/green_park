@@ -113,12 +113,8 @@
                   </div>
 
                   <div class="form-group col-lg-3">
-                    <label>Test Category</label><button type="button" class="btn btn-link" data-toggle="modal" data-target="#categoryModal">Add TestCategory</button>
-                    <select name="testcategory" class="form-control form-control-sm" required>
-                        @foreach ($testcategory as $row)
-                        <option value="{{$row}}">{{$row}}</option>
-                        @endforeach
-                    </select>
+                    <label>Test Category</label>
+                    <input type="text" name="testcategory"  class="form-control form-control-sm" required>
                   </div>
 
 
