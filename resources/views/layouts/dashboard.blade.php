@@ -8,14 +8,12 @@
   <title>@yield('title')</title>
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{{asset('css/app.min.css')}}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Template CSS -->
   <link rel="stylesheet" href="{{asset('css/style.css')}}">
   <link rel="stylesheet" href="{{asset('css/components.css')}}">
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
-  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
     .select2 {
@@ -140,7 +138,7 @@
             <ul class="sidebar-menu">
               <li class="menu-header">Main</li>
               <?php
-              $exam =\App\Models\Exam::getOngoingExams(auth()->user()->coaching_type, auth()->user()->branch_id);
+              $exam = auth()->user()->GetExam();
               ?>
               @if($exam)
               <li class="dropdown">
@@ -168,86 +166,6 @@
                 </li>
                 @endif
                 @endforeach
-                {{-- <li class="dropdown">
-                  <a href="{{ route('student.chairmanvideo') }}" class="nav-link">
-                    <i class="fas fa-video" style="font-size: 20px; color: #2196f3;"></i><span>Chairman's Video</span>
-                  </a>
-                </li>
-                @if (auth()->user()->coaching_type != 'Offline')
-                  <li class="dropdown">
-                    <a href="{{ route('student.classvideo') }}" class="nav-link">
-                      <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Class Video</span>
-                    </a>
-                  </li>
-
-                  <li class="dropdown">
-                    <a href="{{ route('student.revisionvideo') }}" class="nav-link">
-                      <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Revision Video</span>
-                    </a>
-                  </li>
-
-                  <li class="dropdown">
-                    <a href="{{ route('student.discussionvideo') }}" class="nav-link">
-                      <i class="fas fa-play-circle" style="font-size: 20px; color: #2196f3;"></i><span>Discussion Video</span>
-                    </a>
-                  </li>
-                @endif
-                <li class="dropdown">
-                  <a href="{{ route('student.examportion') }}" class="nav-link">
-                    <i class="fas fa-file-pdf" style="font-size: 20px; color: #2196f3;"></i><span>Exam Portions</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('student.marksheet') }}" class="nav-link">
-                    <i class="fas fa-chart-bar" style="font-size: 20px; color: #2196f3;"></i><span>Mark Details</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('student.questionKey') }}" class="nav-link">
-
- <i class="fas fa-question-circle" style="font-size: 20px; color: #2196f3;"></i><span>Question Papers</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('student.answerkey') }}" class="nav-link">
-                    <i class="fas fa-key" style="font-size: 20px; color: #2196f3;"></i><span>Answer Key</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('student.download') }}" class="nav-link">
-                    <i class="fas fa-download" style="font-size: 20px; color: #5daaf1;"></i><span>Downloads</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('student.worksheet') }}" class="nav-link">
-                    <i class="fas fa-file" style="font-size: 20px; color: #5daaf1;"></i><span>Worksheet</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('document.upload') }}" class="nav-link">
-
-                    <i class="fas fa-folder" style="font-size: 20px; color: #5daaf1;"></i><span>Document Upload</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('student.mock') }}" class="nav-link">
-                      <i class="fas fa-book-open" style="font-size: 20px; color: #5daaf1;"></i>
-                      <span>Mock Test</span>
-                  </a>
-              </li>
-              <li class="dropdown">
-                <a href="{{ route('student.timetable') }}" class="nav-link">
-                    <i class="fas fa-clock" style="font-size: 20px; color: #5daaf1;"></i>
-                    <span>Time Table</span>
-                </a>
-            </li>
-
-            <li class="dropdown">
-              <a href="{{ route('student.attendance') }}" class="nav-link">
-                  <i class="fas fa-user-plus" style="font-size: 20px; color: #5daaf1;"></i>
-                  <span>Attendance</span>
-              </a>
-          </li> --}}
 
               @endif
             </ul>
@@ -269,18 +187,8 @@
   <script src="{{asset('js/app.min.js')}}"></script>
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/easytimer.js/dist/easytimer.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      $('.select').each(function () {
-        new TomSelect(this, {
-          create: true,
-          sortField: { field: "text", direction: "asc" }
-        });
-      });
-    });
-  </script>
+  
   <script>
     window.addEventListener("pageshow", function (event) {
         if (event.persisted) {
@@ -290,12 +198,9 @@
 </script>
   <script>
     $(document).on('contextmenu', event => event.preventDefault());
-    // $(document).on('mousedown', event => event.preventDefault());
-  </script>
-  <script>
    
    document.addEventListener("DOMContentLoaded", function () {
-    var examStartTime = "{{ $examStartTime ?? '' }}"; // Get exam start time from backend
+    var examStartTime = "{{ $examStartTime ?? '' }}";
 
     if (!examStartTime) {
         console.log("No upcoming exams.");
@@ -312,7 +217,7 @@
 
         if (timeDiff <= 0) {
             timerElement.innerHTML = "Exam has started!";
-            timerContainer.style.display = "none"; // Hide text when exam starts
+            timerContainer.style.display = "none";
             clearInterval(timerInterval);
             return;
         }
@@ -326,11 +231,11 @@
                          seconds + "s";
 
         timerElement.innerHTML = timeString;
-        timerContainer.style.display = "inline"; // Show text when exam is upcoming
+        timerContainer.style.display = "inline";
     }
 
     var timerInterval = setInterval(updateTimer, 1000);
-    updateTimer(); // Run immediately on page load
+    updateTimer();
 });
 
       const timetimer = new easytimer.Timer();

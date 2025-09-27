@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Exam;
 use App\Models\Student;
+use App\Models\Options;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ImportController;
@@ -16,16 +17,10 @@ class ExamController extends Controller
 
     public function index(Request $request)
     {
-        $tests = Exam::latest()->take(25)->get();
         $tests = Exam::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
                 $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-            })
-            ->latest()
-            ->get();
-
-
-
+            })->latest()->get();
 
         if ($request->has('test_id')) {
             $test = Exam::find($request->test_id);
@@ -40,51 +35,32 @@ class ExamController extends Controller
             return to_route('exam.index');
         }
 
-        $exams = DB::table('exam as e')
-            ->leftJoin('exam_answer as ea', 'e.id', '=', 'ea.test_id')
-            ->select('e.id as exam_id', 'e.name', DB::raw('COUNT(DISTINCT ea.student_id) as student_count'))
-            ->where('ea.student_id', '>', 0)
-            ->groupBy('e.id')
-            ->get();
-
-
-        $tests = $tests->map(function ($test) use ($exams) {
-            $exam = $exams->firstWhere('exam_id', $test->id);
-            $test->student_count = $exam ? $exam->student_count : 0;
-            return $test;
-        });
-
-        return view('exam.index', compact('tests'));
+       return view('exam.index', compact('tests'));
     }
 
     public function create()
     {
-
-        return view('exam.create');
+        $testcategory = Options::firstWhere('type', 'testcategory')?->value;
+        return view('exam.create', compact('testcategory'));
     }
 
 
     public function store(Request $request)
     {
-        $request->validate([
-            'id' => 'required|unique:exam,id',
-        ]);
-
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
-        $data['subject_name'] = implode(',', $request->subject_name);
-        $data['branch_id'] = implode(',', $request->branch_id);
-        $data['coaching_type'] = implode(',', $request->coaching_type);
+         foreach (['coaching_type', 'branch', 'category', 'batch','subject_name'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
         $data['status'] = 'preview';
-
         $questions = [];
 
         foreach (['physics', 'chemistry', 'botany', 'zoology'] as $subject) {
-            if ($request->hasFile($subject."_files")) {
+            if ($request->hasFile($subject . "_files")) {
                 foreach ($request->file($subject . "_files") as $key => $file) {
                     $q_no = $key + 1;
-                    $filename = time().'-'.$subject.'-'.$q_no.'.'.$file->getClientOriginalExtension();
+                    $filename = time() . '-' . $subject . '-' . $q_no . '.' . $file->getClientOriginalExtension();
                     $file->move('questions', $filename);
-                    $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/".$filename];
+                    $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/" . $filename];
                 }
             }
         }
@@ -97,16 +73,33 @@ class ExamController extends Controller
 
     public function edit(Request $request, Exam $exam)
     {
+        $type = Student::StudentFilterQuery($exam->branch, $exam->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+        $section = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, $exam->category, $exam->batch, $exam->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+        $students = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+        $testcategory = Options::firstWhere('type', 'testcategory')?->value;
 
-        return view('exam.edit', compact('exam'));
+        return view('exam.edit', compact('exam', 'type', 'section', 'students', 'testcategory'));
+    }
+
+    
+    public function TestCategory(Request $request)
+    {
+        $option = Options::firstWhere('type', 'testcategory');
+        $testcategory = $option?->value;
+        if (!in_array($request->category, $testcategory)) {
+            $option->value = array_merge($testcategory, [$request->category]);
+            $option->save();
+        }
+        return redirect()->back()->with('success', 'Test Category added successfully!'); 
     }
 
 
     public function update(Request $request, Exam $exam)
     {
         $data = $request->all();
-        $data['branch_id'] = implode(',', $request->branch_id);
-        $data['coaching_type'] = implode(',', $request->coaching_type);
+         foreach (['coaching_type', 'branch', 'category', 'batch','subject_name'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
         $exam->update($data);
         session()->flash('success', 'Test updated successfully');
         return to_route('exam.index');
@@ -241,11 +234,6 @@ class ExamController extends Controller
 
     public function enableExam(Request $request)
     {
-        $request->validate([
-            'test_id' => 'required|exists:exam,id',
-            'student_id' => 'required|exists:student,id',
-        ]);
-
         $studentId = $request->student_id;
         $testId = $request->test_id;
 
@@ -259,7 +247,7 @@ class ExamController extends Controller
 
     public function test()
     {
-        $tests = Exam::all();
+        $tests = Exam::where('academic_year', $this->academic_year)->latest()->get();
         return view('exam.test', compact('tests'));
     }
 
@@ -268,7 +256,7 @@ class ExamController extends Controller
     {
         $testId = $request->input('test_id');
         $reportData = DB::table('exam_answer as ea')
-            ->join('exam as e', 'e.id', '=', 'ea.test_id')
+            ->join('exam as e', 'e.testid', '=', 'ea.test_id')
             ->join('branch as b', 'b.id', '=', 'e.branch_id')
             ->join('student as s', 's.student_id', '=', 'ea.student_id')
             ->select(
@@ -280,7 +268,7 @@ class ExamController extends Controller
                 'ea.student_id',
                 'ea.test_id',
                 'e.name as exam_name',
-                DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'), //Format date as string
+                DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'),
                 'ea.q_no',
                 'ea.answer'
             )
@@ -455,9 +443,9 @@ class ExamController extends Controller
                 DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);
             }
         }
-        $filename = date('Y-m-d H-i-s') . $originalFileName;
-        $request->answer_key->move('answer_key', $filename);
-        $path = 'answer_key/' . $filename;
+        $filename = date('Y-m-d H-i-s').$originalFileName;
+        $request->answer_key->move('answer_key',$filename);
+        $path = 'answer_key/'.$filename;
 
         DB::table('key_log')->insert([
             'file_name' => $originalFileName,
@@ -475,10 +463,9 @@ class ExamController extends Controller
     function Dump_Report(Request $request)
     {
         $test_name = $request->test_name ?? '';
-        $tests = Exam::groupBy('name')->get();
-        $test_ids = Exam::where('name', $test_name)->implode('id', ',');
-        $test_ids = $test_ids != '' ? $test_ids : 0;
-
+        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
+        $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->implode('testid', ',');
+    
         $results = DB::select("SELECT test_id,a.student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.student_id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
         return view('exam.dump_report', compact('test_name', 'results', 'tests', 'test_ids'));
     }
@@ -500,13 +487,12 @@ class ExamController extends Controller
     {
 
         $testIdsArray = explode(',', $test_ids);
-        $testIdsArray = array_map('intval', $testIdsArray);
-        $testIdsString = implode(',', $testIdsArray);
 
         $results = DB::table('exam_answer as a')
             ->join('student as b', 'a.student_id', '=', 'b.student_id')
             ->join('branch as c', 'b.campus', '=', 'c.id')
             ->whereIn('a.test_id', $testIdsArray)
+            ->where('a.academic_year', $this->academic_year)
             ->select(
                 'a.test_id',
                 'a.student_id',
@@ -586,7 +572,7 @@ class ExamController extends Controller
             $csvData[] = $row;
         }
 
-        $filename = "test_report_dump.csv";
+        $filename = "$testIdsArray-DUMPREPORT.csv";
 
         return response()->stream(function () use ($csvData) {
             $file = fopen('php://output', 'w');

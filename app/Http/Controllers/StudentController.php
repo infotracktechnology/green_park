@@ -110,91 +110,34 @@ class StudentController extends Controller
     {
         return view('student.profile');
     }
-    public function home()
-    {
-
-        $studentId = Auth::user()->student_id;
-        $startOfMonth = now()->startOfMonth();
-        $endOfMonth = now()->endOfMonth();
-
-
-        $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
-            ->where('student_id', $studentId)
-            ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
-            ->distinct();
-
-        $stats = DB::query()
-            ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
-            ->selectRaw("
-            -- Logic for Total Days: Count the unique days.
-            COUNT(DISTINCT attendance_date) as total_days,
-            
-            -- Logic for Present Days: Sum 0.5 for every 'P' status.
-            SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days
-        ")
-            ->first();
-
-
-        $totalDaysInMonth = $stats->total_days ?? 0;
-        $presentDaysInMonth = $stats->present_days ?? 0;
-
-        $percentage = $totalDaysInMonth > 0
-            ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2)
-            : 0;
-
-        return view('student.home', [
-            'totalDays' => $totalDaysInMonth,
-            'presentDays' => $presentDaysInMonth,
-            'attendancePercentage' => $percentage,
-        ]);
-    }
-
-
+ 
 
     public function dashboard()
     {
-        $coachingType = auth()->user()->coaching_type;
-        $branchId = auth()->user()->branch_id;
-
-        $exam = Exam::where('start_at', '>', now())
-            ->where('coaching_type', 'LIKE', "%$coachingType%")
-            ->where('branch_id', 'LIKE', "%$branchId%")
-            ->orderBy('start_at', 'asc')
-            ->first();
+        $student = Student::where('student_id',auth()->user()->student_id)->first();
+        $exam = $student->GetExam();
 
         $examStartTime = $exam ? $exam->start_at->toIso8601String() : null;
 
-        $studentId = Auth::user()->student_id;
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
 
 
         $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
-            ->where('student_id', $studentId)
+            ->where('student_id', $student->student_id)
             ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
             ->distinct();
 
-        $stats = DB::query()
-            ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
-            ->selectRaw("
-            -- Logic for Total Days: Count the unique days.
-            COUNT(DISTINCT attendance_date) as total_days,
-            
-            -- Logic for Present Days: Sum 0.5 for every 'P' status.
-            SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days
-        ")
-            ->first();
-
+        $stats = DB::query()->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')->selectRaw("COUNT(DISTINCT attendance_date) as total_days,SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days")->first();
 
         $totalDaysInMonth = $stats->total_days ?? 0;
         $presentDaysInMonth = $stats->present_days ?? 0;
 
-        $percentage = $totalDaysInMonth > 0
-            ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2)
-            : 0;
+        $percentage = $totalDaysInMonth > 0 ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2) : 0;
 
         return view('dashboards.studentdashboard', compact('examStartTime', 'totalDaysInMonth', 'presentDaysInMonth', 'percentage'));
     }
+
     function marksheet(Request $request)
     {
         $sid = auth()->user()->student_id;

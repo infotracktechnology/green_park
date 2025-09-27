@@ -30,7 +30,7 @@
                               <select name="test_id" id="test_id" class="form-control form-control-sm " required>
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
-                                    <option value="{{ $test->id }}" @if($test->id == $testId) selected @endif>{{ $test->name }}</option>
+                                    <option value="{{ $test->testid }}" @selected($test->testid == $testId)>{{ $test->name }}</option>
                                  @endforeach
                               </select>
                            </div>
