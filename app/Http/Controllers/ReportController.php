@@ -14,8 +14,8 @@ class ReportController extends Controller
 {
     public function section_exam(Request $request)
     {
-        $sections = DB::table('student')->select('section')->distinct()->orderBy('section')->get();
-        $tests = Exam::groupBy('name')->get();
+        $sections = Student::select('section')->distinct()->orderBy('section')->get();
+        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
         $test_name = $request->test_name ?? 0;
 
         if ($request->has('publish')) {
@@ -24,10 +24,11 @@ class ReportController extends Controller
         }
 
         if ($request->query('type') == 'overall') {
-            $testIds = Exam::where('name', $test_name)->pluck('id')->toArray();
-            $testIds = $testIds != '' ? $testIds : 0;
-            $section = $request->section;
-            $results = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.student_id')->join('branch as c', 'b.campus', '=', 'c.id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->select('a.test_id', 'a.student_id', 'a.mode as stmode', DB::raw('GROUP_CONCAT(DISTINCT a.subject) as subjects'), DB::raw('SUM(a.mark) as mark'), 'b.student_name', 'c.name', 'b.coaching_type', 'b.gender', 'b.section', 'a.test_id')->groupBy('a.student_id')->orderBy('test_id')->orderBy('student_name')->get();
+        $testIds = Exam::where('name', $test_name)->pluck('testid')->toArray();
+        $section = $request->section;
+        
+        $results = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.student_id')->join('branch as c', 'b.campus', '=', 'c.id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->selectRaw("a.test_id,a.student_id,a.mode as stmode,GROUP_CONCAT(DISTINCT a.subject)subjects,sum(a.mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section")->groupBy('a.student_id')->orderBy('test_id')->orderBy('student_name')->get();
+
             if (count($results) == 0) {
                 return back()->with('error', 'No data found');
             }
@@ -36,8 +37,7 @@ class ReportController extends Controller
         }
 
         if ($request->query('type') == 'omr') {
-            $testIds = Exam::where('name', $test_name)->pluck('id')->toArray();
-            $testIds = $testIds != '' ? $testIds : 0;
+            $testIds = Exam::where('name', $test_name)->pluck('testid')->toArray();
             $section = $request->section;
             $answers = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.student_id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->selectRaw("a.*,b.section,b.student_name")->orderBy('test_id')->orderBy('student_name')->orderBy('q_no')->get();
             if (count($answers) == 0) {
@@ -106,24 +106,24 @@ class ReportController extends Controller
         return view('report.attendancereport', compact('attendances'));
     }
 
-     public function BatchList(Request $request)
+    public function BatchList(Request $request)
     {
         $report = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,hostel_dayscholar,batch,section,COUNT(*) as strength,b.id")->where('academic_year', $this->academic_year)->groupBy('b.name', 'hostel_dayscholar', 'batch', 'section')->orderBy('b.id')->get();
         return view('report.batchlist', compact('report'));
     }
-     public function SectionList(Request $request)
+    public function SectionList(Request $request)
     {
         $branch = $request->branch ?? 0;
         $course = $request->course ?? 0;
         $data = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,batch,section,COUNT(*) as total,b.id,concat(gender,'-',hostel_dayscholar)gender,sum(ac_nonac='AC')ac,sum(ac_nonac='NON AC')nonac,sum(board_of_study_XII_std='SB')sb,sum(board_of_study_XII_std='CBSE')cbse,hostel_dayscholar")->where('academic_year', $this->academic_year)->where('b.id', $branch)->where('course', $course)->groupBy('section')->orderBy('hostel_dayscholar')->get();
         $grouped = $data->groupBy(['gender']);
 
-        if($request->isMethod('post')) {
-        $section = $request->section;
-        $students = Student::where('section', $section)->where('academic_year', $this->academic_year)->get();
-        $branchname = $request->branchname;
-        $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname','section'));
-        return $pdf->download("$section-$request->view.pdf");
+        if ($request->isMethod('post')) {
+            $section = $request->section;
+            $students = Student::where('section', $section)->where('academic_year', $this->academic_year)->get();
+            $branchname = $request->branchname;
+            $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'section'));
+            return $pdf->download("$section-$request->view.pdf");
         }
 
         return view('report.sectionlist', compact('grouped'));

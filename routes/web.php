@@ -87,6 +87,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {
         Route::get('exam/instruction/{test_id}', 'instruction')->name('exam.instruction');
+        Route::post('exam/testcategory', 'TestCategory')->name('exam.testcategory');
         Route::get('enable/exam', 'enable')->name('exam.enable');
         Route::post('enable/exam', 'enableExam')->name('exam.enableExam');
         Route::get('test/exam', 'test')->name('exam.test');
@@ -168,7 +169,6 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::controller(StudentController::class)->group(function () {
         Route::get('dashboard', 'dashboard')->name('studentdashboard');
         Route::get('profile', 'profile')->name('student.profile');
-        Route::get('home', 'home')->name('student.home');
         Route::get('marksheet', 'marksheet')->name('student.marksheet');
         Route::get('mark/subject/{test_id}', 'mark_subject')->name('student.mark_subject');
         Route::get('mark/download/{test_id}', 'mark_download')->name('student.mark_download');
