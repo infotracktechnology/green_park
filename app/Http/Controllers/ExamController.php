@@ -79,19 +79,7 @@ class ExamController extends Controller
         return view('exam.edit', compact('exam', 'type', 'section', 'students'));
     }
 
-    
-    // public function TestCategory(Request $request)
-    // {
-    //     $option = Options::firstWhere('type', 'testcategory');
-    //     $testcategory = $option?->value;
-    //     if (!in_array($request->category, $testcategory)) {
-    //         $option->value = array_merge($testcategory, [$request->category]);
-    //         $option->save();
-    //     }
-    //     return redirect()->back()->with('success', 'Test Category added successfully!'); 
-    // }
-
-
+  
     public function update(Request $request, Exam $exam)
     {
         $data = $request->all();
@@ -349,7 +337,7 @@ class ExamController extends Controller
         }
 
         foreach ($answers as $answer) {
-            $exam = Exam::find($answer['test_id']);
+            $exam = Exam::where('academic_year', $this->academic_year)->where('testid', $answer['test_id'])->first();
 
             if (!$exam) {
                 return back()->with('error', "Exam with ID {$answer['test_id']} not found.");

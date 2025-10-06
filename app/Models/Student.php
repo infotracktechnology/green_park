@@ -34,9 +34,10 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
+            $model->student_id = self::generateId($model->course);
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
-            $model->user_name = self::generateName($model->coaching_type,$model->student_id);
+            $model->user_name = self::generateName($model->course,$model->student_id);
         });
     }
 
@@ -71,17 +72,30 @@ class Student extends Authenticatable
         return $password;
     }
 
-    private static function generateID(){
-            return $this->max('student_id') + 1;
+   private static function generateId($course){
+    $lastId = self::where('course', $course)->max('student_id');
+    if ($lastId) {
+        return $lastId + 1;
+    } else {
+        switch ($course) {
+            case 'XI - OB':
+                return 526001;
+            case 'XII - OB':
+                return 425001;
+            default:
+                return 260001;
+        }
     }
+ }
 
-    private static function generateName($coaching_type,$student_id){
-        if($coaching_type == "XI - OB" || $coaching_type == "XII - OB"){
+    private static function generateName($course,$student_id){
+        if($course == "XI - OB" || $course == "XII - OB"){
             return 'S'.$student_id;
         }else{
             return 'L'.$student_id;
         }
     }
+    
     public function calculateCurrentMonthStats(string $studentId): object
     {
         $startOfMonth = now()->startOfMonth();
