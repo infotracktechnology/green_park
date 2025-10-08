@@ -446,30 +446,34 @@ class ExamController extends Controller
         return redirect()->back()->with('success', 'Answer key uploaded successfully.');
     }
 
-    function Dump_Report(Request $request)
+    public function Dump_Report(Request $request)
     {
         $test_name = $request->test_name ?? '';
         $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
         $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->implode('testid', ',');
-    
+
+        if (empty($testIds)) {
+            return view('exam.dump_report', compact('test_name', 'tests'))->with('results', collect());
+        }
+
         $results = DB::select("SELECT test_id,a.student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.student_id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
         return view('exam.dump_report', compact('test_name', 'results', 'tests', 'test_ids'));
     }
 
-    function deleteAnswerKey($id, $test_id)
+    public function deleteAnswerKey($id, $test_id)
     {
         DB::table('key_log')->where('id', $id)->delete();
         return redirect()->route('exam.answerkey')->with('success', 'Answer key log deleted successfully.');
     }
 
-    function deleteOfflineKey($id, $test_id)
+    public function deleteOfflineKey($id, $test_id)
     {
         DB::table('key_log')->where('id', $id)->delete();
         DB::table('exam_answer')->where('test_id', $test_id)->where('academic_year', $this->academic_year)->where('mode', 'OMR')->delete();
         return redirect()->route('exam.offline.index')->with('success', 'Answer key log deleted successfully.');
     }
 
-    function csv_download($test_ids, Request $request)
+    public function csv_download($test_ids, Request $request)
     {
 
         $testIdsArray = explode(',', $test_ids);
