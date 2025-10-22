@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
-use App\Models\Exam; // Import the Exam model
+use App\Models\Exam;
+use App\Models\ExamAnswer;
+use App\Models\ExamSubjectReport;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Announcement;
@@ -141,8 +143,12 @@ class StudentController extends Controller
     function marksheet(Request $request)
     {
         $sid = auth()->user()->student_id;
-        $tests = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$sid and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
-        return view('student.marksheet', compact('tests'));
+        $tests = DB::table("exam_answer as a")->join('exam as b', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get();
+        $subjectexam = null;
+        if($request->exam){
+           $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderBy('id')->get();
+        }
+        return view('student.marksheet', compact('tests', 'subjectexam'));
     }
 
     function mark_subject(Request $request, $test_id)

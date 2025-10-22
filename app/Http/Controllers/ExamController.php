@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Branch;
 use App\Models\Exam;
 use App\Models\Student;
+use App\Models\ExamAnswer;
 use App\Models\Options;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -104,7 +105,7 @@ class ExamController extends Controller
     {
         $student_id = $request->student_id ?? 0;
 
-        $exam_answers =  DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', $student_id)->get()->keyBy('q_no');
+        $exam_answers =  ExamAnswer::where('test_id', $request->test_id)->where('student_id', $student_id)->get()->keyBy('q_no');
 
         for ($i = 1; $i <= $request->total_question; $i++) {
             $status = $request->status[$i] ?? null;
@@ -139,7 +140,7 @@ class ExamController extends Controller
             unlink($question['image']);
         }
         $exam->delete();
-        DB::table('exam_answer')->where('test_id', $exam->id)->delete();
+        // ExamAnswer::where('test_id', $exam->id)->delete();
         session()->flash('success', 'Test deleted successfully');
         return to_route('exam.index');
     }
@@ -147,7 +148,7 @@ class ExamController extends Controller
     function student_instruction(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
-        $exam_answer = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->selectRaw('count(q_no) as total_question')->first();
+        $exam_answer = ExamAnswer::where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->selectRaw('count(q_no) as total_question')->first();
         if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
             return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
         }
@@ -157,7 +158,7 @@ class ExamController extends Controller
     function student_exam(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
-        $answers = DB::table('exam_answer')->where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
+        $answers = ExamAnswer::where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
         $maxQuestions = $answers->first()->q_no ?? 0;
         $answers = $answers->keyBy('q_no');
         $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
@@ -172,11 +173,11 @@ class ExamController extends Controller
     function Save(Request $request)
     {
         $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year];
-        $answer = DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
+        $answer = ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
         if ($answer) {
-            DB::table('exam_answer')->where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
+            ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
         } else {
-            DB::table('exam_answer')->insert($data);
+            ExamAnswer::create($data);
         }
 
         return response()->json(['message' => 'Answer saved successfully']);
@@ -347,7 +348,7 @@ class ExamController extends Controller
                 continue;
             }
 
-            $exists = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->exists();
+            $exists = ExamAnswer::where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->exists();
 
             if ($exists) {
                 continue;
@@ -359,7 +360,7 @@ class ExamController extends Controller
                 $subject = $this->determineSubject($i, $exam->phy_start, $exam->phy_end, $exam->chem_start, $exam->chem_end, $exam->bot_start, $exam->bot_end, $exam->zoo_start, $exam->zoo_end);
                 $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
             }
-            $exam_answer = DB::table('exam_answer')->insert($record);
+            $exam_answer = ExamAnswer::insert($record);
         }
 
         $file = $request->file('offline');
@@ -413,7 +414,7 @@ class ExamController extends Controller
         $originalFileName = $request->file('answer_key')->getClientOriginalName();
         $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
         foreach ($answers as $answer) {
-            $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
+            $exam_answers = ExamAnswer::where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
             foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
@@ -426,7 +427,7 @@ class ExamController extends Controller
                     $answer_key = "DEL";
                 }
 
-                DB::table('exam_answer')->where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);
+                ExamAnswer::where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);
             }
         }
         $filename = date('Y-m-d H-i-s').$originalFileName;
@@ -576,3 +577,4 @@ class ExamController extends Controller
         ]);
     }
 }
+
