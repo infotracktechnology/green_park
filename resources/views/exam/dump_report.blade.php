@@ -38,10 +38,10 @@
                            
                           <div class="form-group col-lg-4">
                              <label>Test Name</label>
-                             <select name="test_name" id="test_name" class="form-control form-control-sm" required>
+                             <select name="test_name" id="test_name" class="select2" required>
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
-                                     <option value="{{ $test->name }}" @if($test->name == $test_name) selected @endif>
+                                     <option value="{{ $test->name }}" @selected($test_name == $test->name)>
                                       {{ $test->name }}
                                      </option>
                                  @endforeach

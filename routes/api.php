@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo,Download,Worksheet,Achievement};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo,Download,Worksheet,Achievement,ExamSubjectReport};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -83,8 +83,22 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
         $results = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$student_id and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
+        $testgroup = ['CUMULATIVE (CHEBOT)','CUMULATIVE (PHYZOO)','GRAND TEST','WEEKEND (BOTANY)','WEEKEND (CHEMISTRY)','WEEKEND (PHYSICS)','WEEKEND (ZOOLOGY)'];
         $results = count($results) > 0 ? $results : [];
-        return response()->json($results);
+        return response()->json(['results' => $results, 'testgroup' => $testgroup]);
+    });
+
+    Route::get('/perviousexamresult/{student_id}/{subject}', function (Request $request, $student_id,$subject) {
+        $subjectexam = ExamSubjectReport::where("subject", "like", "%$subject%")->where("stuid", $student_id)->orderBy('id')->get();
+        $header = $subjectexam->first()?->Header($subject);
+        $subjectexam = $subjectexam->map(function ($subjectexam) use ($subject) {
+            return [
+              'exam_date' => $subjectexam->exam_date,
+              'subject' => $subjectexam->subject,
+              'scores' => $subjectexam->getScoresForHeader($subject),
+            ];
+        });
+        return response()->json(['header' => $header,'results' => $subjectexam]);
     });
 
     Route::get('/marksheet/{student_id}/{exam}', function (Request $request, $student_id, Exam $exam) {

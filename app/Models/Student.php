@@ -74,17 +74,11 @@ class Student extends Authenticatable
 
    private static function generateId($course){
     $lastId = self::where('course', $course)->max('student_id');
+    $nextyear = substr(date('Y')+1, -2);
     if ($lastId) {
         return $lastId + 1;
     } else {
-        switch ($course) {
-            case 'XI - OB':
-                return 526001;
-            case 'XII - OB':
-                return 425001;
-            default:
-                return 260001;
-        }
+        return $nextyear.'00001';
     }
  }
 

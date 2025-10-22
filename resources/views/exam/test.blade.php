@@ -24,10 +24,9 @@
               <div class="card-body">
                 <div class="row">
 
-
-                  <div class="form-group col-lg-3">
-                    <label>Test ID</label>
-                    <select name="test_id" id="test_id" class="form-control form-control-sm" required>
+                  <div class="form-group col-lg-4">
+                    <label>Test Name</label>
+                    <select name="test_id" id="test_id" class="select2" required>
                       <option value="">Select Test</option>
                       @foreach ($tests as $test)
                       <option value="{{ $test->testid }}">

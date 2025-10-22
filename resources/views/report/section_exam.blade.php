@@ -25,6 +25,7 @@
             <div class="card-body">
 
               <div class="row">
+
                 @if(session('error'))
                 <div class="col-md-12">
                   <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -32,10 +33,11 @@
                   </div>
                 </div>
                 @endif
+
                 <div class="col-md-10 col-sm-12 mb-3">
                   <h6 class="col-deep-purple">Exam Section Wise Report</h6>
                 </div>
-              </div>
+             
 
               <div class="col-md-12">
                 <form method="get" id="myForm" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
@@ -43,7 +45,7 @@
 
                     <div class="form-group col-lg-4">
                       <label>Test Name</label>
-                      <select name="test_name" id="test_name" class="form-control form-control-sm" required>
+                      <select name="test_name" id="test_name" class="select2" required>
                         <option value="">Select Test</option>
                         @foreach ($tests as $test)
                         <option value="{{ $test->name }}" @if($test->name == $test_name) selected @endif>
@@ -62,7 +64,8 @@
               </div>
 
               @if($test_name)
-              <div class="col-md-12">
+              
+              <div class="col-md-8">
                 <div class="table-responsive">
                   <table class="table table-striped">
                     <thead>
@@ -88,23 +91,21 @@
               </div>
 
 
-              <form method="get" class="col-md-12" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
+              <form method="get" class="col-md-4" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
                 <input type="hidden" name="test_name" value="{{ $test_name }}">
-                <div class="col-lg-12">
-                  <h6>Exam Publish</h6>
-                </div>
-                <div class="form-group col-lg-3">
+                <div class="form-group">
                   <label>Result Publish</label>
                   <select name="publish" id="publish" class="form-control form-control-sm" required>
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
                 </div>
-                <div class="col-lg-2">
-                  <label>&nbsp;</label>
+                <div class="form-group">
                   <button class="btn btn-primary m-b-20" type="Submit">Publish</button>
                 </div>
               </form>
+
+              
 
               @endif
 
@@ -126,11 +127,7 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script>
   const table = $('#myTable').DataTable({
-  
     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-  
   });
-  
 </script>
-
 @endsection
