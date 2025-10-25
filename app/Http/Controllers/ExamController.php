@@ -413,12 +413,12 @@ class ExamController extends Controller
 
         $originalFileName = $request->file('answer_key')->getClientOriginalName();
         $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
+        $bulkdata=[];
         foreach ($answers as $answer) {
         $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
             foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
-
                 if (array_sum($ans_key) > 0) {
                     $mark = in_array($row->answer, $ans_key) ? 4 : -1;
                     $answer_key = $ans;
@@ -426,10 +426,10 @@ class ExamController extends Controller
                     $mark = NULL;
                     $answer_key = "DEL";
                 }
-
-                ExamAnswer::where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);
+                $bulkdata[] = ['id', $row->id, 'answer_key', $answer_key, 'mark', $mark];
             }
         }
+        ExamAnswer::upsert($bulkdata, ['id'], ['answer_key', 'mark']);
         $filename = date('Y-m-d H-i-s').$originalFileName;
         $request->answer_key->move('answer_key',$filename);
         $path = 'answer_key/'.$filename;
