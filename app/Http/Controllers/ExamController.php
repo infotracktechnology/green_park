@@ -434,7 +434,8 @@ class ExamController extends Controller
             $totalProcessed += $this->processBatch($bulkData);
         }
 
-        $filename = date('Y-m-d H-i-s') . $originalFileName;
+        $originalFileName = $request->answer_key->getClientOriginalName();
+        $filename = date('Y-m-d H-i-s').$originalFileName;
         $request->answer_key->move('answer_key', $filename);
         $path = 'answer_key/' . $filename;
 
