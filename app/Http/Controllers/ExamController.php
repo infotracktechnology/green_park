@@ -414,7 +414,7 @@ class ExamController extends Controller
         $originalFileName = $request->file('answer_key')->getClientOriginalName();
         $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
         foreach ($answers as $answer) {
-            $exam_answers = ExamAnswer::where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
+        $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
             foreach ($exam_answers as $row) {
                 $ans = $answer["a$row->q_no"];
                 $ans_key = explode('|', $ans);
