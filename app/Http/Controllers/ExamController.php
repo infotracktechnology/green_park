@@ -36,7 +36,7 @@ class ExamController extends Controller
             return to_route('exam.index');
         }
 
-       return view('exam.index', compact('tests'));
+        return view('exam.index', compact('tests'));
     }
 
     public function create()
@@ -48,7 +48,7 @@ class ExamController extends Controller
     public function store(Request $request)
     {
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
-         foreach (['coaching_type', 'branch', 'category', 'batch','subject_name'] as $field) {
+        foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $data['status'] = 'preview';
@@ -76,15 +76,15 @@ class ExamController extends Controller
         $type = Student::StudentFilterQuery($exam->branch, $exam->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
         $section = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, $exam->category, $exam->batch, $exam->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
         $students = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
-        
+
         return view('exam.edit', compact('exam', 'type', 'section', 'students'));
     }
 
-  
+
     public function update(Request $request, Exam $exam)
     {
         $data = $request->all();
-         foreach (['coaching_type', 'branch', 'category', 'batch','subject_name'] as $field) {
+        foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $exam->update($data);
@@ -400,7 +400,6 @@ class ExamController extends Controller
 
     public function uploadAnswerKey(Request $request, ImportController $import)
     {
-
         $request->validate([
             'answer_key' => 'required|max:1024',
         ]);
@@ -410,29 +409,34 @@ class ExamController extends Controller
             return back()->with('error', 'File is not in the correct format.');
         }
 
+        $batchSize = 1000;
+        $totalProcessed = 0;
 
-        $originalFileName = $request->file('answer_key')->getClientOriginalName();
-        $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
+        $examAnswers = $this->getExamAnswers(array_column($answers, 'test_id'));
+
+        $bulkData = [];
+
         foreach ($answers as $answer) {
-        $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
-            foreach ($exam_answers as $row) {
-                $ans = $answer["a$row->q_no"];
-                $ans_key = explode('|', $ans);
+            $testId = $answer['test_id'];
+            if (!isset($examAnswers[$testId])) continue;
 
-                if (array_sum($ans_key) > 0) {
-                    $mark = in_array($row->answer, $ans_key) ? 4 : -1;
-                    $answer_key = $ans;
-                } else {
-                    $mark = NULL;
-                    $answer_key = "DEL";
+            foreach ($examAnswers[$testId] as $row) {
+                $bulkData[] = $this->prepareAnswerData($row, $answer);
+
+                if (count($bulkData) >= $batchSize) {
+                    $totalProcessed += $this->processBatch($bulkData);
+                    $bulkData = [];
                 }
-
-                ExamAnswer::where('id', $row->id)->update(['mark' => $mark, 'answer_key' => $answer_key]);
             }
         }
-        $filename = date('Y-m-d H-i-s').$originalFileName;
-        $request->answer_key->move('answer_key',$filename);
-        $path = 'answer_key/'.$filename;
+
+        if (!empty($bulkData)) {
+            $totalProcessed += $this->processBatch($bulkData);
+        }
+
+        $filename = date('Y-m-d H-i-s') . $originalFileName;
+        $request->answer_key->move('answer_key', $filename);
+        $path = 'answer_key/' . $filename;
 
         DB::table('key_log')->insert([
             'file_name' => $originalFileName,
@@ -444,7 +448,40 @@ class ExamController extends Controller
             'type' => 'answer_key',
         ]);
 
-        return redirect()->back()->with('success', 'Answer key uploaded successfully.');
+
+        return redirect()->back()->with('success', "Answer key uploaded successfully. Processed {$totalProcessed} records.");
+    }
+
+
+    private function getExamAnswers(array $testIds)
+    {
+        return DB::table('exam_answer')
+            ->whereIn('test_id', $testIds)
+            ->where('answer', '>', 0)
+            ->where('academic_year', $this->academic_year)
+            ->get()
+            ->groupBy('test_id');
+    }
+
+    private function prepareAnswerData($row, $answer)
+    {
+        $key = "a{$row->q_no}";
+        $ans = $answer[$key] ?? '';
+        $ansKey = explode('|', $ans);
+
+        $mark = array_sum($ansKey) > 0 ? (in_array($row->answer, $ansKey) ? 4 : -1) : null;
+
+        return [
+            'id' => $row->id,
+            'answer_key' => array_sum($ansKey) > 0 ? $ans : 'DEL',
+            'mark' => $mark
+        ];
+    }
+
+    private function processBatch(array $batchData)
+    {
+        DB::table('exam_answer')->upsert($batchData, ['id'], ['answer_key', 'mark']);
+        return count($batchData);
     }
 
     public function Dump_Report(Request $request)
@@ -577,4 +614,3 @@ class ExamController extends Controller
         ]);
     }
 }
-
