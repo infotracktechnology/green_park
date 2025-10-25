@@ -434,13 +434,14 @@ class ExamController extends Controller
             $totalProcessed += $this->processBatch($bulkData);
         }
 
-        $filename = date('Y-m-d H-i-s') . $originalFileName;
+        $originalFileName = $request->answer_key->getClientOriginalName();
+        $filename = date('Y-m-d H-i-s').$originalFileName;
         $request->answer_key->move('answer_key', $filename);
         $path = 'answer_key/' . $filename;
 
         DB::table('key_log')->insert([
             'file_name' => $originalFileName,
-            'upload_time' => $uploadTime,
+            'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
             'path' => $path,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
