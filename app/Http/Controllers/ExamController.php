@@ -441,7 +441,7 @@ class ExamController extends Controller
 
         DB::table('key_log')->insert([
             'file_name' => $originalFileName,
-            'upload_time' => $uploadTime,
+            'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
             'path' => $path,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
