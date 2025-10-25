@@ -138,6 +138,12 @@
                     <input type="text" name="name" value="{{ $exam->name }}" id="name" class="form-control form-control-sm" required>
                   </div>
 
+                  <div class="form-group col-lg-2">
+                    <label>Exam Date</label>
+                    <input type="date" value="{{ $exam->exam_date }}" name="exam_date" class="form-control form-control-sm">
+                  </div>
+
+
                   <div class="form-group col-lg-4">
                     <label>Start Datetime</label>
                     <input type="text" id="start_at" value="{{ $exam->start_at }}" name="start_at" class="datetime-picker form-control form-control-sm">

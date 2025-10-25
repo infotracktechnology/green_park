@@ -420,36 +420,31 @@ class ExamController extends Controller
                 $testId = $answer['test_id'];
                 $uniqueTests[$testId] = $answer['test_name'] ?? '';
 
-                DB::table('exam_answer')
-                    ->where('test_id', $testId)
-                    ->where('answer', '>', 0)
-                    ->where('academic_year', $this->academic_year)
-                    ->orderBy('id')
-                    ->chunk(20000, function ($examAnswers) use ($answer, &$processedCount) {
-                        $bulkData = [];
+                DB::table('exam_answer')->where('test_id', $testId)->where('answer', '>', 0)->where('academic_year', $this->academic_year)->orderBy('id')->chunk(20000, function ($examAnswers) use ($answer, &$processedCount) {
+                    $bulkData = [];
 
-                        foreach ($examAnswers as $row) {
-                            $key = "a{$row->q_no}";
-                            $ans = $answer[$key] ?? '';
-                            $ansKey = array_filter(explode('|', $ans));
+                    foreach ($examAnswers as $row) {
+                        $key = "a{$row->q_no}";
+                        $ans = $answer[$key] ?? '';
+                        $ansKey = array_filter(explode('|', $ans));
 
-                            if (count($ansKey) > 0) {
-                                $mark = in_array($row->answer, $ansKey) ? 4 : -1;
-                                $answerKey = $ans;
-                            } else {
-                                $mark = null;
-                                $answerKey = 'DEL';
-                            }
-
-                            $bulkData[] = [
-                                'id' => $row->id,
-                                'answer_key' => $answerKey,
-                                'mark' => $mark,
-                            ];
+                        if (count($ansKey) > 0) {
+                            $mark = in_array($row->answer, $ansKey) ? 4 : -1;
+                            $answerKey = $ans;
+                        } else {
+                            $mark = null;
+                            $answerKey = 'DEL';
                         }
-                        $this->executeBatchUpdate($bulkData);
-                        $processedCount += count($bulkData);
-                    });
+
+                        $bulkData[] = [
+                            'id' => $row->id,
+                            'answer_key' => $answerKey,
+                            'mark' => $mark,
+                        ];
+                    }
+                    $this->executeBatchUpdate($bulkData);
+                    $processedCount += count($bulkData);
+                });
             }
 
             $filename = date('Y-m-d_H-i-s') . '_' . $originalFileName;
@@ -493,7 +488,7 @@ class ExamController extends Controller
         $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
         $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->implode('testid', ',');
 
-        if (empty($testIds)) {
+        if (empty($test_ids)) {
             return view('exam.dump_report', compact('test_name', 'tests'))->with('results', collect());
         }
 
@@ -616,4 +611,34 @@ class ExamController extends Controller
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ]);
     }
+ public function Publish(Request $request){
+    $exams = [];
+    if($request->start_date && $request->end_date){
+        $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->get();
+    }
+
+    if($request->isMethod('post')){
+        $markranges = $request->file('markrange', []);
+        $publishs = $request->input('publish', []);
+        foreach($request->ids as $key => $id){
+            $exam = Exam::find($id);
+            if(file_exists($exam->markrange)) { 
+             unlink($exam->markrange); 
+             $exam->markrange = null; 
+            }
+            
+            $exam->publish = $publishs[$key] ?? 'No';
+            if (isset($markranges[$key]) && $markranges[$key]->isValid()) {
+                $file = $markranges[$key];
+                $filename = time().'-'.$file->getClientOriginalName();
+                $file->move('assets/markrange', $filename);
+                $exam->markrange = 'assets/markrange/'.$filename;
+            }
+            $exam->save();
+        }
+        return redirect()->route('exam.publish')->with('success', 'Exams Published Successfully.');
+    }
+
+    return view('exam.publish', compact('exams'));
+ }
 }
