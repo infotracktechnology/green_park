@@ -149,9 +149,6 @@
               <li><a href="{{route('chairmanvideo.index')}}" class="nav-link"> Chairman Video</a></li>
               <li><a href="{{route('classvideo.index')}}" class="nav-link"> Class Video</a></li>
               <li><a href="{{route('revisionvideo.index')}}" class="nav-link"> Revision Video</a></li>
-
-              {{-- <li><a href="" class="nav-link">Class Video upload</a></li> --}}
-
               <li><a href="{{route('examportion.index')}}" class="nav-link"> Exam Portion</a></li>
               <li><a href="{{route('questionkey.index')}}" class="nav-link"> Question Paper</a></li>
               <li><a href="{{route('answerkey.index')}}" class="nav-link"> Answer key</a></li>
@@ -165,13 +162,13 @@
           <li class="dropdown">
             <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Examination</span></a>
             <ul class="dropdown-menu">
-              <li><a href="{{ route('exam.index') }}" class="nav-link"> Add Test</a></li>
+              <li><a href="{{ route('exam.index') }}" class="nav-link">Add Test</a></li>
               <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
-              <li><a href="{{ route('exam.test') }}" class="nav-link">Test Report</a></li>
-              <li><a href="{{route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
-              <li><a href="{{route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
-              <li><a href="{{ route('exam.report.dump') }}" class="nav-link">Result Report</a></li>
-              <li><a href="{{ route('report.section_exam') }}" class="nav-link">Exam Section Wise</a></li>
+              <li><a href="{{ route('exam.test') }}" class="nav-link">Online Response(csv file)</a></li>
+              <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
+              <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
+              <li><a href="{{ route('exam.report.dump') }}" class="nav-link">Subject Wise Mark Report</a></li>
+              <li><a href="{{ route('report.section_exam') }}" class="nav-link">Section Wise Report</a></li>
             </ul>
           </li>
           <li class="dropdown">
@@ -202,6 +199,16 @@
           </li>
 
           <li class="dropdown">
+            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
+            <ul class="dropdown-menu">
+              <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
+              <li><a href="{{ route('feesplan.index') }}" class="nav-link">Fee Plan</a></li>
+              <li><a href="{{ route('fees.collection') }}" class="nav-link">Fee Collection</a></li>
+
+            </ul>
+          </li>
+
+          <li class="dropdown">
             <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
             <ul class="dropdown-menu">
               <li><a href="{{ route('report.log') }}" class="nav-link">Log Report</a></li>
@@ -209,20 +216,6 @@
               <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList Report</a></li>
             </ul>
           </li>
-
-          <li class="dropdown">
-            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
-            <ul class="dropdown-menu">
-              <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
-              <li><a href="{{ route('feesplan.index') }}" class="nav-link">Fees Plan</a></li>
-              <li><a href="{{ route('fees.collection') }}" class="nav-link">Fees Collection</a></li>
-
-            </ul>
-          </li>
-
-
-
-
 
           </ul>
         </aside>

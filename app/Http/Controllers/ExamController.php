@@ -328,7 +328,7 @@ class ExamController extends Controller
     public function offlineUpload(Request $request, ImportController $import)
     {
         $request->validate([
-            'offline' => 'required|mimes:csv,txt|max:1024',
+            'offline' => 'required|mimes:csv,txt|max:2048',
         ]);
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
