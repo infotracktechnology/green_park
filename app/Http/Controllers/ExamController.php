@@ -36,7 +36,7 @@ class ExamController extends Controller
             return to_route('exam.index');
         }
 
-       return view('exam.index', compact('tests'));
+        return view('exam.index', compact('tests'));
     }
 
     public function create()
@@ -48,7 +48,7 @@ class ExamController extends Controller
     public function store(Request $request)
     {
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
-         foreach (['coaching_type', 'branch', 'category', 'batch','subject_name'] as $field) {
+        foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $data['status'] = 'preview';
@@ -76,15 +76,15 @@ class ExamController extends Controller
         $type = Student::StudentFilterQuery($exam->branch, $exam->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
         $section = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, $exam->category, $exam->batch, $exam->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
         $students = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
-        
+
         return view('exam.edit', compact('exam', 'type', 'section', 'students'));
     }
 
-  
+
     public function update(Request $request, Exam $exam)
     {
         $data = $request->all();
-         foreach (['coaching_type', 'branch', 'category', 'batch','subject_name'] as $field) {
+        foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $exam->update($data);
@@ -400,56 +400,103 @@ class ExamController extends Controller
 
     public function uploadAnswerKey(Request $request, ImportController $import)
     {
-
         $request->validate([
             'answer_key' => 'required|max:1024',
         ]);
 
-        $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
-        if (!isset($answers[0]['test_id'])) {
-            return back()->with('error', 'File is not in the correct format.');
-        }
+        try {
 
+            $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
 
-        $originalFileName = $request->file('answer_key')->getClientOriginalName();
-        $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
-        $bulkdata=[];
-        foreach ($answers as $answer) {
-        $exam_answers = DB::table('exam_answer')->where('test_id', $answer['test_id'])->where('answer', '>', 0)->where('academic_year', $this->academic_year)->get();
-            foreach ($exam_answers as $row) {
-                $ans = $answer["a$row->q_no"];
-                $ans_key = explode('|', $ans);
-                if (array_sum($ans_key) > 0) {
-                    $mark = in_array($row->answer, $ans_key) ? 4 : -1;
-                    $answer_key = $ans;
-                } else {
-                    $mark = NULL;
-                    $answer_key = "DEL";
-                }
-                $bulkdata[] = ['id', $row->id, 'answer_key', $answer_key, 'mark', $mark];
+            if (empty($answers) || !isset($answers[0]['test_id'])) {
+                return back()->with('error', 'File is not in the correct format.');
             }
+
+            $originalFileName = $request->file('answer_key')->getClientOriginalName();
+            $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
+            $testIds = array_column($answers, 'test_id');
+
+
+            $examAnswers = DB::table('exam_answer')->whereIn('test_id', array_unique($testIds))->where('answer', '>', 0)
+                ->where('academic_year', $this->academic_year)->select('id', 'test_id', 'q_no', 'answer')
+                ->get()->groupBy('test_id')->toArray();
+
+
+            $bulkData = [];
+            $uniqueTests = [];
+
+            foreach ($answers as $answer) {
+                $testId = $answer['test_id'];
+                $uniqueTests[$testId] = $answer['test_name'] ?? '';
+
+                if (!isset($examAnswers[$testId])) {
+                    continue;
+                }
+
+                foreach ($examAnswers[$testId] as $row) {
+                    $key = "a{$row->q_no}";
+                    $ans = $answer[$key] ?? '';
+
+                    if (empty($ans)) {
+                        continue;
+                    }
+
+                    $ansKey = array_filter(explode('|', $ans));
+
+                    if (count($ansKey) > 0) {
+                        $mark = in_array($row->answer, $ansKey) ? 4 : -1;
+                        $answerKey = $ans;
+                    } else {
+                        $mark = null;
+                        $answerKey = 'DEL';
+                    }
+
+                    $bulkData[] = [
+                        'id' => $row->id,
+                        'answer_key' => $answerKey,
+                        'mark' => $mark,
+                    ];
+                }
+            }
+
+            if (empty($bulkData)) {
+                return back()->with('error', 'No valid answers to process.');
+            }
+
+
+            $batchSize = 1000;
+            $chunks = array_chunk($bulkData, $batchSize);
+
+            foreach ($chunks as $chunk) {
+                DB::table('exam_answer')->upsert(
+                    $chunk,
+                    ['id'],
+                    ['answer_key', 'mark']
+                );
+            }
+
+
+            $filename = date('Y-m-d_H-i-s') . '_' . pathinfo($originalFileName, PATHINFO_FILENAME) . '.csv';
+            $request->file('answer_key')->move('answer_key', $filename);
+            $path = 'answer_key/' . $filename;
+
+
+            DB::table('key_log')->insert([
+                'file_name' => $originalFileName,
+                'upload_time' => $uploadTime,
+                'test_name' => implode(',', array_unique($uniqueTests)),
+                'path' => $path,
+                'test_id' => implode(',', array_keys($uniqueTests)),
+                'no_rows' => count($answers),
+                'type' => 'answer_key',
+            ]);
+
+            $totalRecords = count($bulkData);
+            return redirect()->back()->with('success', "Answer key uploaded successfully. Processed {$totalRecords} records.");
+        } catch (\Exception $e) {
+            \Log::error('Answer Key Upload Error: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred during upload. Check logs for details.');
         }
-        $bulkdata = collect($bulkdata);
-        
-        $bulkdata->chunk(1000)->each(function ($chunk) {
-            DB::table('exam_answer')->upsert($chunk->toArray(), ['id'], ['answer_key', 'mark']);
-        });
-
-        $filename = date('Y-m-d H-i-s').$originalFileName;
-        $request->answer_key->move('answer_key',$filename);
-        $path = 'answer_key/'.$filename;
-
-        DB::table('key_log')->insert([
-            'file_name' => $originalFileName,
-            'upload_time' => $uploadTime,
-            'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
-            'path' => $path,
-            'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
-            'no_rows' => count($answers),
-            'type' => 'answer_key',
-        ]);
-
-        return redirect()->back()->with('success', 'Answer key uploaded successfully.');
     }
 
     public function Dump_Report(Request $request)
@@ -582,4 +629,3 @@ class ExamController extends Controller
         ]);
     }
 }
-
