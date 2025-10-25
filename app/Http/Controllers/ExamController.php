@@ -404,85 +404,99 @@ class ExamController extends Controller
             'answer_key' => 'required|max:1024',
         ]);
 
-        $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
-        if (!isset($answers[0]['test_id'])) {
-            return back()->with('error', 'File is not in the correct format.');
-        }
+        try {
 
-        $batchSize = 1000;
-        $totalProcessed = 0;
+            $answers = $import->parseCSV($request->file('answer_key')->getRealPath());
 
-        $examAnswers = $this->getExamAnswers(array_column($answers, 'test_id'));
+            if (empty($answers) || !isset($answers[0]['test_id'])) {
+                return back()->with('error', 'File is not in the correct format.');
+            }
 
-        $bulkData = [];
+            $originalFileName = $request->file('answer_key')->getClientOriginalName();
+            $uploadTime = Carbon::now()->format('Y-m-d H:i:s');
+            $testIds = array_column($answers, 'test_id');
 
-        foreach ($answers as $answer) {
-            $testId = $answer['test_id'];
-            if (!isset($examAnswers[$testId])) continue;
 
-            foreach ($examAnswers[$testId] as $row) {
-                $bulkData[] = $this->prepareAnswerData($row, $answer);
+            $examAnswers = DB::table('exam_answer')->whereIn('test_id', array_unique($testIds))->where('answer', '>', 0)
+                ->where('academic_year', $this->academic_year)->select('id', 'test_id', 'q_no', 'answer')
+                ->get()->groupBy('test_id')->toArray();
 
-                if (count($bulkData) >= $batchSize) {
-                    $totalProcessed += $this->processBatch($bulkData);
-                    $bulkData = [];
+
+            $bulkData = [];
+            $uniqueTests = [];
+
+            foreach ($answers as $answer) {
+                $testId = $answer['test_id'];
+                $uniqueTests[$testId] = $answer['test_name'] ?? '';
+
+                if (!isset($examAnswers[$testId])) {
+                    continue;
+                }
+
+                foreach ($examAnswers[$testId] as $row) {
+                    $key = "a{$row->q_no}";
+                    $ans = $answer[$key] ?? '';
+
+                    if (empty($ans)) {
+                        continue;
+                    }
+
+                    $ansKey = array_filter(explode('|', $ans));
+
+                    if (count($ansKey) > 0) {
+                        $mark = in_array($row->answer, $ansKey) ? 4 : -1;
+                        $answerKey = $ans;
+                    } else {
+                        $mark = null;
+                        $answerKey = 'DEL';
+                    }
+
+                    $bulkData[] = [
+                        'id' => $row->id,
+                        'answer_key' => $answerKey,
+                        'mark' => $mark,
+                    ];
                 }
             }
+
+            if (empty($bulkData)) {
+                return back()->with('error', 'No valid answers to process.');
+            }
+
+
+            $batchSize = 1000;
+            $chunks = array_chunk($bulkData, $batchSize);
+
+            foreach ($chunks as $chunk) {
+                DB::table('exam_answer')->upsert(
+                    $chunk,
+                    ['id'],
+                    ['answer_key', 'mark']
+                );
+            }
+
+
+            $filename = date('Y-m-d_H-i-s') . '_' . pathinfo($originalFileName, PATHINFO_FILENAME) . '.csv';
+            $request->file('answer_key')->move('answer_key', $filename);
+            $path = 'answer_key/' . $filename;
+
+
+            DB::table('key_log')->insert([
+                'file_name' => $originalFileName,
+                'upload_time' => $uploadTime,
+                'test_name' => implode(',', array_unique($uniqueTests)),
+                'path' => $path,
+                'test_id' => implode(',', array_keys($uniqueTests)),
+                'no_rows' => count($answers),
+                'type' => 'answer_key',
+            ]);
+
+            $totalRecords = count($bulkData);
+            return redirect()->back()->with('success', "Answer key uploaded successfully. Processed {$totalRecords} records.");
+        } catch (\Exception $e) {
+            \Log::error('Answer Key Upload Error: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred during upload. Check logs for details.');
         }
-
-        if (!empty($bulkData)) {
-            $totalProcessed += $this->processBatch($bulkData);
-        }
-
-        $originalFileName = $request->answer_key->getClientOriginalName();
-        $filename = date('Y-m-d H-i-s').$originalFileName;
-        $request->answer_key->move('answer_key', $filename);
-        $path = 'answer_key/' . $filename;
-
-        DB::table('key_log')->insert([
-            'file_name' => $originalFileName,
-            'upload_time' => now(),
-            'test_name' => implode(',', array_unique(array_column($answers, 'test_name'))),
-            'path' => $path,
-            'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
-            'no_rows' => count($answers),
-            'type' => 'answer_key',
-        ]);
-
-
-        return redirect()->back()->with('success', "Answer key uploaded successfully. Processed {$totalProcessed} records.");
-    }
-
-
-    private function getExamAnswers(array $testIds)
-    {
-        return DB::table('exam_answer')
-            ->whereIn('test_id', $testIds)
-            ->where('answer', '>', 0)
-            ->where('academic_year', $this->academic_year)
-            ->get()
-            ->groupBy('test_id');
-    }
-
-    private function prepareAnswerData($row, $answer)
-    {
-        $key = "a{$row->q_no}";
-        $ans = $answer[$key] ?? '';
-        $ansKey = explode('|', $ans);
-
-        $mark = array_sum($ansKey) > 0 ? (in_array($row->answer, $ansKey) ? 4 : -1) : null;
-
-        return [
-            'id' => $row->id,
-            'answer_key' => array_sum($ansKey) > 0 ? $ans : 'DEL',
-            'mark' => $mark
-        ];
-    }
-
-    private function processBatch(array $batchData)
-    {
-        DB::table('exam_answer')->upsert($batchData, ['id'], ['answer_key', 'mark']);
-        return count($batchData);
     }
 
     public function Dump_Report(Request $request)
