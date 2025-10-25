@@ -1,8 +1,24 @@
 @extends('layouts.app')
-@section('title', 'Question Key')
+@section('title', 'Section Wise Report')
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+<style>
+    table {
+        width: 100%;
+        overflow-x: auto !important;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #000;
+        padding: 5px;
+        color: #000 !important;
+    }
+    th {
+        background-color: #007bff !important;
+        color: #fff !important;
+    }
+</style>
 @endsection
 
 @section('main')
@@ -35,7 +51,7 @@
                 @endif
 
                 <div class="col-md-10 col-sm-12 mb-3">
-                  <h6 class="col-deep-purple">Exam Section Wise Report</h6>
+                  <h6 class="col-deep-purple">Section Wise Report</h6>
                 </div>
              
 
@@ -67,7 +83,7 @@
               
               <div class="col-md-8">
                 <div class="table-responsive">
-                  <table class="table table-striped">
+                  <table>
                     <thead>
                       <tr>
                         <th>#</th>
@@ -91,7 +107,7 @@
               </div>
 
 
-              <form method="get" class="col-md-4" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
+              {{-- <form method="get" class="col-md-4" onsubmit="return confirm('Are you sure you want to publish?')" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
                 <input type="hidden" name="test_name" value="{{ $test_name }}">
                 <div class="form-group">
                   <label>Result Publish</label>
@@ -103,7 +119,7 @@
                 <div class="form-group">
                   <button class="btn btn-primary m-b-20" type="Submit">Publish</button>
                 </div>
-              </form>
+              </form> --}}
 
               
 

@@ -146,7 +146,7 @@ class StudentController extends Controller
         $tests = DB::table("exam_answer as a")->join('exam as b', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get();
         $subjectexam = null;
         if($request->exam){
-           $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderBy('id')->get();
+           $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         }
         return view('student.marksheet', compact('tests', 'subjectexam'));
     }

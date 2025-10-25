@@ -89,11 +89,11 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/perviousexamresult/{student_id}/{subject}', function (Request $request, $student_id,$subject) {
-        $subjectexam = ExamSubjectReport::where("subject", "like", "%$subject%")->where("stuid", $student_id)->orderBy('id')->get();
+        $subjectexam = ExamSubjectReport::where("subject", "like", "%$subject%")->where("stuid", $student_id)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         $header = $subjectexam->first()?->Header($subject);
         $subjectexam = $subjectexam->map(function ($subjectexam) use ($subject) {
             return [
-              'exam_date' => $subjectexam->exam_date,
+              'exam_date' => $subjectexam->exdate,
               'subject' => $subjectexam->subject,
               'scores' => $subjectexam->getScoresForHeader($subject),
             ];
