@@ -86,21 +86,22 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     // Exams
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {
-        Route::get('exam/instruction/{test_id}', 'instruction')->name('exam.instruction');
-        Route::post('exam/testcategory', 'TestCategory')->name('exam.testcategory');
-        Route::get('enable/exam', 'enable')->name('exam.enable');
-        Route::post('enable/exam', 'enableExam')->name('exam.enableExam');
-        Route::get('test/exam', 'test')->name('exam.test');
-        Route::post('exam/test/download', 'downloadTestReport')->name('exam.test.download');
-        Route::get('offline/exam', 'offline')->name('exam.offline.index');
-        Route::post('offline/exam', 'offlineUpload')->name('exam.offline.upload');
-        Route::get('answerkey/exam', 'answerKey')->name('exam.answerkey');
-        Route::post('answerkey/exam', 'uploadAnswerKey')->name('exam.answerkey.upload');
-        Route::get('exam/report/dump', 'Dump_Report')->name('exam.report.dump');
-        Route::delete('answerkey/delete/{id}/{test_id}', 'deleteAnswerKey')->name('answerkey.delete');
-        Route::delete('offline/delete/{id}/{test_id}', 'deleteOfflineKey')->name('offline.delete');
-        Route::get('/exam/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
+        Route::get('examination/instruction/{test_id}', 'instruction')->name('exam.instruction');
+        Route::post('examination/testcategory', 'TestCategory')->name('exam.testcategory');
+        Route::get('examination/enable', 'enable')->name('exam.enable');
+        Route::post('examination/enable', 'enableExam')->name('exam.enableExam');
+        Route::get('examination/test', 'test')->name('exam.test');
+        Route::post('examination/test/download', 'downloadTestReport')->name('exam.test.download');
+        Route::get('examination/offline', 'offline')->name('exam.offline.index');
+        Route::post('examination/offline', 'offlineUpload')->name('exam.offline.upload');
+        Route::get('examination/answerkey', 'answerKey')->name('exam.answerkey');
+        Route::post('examination/answerkey', 'uploadAnswerKey')->name('exam.answerkey.upload');
+        Route::get('examination/report/dump', 'Dump_Report')->name('exam.report.dump');
+        Route::delete('examination/answerkey/delete/{id}/{test_id}', 'deleteAnswerKey')->name('answerkey.delete');
+        Route::delete('examination/offline/delete/{id}/{test_id}', 'deleteOfflineKey')->name('offline.delete');
+        Route::get('examination/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
     });
+    
     Route::resource('examportion', ExamPortionController::class);
 
     Route::resource('chairmanvideo', ChairmanVideoController::class);
