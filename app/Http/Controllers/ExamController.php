@@ -368,7 +368,7 @@ class ExamController extends Controller
         $filename = now()->format('Y-m-d H-i-s') . '-' . $originalName;
         $path = $file->storeAs('answer_key', $filename, 'public');
 
-        DB::table('key_log')->create([
+        DB::table('key_log')->insert([
             'file_name' => $originalName,
             'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
