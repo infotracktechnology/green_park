@@ -70,7 +70,7 @@
                       <tbody>
                         @foreach($exams as $exam)
                         <tr>
-                          <td>{{ $exam->testid }}<input type="hidden" name="ids[]" value="{{ $exam->id }}"></td>
+                          <td>{{ $exam->testid }}<input type="hidden" name="names[]" value="{{ $exam->name }}"></td>
                           <td>{{ $exam->name }}</td>
                           <td>{{ $exam->testcategory }}</td>
                           <td>{{ $exam->total_questions }}</td>
@@ -78,8 +78,8 @@
                           <td>
                             <select name="publish[]" class="form-control form-control-sm" required>
                              <option value="">Select Option</option>
-                             <option value="Yes" @selected($exam->publish=='Yes')>Yes</option>
-                             <option value="No" @selected($exam->publish=='No')>No</option>
+                             <option value="Yes">Yes</option>
+                             <option value="No">No</option>
                             </select>
                           </td>
                         </tr>

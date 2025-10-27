@@ -614,27 +614,21 @@ class ExamController extends Controller
  public function Publish(Request $request){
     $exams = [];
     if($request->start_date && $request->end_date){
-        $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->get();
+        $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions")->groupBy('name')->get();
     }
 
     if($request->isMethod('post')){
         $markranges = $request->file('markrange', []);
         $publishs = $request->input('publish', []);
-        foreach($request->ids as $key => $id){
-            $exam = Exam::find($id);
-            if(file_exists($exam->markrange)) { 
-             unlink($exam->markrange); 
-             $exam->markrange = null; 
-            }
-            
-            $exam->publish = $publishs[$key] ?? 'No';
+        foreach($request->names as $key => $name){   
+            $exam['publish'] = $publishs[$key] ?? 'No';
             if (isset($markranges[$key]) && $markranges[$key]->isValid()) {
                 $file = $markranges[$key];
                 $filename = time().'-'.$file->getClientOriginalName();
                 $file->move('assets/markrange', $filename);
-                $exam->markrange = 'assets/markrange/'.$filename;
+                $exam['markrange'] = 'assets/markrange/'.$filename;
             }
-            $exam->save();
+            Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
         }
         return redirect()->route('exam.publish')->with('success', 'Exams Published Successfully.');
     }
