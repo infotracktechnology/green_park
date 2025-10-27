@@ -56,9 +56,8 @@
              
 
               <div class="col-md-12">
-                <form method="get" id="myForm" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
+                <form method="post" id="myForm" action="{{ route('report.section_exam') }}" enctype="multipart/form-data">
                   <div class="row">
-
                     <div class="form-group col-lg-4">
                       <label>Test Name</label>
                       <select name="test_name" id="test_name" class="select2" required>
@@ -70,12 +69,18 @@
                         @endforeach
                       </select>
                     </div>
-
-                    <div class="form-group col-lg-2">
-                      <label>&nbsp;</label>
-                      <button type="submit" class="btn btn-primary btn-block">Submit</button>
-                    </div>
                   </div>
+
+                  <div class="row">
+                      <button type="submit" class="btn btn-primary m-2">Least Attempted Questions</button>
+                      <button type="submit" class="btn btn-primary m-2">Common Track Wise Objective Toppers</button>
+                      <button type="submit" class="btn btn-primary m-2">Error List Analysis</button>
+                      <button type="submit" class="btn btn-primary m-2">Objective Branch Wise Total Marks</button>
+                      <button type="submit" class="btn btn-primary m-2">Objective Section Wise Total Marks </button>
+                      <button type="submit" class="btn btn-primary m-2">Section Wise Topper Marks</button>
+                      <button type="submit" class="btn btn-primary m-2">Student Subject Wise Marks</button>
+                    </div>
+
                 </form>
               </div>
 

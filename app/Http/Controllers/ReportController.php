@@ -129,7 +129,7 @@ class ReportController extends Controller
         return view('report.sectionlist', compact('grouped'));
     }
     public function ExaminationAnalysis(Request $request) {
-        $tests = Exam::where('academic_year', $this->academic_year)->get();
+        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
         return view('report.examinationanalysis', compact('tests'));
     }
 }
