@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -13,13 +14,12 @@ class RevisionVideoController extends Controller
     public function index()
     {
         $academic_years = AcademicYear::all();
-        
-        $revisionvideos = RevisionVideo::when($this->academic_year, function ($query) {
-            $query->where('academic_year', $this->academic_year);
-        })
-        ->latest()
-        ->get();
-    
+
+        $revisionvideos = RevisionVideo::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+            })->get();
+
         return view('revisionvideo.index', compact('revisionvideos'));
     }
 
@@ -28,100 +28,85 @@ class RevisionVideoController extends Controller
         return view('revisionvideo.create');
     }
 
-    public function store(Request $request,ImportController $import)
+    public function store(Request $request)
     {
-        if ($request->hasFile('file')) {
-           
-            $csvData = $import->parseCSV($request->file->getRealPath());
-            
-    
-            foreach ($csvData as $data) {
-                
-                if(!isset($data['subject']) || !isset($data['video_id'])){
-                    return redirect()->back()->with('error', 'Subject, Chapter and Video ID fields are required.');
-                }
+        $data = $request->except('file', '_token');
+        $revisionvideos = [];
 
-                
-    
-    
-                $subject = trim($data['subject'] ?? 'Unknown');
-                $chapter = trim($data['chapter'] ?? 'Unknown');
-                $expire_at = $request->expire_at;
-                $video_id = trim($data['video_id'] ?? '0');
-                $academic_year = $request->academic_year ?? $this->academic_year;
-    
-                RevisionVideo::create([
-                    'subject' => $subject,
-                    'chapter' => $chapter,
-                    'expire_at' => $expire_at,
-                    'video_id' => $video_id,
-                    'academic_year' => $academic_year,
-                ]);
-            }
-    
-            return redirect()->back()->with('success', 'Revision videos uploaded successfully!');
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
-    
-        return redirect()->back()->with('error', 'No file selected for upload.');
-        // try {
-        //     RevisionVideo::create($request->all());
-        //     return redirect()->route('RevisionVideo.index')->with('success', 'Class video added successfully!');
-        // } catch (\Exception $e) {
-        //     return redirect()->back()->with('error', 'Failed to add class video! ' . $e->getMessage());
-        // }
-    }
-    
-        public function destroy($id){
-        $video = RevisionVideo::findOrFail($id);
-        $video->delete();
+        $file = $request->file('file');
+        $csvData = array_map('str_getcsv', file($file->getRealPath()));
 
+        if (empty($csvData)) {
+            return back()->with('error', 'CSV file is empty.');
+        }
+
+        $header = array_map('trim', array_shift($csvData));
+
+        foreach ($csvData as $row) {
+            $row = array_map('trim', $row);
+            $record = array_combine($header, $row);
+            if (empty($record['subject']) || empty($record['video_id'])) {
+                return back()->with('error', 'Subject and Video ID fields are required.');
+            }
+            $revisionvideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown']);
+        }
+
+        RevisionVideo::insert($revisionvideos);
+        return redirect()->route('revisionvideo.index')->with('success', 'Class videos uploaded successfully.');
+    }
+
+    public function destroy(RevisionVideo $revisionvideo)
+    {
+        $revisionvideo->delete();
         return redirect()->route('revisionvideo.index')->with('success', 'Revision Video deleted successfully!');
     }
 
 
 
-    public function edit($id){
-    $video = RevisionVideo::findOrFail($id);
-    return view('revisionvideo.edit', compact('video'));
-}
+    public function edit(RevisionVideo $revisionvideo)
+    {
+        $type = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-public function update(Request $request, $id)
-{
-    
-    try {
-        $RevisionVideo = RevisionVideo::findOrFail($id);
-        $RevisionVideo->update($request->all());
-        return redirect()->route('revisionvideo.index')->with('success', 'Revision video updated successfully!');
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Failed to update class video! ' . $e->getMessage());
+        $section = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, $revisionvideo->type, $revisionvideo->category, $revisionvideo->batch, $revisionvideo->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, $revisionvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+        
+        return view('revisionvideo.edit', compact('revisionvideo', 'type', 'section', 'students'));
     }
-}
+
+    public function update(Request $request, RevisionVideo $revisionvideo) {
+        $data = $request->all();
+
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
+        $revisionvideo->update($data);
+        return redirect()->route('revisionvideo.index')->with('success', 'Video updated successfully.');
+    }
 
 
     public function revisionvideo(Request $request)
     {
-        $datetime = date('Y-m-d H:i:s');
-        $academic_year = auth()->user()->academic_year;
-        $revisionvideos = RevisionVideo::where('expire_at', '>=', $datetime)->where('academic_year', $academic_year)->get();
+        $student = Student::where('student_id', auth()->user()->student_id)->first();
+        $revisionvideos = RevisionVideo::ForStudent($student);
         return view('student.revisionvideo', compact('revisionvideos'));
     }
 
-  
+
     public function bulkDelete(Request $request)
-{
-    $ids = explode(",", $request->ids);
+    {
+        $ids = explode(",", $request->ids);
 
-    if (empty($ids)) {
-        return response()->json(['message' => 'No videos selected'], 400);
+        if (empty($ids)) {
+            return response()->json(['message' => 'No videos selected'], 400);
+        }
+
+        RevisionVideo::whereIn('id', $ids)->delete();
+
+        return response()->json(['message' => RevisionVideo::whereIn('id', $ids)], 200);
     }
-
-    RevisionVideo::whereIn('id', $ids)->delete();
-
-    return response()->json(['message' => 'Selected videos deleted successfully!'], 200);
 }
-
-    
-    
-}
-
-

@@ -27,17 +27,17 @@
                            <!-- Test ID Dropdown -->
                            <div class="form-group col-lg-3">
                               <label>Test ID</label>
-                              <select name="test_id" id="test_id" class="form-control form-control-sm " required>
+                              <select name="test_id" id="test_id" class="select2" required>
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
-                                    <option value="{{ $test->id }}" @if($test->id == $testId) selected @endif>{{ $test->name }}</option>
+                                    <option value="{{ $test->testid }}" @selected($test->testid == $testId)>{{ $test->name }}</option>
                                  @endforeach
                               </select>
                            </div>
 
-                           <div class="form-group col-lg-3">
+                           <div class="form-group col-lg-4">
                               <label>Student</label>
-                              <select name="student_id" id="student_id" class="form-control form-control-sm select2" required>
+                              <select name="student_id" id="student_id" class="select2" required>
                                   <option value="">Select Student</option>
                                   @foreach ($students as $student)
                                       <option value="{{ $student->id }}">{{ $student->name }}</option>

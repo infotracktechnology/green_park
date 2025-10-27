@@ -8,9 +8,8 @@
 <div class="main-content">
     <div class="section-body">
         <div class="row">
-            <div class="col-md-6 col-lg-12 col-xl-8">
-                
-                @if(isset($chairmanvideo->video_id))
+            <div class="col-md-6 col-lg-12 col-xl-8"> 
+    @if(isset($chairmanvideo->video_id))
     @php
         $videoId = $chairmanvideo->video_id ?? null;
     @endphp

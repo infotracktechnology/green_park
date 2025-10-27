@@ -13,6 +13,6 @@ class Options extends Model
 
     protected $guarded = [];
     protected $casts = [
-        'value' => 'json',
+        'value' => 'array',
     ];
 }

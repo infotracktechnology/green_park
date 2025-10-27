@@ -3,13 +3,6 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
-use App\Models\Announcement;
-use App\Models\Branch;
-use App\Models\Chairmanvideo;
-use App\Models\Examportion;
-use App\Models\ExamAnswer;
-use App\Models\AnswerKey;
-use App\Models\QuestionKey;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\DB;
@@ -41,64 +34,14 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
+            $model->student_id = self::generateId($model->course);
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
-            $model->user_name = self::generateName($model->coaching_type,$model->student_id);
+            $model->user_name = self::generateName($model->course,$model->student_id);
         });
-        // static::created(function ($model) {
-          
-        //     $model->save();
-        // });
     }
 
-
-    function chairmanvideo()
-    {
-        return Chairmanvideo::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('gender', 'like', "%$this->gender%")->where('academic_year', $this->academic_year)->latest()->first();
-    }
-    function examportion()
-    {
-        return Examportion::where('branch_id', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year);
-    }
-
-    public function answerkey()
-    {
-        return AnswerKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->take(5)->get();
-    }
-
-    public function questionkey()
-    {
-        return QuestionKey::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->take(5)->get();
-    }
-
-    public function downloads()
-    {
-        return Download::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->get();
-    }
-
-    public function worksheet()
-    {
-        return Worksheet::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->get();
-    }
-
-    public function achievements()
-    {
-        return Achievement::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('academic_year', $this->academic_year)->latest()->get();
-    }
-
-
-
-    public function classvideo($subject = ''){
-        $datetime = date('Y-m-d H:i:s');
-        return ClassVideo::where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->where('academic_year', $this->academic_year)->get();
-    }
-    
-
-    public function discussionvideos($subject = '')
-    {
-        $datetime = date('Y-m-d H:i:s');
-        return DiscussionVideo::where('branch', 'like', "%$this->campus%")->where('coaching_type', 'like', "%$this->coaching_type%")->where('start_at', '<=', $datetime)->where('end_at', '>=', $datetime)->where('subject', $subject)->where('academic_year', $this->academic_year)->get();
-    }
+  
 
     public function fees()
     {
@@ -129,17 +72,24 @@ class Student extends Authenticatable
         return $password;
     }
 
-    private static function generateID(){
-            return $this->max('student_id') + 1;
+   private static function generateId($course){
+    $lastId = self::where('course', $course)->max('student_id');
+    $nextyear = substr(date('Y')+1, -2);
+    if ($lastId) {
+        return $lastId + 1;
+    } else {
+        return $nextyear.'00001';
     }
+ }
 
-    private static function generateName($coaching_type,$student_id){
-        if($coaching_type == "XI - OB" || $coaching_type == "XII - OB"){
+    private static function generateName($course,$student_id){
+        if($course == "XI - OB" || $course == "XII - OB"){
             return 'S'.$student_id;
         }else{
             return 'L'.$student_id;
         }
     }
+    
     public function calculateCurrentMonthStats(string $studentId): object
     {
         $startOfMonth = now()->startOfMonth();
@@ -188,6 +138,35 @@ class Student extends Authenticatable
             $query->where('gender', $gender);
         }
         return $query;
+    }
+
+     public  function GetExam()
+    {
+        return Exam::query()
+            ->where(function ($query) {
+                $query->where('usertype', 'INDIVIDUAL')
+                    ->where('students', $this->student_id)
+                    ->where('start_at', '<=', date('Y-m-d H:i:s'))
+                    ->where('end_at', '>=', date('Y-m-d H:i:s'));
+            })
+            ->orWhere(function ($query){
+                $query->where('academic_year', $this->academic_year)
+                    ->where('course', $this->course)
+                    ->where('branch', 'like', "%{$this->campus}%")
+                    ->where('coaching_type', 'like', "%{$this->coaching_type}%")
+                    ->when($this->coaching_type === 'OFFLINE', function ($q){
+                        if (in_array($this->course, ['NEET', 'JEE'])) {
+                            if (in_array($this->campus, [1, 4, 5])) {
+                                $q->where('category', 'like', "%{$this->hostel_dayscholar}%");
+                            }
+                            $q->where('batch', 'like', "%{$this->batch}%");
+                        }
+                        $q->where('section', 'like', "%{$this->section}%");
+                    })
+                    ->whereIn('gender', [$this->gender, 'All'])
+                    ->where('start_at', '<=', date('Y-m-d H:i:s'))
+                    ->where('end_at', '>=', date('Y-m-d H:i:s'));
+            })->first();
     }
    
 }
