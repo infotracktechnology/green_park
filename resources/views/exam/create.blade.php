@@ -129,6 +129,11 @@
                     <input type="text" name="name" id="name" class="form-control form-control-sm" required>
                   </div>
 
+                  <div class="form-group col-lg-2">
+                    <label>Exam Date</label>
+                    <input type="date" value="{{ date('Y-m-d') }}" name="exam_date" class="form-control form-control-sm">
+                  </div>
+
                   <div class="form-group col-lg-12 d-flex align-items-start">
 
                     <div class="col-lg-3 form-check d-flex flex-column align-items-start">

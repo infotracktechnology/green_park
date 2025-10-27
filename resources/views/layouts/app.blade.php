@@ -168,7 +168,8 @@
               <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
               <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
               <li><a href="{{ route('exam.report.dump') }}" class="nav-link">Subject Wise Mark Report</a></li>
-              <li><a href="{{ route('report.section_exam') }}" class="nav-link">Section Wise Report</a></li>
+              <li><a href="{{ route('exam.publish')}}" class="nav-link">Exam Publish</a></li>
+              <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
             </ul>
           </li>
           <li class="dropdown">
@@ -179,8 +180,6 @@
               <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
               <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
               <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li>
-
-
             </ul>
           </li>
 

@@ -100,6 +100,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::delete('examination/answerkey/delete/{id}/{test_id}', 'deleteAnswerKey')->name('answerkey.delete');
         Route::delete('examination/offline/delete/{id}/{test_id}', 'deleteOfflineKey')->name('offline.delete');
         Route::get('examination/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
+        Route::match(['get', 'post'],'examination/publish','Publish')->name('exam.publish');
     });
     
     Route::resource('examportion', ExamPortionController::class);
