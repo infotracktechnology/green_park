@@ -157,6 +157,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/log', [ReportController::class, 'LogReport'])->name('log');
         Route::get('/attendance', [ReportController::class, 'AttendanceReport'])->name('attendance');
         Route::get('/section_exam', [ReportController::class, 'section_exam'])->name('section_exam');
+        Route::get('/examination/analysis', [ReportController::class, 'ExaminationAnalysis'])->name('exam_analyisis');
         Route::get('/batchlist', [ReportController::class, 'BatchList'])->name('batchlist');
         Route::match(['get', 'post'],'/sectionlist', [ReportController::class, 'SectionList'])->name('sectionlist');
     });
