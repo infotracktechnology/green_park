@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Exam;
+use App\Models\ExamAnswer;
 use App\Models\Student;
 use App\Models\Announcement;
 use App\Models\Attendance;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Providers\CsvServiceProvider;
+use Illuminate\Support\Facades\Response;
 
 class ReportController extends Controller
 {
@@ -129,7 +132,58 @@ class ReportController extends Controller
         return view('report.sectionlist', compact('grouped'));
     }
     public function ExaminationAnalysis(Request $request) {
-        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
+        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->orderBy('id', 'desc')->get();
         return view('report.examinationanalysis', compact('tests'));
+    }
+
+    public function LeastAttempted(Request $request) {
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->get();
+
+        if (!$exam) return back()->with('error', 'Exam not found.');
+
+        $csvData = [];
+        $csvData[] = ['Title', 'Least Attempted Questions'];
+        $csvData[] = ['Exam Name', $exam->first()?->name];
+        $csvData[] = [];
+        $csvData[] = ['S.NO', 'Q.NO', 'PERCENTAGE'];
+        $answers = ExamAnswer::whereIn('test_id',$exam->pluck('testid'))->selectRaw("q_no,count(student_id)total,sum(answer>0)least")->groupBy('q_no')->get();
+        foreach ($answers as $key => $answer) {
+            $csvData[] = [$key+1, $answer->q_no, round(($answer->least/$answer->total)*100, 2)];
+        }
+        $content = CsvServiceProvider::export($csvData);
+        return Response::make($content, 200, ['Content-Type' => 'text/csv','Content-Disposition' => 'attachment; filename="Least Attempted Questions.csv"']);
+    }
+
+     public function CommonTrackTopper(Request $request) {
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->get();
+        if (!$exam) return back()->with('error', 'Exam not found.');
+
+        $examname  = $exam->first()?->name;
+        $examdate  = $exam->first()?->exam_date;
+        $subjects = array_map('trim', explode(',', strtoupper($exam->first()?->subject_name)));
+
+        $csvData = [];
+        $csvData[] = ['Title', 'Common Track Topper'];
+        $csvData[] = ['Exam Name', $examname];
+        $csvData[] = [];
+
+        $csvData[] = array_merge(['S.No', 'Student ID', 'Student Name', 'Branch', 'Exam Date', 'Exam Name', 'Batch'],$subjects,['Total']);
+
+        $sumExpressions = [];
+        foreach ($subjects as $sub) {
+            $sumExpressions[] = "SUM(IF(subject = '{$sub}', mark, 0)) AS `{$sub}`";
+        }
+        $answers = ExamAnswer::whereIn('test_id',$exam->pluck('testid'))->selectRaw("student_id,sum(mark)mark,".implode(',', $sumExpressions))->groupBy('student_id')->orderBy('mark','desc')->get();
+
+        foreach ($answers as $key => $answer) {
+            $csvData[] = [$answer->student_id,$answer->student?->student_name,$answer->student?->branch?->name,$examdate,$examname,$answer->student?->batch];
+            foreach ($subjects as $sub) {
+            $csvData[] = $answer->$sub ?? 0;
+            }
+            $csvData[] = [$answer->mark];
+        }
+
+        $content = CsvServiceProvider::export($csvData);
+        return Response::make($content, 200, ['Content-Type' => 'text/csv','Content-Disposition' => 'attachment; filename="Common Track Topper.csv"']);
     }
 }

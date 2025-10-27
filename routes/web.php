@@ -160,6 +160,13 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/examination/analysis', [ReportController::class, 'ExaminationAnalysis'])->name('exam_analyisis');
         Route::get('/batchlist', [ReportController::class, 'BatchList'])->name('batchlist');
         Route::match(['get', 'post'],'/sectionlist', [ReportController::class, 'SectionList'])->name('sectionlist');
+        Route::post('/examination/leastattempted', [ReportController::class, 'LeastAttempted'])->name('leastattempted');
+        Route::post('/examination/commontracktopper', [ReportController::class, 'CommonTrackTopper'])->name('commontracktopper');
+        Route::post('/examination/errorlist', [ReportController::class, 'ErrorList'])->name('errorlist');
+        Route::post('/examination/branchwisemarks', [ReportController::class, 'BranchWiseMarks'])->name('branchwisemarks');
+        Route::post('/examination/sectionwisemarks', [ReportController::class, 'SectionWiseMarks'])->name('sectionwisemarks');
+        Route::post('/examination/sectionwisetopper', [ReportController::class, 'SectionWiseTopper'])->name('sectionwisetopper');
+        Route::post('/examination/subjectwisemarks', [ReportController::class, 'SubjectWiseMarks'])->name('subjectwisemarks');
     });
 });
 
