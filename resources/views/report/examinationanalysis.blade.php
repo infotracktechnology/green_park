@@ -36,12 +36,12 @@
 
                 <div class="row">
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.leastattempted') }}">Least Attempted Questions</button>
-                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.commontracktopper') }}">Common Track Wise Objective Toppers</button>
+                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.commontracktopper') }}">SUbject Wise Marks</button>
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.errorlist') }}">Error List Analysis</button>
-                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.branchwisemarks') }}">Objective Branch Wise Total Marks</button>
-                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.sectionwisemarks') }}">Objective Section Wise Total Marks</button>
+                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.branchwisemarks') }}">Branch Wise Marks Analysis</button>
+                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.sectionwisemarks') }}">Section Wise Marks Analysis</button>
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.sectionwisetopper') }}">Section Wise Topper Marks</button>
-                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.subjectwisemarks') }}">Student Subject Wise Marks</button>
+                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.subjectwisemarks') }}">Student Subject Wise Analysis</button>
                 </div>
               </form>
 
