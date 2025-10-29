@@ -213,10 +213,10 @@ class ReportController extends Controller
 
         $subjects = array_map('trim', explode(',', strtoupper($exam->subject_name)));
 
-        $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,mark,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,mark,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,mark,0)) AS `{$s}_UNATTEMPTED`,sum(IF(subject='$s',mark,0)) AS `{$s}_TOTAL`")->implode(',');
+        $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK")->implode(',');
 
 
-        $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("exam_answer.student_id, s.student_name, s.campus, s.batch, s.section,SUM(IF(mark=4,mark,0)) AS overall_correct,SUM(IF(mark=-1,mark,0)) AS overall_wrong,SUM(IF(mark=0,mark,0)) AS overall_unattempted,SUM(mark) AS total,$expr")->where('s.section', '!=', '')->groupBy('exam_answer.student_id')->orderBy('s.section')->orderByDesc('total')->get();
+        $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("exam_answer.student_id, s.student_name, s.campus, s.batch, s.section,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('exam_answer.student_id')->orderBy('s.section')->orderByDesc('total')->get();
 
         $csvHeaders = ['Section', 'Student ID', 'Student Name', 'Branch', 'Batch', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage', 'Overall Rank'];
 
@@ -235,13 +235,14 @@ class ReportController extends Controller
 
         foreach ($sectionToppers as $a) {
             $branch = Branch::find($a->campus);
-            $overallPct = round(($a->overall_correct / $a->total) * 100, 2);
+            $overallPct = round(($a->overall_correct / $a->overall_total) * 100, 2);
             $row = [$a->section, $a->student_id, $a->student_name, $branch?->name, $a->batch, $exam->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total, $overallPct, ''];
             foreach ($subjects as $s) {
                 $mark = $a->{"{$s}_CORRECT"} ?? 0;
                 $total = $a->{"{$s}_TOTAL"} ?: 0;
+                $total_mark = $a->{"{$s}_MARK"} ?: 0;
                 $per = round(($mark / $total) * 100, 2);
-                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total, $per, '');
+                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total_mark, $per, '');
             }
             $csvData[] = $row;
         }
@@ -257,12 +258,12 @@ class ReportController extends Controller
 
         $subjects = array_map('trim', explode(',', strtoupper($exam->subject_name)));
 
-        $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,mark,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,mark,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,mark,0)) AS `{$s}_UNATTEMPTED`,sum(IF(subject='$s',mark,0)) AS `{$s}_TOTAL`")->implode(',');
+        $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
 
-        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(IF(mark=4,mark,0)) AS overall_correct,SUM(IF(mark=-1,mark,0)) AS overall_wrong,SUM(IF(mark=0,mark,0)) AS overall_unattempted,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
+        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
 
-        $csvHeaders = ['Student ID', 'Student Name', 'Branch', 'Batch','Section','Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage', 'Overall Rank'];
+        $csvHeaders = ['Student ID', 'Student Name', 'Branch', 'Batch', 'Section', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage', 'Overall Rank'];
 
         foreach ($subjects as $s) {
             $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total", "{$s} Percentage", "{$s} Rank"]);
@@ -277,13 +278,14 @@ class ReportController extends Controller
 
 
         foreach ($answers as $a) {
-            $overallPct = round(($a->overall_correct / $a->total) * 100, 2);
+            $overallPct = round(($a->overall_correct / $a->overall_total) * 100, 2);
             $row = [$a->student_id, $a->student?->student_name, $a->student?->branch?->name, $a->student?->batch, $a->student?->section, $exam->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total, $overallPct, ''];
             foreach ($subjects as $s) {
                 $mark = $a->{"{$s}_CORRECT"} ?? 0;
                 $total = $a->{"{$s}_TOTAL"} ?: 0;
+                $total_mark = $a->{"{$s}_MARK"} ?: 0;
                 $per = round(($mark / $total) * 100, 2);
-                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total, $per, '');
+                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total_mark, $per, '');
             }
             $csvData[] = $row;
         }
@@ -356,7 +358,7 @@ class ReportController extends Controller
             return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$high}-{$low}`";
         })->implode(',');
 
-        $csvHeaders = ['SNo','Section', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
+        $csvHeaders = ['SNo', 'Section', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
         foreach ($ranges as $r) {
             $csvHeaders = array_merge($csvHeaders, ["{$r[0]}-{$r[1]}"]);
         }
