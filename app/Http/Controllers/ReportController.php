@@ -213,7 +213,7 @@ class ReportController extends Controller
 
         $subjects = array_map('trim', explode(',', strtoupper($exam->subject_name)));
 
-        $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK")->implode(',');
+        $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
 
         $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("exam_answer.student_id, s.student_name, s.campus, s.batch, s.section,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('exam_answer.student_id')->orderBy('s.section')->orderByDesc('total')->get();
@@ -365,7 +365,7 @@ class ReportController extends Controller
 
         $studentmark = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(mark) AS total")->groupBy('student_id');
 
-        $results = Student::leftJoinSub($studentmark, 'c', fn($join) => $join->on('c.student_id', '=', 'student.student_id'))->selectRaw("student.section,count(student.student_id)actual_str,count(c.student_id)appeared_str,max(c.total)max_marks,min(c.total)min_marks,$rangeExprs")->where('student.section', '!=', '')->groupBy('student.section')->orderBy('student.section')->get();
+        $results = Student::joinSub($studentmark, 'c', fn($join) => $join->on('c.student_id', '=', 'student.student_id'))->selectRaw("student.section,count(student.student_id)actual_str,count(c.student_id)appeared_str,max(c.total)max_marks,min(c.total)min_marks,$rangeExprs")->where('student.section', '!=', '')->groupBy('student.section')->orderBy('student.section')->get();
 
         $csvData = [
             ['Title', 'Section Wise Marks'],
