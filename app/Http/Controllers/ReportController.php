@@ -216,12 +216,12 @@ class ReportController extends Controller
         $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
 
-        $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("exam_answer.student_id, s.student_name, s.campus, s.batch, s.section,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('exam_answer.student_id')->orderBy('s.section')->orderByDesc('total')->get();
+        $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("exam_answer.student_id, s.student_name, s.campus, s.batch, s.section,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->where('s.section', '!=', '')->groupBy('exam_answer.student_id')->orderBy('s.section')->orderByDesc('total')->get();
 
-        $csvHeaders = ['Section', 'Student ID', 'Student Name', 'Branch', 'Batch', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage', 'Overall Rank'];
+        $csvHeaders = ['Section', 'Student ID', 'Student Name', 'Branch', 'Batch', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage'];
 
         foreach ($subjects as $s) {
-            $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total", "{$s} Percentage", "{$s} Rank"]);
+            $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total", "{$s} Percentage"]);
         }
 
         $csvData = [
@@ -236,13 +236,13 @@ class ReportController extends Controller
         foreach ($sectionToppers as $a) {
             $branch = Branch::find($a->campus);
             $overallPct = round(($a->overall_correct / $a->overall_total) * 100, 2);
-            $row = [$a->section, $a->student_id, $a->student_name, $branch?->name, $a->batch, $exam->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total, $overallPct, ''];
+            $row = [$a->section, $a->student_id, $a->student_name, $branch?->name, $a->batch, $exam->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total, $overallPct];
             foreach ($subjects as $s) {
                 $mark = $a->{"{$s}_CORRECT"} ?? 0;
                 $total = $a->{"{$s}_TOTAL"} ?: 0;
                 $total_mark = $a->{"{$s}_MARK"} ?: 0;
                 $per = round(($mark / $total) * 100, 2);
-                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total_mark, $per, '');
+                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total_mark, $per);
             }
             $csvData[] = $row;
         }
@@ -260,52 +260,52 @@ class ReportController extends Controller
 
         $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
-
         $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
 
-        $csvHeaders = ['Student ID', 'Student Name', 'Branch', 'Batch', 'Section', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage', 'Overall Rank'];
+        $overallRanks = $answers->sortByDesc('total')->values()->mapWithKeys(fn($a, $i) => [$a->student_id => $i + 1]);
 
+        $subjectRanks = [];
+        foreach ($subjects as $s) {
+            $subjectRanks[$s] = $answers->sortByDesc("{$s}_MARK")->values()->mapWithKeys(fn($a, $i) => [$a->student_id => $i + 1]);
+        }
+
+        $csvHeaders = ['Student ID', 'Student Name', 'Branch', 'Batch', 'Section', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage', 'Overall Rank'];
         foreach ($subjects as $s) {
             $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total", "{$s} Percentage", "{$s} Rank"]);
         }
-
-        $csvData = [
-            ['Title', 'Subject Wise Marks'],
-            ['Exam Name', $exam->name],
-            [],
-            $csvHeaders
-        ];
-
-
+        $csvData = [['Title', 'Subject Wise Marks'], ['Exam Name', $exam->name], [], $csvHeaders];
         foreach ($answers as $a) {
             $overallPct = round(($a->overall_correct / $a->overall_total) * 100, 2);
-            $row = [$a->student_id, $a->student?->student_name, $a->student?->branch?->name, $a->student?->batch, $a->student?->section, $exam->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total, $overallPct, ''];
+            $row = [$a->student_id, $a->student?->student_name, $a->student?->branch?->name, $a->student?->batch, $a->student?->section, $exam->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total, $overallPct, $overallRanks[$a->student_id] ?? ''];
             foreach ($subjects as $s) {
                 $mark = $a->{"{$s}_CORRECT"} ?? 0;
                 $total = $a->{"{$s}_TOTAL"} ?: 0;
                 $total_mark = $a->{"{$s}_MARK"} ?: 0;
-                $per = round(($mark / $total) * 100, 2);
-                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total_mark, $per, '');
+                $per = $total ? round(($mark / $total) * 100, 2) : 0;
+                array_push($row, $mark, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $total_mark, $per, $subjectRanks[$s][$a->student_id] ?? '');
             }
             $csvData[] = $row;
         }
         return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Subject_Wise_Marks.csv"']);
     }
+    
     public function BranchWiseMarks(Request $request)
     {
         $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->first();
         if (!$exam) return back()->with('error', 'Exam not found.');
-        $minMarks = 0;
-        $maxMarks = $exam->total_questions * 4;
-        $rangeSize = ceil(($maxMarks - $minMarks) / 6);
-        $ranges = [];
-        $start = $maxMarks;
+        $testcategory = strtoupper($exam->testcategory);
 
-        for ($i = 0; $i < 6; $i++) {
-            $end = max($start - $rangeSize + 1, $minMarks);
-            $ranges[] = [$start, $end];
-            $start -= $rangeSize;
-        }
+        $ranges = match ($testcategory) {
+            'GRAND TEST' => [[700, 720], [651, 659], [601, 650], [551, 600], [501, 550], [451, 500], [351, 450], [251, 350], [151, 250], [1, 150]],
+            'WEEKEND (PHYSICS)' => [[91, 120], [61, 90], [31, 60], [1, 30]],
+            'WEEKEND (CHEMISTRY)' => [[141, 180], [101, 140], [51, 100], [1, 50]],
+            'WEEKEND (BOTANY)' => [[221, 240], [201, 220], [181, 200], [121, 180], [61, 120], [1, 60]],
+            'WEEKEND (ZOOLOGY)' => [[221, 240], [201, 220], [181, 200], [121, 180], [61, 120], [1, 60]],
+            'CUMULATIVE (PHYZOO)' => [[351, 400], [301, 350], [251, 300], [201, 250], [151, 200], [101, 150], [1, 100]],
+            'CUMULATIVE (CHEBOT)' => [[351, 400], [301, 350], [251, 300], [201, 250], [151, 200], [101, 150], [1, 100]],
+            default => [[101, 120], [81, 100], [61, 80], [41, 60], [21, 40], [1, 20]],
+        };
+
 
         $rangeExprs = collect($ranges)->map(function ($r) {
             [$high, $low] = $r;
@@ -341,17 +341,18 @@ class ReportController extends Controller
     {
         $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->first();
         if (!$exam) return back()->with('error', 'Exam not found.');
-        $minMarks = 0;
-        $maxMarks = $exam->total_questions * 4;
-        $rangeSize = ceil(($maxMarks - $minMarks) / 6);
-        $ranges = [];
-        $start = $maxMarks;
+        $testcategory = strtoupper($exam->testcategory);
 
-        for ($i = 0; $i < 6; $i++) {
-            $end = max($start - $rangeSize + 1, $minMarks);
-            $ranges[] = [$start, $end];
-            $start -= $rangeSize;
-        }
+        $ranges = match ($testcategory) {
+            'GRAND TEST' => [[700, 720], [651, 659], [601, 650], [551, 600], [501, 550], [451, 500], [351, 450], [251, 350], [151, 250], [1, 150]],
+            'WEEKEND (PHYSICS)' => [[91, 120], [61, 90], [31, 60], [1, 30]],
+            'WEEKEND (CHEMISTRY)' => [[141, 180], [101, 140], [51, 100], [1, 50]],
+            'WEEKEND (BOTANY)' => [[221, 240], [201, 220], [181, 200], [121, 180], [61, 120], [1, 60]],
+            'WEEKEND (ZOOLOGY)' => [[221, 240], [201, 220], [181, 200], [121, 180], [61, 120], [1, 60]],
+            'CUMULATIVE (PHYZOO)' => [[351, 400], [301, 350], [251, 300], [201, 250], [151, 200], [101, 150], [1, 100]],
+            'CUMULATIVE (CHEBOT)' => [[351, 400], [301, 350], [251, 300], [201, 250], [151, 200], [101, 150], [1, 100]],
+            default => [[101, 120], [81, 100], [61, 80], [41, 60], [21, 40], [1, 20]],
+        };
 
         $rangeExprs = collect($ranges)->map(function ($r) {
             [$high, $low] = $r;
