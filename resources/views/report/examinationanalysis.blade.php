@@ -42,6 +42,7 @@
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.sectionwisemarks') }}">Section Wise Marks Analysis</button>
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.sectionwisetopper') }}">Section Wise Topper Marks</button>
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.subjectwisemarks') }}">Student Subject Wise Analysis</button>
+                   
                 </div>
               </form>
 
