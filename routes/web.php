@@ -167,6 +167,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('/examination/sectionwisemarks', [ReportController::class, 'SectionWiseMarks'])->name('sectionwisemarks');
         Route::post('/examination/sectionwisetopper', [ReportController::class, 'SectionWiseTopper'])->name('sectionwisetopper');
         Route::post('/examination/subjectwisemarks', [ReportController::class, 'SubjectWiseMarks'])->name('subjectwisemarks');
+        Route::post('/examination/overallmarkanalysis', [ReportController::class, 'OverallMarkAnalysis'])->name('overallmarkanalysis');
     });
 });
 

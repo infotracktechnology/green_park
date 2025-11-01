@@ -288,7 +288,7 @@ class ReportController extends Controller
         }
         return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Subject_Wise_Marks.csv"']);
     }
-    
+
     public function BranchWiseMarks(Request $request)
     {
         $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->first();
@@ -308,7 +308,7 @@ class ReportController extends Controller
 
 
         $rangeExprs = collect($ranges)->map(function ($r) {
-            [$high, $low] = $r;
+            [$low, $high] = $r;
             return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$high}-{$low}`";
         })->implode(',');
 
@@ -355,7 +355,7 @@ class ReportController extends Controller
         };
 
         $rangeExprs = collect($ranges)->map(function ($r) {
-            [$high, $low] = $r;
+            [$low, $high] = $r;
             return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$high}-{$low}`";
         })->implode(',');
 
@@ -382,5 +382,36 @@ class ReportController extends Controller
             $csvData[] = $row;
         }
         return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Section_Wise_Marks_Analysis.csv"']);
+    }
+    public function OverallMarkAnalysis(Request $request)
+    {
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->first();
+
+        if (!$exam) return back()->with('error', 'Exam not found.');
+
+        $subjects = array_map('trim', explode(',', strtoupper($exam->subject_name)));
+
+        $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
+
+        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
+
+      
+
+        $csvHeaders = ['Student ID', 'Student Name', 'Branch', 'Batch', 'Section', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total'];
+
+        foreach ($subjects as $s) {
+            $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total"]);
+        }
+
+        $csvData = [['Title', 'Subject Wise Marks'], ['Exam Name', $exam->name], [], $csvHeaders];
+        foreach ($answers as $a) {
+            $row = [$a->student_id, $a->student_name, $a->branch, $a->batch, $a->section, $a->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
+            foreach ($subjects as $s) {
+                $row = array_merge($row, [$a->{"{$s}_CORRECT"} ?? 0, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $a->{"{$s}_MARK"} ?? 0]);
+            }
+            $csvData[] = $row;
+        }
+
+        return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Subject_Wise_Marks.csv"']);
     }
 }
