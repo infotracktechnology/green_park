@@ -27,25 +27,27 @@ class ImportController extends Controller
             $file = $request->file('csv_file');
             $filePath = $file->getRealPath();
             $data = $this->parseCSV($filePath);
-
-           $data = array_map(function ($row) use ($request) {
-                $row['academic_year'] = $request->academic_year;
-                if($request->operation == 'add'){
-                $row['campus'] = $request->branch;
-                }
-                if(isset($row['password_1'])){
-                $row['password'] = bcrypt($row['password_1']);
-                }
-                return $row;
+            $data = array_map(function ($row) use ($request) {
+             $row['academic_year'] = $request->academic_year;
             }, $data);
-
             try{
-                Student::upsert($data, ['student_id'], array_keys($data[0]));
-                return back()->with('success', 'CSV file uploaded and data saved successfully!');
+             if($request->operation == 'add'){
+                foreach($data as $row){
+                    Student::create($row);
+                }
+             }
+             else{
+                foreach($data as $row){
+                    if(empty($row['student_id']) || !isset($row['student_id'])) continue;
+                    unset($row['password_1'], $row['user_name']);
+                    Student::where('student_id', $row['student_id'])->update($row);
+                }
+             }
             }
             catch(\Exception $e){
-                return back()->with('error', 'Error saving data:'.$e->getMessage());
+               return back()->with('error', 'Error: ' . $e->getMessage());
             }
+            return back()->with('success', 'File processed successfully.');
         }
         return back()->with('error', 'No data found in the file or file upload failed.');
     }

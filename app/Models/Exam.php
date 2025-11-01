@@ -24,4 +24,12 @@ class Exam extends Model
         return Branch::whereIn('id', explode(',', $this->branch))->get()->implode('name', '/');
     }
 
+    public static function FilterQuery($testcategory=''){
+        $query = self::query();
+        if($testcategory){
+            $query->where('testcategory', $testcategory);
+        }
+        return $query->groupBy('name')->get();
+    }
+
 }
