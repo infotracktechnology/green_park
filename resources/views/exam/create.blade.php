@@ -112,9 +112,14 @@
                     </select>
                   </div>
 
-                  <div class="form-group col-lg-3">
-                    <label>Test Category</label>
-                    <input type="text" name="testcategory"  class="form-control form-control-sm" required>
+                 <div class="form-group col-lg-3">
+                    <label>Test Category <button type="button" class="btn btn-link" data-toggle="modal" data-target="#categoryModal">Add <i class="fas fa-plus"></i></button></label>
+                    <select name="testcategory" class="form-control form-control-sm" required>
+                      <option value="">Select Test Category</option>
+                      @foreach ($testcategory as $row)
+                      <option value="{{$row}}">{{$row}}</option>
+                      @endforeach
+                    </select>
                   </div>
 
 

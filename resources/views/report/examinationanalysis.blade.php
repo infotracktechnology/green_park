@@ -24,16 +24,32 @@
 
               <form method="post" id="myForm" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group col-lg-4">
-                  <label>Test Name</label>
-                  <select name="test_name" id="test_name" class="select2 form-control" required>
-                    <option value="">Select Test</option>
-                    @foreach ($tests as $test)
-                    <option value="{{ $test->name }}">{{ $test->name }}</option>
-                    @endforeach
-                  </select>
-                </div>
 
+              <div class="row">
+               <div class="form-group col-lg-4">
+                      <label>Exam Category</label>
+                      <select name="testcategory" id="testcategory" class="select2" required>
+                        <option value="">Select Category</option>
+                        @foreach ($category as $row)
+                        <option value="{{ $row }}" @selected($row==request('testcategory'))>
+                          {{ $row }}
+                        </option>
+                        @endforeach
+                      </select>
+                    </div>
+
+                    <div class="form-group col-lg-4">
+                      <label>Exam Name</label>
+                      <select name="test_name" id="testname" class="select2" required>
+                        <option value="">Select Test</option>
+                        @foreach ($exams as $row)
+                        <option value="{{ $row}}" @selected($row==request('test_name'))> {{ $row }}</option>
+                        @endforeach
+                      </select>
+                    </div>
+
+              </div>
+              
                 <div class="row">
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.leastattempted') }}">Least Attempted Questions</button>
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.commontracktopper') }}">SUbject Wise Marks</button>
@@ -65,5 +81,8 @@
     let action = $(this).data('action');
     $('#myForm').attr('action', action).submit();
   });
+
+$('#testcategory').change(() => window.location = `{{ route('report.exam_analyisis') }}?testcategory=${$('#testcategory').val()}`);
+
 </script>
 @endsection

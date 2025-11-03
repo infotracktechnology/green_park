@@ -247,7 +247,7 @@
     const backbutton = `<div class="row m-b-10"><div class="col-md-2 offset-md-10"><a href="{{ url()->previous() }}" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back</a></div></div>`;
     $('.section-body').prepend(backbutton);
 
-    $('form[method="post"]').on('submit', function() {
+    $('form[method="post"]:not(.no-loader)').on('submit', function() {
       $(this).find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
     })
   </script>

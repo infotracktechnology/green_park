@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\Announcement;
 use App\Models\Attendance;
 use App\Models\Branch;
+use App\Models\Options;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -18,14 +19,17 @@ class ReportController extends Controller
 {
     public function section_exam(Request $request)
     {
-        $sections = Student::select('section')->distinct()->orderBy('section')->get();
-        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
-        $test_name = $request->test_name ?? 0;
+        $sections = Student::when(auth()->user()->branch,fn ($query) => $query->where('campus', auth()->user()->branch))->where('section', '!=', '')->select('section')->distinct()->orderBy('section')->get();
+    
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
 
-        if ($request->has('publish')) {
-            $testIds = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->update(['publish' => $request->publish]);
-            return view('report.section_exam', compact('sections', 'tests', 'test_name'));
-        }
+        $exams = [];
+
+       if($request->has('testcategory')) {
+        $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
+       }
+
+        $test_name = $request->test_name ?? 0;
 
         if ($request->query('type') == 'overall') {
             $testIds = Exam::where('name', $test_name)->pluck('testid')->toArray();
@@ -65,7 +69,7 @@ class ReportController extends Controller
             return view('report.omr_print', compact('formattedData', 'test_name', 'section'));
         }
 
-        return view('report.section_exam', compact('sections', 'tests', 'test_name'));
+        return view('report.section_exam', compact('sections','test_name', 'category', 'exams'));
     }
 
     public function LogReport(Request $request)
@@ -134,8 +138,14 @@ class ReportController extends Controller
     }
     public function ExaminationAnalysis(Request $request)
     {
-        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->orderBy('id', 'desc')->get();
-        return view('report.examinationanalysis', compact('tests'));
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $exams = [];
+
+        if($request->has('testcategory')) {
+            $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
+        }
+
+        return view('report.examinationanalysis', compact('category', 'exams'));
     }
     public function LeastAttempted(Request $request)
     {
@@ -356,7 +366,7 @@ class ReportController extends Controller
 
         $rangeExprs = collect($ranges)->map(function ($r) {
             [$low, $high] = $r;
-            return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$high}-{$low}`";
+            return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$low}-{$high}`";
         })->implode(',');
 
         $csvHeaders = ['SNo', 'Section', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
@@ -405,13 +415,13 @@ class ReportController extends Controller
 
         $csvData = [['Title', 'Subject Wise Marks'], ['Exam Name', $exam->name], [], $csvHeaders];
         foreach ($answers as $a) {
-            $row = [$a->student_id, $a->student_name, $a->branch, $a->batch, $a->section, $a->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
+            $row = [$a->student_id, $a->student?->student_name, $a->student?->branch?->name, $a->student?->batch, $a->student?->section, $a->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
             foreach ($subjects as $s) {
                 $row = array_merge($row, [$a->{"{$s}_CORRECT"} ?? 0, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $a->{"{$s}_MARK"} ?? 0]);
             }
             $csvData[] = $row;
         }
 
-        return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Subject_Wise_Marks.csv"']);
+        return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Overall_Marks_Analysis.csv"']);
     }
 }

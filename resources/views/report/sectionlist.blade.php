@@ -107,7 +107,7 @@
                   @endforeach
                 </div>
                 <div class="col-md-4">
-                  <form method="post" action="{{ route('report.sectionlist') }}" enctype="multipart/form-data">
+                  <form method="post" class="no-loader" action="{{ route('report.sectionlist') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group col-lg-12">
                       <label>Sections</label>
@@ -122,9 +122,16 @@
                       </select>
                     </div>
                     <div class="form-group col-lg-12">
-                      @foreach(["Attendance List"=>"attendancelist","Phone Number"=>"phonelist","Door List"=>"doorlist","ACINON AC LIST"=>"acnonaclist","SIGN LIST"=>"signlist","Photo List"=>"photolist"] as $key => $link)
-                      <button class="btn btn-primary m-t-10 m-r-10" name="view" value="{{ $link }}" type="submit">{{ $key }}</button>
+                      <label>Reports</label>
+                      <select name="view" class="form-control form-control-sm" required>
+                      <option value="">Select Report</option>
+                      @foreach(["Attendance List"=>"attendancelist","Phone Number"=>"phonelist","Door List"=>"doorlist","ACINON AC LIST"=>"acnonaclist","SIGN LIST"=>"signlist","Photo List"=>"photolist"] as $key => $link)                
+                        <option value="{{ $link }}">{{ $key }}</option>
                       @endforeach
+                      </select>
+                    </div>
+                     <div class="form-group col-lg-12">
+                      <button type="submit" class="btn btn-primary btn-block">Submit</button>
                     </div>
                   </form>
                 </div>
@@ -137,25 +144,4 @@
 @endsection
 
 @section('js')
-<script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
-<script src="{{asset('bundles/datatables/export-tables/dataTables.buttons.min.js')}}"></script>
-<script src="{{asset('bundles/datatables/export-tables/buttons.flash.min.js')}}"></script>
-<script src="{{asset('bundles/datatables/export-tables/jszip.min.js')}}"></script>
-<script src="{{asset('bundles/datatables/export-tables/buttons.print.min.js')}}"></script>
-
-<script>
-  $(document).ready(function () {
-    $("#myTable").DataTable({
-      dom: "Bfrtip",
-      buttons: [
-        {
-          extend: "excelHtml5",
-          footer: true,
-        }
-      ],
-      pageLength: 25,
-    });
-  });
-  
-</script>
 @endsection
