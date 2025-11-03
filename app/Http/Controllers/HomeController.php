@@ -14,8 +14,8 @@ use App\Providers\FcmServiceProvider;
 use App\Models\Staff;
 use Carbon\Carbon;
 use App\Models\Attendance;
+use App\Models\Exam;
 use App\Models\ParentConcern;
-
 
 class HomeController extends Controller
 {
@@ -182,6 +182,14 @@ class HomeController extends Controller
         }
 
        
+    }
+
+    public function ExaminationFilter(Request $request)
+    {
+       if($request->has('testcategory')) {
+        $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
+        return $request->ajax() ? response()->json($exams) : $exams;
+       }
     }
 
     public function dashboardGender(Request $request)

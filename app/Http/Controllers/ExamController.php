@@ -98,7 +98,7 @@ class ExamController extends Controller
     }
     public function TestCategory(Request $request)
     {
-        $category = $testcategory = Options::where('type', 'testcategory')->first()->value ?? [];
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
         array_push($category, $request->category);
         $update = Options::where('type', 'testcategory')->update(['value' => $category]);
         return redirect()->back()->with('success', 'Test Category added successfully!');

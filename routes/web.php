@@ -48,6 +48,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('admin.home');
     Route::controller(HomeController::class)->group(function () {
         Route::get('/filter', 'Filter')->name('filter');
+        Route::get('examination/filter', 'ExaminationFilter')->name('examination.filter');
         Route::get('/dashboard/gender', 'dashboardGender')->name('dashboard.gender');
         Route::get('/dashboard/staff', 'dashboardStaff')->name('dashboard.staff');
         Route::get('/dashboard/announcement', 'dashboardAnnouncement')->name('dashboard.announcement');
