@@ -41,7 +41,8 @@ class ExamController extends Controller
 
     public function create()
     {
-        return view('exam.create');
+        $testcategory = Options::where('type', 'testcategory')->first()->value;
+        return view('exam.create', compact('testcategory'));
     }
 
 
@@ -74,10 +75,14 @@ class ExamController extends Controller
     public function edit(Request $request, Exam $exam)
     {
         $type = Student::StudentFilterQuery($exam->branch, $exam->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
-        $section = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, $exam->category, $exam->batch, $exam->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
-        $students = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
-        return view('exam.edit', compact('exam', 'type', 'section', 'students'));
+        $section = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, $exam->category, $exam->batch, $exam->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+        
+        $testcategory = Options::where('type', 'testcategory')->first()->value;
+
+        return view('exam.edit', compact('exam', 'type', 'section', 'students', 'testcategory'));
     }
 
 
@@ -90,6 +95,13 @@ class ExamController extends Controller
         $exam->update($data);
         session()->flash('success', 'Test updated successfully');
         return to_route('exam.index');
+    }
+    public function TestCategory(Request $request)
+    {
+        $category = $testcategory = Options::where('type', 'testcategory')->first()->value ?? [];
+        array_push($category, $request->category);
+        $update = Options::where('type', 'testcategory')->update(['value' => $category]);
+        return redirect()->back()->with('success', 'Test Category added successfully!');
     }
 
     function show(Request $request, Exam $exam)

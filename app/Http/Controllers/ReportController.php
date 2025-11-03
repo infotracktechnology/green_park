@@ -356,7 +356,7 @@ class ReportController extends Controller
 
         $rangeExprs = collect($ranges)->map(function ($r) {
             [$low, $high] = $r;
-            return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$high}-{$low}`";
+            return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$low}-{$high}`";
         })->implode(',');
 
         $csvHeaders = ['SNo', 'Section', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
@@ -405,13 +405,13 @@ class ReportController extends Controller
 
         $csvData = [['Title', 'Subject Wise Marks'], ['Exam Name', $exam->name], [], $csvHeaders];
         foreach ($answers as $a) {
-            $row = [$a->student_id, $a->student_name, $a->branch, $a->batch, $a->section, $a->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
+            $row = [$a->student_id, $a->student?->student_name, $a->student?->branch?->name, $a->student?->batch, $a->student?->section, $a->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
             foreach ($subjects as $s) {
                 $row = array_merge($row, [$a->{"{$s}_CORRECT"} ?? 0, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $a->{"{$s}_MARK"} ?? 0]);
             }
             $csvData[] = $row;
         }
 
-        return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Subject_Wise_Marks.csv"']);
+        return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Overall_Marks_Analysis.csv"']);
     }
 }
