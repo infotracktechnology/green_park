@@ -49,14 +49,15 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files']);
+        $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files', 'maths_files']);
         foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
+
         $data['status'] = 'preview';
         $questions = [];
 
-        foreach (['physics', 'chemistry', 'botany', 'zoology'] as $subject) {
+        foreach (['physics', 'chemistry', 'botany', 'zoology', 'maths'] as $subject) {
             if ($request->hasFile($subject . "_files")) {
                 foreach ($request->file($subject . "_files") as $key => $file) {
                     $q_no = $key + 1;
@@ -302,7 +303,7 @@ class ExamController extends Controller
             $csvData[] = $row;
         }
 
-        $filename = "OnlineResponse_".$examname.".csv";
+        $filename = "OnlineResponse_" . $examname . ".csv";
         return response()->stream(function () use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $line) {
@@ -512,7 +513,7 @@ class ExamController extends Controller
     {
         $exams = [];
         if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions")->groupBy('name')->get();
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish")->groupBy('name')->get();
         }
 
         if ($request->isMethod('post')) {
@@ -528,7 +529,7 @@ class ExamController extends Controller
                 }
                 Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
             }
-            return redirect()->route('exam.publish')->with('success', 'Exams Published Successfully.');
+            return redirect()->back()->with('success', "Exams Publish Updated Successfully.");
         }
 
         return view('exam.publish', compact('exams'));
@@ -536,17 +537,29 @@ class ExamController extends Controller
 
     public function PerviousExamResult(Request $request)
     {
-        $exams = null;
+        $exams = collect();
+        $headers = [];
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
         $exam = [];
         if ($request->testcategory) {
-            $exam = ExamSubjectReport::where('subject', 'like',"%{$request->testcategory}%")->select('subject')->distinct()->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+            $exam = ExamSubjectReport::where('subject', 'like', "%{$request->testcategory}%")->select('subject')->distinct()->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         }
 
         if ($request->testcategory && $request->examname) {
-            $exams = ExamSubjectReport::where('subject',$request->examname)->get();
+            $exams = ExamSubjectReport::where('subject', $request->examname)->get();
+            $headers = $exams->first()?->Header($request->testcategory);
+            $exams = $exams->map(function ($row) use ($request, $headers) {
+                $scores = [];
+                foreach ($headers as $subject) {
+                    $map = ExamSubjectReport::SUBJECT_MAP[$subject] ?? null;
+                    $total = ($row->{$map['r']} + $row->{$map['w']} + $row->{$map['l']}) * 4;
+                    $scores[$subject] = ['mark' => $row->{$map['tot']}, 'total' => $total];
+                }
+                $row->score_data = $scores;
+                return $row;
+            });
         }
 
-        return view('exam.perviousexamresult', compact('exams', 'category', 'exam'));
+        return view('exam.perviousexamresult', compact('exams', 'category', 'exam', 'headers'));
     }
 }
