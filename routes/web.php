@@ -91,8 +91,8 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('examination/testcategory', 'TestCategory')->name('exam.testcategory');
         Route::get('examination/enable', 'enable')->name('exam.enable');
         Route::post('examination/enable', 'enableExam')->name('exam.enableExam');
-        Route::get('examination/test', 'test')->name('exam.test');
-        Route::post('examination/test/download', 'downloadTestReport')->name('exam.test.download');
+        Route::get('examination/onlineresponse', 'OnlineResponse')->name('exam.onlineresponse');
+        Route::post('examination/onlineresponse/download', 'OnlineResponseDownload')->name('exam.onlineresponse.download');
         Route::get('examination/offline', 'offline')->name('exam.offline.index');
         Route::post('examination/offline', 'offlineUpload')->name('exam.offline.upload');
         Route::get('examination/answerkey', 'answerKey')->name('exam.answerkey');
@@ -102,6 +102,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::delete('examination/offline/delete/{id}/{test_id}', 'deleteOfflineKey')->name('offline.delete');
         Route::get('examination/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
         Route::match(['get', 'post'],'examination/publish','Publish')->name('exam.publish');
+        Route::get('examination/perviousexamresult/', 'PerviousExamResult')->name('exam.perviousexamresult');
     });
     
     Route::resource('examportion', ExamPortionController::class);

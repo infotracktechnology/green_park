@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Exam;
 use App\Models\Student;
 use App\Models\ExamAnswer;
+use App\Models\ExamSubjectReport;
 use App\Models\Options;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -79,7 +80,7 @@ class ExamController extends Controller
         $section = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, $exam->category, $exam->batch, $exam->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
         $students = Student::StudentFilterQuery($exam->branch, $exam->course, $exam->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
-        
+
         $testcategory = Options::where('type', 'testcategory')->first()->value;
 
         return view('exam.edit', compact('exam', 'type', 'section', 'students', 'testcategory'));
@@ -244,40 +245,26 @@ class ExamController extends Controller
         return redirect()->back()->with('success', 'Exam enabled successfully!');
     }
 
-    public function test()
+    public function OnlineResponse(Request $request)
     {
-        $tests = Exam::where('academic_year', $this->academic_year)->latest()->get();
-        return view('exam.test', compact('tests'));
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $exams = [];
+
+        if ($request->has('testcategory')) {
+            $exams = Exam::where('testcategory', $request->testcategory)->groupBy('name')->get();
+        }
+
+        return view('exam.onlineresponse', compact('category', 'exams'));
     }
 
 
-    public function downloadTestReport(Request $request)
+    public function OnlineResponseDownload(Request $request)
     {
-        $testId = $request->input('test_id');
-        $reportData = DB::table('exam_answer as ea')
-            ->join('exam as e', 'e.testid', '=', 'ea.test_id')
-            ->join('branch as b', 'b.id', '=', 'e.branch_id')
-            ->join('student as s', 's.student_id', '=', 'ea.student_id')
-            ->select(
-                's.coaching_type',
-                'b.name as branch_name',
-                's.user_name as username',
-                's.student_name',
-                's.section',
-                'ea.student_id',
-                'ea.test_id',
-                'e.name as exam_name',
-                DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'),
-                'ea.q_no',
-                'ea.answer'
-            )
-            ->where('ea.test_id', $testId)
-            ->get()
-            ->groupBy('student_id');
+        $examname = $request->examname;
+        $reportData = DB::table('exam_answer as ea')->join('exam as e', 'e.testid', '=', 'ea.test_id')->join('student as s', 's.student_id', '=', 'ea.student_id')->select('s.coaching_type', 's.user_name as username', 's.student_name', 's.section', 'ea.student_id', 'ea.test_id', 'e.name as exam_name', DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'), 'ea.q_no', 'ea.answer')->where('e.name', $examname)->where('ea.mode', '!=', 'OMR')->get()->groupBy('student_id');
 
         $headers = [
             'Coaching Type',
-            'Branch Name',
             'Username',
             'Student Name',
             'Section',
@@ -299,7 +286,6 @@ class ExamController extends Controller
             $student = $answers->first();
             $row = [
                 $student->coaching_type,
-                $student->branch_name,
                 $student->username,
                 $student->student_name,
                 $student->section,
@@ -316,7 +302,7 @@ class ExamController extends Controller
             $csvData[] = $row;
         }
 
-        $filename = "test_report_{$testId}.csv";
+        $filename = "OnlineResponse_".$examname.".csv";
         return response()->stream(function () use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $line) {
@@ -400,7 +386,7 @@ class ExamController extends Controller
             $chemStart && $question >= $chemStart && $question <= $chemEnd => 'CHEMISTRY',
             $botStart && $question >= $botStart && $question <= $botEnd => 'BOTANY',
             $zooStart && $question >= $zooStart && $question <= $zooEnd => 'ZOOLOGY',
-            default => 'NULL',
+            default => NULL,
         };
     }
 
@@ -521,130 +507,46 @@ class ExamController extends Controller
         return redirect()->route('exam.offline.index')->with('success', 'Answer key log deleted successfully.');
     }
 
-    public function csv_download($test_ids, Request $request)
+
+    public function Publish(Request $request)
     {
-
-        $testIdsArray = explode(',', $test_ids);
-
-        $results = DB::table('exam_answer as a')
-            ->join('student as b', 'a.student_id', '=', 'b.student_id')
-            ->join('branch as c', 'b.campus', '=', 'c.id')
-            ->whereIn('a.test_id', $testIdsArray)
-            ->where('a.academic_year', $this->academic_year)
-            ->select(
-                'a.test_id',
-                'a.student_id',
-                'a.mode as stmode',
-                DB::raw('GROUP_CONCAT(DISTINCT a.subject) as subjects'),
-                DB::raw('SUM(a.mark) as mark'),
-                'b.student_name',
-                'c.name',
-                'b.coaching_type',
-                'b.gender',
-                'b.section'
-            )
-            ->groupBy('a.student_id')
-            ->orderByDesc('mark')
-            ->get();
-
-
-
-        $subjects = explode(',', $results[0]->subjects);
-
-        $headers = [
-            'S.NO',
-            'SID',
-            'Mode',
-            'Name',
-            'Sex',
-            'Campus',
-            'Coach Type',
-            'SEC',
-        ];
-
-        foreach ($subjects as $subject) {
-            $headers[] = $subject . ' R';
-            $headers[] = $subject . ' W';
-            $headers[] = $subject . ' L';
-            $headers[] = $subject . ' TOT';
-        }
-        $headers[] = 'Net Total';
-
-        $csvData = [$headers];
-
-        foreach ($results as $key => $result) {
-            $row = [
-                $key + 1,
-                $result->student_id,
-                $result->stmode,
-                $result->student_name,
-                $result->gender,
-                $result->name,
-                $result->coaching_type,
-                $result->section,
-            ];
-
-            $subjectMarks = [];
-            foreach ($subjects as $subject) {
-                $marks = DB::table('exam_answer')
-                    ->whereIn('test_id', $testIdsArray)
-                    ->where('student_id', $result->student_id)
-                    ->where('subject', $subject)
-                    ->select(
-                        DB::raw('SUM(CASE WHEN mark = 4 THEN 1 ELSE 0 END) as r'),
-                        DB::raw('SUM(CASE WHEN mark = -1 THEN 1 ELSE 0 END) as w'),
-                        DB::raw('SUM(CASE WHEN mark = 0 THEN 1 ELSE 0 END) as l'),
-                        DB::raw('SUM(mark) as tot')
-                    )
-                    ->first();
-
-                $subjectMarks[] = $marks->r ?? 0;
-                $subjectMarks[] = $marks->w ?? 0;
-                $subjectMarks[] = $marks->l ?? 0;
-                $subjectMarks[] = $marks->tot ?? 0;
-            }
-
-            $row = array_merge($row, $subjectMarks);
-            $row[] = $result->mark;
-
-            $csvData[] = $row;
+        $exams = [];
+        if ($request->start_date && $request->end_date) {
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions")->groupBy('name')->get();
         }
 
-        $filename = "$testIdsArray-DUMPREPORT.csv";
-
-        return response()->stream(function () use ($csvData) {
-            $file = fopen('php://output', 'w');
-            foreach ($csvData as $line) {
-                fputcsv($file, $line);
+        if ($request->isMethod('post')) {
+            $markranges = $request->file('markrange', []);
+            $publishs = $request->input('publish', []);
+            foreach ($request->names as $key => $name) {
+                $exam['publish'] = $publishs[$key] ?? 'No';
+                if (isset($markranges[$key]) && $markranges[$key]->isValid()) {
+                    $file = $markranges[$key];
+                    $filename = time() . '-' . $file->getClientOriginalName();
+                    $file->move('assets/markrange', $filename);
+                    $exam['markrange'] = 'assets/markrange/' . $filename;
+                }
+                Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
             }
-            fclose($file);
-        }, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
-        ]);
-    }
- public function Publish(Request $request){
-    $exams = [];
-    if($request->start_date && $request->end_date){
-        $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions")->groupBy('name')->get();
-    }
-
-    if($request->isMethod('post')){
-        $markranges = $request->file('markrange', []);
-        $publishs = $request->input('publish', []);
-        foreach($request->names as $key => $name){   
-            $exam['publish'] = $publishs[$key] ?? 'No';
-            if (isset($markranges[$key]) && $markranges[$key]->isValid()) {
-                $file = $markranges[$key];
-                $filename = time().'-'.$file->getClientOriginalName();
-                $file->move('assets/markrange', $filename);
-                $exam['markrange'] = 'assets/markrange/'.$filename;
-            }
-            Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
+            return redirect()->route('exam.publish')->with('success', 'Exams Published Successfully.');
         }
-        return redirect()->route('exam.publish')->with('success', 'Exams Published Successfully.');
+
+        return view('exam.publish', compact('exams'));
     }
 
-    return view('exam.publish', compact('exams'));
- }
+    public function PerviousExamResult(Request $request)
+    {
+        $exams = null;
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $exam = [];
+        if ($request->testcategory) {
+            $exam = ExamSubjectReport::where('subject', 'like',"%{$request->testcategory}%")->select('subject')->distinct()->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+        }
+
+        if ($request->testcategory && $request->examname) {
+            $exams = ExamSubjectReport::where('subject',$request->examname)->get();
+        }
+
+        return view('exam.perviousexamresult', compact('exams', 'category', 'exam'));
+    }
 }
