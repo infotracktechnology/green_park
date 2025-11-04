@@ -9,7 +9,7 @@ class ExamSubjectReport extends Model
     protected $table = 'examsubjectreport';
     protected $guarded = [];
 
-    private const SUBJECT_MAP = [
+    public const SUBJECT_MAP = [
         'PHYSICS'   => ['tot' => 'ptot', 'r' => 'pr', 'w' => 'pw', 'l' => 'pl'],
         'CHEMISTRY' => ['tot' => 'ctot', 'r' => 'cr', 'w' => 'cw', 'l' => 'cl'],
         'BOTANY'    => ['tot' => 'btot', 'r' => 'br', 'w' => 'bw', 'l' => 'bl'],

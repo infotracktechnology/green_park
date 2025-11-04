@@ -19,57 +19,60 @@ class ReportController extends Controller
 {
     public function section_exam(Request $request)
     {
-        $sections = Student::when(auth()->user()->branch,fn ($query) => $query->where('campus', auth()->user()->branch))->where('section', '!=', '')->select('section')->distinct()->orderBy('section')->get();
-    
+        $sections = Student::when(auth()->user()->branch, fn($query) => $query->where('campus', auth()->user()->branch))->where('section', '!=', '')->select('section')->distinct()->orderBy('section')->get();
+
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
 
         $exams = [];
 
-       if($request->has('testcategory')) {
-        $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
-       }
+        if ($request->has('testcategory')) {
+            $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
+        }
 
         $test_name = $request->test_name ?? 0;
 
         if ($request->query('type') == 'overall') {
-            $testIds = Exam::where('name', $test_name)->pluck('testid')->toArray();
             $section = $request->section;
-
-            $results = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.student_id')->join('branch as c', 'b.campus', '=', 'c.id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->selectRaw("a.test_id,a.student_id,a.mode as stmode,GROUP_CONCAT(DISTINCT a.subject)subjects,sum(a.mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section")->groupBy('a.student_id')->orderBy('test_id')->orderBy('student_name')->get();
-
-            if (count($results) == 0) {
-                return back()->with('error', 'No data found');
-            }
-            $testids = implode(',', $testIds);
-            return view('report.overall_print', compact('results', 'test_name', 'section', 'testids'));
+            $exam = Exam::where('name', $test_name)->first();
+            $answers = ExamAnswer::with('student')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->whereHas('student', fn($q) => $q->where('section', $section))->get();
+            $subjects = $answers->pluck('subject')->unique()->values()->toArray();
+            $results = $answers->groupBy('student_id')->map(function($logs) use ($subjects) {
+            $student = $logs->first()->student;
+            $subjectStats = collect($subjects)->mapWithKeys(function($subject) use ($logs) {
+                $sub = $logs->where('subject', $subject);
+            return [$subject=>['right' => $sub->where('mark', 4)->count(),'wrong' => $sub->where('mark', -1)->count(),'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark')]];
+             });
+             return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total')];
+             })->values();
+            $pdf = Pdf::loadView('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
+            return $pdf->download("OVERALLPRINT-$exam->name - $section.pdf");
         }
 
         if ($request->query('type') == 'omr') {
-            $testIds = Exam::where('name', $test_name)->pluck('testid')->toArray();
             $section = $request->section;
-            $answers = DB::table('exam_answer as a')->join('student as b', 'a.student_id', '=', 'b.student_id')->whereIn('a.test_id', $testIds)->where('b.section', $request->section)->selectRaw("a.*,b.section,b.student_name")->orderBy('test_id')->orderBy('student_name')->orderBy('q_no')->get();
-            if (count($answers) == 0) {
-                return back()->with('error', 'No data found');
-            }
-            $studentAnswers = [];
-            foreach ($answers as $answer) {
-                $studentAnswers[$answer->student_id][] = $answer;
-            }
-            $formattedData = [];
-            foreach ($studentAnswers as $studentId => $studentData) {
-                $chunks = array_chunk($studentData, ceil(count($studentData) / 4));
-                $pages = array_chunk($chunks, 4);
+            $exam = Exam::where('name', $test_name)->first();
+            $answers = ExamAnswer::with(['student'])->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->whereHas('student', fn($q) => $q->where('section', $section))->orderBy('student_id')->orderBy('q_no')->get();
 
-                foreach ($pages as $page) {
-                    $formattedData[] = $page;
-                }
-            }
-
-
-            return view('report.omr_print', compact('formattedData', 'test_name', 'section'));
+            $students = $answers->groupBy('student_id')->map(function ($items) {
+                $student = $items->first()->student;
+                $testId = $items->first()->test_id;
+                $subjects = $items->groupBy('subject')->map(function ($sub) {
+                    return ['subject' => $sub->first()->subject, 'right' => $sub->where('mark', 4)->count(), 'wrong' => $sub->where('mark', -1)->count(), 'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark'), 'max' => $sub->count() * 4];
+                })->values();
+                $totalRight = $subjects->sum('right');
+                $totalWrong = $subjects->sum('wrong');
+                $totalLeft  = $subjects->sum('left');
+                $totalMarks = $subjects->sum('total');
+                $maxMarks   = $subjects->sum('max');
+                $splitAnswers = $items->chunk(ceil($items->count() / 4))->values();
+                return ['student_id'   => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $testId, 'answers' => $splitAnswers, 'subjects' => $subjects, 'totals' => compact('totalRight', 'totalWrong', 'totalLeft', 'totalMarks', 'maxMarks')];
+            });
+            $pdf = Pdf::loadView('report.omr_print', compact('answers', 'exam', 'students', 'test_name'));
+            return $pdf->download("OMRPRINT-$exam->name - $section.pdf");
         }
 
-        return view('report.section_exam', compact('sections','test_name', 'category', 'exams'));
+
+        return view('report.section_exam', compact('sections', 'test_name', 'category', 'exams'));
     }
 
     public function LogReport(Request $request)
@@ -141,7 +144,7 @@ class ReportController extends Controller
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
         $exams = [];
 
-        if($request->has('testcategory')) {
+        if ($request->has('testcategory')) {
             $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
         }
 
@@ -405,7 +408,7 @@ class ReportController extends Controller
 
         $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
 
-      
+
 
         $csvHeaders = ['Student ID', 'Student Name', 'Branch', 'Batch', 'Section', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total'];
 

@@ -112,7 +112,7 @@
                     </select>
                   </div>
 
-                 <div class="form-group col-lg-3">
+                 <div class="form-group col-lg-2">
                     <label>Test Category <button type="button" class="btn btn-link" data-toggle="modal" data-target="#categoryModal">Add <i class="fas fa-plus"></i></button></label>
                     <select name="testcategory" class="form-control form-control-sm" required>
                       <option value="">Select Test Category</option>
@@ -138,10 +138,11 @@
                     <label>Exam Date</label>
                     <input type="date" value="{{ date('Y-m-d') }}" name="exam_date" class="form-control form-control-sm">
                   </div>
+                </div>
 
-                  <div class="form-group col-lg-12 d-flex align-items-start">
+                  <div class="row m-2">
 
-                    <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                    <div class="col-lg-1 form-check">
                       <input type="checkbox" id="physicsCheckbox" name="subject_name[]" value="Physics" class="form-check-input">
                       <label for="physicsCheckbox" class="form-check-label">Physics</label>
                     </div>
@@ -165,9 +166,9 @@
                     </div>
                   </div>
 
-                  <div class="form-group col-lg-12 d-flex align-items-start">
+                  <div class="row m-2">
 
-                    <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                    <div class="col-lg-1 form-check">
                       <input type="checkbox" id="chemistryCheckbox" name="subject_name[]" value="Chemistry" class="form-check-input">
                       <label for="chemistryCheckbox" class="form-check-label">Chemistry</label>
                     </div>
@@ -191,9 +192,9 @@
                     </div>
                   </div>
 
-                  <div class="form-group col-lg-12 d-flex align-items-start">
+                  <div class="row m-2">
 
-                    <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                    <div class="col-lg-1 form-check">
                       <input type="checkbox" id="botanyCheckbox" name="subject_name[]" value="Botany" class="form-check-input">
                       <label for="botanyCheckbox" class="form-check-label">Botany</label>
                     </div>
@@ -218,9 +219,9 @@
                     </div>
                   </div>
 
-                  <div class="form-group col-lg-12 d-flex align-items-start">
+                  <div class="row m-2">
 
-                    <div class="col-lg-3 form-check d-flex flex-column align-items-start">
+                    <div class="col-lg-1 form-check">
                       <input type="checkbox" id="zoologyCheckbox" name="subject_name[]" value="Zoology" class="form-check-input">
                       <label for="zoologyCheckbox" class="form-check-label">Zoology</label>
                     </div>
@@ -244,13 +245,34 @@
                     </div>
                   </div>
 
-                  <div class="form-group col-lg-12 row">
+                  <div class="row m-2">
+                    <div class="col-lg-1 form-check">
+                      <input type="checkbox" id="mathsCheckbox" name="subject_name[]" value="Mathematics" class="form-check-input">
+                      <label for="mathsCheckbox" class="form-check-label">Mathematics</label>
+                    </div>
+                    <div class="col-lg-2 maths-inputs" style="display: none;">
+                      <label for="mathsQuestions">Maths Questions</label>
+                      <input type="number" min="1" max="180" name="maths_questions" id="mathsQuestions" class="form-control form-control-sm" disabled>
+                    </div>
+                    <div class="col-lg-2 maths-inputs" style="display: none;">
+                      <label for="mathsStart">Maths Start No</label>
+                      <input type="number" min="1" name="math_start" id="mathsStart" class="form-control form-control-sm" disabled>
+                    </div>
+                    <div class="col-lg-2 maths-inputs" style="display: none;">
+                      <label>Maths End No</label>
+                      <input type="number" min="1" name="math_end" class="form-control form-control-sm" disabled>
+                    </div>
+                    <div class="col-lg-3 maths-inputs" style="display: none;">
+                      <label for="mathsFile">Maths Files</label>
+                      <input type="file" name="maths_files[]" id="mathsFile" class="form-control form-control-sm" accept="image/*" multiple disabled onchange="validateFileCount('mathsQuestions','mathsFile')">
+                    </div>
+                  </div>
+
+                  <div class="row">
                     <div class="form-group col-lg-2">
                       <label>Total Questions</label>
                       <input type="number" min="1" name="total_questions" id="total_questions" class="form-control form-control-sm" required>
                     </div>
-
-                  </div>
 
                   <div class="form-group col-lg-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -299,66 +321,68 @@
 @endsection
 @section('js')
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-      const subjects = [
-          { checkbox: 'physicsCheckbox', inputs: 'physics-inputs', questions: 'physicsQuestions', files: 'physicsFile' },
-          { checkbox: 'chemistryCheckbox', inputs: 'chemistry-inputs', questions: 'chemistryQuestions', files: 'chemistryFile' },
-          { checkbox: 'botanyCheckbox', inputs: 'botany-inputs', questions: 'botanyQuestions', files: 'botanyFile' },
-          { checkbox: 'zoologyCheckbox', inputs: 'zoology-inputs', questions: 'zoologyQuestions', files: 'zoologyFile' }
-      ];
-  
-      const totalQuestionsInput = document.getElementById('total_questions');
-  
-      subjects.forEach(subject => {
-          const checkbox = document.getElementById(subject.checkbox);
-          const inputs = document.querySelectorAll(`.${subject.inputs}`);
-          const questionInput = document.getElementById(subject.questions);
-          const fileInput = document.getElementById(subject.files);
-  
-          checkbox.addEventListener('change', function () {
-              const isChecked = this.checked;
-              inputs.forEach(input => {
-                  input.style.display = isChecked ? 'block' : 'none';
-                  const inputElement = input.querySelector('input');
-                  if (inputElement) {
-                      inputElement.disabled = !isChecked;
-                      if (inputElement.type !== 'file') {
-                          inputElement.required = isChecked;
-                      }
-                      if (!isChecked) {
-                          inputElement.value = '';
-                      }
-                  }
-              });
-              calculateTotalQuestions();
-          });
-  
-          questionInput.addEventListener('input', calculateTotalQuestions);
-          fileInput.addEventListener('change', function () {
-              validateFileCount(subject.questions, subject.files);
-          });
-      });
-  
-      function calculateTotalQuestions() {
-          let total = 0;
-          subjects.forEach(subject => {
-              const input = document.getElementById(subject.questions);
-              total += parseInt(input.value) || 0;
-          });
-          totalQuestionsInput.value = total;
-      }
-  });
-  
-  function validateFileCount(questionInputId, fileInputId) {
-      const questionCount = parseInt(document.getElementById(questionInputId).value);
-      const fileInput = document.getElementById(fileInputId);
-      const files = fileInput.files;
-  
-      if (files.length !== questionCount) {
-          alert(`The number of uploaded files must match the number of questions exactly for ${questionInputId.replace('Questions', '')}.`);
-          fileInput.value = ""; 
-      }
-  }
-  </script>
+  const subjects = [
+    { key: 'physics' },
+    { key: 'chemistry' },
+    { key: 'botany' },
+    { key: 'zoology' },
+    { key: 'maths' }
+  ];
 
+  const $total = $('#total_questions');
+  const $course = $('#course');
+
+ function toggleSubjects() {
+  var course = $course.val()?.toUpperCase();
+  var jee = $('#mathsCheckbox').closest('.row');
+  var neet = $('#botanyCheckbox, #zoologyCheckbox').closest('.row');
+
+  if (course === 'JEE') {
+    jee.show();
+    neet.hide().find('input[type=checkbox]').prop('checked', false).trigger('change');
+  } else {
+    jee.hide().find('input[type=checkbox]').prop('checked', false).trigger('change');
+    neet.show();
+  }
+}
+ 
+  $course.on('change', toggleSubjects);
+
+  toggleSubjects();
+  $.each(subjects, function(_, s) {
+    const $check = $('#' + s.key + 'Checkbox');
+    const $inputs = $('.' + s.key + '-inputs');
+    const $questions = $('#' + s.key + 'Questions');
+    const $files = $('#' + s.key + 'File');
+
+    $check.on('change', function() {
+      const checked = this.checked;
+      $inputs.toggle(checked);
+      $inputs.find('input').prop('disabled', !checked).prop('required', checked && this.type !== 'file');
+      if (!checked) $inputs.find('input').val('');
+      calcTotal();
+    });
+
+    $questions.on('input', calcTotal);
+    $files.on('change', function() { validateFiles($questions, $files, s.key); });
+  });
+
+  function calcTotal() {
+    let total = 0;
+    $.each(subjects, function(_, s) {
+      total += parseInt($('#' + s.key + 'Questions').val()) || 0;
+    });
+    $total.val(total);
+  }
+
+  function validateFiles($q, $f, key) {
+    const qCount = parseInt($q.val()) || 0;
+    const fCount = $f[0].files.length;
+    if (fCount !== qCount) {
+      alert(`Uploaded files must equal question count for ${key.toUpperCase()}.`);
+      $f.val('');
+    }
+  }
+
+</script>
 @endsection
