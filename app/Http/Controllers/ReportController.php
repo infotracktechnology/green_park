@@ -34,7 +34,9 @@ class ReportController extends Controller
         if ($request->query('type') == 'overall') {
             $section = $request->section;
             $exam = Exam::where('name', $test_name)->first();
-            $answers = ExamAnswer::with('student')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->whereHas('student', fn($q) => $q->where('section', $section))->get();
+        
+        $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->whereIn('test_id', Exam::where('name', $test_name)->pluck('testid'))->get();
+
             $subjects = $answers->pluck('subject')->unique()->values()->toArray();
             $results = $answers->groupBy('student_id')->map(function($logs) use ($subjects) {
             $student = $logs->first()->student;
@@ -51,7 +53,8 @@ class ReportController extends Controller
         if ($request->query('type') == 'omr') {
             $section = $request->section;
             $exam = Exam::where('name', $test_name)->first();
-            $answers = ExamAnswer::with(['student'])->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->whereHas('student', fn($q) => $q->where('section', $section))->orderBy('student_id')->orderBy('q_no')->get();
+
+           $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->whereIn('test_id', Exam::where('name', $test_name)->pluck('testid'))->orderBy('student_id')->orderBy('q_no')->get();
 
             $students = $answers->groupBy('student_id')->map(function ($items) {
                 $student = $items->first()->student;
