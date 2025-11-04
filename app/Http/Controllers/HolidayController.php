@@ -13,26 +13,17 @@ class HolidayController extends Controller
 {
     public function index()
     {
-        $holidays = Holiday::where('academic_year', $this->academic_year)
-    ->when(auth()->user()->branch, function ($query) {
-        $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-    })
-    ->latest()
-    ->get();
+        $holidays = Holiday::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($query) {
+            $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+        })->latest()->get();
 
-        
         return view('holiday.index', compact('holidays'));
     }
 
     public function create(Request $request)
     {
         if ($request->has('branch')) {
-            // Fetch sections based only on the selected branch
-            $section = Student::whereIn('campus', explode(',', $request->branch))
-                ->select('section')
-                ->distinct()
-                ->get();
-    
+            $section = Student::whereIn('campus', explode(',', $request->branch))->where('section', '!=', '')->whereNotNull('section')->select('section')->distinct()->get();
             return response()->json($section);
         }
         return view('holiday.create');
@@ -64,18 +55,18 @@ class HolidayController extends Controller
         //         });
 
         //     Holiday::insert($dates->toArray());
-         
-        // }
-        $data=$request->all();
 
-        if($request->has('section')){
+        // }
+        $data = $request->all();
+
+        if ($request->has('section')) {
             $data['section'] = implode(',', $request->section);
         }
 
-        if($request->has('branch_id')){
+        if ($request->has('branch_id')) {
             $data['branch_id'] = implode(',', $request->branch_id);
         }
-        
+
         Holiday::create($data);
         return redirect()->route('holiday.index')->with('success', 'Holiday added successfully!');
     }
@@ -86,7 +77,7 @@ class HolidayController extends Controller
         $section_ids = explode(',', $holiday->section);
         $branch_ids = explode(',', $holiday->branch_id);
         $sections = Student::where('gender', $holiday->gender)->whereIn('campus', $branch_ids)->where('hostel_dayscholar', $holiday->hostel)->select('section')->distinct()->get();
-        return view('holiday.edit', compact('holiday', 'section_ids','sections','branch_ids'));
+        return view('holiday.edit', compact('holiday', 'section_ids', 'sections', 'branch_ids'));
     }
 
     public function update(Request $request, Holiday $holiday)
@@ -102,16 +93,16 @@ class HolidayController extends Controller
         //     $data = $request->all();
         //     $holiday->update($data);
         // }
-        $data=$request->all();
-        
-        if($request->has('section')){
+        $data = $request->all();
+
+        if ($request->has('section')) {
             $data['section'] = implode(',', $request->section);
         }
 
-        if($request->has('branch_id')){
+        if ($request->has('branch_id')) {
             $data['branch_id'] = implode(',', $request->branch_id);
         }
-        
+
         $holiday->update($data);
         return redirect()->route('holiday.index')->with('success', 'Holiday updated successfully!');
     }
@@ -125,64 +116,63 @@ class HolidayController extends Controller
     }
 
     public function attendance(Request $request)
-{
-    $sections = [];
-    $students = [];
-    $attendance = [];
+    {
+        $sections = [];
+        $students = [];
+        $attendance = [];
 
-    if ($request->has('branch_id')) {
-        $sections = Student::whereIn('campus', explode(',', $request->branch_id))
-            ->select('section')
-            ->distinct()
-            ->get();
-    }
+        if ($request->has('branch_id')) {
+            $sections = Student::whereIn('campus', explode(',', $request->branch_id))
+                ->select('section')
+                ->distinct()
+                ->get();
+        }
 
-    if ($request->has('show')) {
-        if (Holiday::isHoliday($request->attendance_date, $request->branch_id, $request->attendance_timing, $request->section)) {
-            return redirect()->back()->with('error', 'Holiday already exists for this date!');
-    }
+        if ($request->has('show')) {
+            if (Holiday::isHoliday($request->attendance_date, $request->branch_id, $request->attendance_timing, $request->section)) {
+                return redirect()->back()->with('error', 'Holiday already exists for this date!');
+            }
 
-        $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->get();
+            $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->get();
 
-        $students = Student::whereIn('campus', explode(',', $request->branch_id))->where('section', $request->section)->get();
+            $students = Student::whereIn('campus', explode(',', $request->branch_id))->where('section', $request->section)->get();
+
+            return view('holiday.attendance', compact('sections', 'students', 'attendance'));
+        }
+
+        if ($request->has('delete')) {
+            $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->whereIn('timing', explode(',', $request->timing))->delete();
+            return response()->json(['success' => 'Attendance deleted successfully!']);
+        }
 
         return view('holiday.attendance', compact('sections', 'students', 'attendance'));
     }
 
-    if ($request->has('delete')) {
-       $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->whereIn('timing',explode(',', $request->timing))->delete();
-         return response()->json(['success' => 'Attendance deleted successfully!']);
-    }
 
-    return view('holiday.attendance', compact('sections', 'students', 'attendance'));
-}
-
-
-    public function attendance_store(Request $request){
-    $attendanceData = [];
-    foreach($request->status as $key => $status){             
-        foreach($status as $time => $value){  
-            if($request->has('attendance_id')){
-                $attendance_id = $request->attendance_id[$key][$time];
-                $attendanceData[] = ['id' => $attendance_id, 'status' => $value ?? 'A'];
+    public function attendance_store(Request $request)
+    {
+        $attendanceData = [];
+        foreach ($request->status as $key => $status) {
+            foreach ($status as $time => $value) {
+                if ($request->has('attendance_id')) {
+                    $attendance_id = $request->attendance_id[$key][$time];
+                    $attendanceData[] = ['id' => $attendance_id, 'status' => $value ?? 'A'];
+                } else {
+                    $student_id = $request->student_id[$key][$time];
+                    $attendanceData[] = [
+                        'academic_year' => $request->academic_year,
+                        'branch_id' => $request->branch_id,
+                        'attendance_date' => $request->attendance_date,
+                        'timing' => $time,
+                        'student_id' => $student_id,
+                        'section' => $request->section,
+                        'status' => $value ?? 'A',
+                    ];
+                }
             }
-          else{         
-           $student_id = $request->student_id[$key][$time];
-           $attendanceData[] = [
-                'academic_year' => $request->academic_year,
-                'branch_id' => $request->branch_id,
-                'attendance_date' => $request->attendance_date,
-                'timing' => $time,
-                'student_id' => $student_id,
-                'section' => $request->section,
-                'status' => $value ?? 'A',
-            ];
         }
-    }
-    }
-    $attendance = Attendance::upsert($attendanceData, ['id'], ['status']);
+        $attendance = Attendance::upsert($attendanceData, ['id'], ['status']);
 
-    return redirect()->back()->with('success', 'Attendance saved successfully.');
- }
-
+        return redirect()->back()->with('success', 'Attendance saved successfully.');
+    }
 }
