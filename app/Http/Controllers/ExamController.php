@@ -357,7 +357,7 @@ class ExamController extends Controller
 
             for ($i = 1; $i <= $exam->total_questions; $i++) {
                 $subject = $this->determineSubject($i, $exam->phy_start, $exam->phy_end, $exam->chem_start, $exam->chem_end, $exam->bot_start, $exam->bot_end, $exam->zoo_start, $exam->zoo_end);
-                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
+                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'],'testname'=>$exam->name, 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
             }
             $exam_answer = ExamAnswer::insert($record);
         }
