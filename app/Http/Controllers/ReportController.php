@@ -26,7 +26,7 @@ class ReportController extends Controller
         $exams = [];
 
         if ($request->has('testcategory')) {
-            $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
+            $exams = Exam::where('testcategory', $request->testcategory)->where("academic_year", $this->academic_year)->select('name')->distinct()->get()->pluck('name');
         }
 
         $test_name = $request->test_name ?? 0;
@@ -47,29 +47,15 @@ class ReportController extends Controller
             })->values();
 
             $pdf = Pdf::loadView('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
-            return $pdf->download("OVERALLPRINT-$exam->name - $section.pdf");
+            return $pdf->download("OVERALLPRINT-$test_name - $section.pdf");
         }
 
         if ($request->query('type') == 'omr') {
             $section = $request->section;
-
-            $stats  = ExamAnswer::selectRaw("exam_answer.*,a.student_name,COUNT(*) * 4 as max_marks,SUM(mark = 4) as right_answers,SUM(mark = -1) as wrong_answers,SUM(mark = 0) as left_answers,SUM(mark) as total_marks")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->groupBy('student_id')->get()->groupBy('student_id');
-
-            $allAnswers = ExamAnswer::where('testname', $test_name)->whereIn('student_id', $stats->keys())->orderBy('student_id')->orderBy('q_no')->get()->groupBy('student_id');
-
-            $students = $stats->map(function ($subjects, $studentId) use ($allAnswers) {
-                $first = $subjects->first();
-                $answers = $allAnswers->get($studentId, collect());
-                $chunkedAnswers = $answers->chunk(ceil($answers->count() / 4))->values();
-
-                $subjectData = $subjects->map(fn($s) => ['subject' => $s->subject, 'right' => $s->right_answers, 'wrong' => $s->wrong_answers, 'left' => $s->left_answers, 'total' => $s->total_marks, 'max' => $s->max_marks,]);
-
-                return ['student_id' => $studentId, 'student_name' => $first->student_name, 'answers' => $chunkedAnswers, 'subjects' => $subjectData, 'totals' => ['totalRight' => $subjectData->sum('right'), 'totalWrong' => $subjectData->sum('wrong'), 'totalLeft' => $subjectData->sum('left'), 'totalMarks' => $subjectData->sum('total'), 'maxMarks'   => $subjectData->sum('max'),]];
-            });
-
-
-            $pdf = Pdf::loadView('report.omr_print', compact('answers', 'students', 'test_name'));
-            return $pdf->download("OMRPRINT-$exam->name - $section.pdf");
+            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->get();
+            
+            $pdf = PDF::loadView('report.omr_print', compact('answers', 'test_name'));
+            return $pdf->download("OMRPRINT-$test_name-$section.pdf");
         }
 
 
@@ -120,7 +106,7 @@ class ReportController extends Controller
 
     public function BatchList(Request $request)
     {
-        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,hostel_dayscholar,batch,section,COUNT(*) as strength,b.id")->where('academic_year', $this->academic_year)->groupBy('b.name', 'hostel_dayscholar', 'batch', 'section')->orderBy('b.id')->get();
+        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,hostel_dayscholar,batch,section,COUNT(*) as strength,b.id")->where('section', '!=', '')->where('hostel_dayscholar', '!=', '')->where('academic_year', $this->academic_year)->groupBy('b.name', 'hostel_dayscholar', 'batch', 'section')->orderBy('b.id')->get();
         return view('report.batchlist', compact('report'));
     }
     public function SectionList(Request $request)
@@ -146,7 +132,7 @@ class ReportController extends Controller
         $exams = [];
 
         if ($request->has('testcategory')) {
-            $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
+            $exams = Exam::where('testcategory', $request->testcategory)->where("academic_year", $this->academic_year)->select('name')->distinct()->get()->pluck('name');
         }
 
         return view('report.examinationanalysis', compact('category', 'exams'));

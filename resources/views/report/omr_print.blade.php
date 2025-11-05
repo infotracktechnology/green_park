@@ -17,15 +17,15 @@
 </head>
 
 <body>
-  @foreach($students as $s)
+  @foreach($answers->groupBy('student_id') as $answer)
   <div class="page">
-    <div class="title">OMR VALUATION REPORT - {{ $s['test_id'] }}</div>
-
+    <div class="title">OMR VALUATION REPORT {{ $test_name }}</div>
      <table style="width: 100%;">
-        <tr>
-      @foreach($s['answers'] as $col)
+    <tr>
+    <?php $cols = $answer->chunk(45); ?>
+      @foreach($cols as $col)
       <td style="padding: 0px 10px;vertical-align: top;">
-      <table class="table"  style="width: {{ 25 * count($s['answers']) }}%;">
+      <table class="table"  style="width: {{ 25 * count($cols) }}%;">
         <thead>
           <tr>
             <th>Q</th>
@@ -56,40 +56,7 @@
     </tr>
     </table>
 
-    <div class="header">
-      <span>STUDENT: {{ $s['student_name'] }}</span>
-      <span>EXAM: {{ $test_name }}</span>
-    </div>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Subject</th>
-          <th>Right</th>
-          <th>Wrong</th>
-          <th>Left</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($s['subjects'] as $sub)
-        <tr>
-          <td>{{ $sub['subject'] }}</td>
-          <td>{{ $sub['right'] }}</td>
-          <td>{{ $sub['wrong'] }}</td>
-          <td>{{ $sub['left'] }}</td>
-          <td>{{ $sub['total'] }}</td>
-        </tr>
-        @endforeach
-        <tr class="bold">
-          <td>Total</td>
-          <td>{{ $s['totals']['totalRight'] }}</td>
-          <td>{{ $s['totals']['totalWrong'] }}</td>
-          <td>{{ $s['totals']['totalLeft'] }}</td>
-          <td>{{ $s['totals']['totalMarks'] }} / {{ $s['totals']['maxMarks'] }}</td>
-        </tr>
-      </tbody>
-    </table>
+   
   </div>
   @endforeach
 </body>

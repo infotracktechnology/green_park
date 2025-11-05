@@ -59,8 +59,8 @@
                       @endphp
 
                       <tr>
-                        <td rowspan="{{ $max }}">{{ $campus }}</td>
-                        <td rowspan="{{ $max }}">{{ $hosDay }}</td>
+                        <td {{ $max ? "rowspan={$max}" : "" }}>{{ $campus }}</td>
+                        <td {{ $max ? "rowspan={$max}" : "" }}>{{ $hosDay }}</td>
                         <td>{{ $batchA[0]->section ?? '-' }}</td>
                         <td>{{ $batchA[0]->strength ?? '-' }}</td>
                         <td>{{ $batchB[0]->section ?? '-' }}</td>

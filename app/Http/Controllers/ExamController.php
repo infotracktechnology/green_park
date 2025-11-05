@@ -253,7 +253,7 @@ class ExamController extends Controller
         $exams = [];
 
         if ($request->has('testcategory')) {
-            $exams = Exam::where('testcategory', $request->testcategory)->groupBy('name')->get();
+            $exams = Exam::where('testcategory', $request->testcategory)->where("academic_year", $this->academic_year)->groupBy('name')->get();
         }
 
         return view('exam.onlineresponse', compact('category', 'exams'));
