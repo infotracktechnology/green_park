@@ -39,6 +39,7 @@
       <form method="post" id="examForm" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="test_id" value="{{ $exam->testid }}">
+        <input type="hidden" name="testname" value="{{ $exam->name }}">
         <input type="hidden" name="student_id" value="{{ auth()->user()->student_id }}">
         <div class="row exam-paper">
           <div class="col-md-12">

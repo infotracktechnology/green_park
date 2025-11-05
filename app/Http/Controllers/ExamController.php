@@ -128,6 +128,7 @@ class ExamController extends Controller
 
             $data = [
                 'test_id' => $request->test_id,
+                'testname' => $request->testname,
                 'student_id' => $student_id,
                 'subject' => $subject,
                 'q_no' => $i,
@@ -186,7 +187,7 @@ class ExamController extends Controller
 
     function Save(Request $request)
     {
-        $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year];
+        $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year,'testname' => $request->testname];
         $answer = ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
         if ($answer) {
             ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
