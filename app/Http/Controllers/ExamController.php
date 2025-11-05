@@ -128,6 +128,7 @@ class ExamController extends Controller
 
             $data = [
                 'test_id' => $request->test_id,
+                'testname' => $request->testname,
                 'student_id' => $student_id,
                 'subject' => $subject,
                 'q_no' => $i,
@@ -186,7 +187,7 @@ class ExamController extends Controller
 
     function Save(Request $request)
     {
-        $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year];
+        $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year,'testname' => $request->testname];
         $answer = ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
         if ($answer) {
             ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
@@ -357,7 +358,7 @@ class ExamController extends Controller
 
             for ($i = 1; $i <= $exam->total_questions; $i++) {
                 $subject = $this->determineSubject($i, $exam->phy_start, $exam->phy_end, $exam->chem_start, $exam->chem_end, $exam->bot_start, $exam->bot_end, $exam->zoo_start, $exam->zoo_end);
-                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
+                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'],'testname'=>$exam->name, 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
             }
             $exam_answer = ExamAnswer::insert($record);
         }

@@ -33,44 +33,42 @@ class ReportController extends Controller
 
         if ($request->query('type') == 'overall') {
             $section = $request->section;
-            $exam = Exam::where('name', $test_name)->first();
-        
-        $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->whereIn('test_id', Exam::where('name', $test_name)->pluck('testid'))->get();
+
+            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->get();
 
             $subjects = $answers->pluck('subject')->unique()->values()->toArray();
-            $results = $answers->groupBy('student_id')->map(function($logs) use ($subjects) {
-            $student = $logs->first()->student;
-            $subjectStats = collect($subjects)->mapWithKeys(function($subject) use ($logs) {
-                $sub = $logs->where('subject', $subject);
-            return [$subject=>['right' => $sub->where('mark', 4)->count(),'wrong' => $sub->where('mark', -1)->count(),'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark')]];
-             });
-             return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total')];
-             })->values();
+            $results = $answers->groupBy('student_id')->map(function ($logs) use ($subjects) {
+                $student = $logs->first()->student;
+                $subjectStats = collect($subjects)->mapWithKeys(function ($subject) use ($logs) {
+                    $sub = $logs->where('subject', $subject);
+                    return [$subject => ['right' => $sub->where('mark', 4)->count(), 'wrong' => $sub->where('mark', -1)->count(), 'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark')]];
+                });
+                return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total')];
+            })->values();
+
             $pdf = Pdf::loadView('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
             return $pdf->download("OVERALLPRINT-$exam->name - $section.pdf");
         }
 
         if ($request->query('type') == 'omr') {
             $section = $request->section;
-            $exam = Exam::where('name', $test_name)->first();
 
-           $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->whereIn('test_id', Exam::where('name', $test_name)->pluck('testid'))->orderBy('student_id')->orderBy('q_no')->get();
+            $stats  = ExamAnswer::selectRaw("exam_answer.*,a.student_name,COUNT(*) * 4 as max_marks,SUM(mark = 4) as right_answers,SUM(mark = -1) as wrong_answers,SUM(mark = 0) as left_answers,SUM(mark) as total_marks")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->groupBy('student_id')->get()->groupBy('student_id');
 
-            $students = $answers->groupBy('student_id')->map(function ($items) {
-                $student = $items->first()->student;
-                $testId = $items->first()->test_id;
-                $subjects = $items->groupBy('subject')->map(function ($sub) {
-                    return ['subject' => $sub->first()->subject, 'right' => $sub->where('mark', 4)->count(), 'wrong' => $sub->where('mark', -1)->count(), 'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark'), 'max' => $sub->count() * 4];
-                })->values();
-                $totalRight = $subjects->sum('right');
-                $totalWrong = $subjects->sum('wrong');
-                $totalLeft  = $subjects->sum('left');
-                $totalMarks = $subjects->sum('total');
-                $maxMarks   = $subjects->sum('max');
-                $splitAnswers = $items->chunk(ceil($items->count() / 4))->values();
-                return ['student_id'   => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $testId, 'answers' => $splitAnswers, 'subjects' => $subjects, 'totals' => compact('totalRight', 'totalWrong', 'totalLeft', 'totalMarks', 'maxMarks')];
+            $allAnswers = ExamAnswer::where('testname', $test_name)->whereIn('student_id', $stats->keys())->orderBy('student_id')->orderBy('q_no')->get()->groupBy('student_id');
+
+            $students = $stats->map(function ($subjects, $studentId) use ($allAnswers) {
+                $first = $subjects->first();
+                $answers = $allAnswers->get($studentId, collect());
+                $chunkedAnswers = $answers->chunk(ceil($answers->count() / 4))->values();
+
+                $subjectData = $subjects->map(fn($s) => ['subject' => $s->subject, 'right' => $s->right_answers, 'wrong' => $s->wrong_answers, 'left' => $s->left_answers, 'total' => $s->total_marks, 'max' => $s->max_marks,]);
+
+                return ['student_id' => $studentId, 'student_name' => $first->student_name, 'answers' => $chunkedAnswers, 'subjects' => $subjectData, 'totals' => ['totalRight' => $subjectData->sum('right'), 'totalWrong' => $subjectData->sum('wrong'), 'totalLeft' => $subjectData->sum('left'), 'totalMarks' => $subjectData->sum('total'), 'maxMarks'   => $subjectData->sum('max'),]];
             });
-            $pdf = Pdf::loadView('report.omr_print', compact('answers', 'exam', 'students', 'test_name'));
+
+
+            $pdf = Pdf::loadView('report.omr_print', compact('answers', 'students', 'test_name'));
             return $pdf->download("OMRPRINT-$exam->name - $section.pdf");
         }
 
@@ -159,7 +157,7 @@ class ReportController extends Controller
 
         if (!$exam) return back()->with('error', 'Exam not found.');
 
-        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("q_no, COUNT(student_id) AS total, SUM(answer > 0) AS least")->groupBy('q_no')->get();
+        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("q_no, COUNT(student_id) AS total, SUM(answer > 0) AS least")->groupBy('q_no')->get();
 
         $csvData = [['Title', 'Least Attempted Questions'], ['Exam Name', $exam->name], [], ['S.NO', 'Q.NO', 'PERCENTAGE']];
 
@@ -178,7 +176,7 @@ class ReportController extends Controller
 
         $sumExp = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s', mark, 0)) AS `$s`")->implode(',');
 
-        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id, SUM(mark) AS total, $sumExp")->groupBy('student_id')->orderByDesc('total')->get();
+        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id, SUM(mark) AS total, $sumExp")->groupBy('student_id')->orderByDesc('total')->get();
 
         $csvData = [['Title', 'Common Track Topper'], ['Exam Name', $exam->name], [], array_merge(['Student ID', 'Student Name', 'Branch', 'Exam Date', 'Batch'], $subjects, ['Total'])];
         foreach ($answers as $a) {
@@ -199,7 +197,7 @@ class ReportController extends Controller
         $subjects = array_map('trim', explode(',', strtoupper($exam->subject_name)));
 
         $expr = collect($subjects)->map(fn($s) => "GROUP_CONCAT(IF(mark=-1 AND subject='$s', q_no, NULL) SEPARATOR '|') AS `{$s}WRONGLY`, GROUP_CONCAT(IF(mark=0 AND subject='$s', q_no, NULL) SEPARATOR '|') AS `{$s}NOT ATTEMPTED`")->implode(',');
-        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id, SUM(mark) AS total, $expr")->groupBy('student_id')->orderByDesc('total')->get();
+        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id, SUM(mark) AS total, $expr")->groupBy('student_id')->orderByDesc('total')->get();
 
         $headers = [];
         foreach ($subjects as $s) {
@@ -232,7 +230,7 @@ class ReportController extends Controller
         $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
 
-        $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("exam_answer.student_id, s.student_name, s.campus, s.batch, s.section,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->where('s.section', '!=', '')->groupBy('exam_answer.student_id')->orderBy('s.section')->orderByDesc('total')->get();
+        $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->where('testname', $request->test_name)->selectRaw("exam_answer.student_id, s.student_name, s.campus, s.batch, s.section,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->where('s.section', '!=', '')->groupBy('exam_answer.student_id')->orderBy('s.section')->orderByDesc('total')->get();
 
         $csvHeaders = ['Section', 'Student ID', 'Student Name', 'Branch', 'Batch', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total', 'Overall Percentage'];
 
@@ -276,7 +274,7 @@ class ReportController extends Controller
 
         $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,COUNT(IF(subject='$s',1,NULL)) AS `{$s}_TOTAL`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
-        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
+        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
 
         $overallRanks = $answers->sortByDesc('total')->values()->mapWithKeys(fn($a, $i) => [$a->student_id => $i + 1]);
 
@@ -333,7 +331,7 @@ class ReportController extends Controller
             $csvHeaders = array_merge($csvHeaders, ["{$r[0]}-{$r[1]}"]);
         }
 
-        $studentmark = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(mark) AS total")->groupBy('student_id');
+        $studentmark = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id,SUM(mark) AS total")->groupBy('student_id');
 
         $results = Branch::join('student as b', 'branch.id', '=', 'b.campus')->leftJoinSub($studentmark, 'c', fn($join) => $join->on('c.student_id', '=', 'b.student_id'))->selectRaw("branch.name,count(b.student_id)actual_str,count(c.student_id)appeared_str,max(c.total)max_marks,min(c.total)min_marks,$rangeExprs")->groupBy('branch.name')->orderBy('branch.name')->get();
 
@@ -380,7 +378,7 @@ class ReportController extends Controller
             $csvHeaders = array_merge($csvHeaders, ["{$r[0]}-{$r[1]}"]);
         }
 
-        $studentmark = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(mark) AS total")->groupBy('student_id');
+        $studentmark = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id,SUM(mark) AS total")->groupBy('student_id');
 
         $results = Student::joinSub($studentmark, 'c', fn($join) => $join->on('c.student_id', '=', 'student.student_id'))->selectRaw("student.section,count(student.student_id)actual_str,count(c.student_id)appeared_str,max(c.total)max_marks,min(c.total)min_marks,$rangeExprs")->where('student.section', '!=', '')->groupBy('student.section')->orderBy('student.section')->get();
 
@@ -409,7 +407,7 @@ class ReportController extends Controller
 
         $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
-        $answers = ExamAnswer::whereIn('test_id', Exam::where('name', $exam->name)->pluck('testid'))->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
+        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
 
 
 
