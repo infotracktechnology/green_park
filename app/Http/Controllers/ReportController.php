@@ -34,7 +34,7 @@ class ReportController extends Controller
         if ($request->query('type') == 'overall') {
             $section = $request->section;
 
-            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->get();
+            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->orderBy('a.student_name')->get();
 
             $subjects = $answers->pluck('subject')->unique()->values()->toArray();
             $results = $answers->groupBy('student_id')->map(function ($logs) use ($subjects) {
@@ -52,7 +52,7 @@ class ReportController extends Controller
 
         if ($request->query('type') == 'omr') {
             $section = $request->section;
-            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->get();
+            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->get();
             
             $pdf = PDF::loadView('report.omr_print', compact('answers', 'test_name'));
             return $pdf->download("OMRPRINT-$test_name-$section.pdf");

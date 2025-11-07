@@ -47,14 +47,14 @@
     <table class="student-info">
         <tr>
             <td width="50%">Student Name: <?php echo auth()->user()->student_name; ?></td>
-            <td width="50%">Exam Date: <?php echo $exam->name; ?></td>
+            <td width="50%">Exam: <?php echo $exam->exam_date; ?></td>
         </tr>
         <tr>
             <td width="50%">Subject: <?php echo $exam->name; ?></td>
             <td width="50%">User Name: <?php echo auth()->user()->user_name; ?></td>
         </tr>
         <tr>
-            <td colspan="2">Test ID: <?php echo $exam->id; ?></td>
+            <td colspan="2">Test ID: <?php echo $exam->testid; ?></td>
         </tr>
     </table>
     

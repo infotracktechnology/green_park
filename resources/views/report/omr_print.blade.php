@@ -17,7 +17,7 @@
 </head>
 
 <body>
-  @foreach($answers->groupBy('student_id') as $answer)
+  @foreach($answers->groupBy('student_id') as $student_id => $answer)
   <div class="page">
     <div class="title">OMR VALUATION REPORT {{ $test_name }}</div>
      <table style="width: 100%;">
@@ -56,7 +56,41 @@
     </tr>
     </table>
 
-   
+     <div class="header">
+      <span>STUDENT: {{ $answer->first()->student_name }}</span>
+      <span>EXAM: {{ $test_name }}</span>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Right</th>
+          <th>Wrong</th>
+          <th>Left</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($answer->pluck('subject')->unique() as $sub)
+        <tr>
+          <td>{{ $sub }}</td>
+          <td>{{ $answer->where('subject', $sub)->where('mark', 4)->count() }}</td>
+          <td>{{ $answer->where('subject', $sub)->where('mark', -1)->count() }}</td>
+          <td>{{ $answer->where('subject', $sub)->where('mark', 0)->count() }}</td>
+          <td>{{ $answer->where('subject', $sub)->sum('mark') }}</td>
+        </tr>
+        @endforeach
+        <tr class="bold">
+          <td>Total</td>
+          <td>{{ $answer->where('mark', 4)->count() }}</td>
+          <td>{{ $answer->where('mark', -1)->count() }}</td>
+          <td>{{ $answer->where('mark', 0)->count() }}</td>
+          <td>{{ $answer->sum('mark') }}</td>
+        </tr>
+      </tbody>
+    </table>
+
   </div>
   @endforeach
 </body>
