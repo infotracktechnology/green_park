@@ -143,26 +143,30 @@ class StudentController extends Controller
     function marksheet(Request $request)
     {
         $sid = auth()->user()->student_id;
-        $tests = DB::table("exam_answer as a")->join('exam as b', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get();
+
+        $exams = DB::table("exam_answer as a")->join('exam as b', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total,markrange")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) {
+            return ['exam_date' => $test->exam_date,'name' => $test->name,'test_id' => $test->test_id,'mark' => $test->mark,'total' => $test->total,'markrange' => $test->markrange,'first_mark' => ExamAnswer::where('test_id', $test->test_id)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderByDesc('mark')->value('mark')];
+        });
+
         $subjectexam = null;
         if($request->exam){
            $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         }
-        return view('student.marksheet', compact('tests', 'subjectexam'));
+        return view('student.marksheet', compact('exams', 'subjectexam'));
     }
 
-    function mark_subject(Request $request, $test_id)
+    function mark_subject(Request $request, $testid)
     {
         $sid = auth()->user()->student_id;
-        $test = DB::select("SELECT sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject FROM `exam_answer` where test_id=$test_id and student_id=$sid group by subject");
-        return view('student.mark_subject', compact('test'));
+        $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject")->where('test_id', $testid)->where('student_id', $sid)->groupBy('subject')->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")->get();
+        return view('student.mark_subject', compact('subjects'));
     }
-    function mark_download(Request $request, $test_id)
+    function mark_download(Request $request, $testid)
     {
         $sid = auth()->user()->student_id;
-        $answers = DB::table('exam_answer')->where('test_id', $test_id)->where('student_id', $sid)->orderBy('q_no')->get();
+        $answers = ExamAnswer::where('test_id', $testid)->where('student_id', $sid)->orderBy('q_no')->get();
         $answers = $answers->chunk(45);
-        $exam = Exam::where('id', $test_id)->selectRaw("name,id")->first();
+        $exam = Exam::where('testid', $testid)->where('academic_year', $this->academic_year)->first();
         $pdf = Pdf::loadView('pdf.marksheet', compact('answers', 'exam'));
         return $pdf->download("$exam->name - $sid.pdf");
     }
@@ -171,7 +175,7 @@ class StudentController extends Controller
 
     public function getExamStartTime()
     {
-        $exam = Exam::latest()->first();
+        $exam = Exam::where('')->first();
 
         if (!$exam || !$exam->start_at) {
             return response()->json(['error' => 'Exam start time not found'], 404);

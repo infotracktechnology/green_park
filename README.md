@@ -1,66 +1,120 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Green Park Educational Management System - Qwen Coder CLI Documentation
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## System Overview
 
-## About Laravel
+This is a Laravel 9.x based educational management platform that handles student lifecycle, examinations, academic resources, and institutional operations. The system integrates Firebase for real-time features and supports PDF generation for reports and documents.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Codebase Architecture
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Framework Stack
+- **Backend**: Laravel 9.x with PHP 8.0+
+- **Frontend**: Blade templating with Bootstrap UI
+- **Database**: MySQL with Eloquent ORM
+- **Real-time**: Firebase Integration
+- **PDF Generation**: DomPDF
+- **Authentication**: Multi-auth system (admin and student guards)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Directory Structure
+```
+├── app/
+│   ├── Http/Controllers/           # MVC Controllers
+│   │   ├── Auth/                   # Authentication controllers
+│   │   ├── HomeController.php      # Dashboard and admin functions
+│   │   ├── StudentController.php   # Student management
+│   │   ├── ExamController.php      # Examination system
+│   │   ├── FinanceController.php   # Financial operations
+│   │   ├── HostelController.php    # Hostel management
+│   │   ├── ExportController.php    # Data export functionality
+│   │   ├── ImportController.php    # Data import functionality
+│   │   └── ReportController.php    # Report generation
+│   ├── Models/                     # Eloquent Models
+│   │   ├── Student.php             # Student entity with SoftDeletes
+│   │   ├── Exam.php                # Examination entity
+│   │   ├── Attendance.php          # Attendance tracking
+│   │   ├── Branch.php              # Branch/Location entity
+│   │   ├── Announcement.php        # Announcement system
+│   │   └── Hostel.php              # Hostel management
+│   └── Providers/                  # Service Providers
+│       ├── FcmServiceProvider.php  # Firebase Cloud Messaging
+│       └── CsvServiceProvider.php  # CSV processing services (if exists)
+├── config/                         # Configuration files
+│   ├── firebase.php                # Firebase service configuration
+│   └── filesystems.php             # File storage configuration
+├── routes/
+│   ├── web.php                     # Web routes with middleware
+│   ├── api.php                     # API endpoints (v2)
+│   └── channels.php                # Broadcasting channels
+├── resources/views/                # Blade templates
+│   ├── layouts/                    # Main layout templates
+│   ├── student/                    # Student-specific views
+│   ├── exam/                       # Examination views
+│   ├── finance/                    # Financial management views
+│   ├── hostel/                     # Hostel management views
+│   ├── dashboards/                 # Dashboard views
+│   └── pdf/                        # PDF generation templates
+├── public/                         # Public assets
+│   ├── bundles/                    # JS/CSS libraries (DataTables, etc.)
+│   ├── css/                        # Stylesheets
+│   ├── js/                         # JavaScript files
+│   └── uploads/                    # File uploads
+└── storage/                        # File uploads and cache
+```
 
-## Learning Laravel
+### Core Features
+1. **Student Management**: Complete lifecycle including registration, profiles, sections, and academic tracking
+2. **Examination System**: Online/offline tests, answer keys, marking, and result analysis
+3. **Attendance Tracking**: Both regular and hostel attendance with detailed reporting
+4. **Hostel Management**: Room allocation, attendance, sick room entries, and student activities
+5. **Finance System**: Fee plans, collection, and tracking
+6. **Communication**: Announcements, videos (chairman, class, discussion), and parent concerns
+7. **Academic Resources**: Timetables, question papers, answer keys, worksheets, and study materials
+8. **Reporting**: Comprehensive reports with analytics and data visualization
+9. **API Integration**: v2 API for mobile applications and external integrations
+10. **Multi-auth System**: Separate authentication for admin and student users
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Authentication & Middleware
+- Admin users (web guard): Full system access
+- Student users (student guard): Limited to student-specific functions
+- Academic year filtering across the application
+- Branch-based access control
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Database Design
+- Uses both Eloquent ORM and direct DB queries where needed
+- Soft deletes implemented on key models
+- JSON fields for flexible data storage (e.g., student menu configuration)
+- Foreign key relationships between entities (Student → Branch, etc.)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### API Structure
+- v2 API endpoints in routes/api.php
+- Student profile, attendance, examination results
+- Resource management (videos, documents, announcements)
+- Mobile application support with token authentication
 
-## Laravel Sponsors
+### Key Controllers
+- HomeController: Main dashboard and administrative functions
+- StudentController: Student lifecycle management
+- ExamController: Full examination workflow
+- FinanceController: Fee management
+- ReportController: Analytics and reporting
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### Frontend Components
+- Bootstrap 4 UI framework
+- DataTables for data presentation and sorting
+- Select2 for enhanced select inputs
+- Summernote for rich text editing
+- Custom JavaScript for dynamic form interactions
+- PDF generation for reports using DomPDF
 
-### Premium Partners
+### Coding Patterns
+- Resource controllers with RESTful routing
+- Custom query methods in models (e.g., StudentFilterQuery)
+- Reusable components in blade templates
+- JavaScript functions for form validation and dynamic updates
+- Centralized navigation with sidebar menu
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Security
+- Laravel's built-in authentication
+- Form request validation
+- CSRF protection
+- Input sanitization
+- Secure file uploads

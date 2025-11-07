@@ -84,7 +84,6 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
     Route::put('sickroom/{id}', [SickRoomEntryController::class, 'update'])->name('sickroom.update');
 
-    // Exams
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {
         Route::get('examination/instruction/{test_id}', 'instruction')->name('exam.instruction');
@@ -103,6 +102,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('examination/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
         Route::match(['get', 'post'],'examination/publish','Publish')->name('exam.publish');
         Route::get('examination/perviousexamresult/', 'PerviousExamResult')->name('exam.perviousexamresult');
+       Route::match(['get', 'post'],'examination/previousexamupload','PreviousExamUpload')->name('exam.previousexamupload'); 
     });
     
     Route::resource('examportion', ExamPortionController::class);
@@ -122,7 +122,6 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
 
     Route::resource('achievement', AchievementController::class);
 
-    // Videos
     Route::resource('classvideo', ClassVideoController::class)->except(['show']);
     Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
     Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
@@ -135,7 +134,6 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('revisionvideo', RevisionVideoController::class);
     Route::post('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
 
-    // Other
     Route::resources([
         'academicyear' => \App\Http\Controllers\AcademicYearController::class,
         'holiday'      => \App\Http\Controllers\HolidayController::class,
@@ -154,7 +152,6 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
 
     Route::match(['get', 'post'], '/shiftwork/assign', [\App\Http\Controllers\WorkshiftController::class, 'assign'])->name('workshift.assign');
 
-    // Reports
     Route::prefix('report')->as('report.')->group(function () {
         Route::get('/log', [ReportController::class, 'LogReport'])->name('log');
         Route::get('/attendance', [ReportController::class, 'AttendanceReport'])->name('attendance');

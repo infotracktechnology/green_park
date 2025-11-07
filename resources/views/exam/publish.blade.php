@@ -74,7 +74,14 @@
                           <td>{{ $exam->name }}</td>
                           <td>{{ $exam->testcategory }}</td>
                           <td>{{ $exam->total_questions }}</td>
-                          <td><input type="file" name="markrange[]" accept="application/pdf" class="form-control form-control-sm"></td>
+                          <td>
+                            @if($exam->markrange)
+                            <a href="{{ env('APP_URL').$exam->markrange }}" download>Download</a>
+                            <a class="btn btn-danger" href="{{ route('exam.markrange')?delete=$exam->testcategory }}"><i class="fas fa-trash"></i></a>
+                            @else
+                            <input type="file" name="markrange[]" accept="application/pdf" class="form-control form-control-sm">
+                            @endif
+                          </td>
                           <td>
                             <select name="publish[]" class="form-control form-control-sm" required>
                              <option value="">Select Option</option>

@@ -187,7 +187,7 @@ class ExamController extends Controller
 
     function Save(Request $request)
     {
-        $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year,'testname' => $request->testname];
+        $data = ['test_id' => $request->test_id, 'student_id' => auth()->user()->student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year, 'testname' => $request->testname];
         $answer = ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->first();
         if ($answer) {
             ExamAnswer::where('test_id', $request->test_id)->where('student_id', auth()->user()->student_id)->where('q_no', $request->q_no)->update($data);
@@ -239,10 +239,7 @@ class ExamController extends Controller
         $studentId = $request->student_id;
         $testId = $request->test_id;
 
-        DB::table('exam_answer')
-            ->where('student_id', $studentId)
-            ->where('test_id', $testId)
-            ->delete();
+        ExamAnswer::where('student_id', $studentId)->where('test_id', $testId)->delete();
 
         return redirect()->back()->with('success', 'Exam enabled successfully!');
     }
@@ -358,7 +355,7 @@ class ExamController extends Controller
 
             for ($i = 1; $i <= $exam->total_questions; $i++) {
                 $subject = $this->determineSubject($i, $exam->phy_start, $exam->phy_end, $exam->chem_start, $exam->chem_end, $exam->bot_start, $exam->bot_end, $exam->zoo_start, $exam->zoo_end);
-                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'],'testname'=>$exam->name, 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
+                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
             }
             $exam_answer = ExamAnswer::insert($record);
         }
@@ -482,19 +479,7 @@ class ExamController extends Controller
             );
         }
     }
-    public function Dump_Report(Request $request)
-    {
-        $test_name = $request->test_name ?? '';
-        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
-        $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->implode('testid', ',');
 
-        if (empty($test_ids)) {
-            return view('exam.dump_report', compact('test_name', 'tests'))->with('results', collect());
-        }
-
-        $results = DB::select("SELECT test_id,a.student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.student_id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
-        return view('exam.dump_report', compact('test_name', 'results', 'tests', 'test_ids'));
-    }
 
     public function deleteAnswerKey($id, $test_id)
     {
@@ -514,7 +499,11 @@ class ExamController extends Controller
     {
         $exams = [];
         if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish")->groupBy('name')->get();
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange")->groupBy('name')->get();
+        }
+        if ($request->delete) {
+            Exam::where('name', $request->delete)->where('academic_year', $this->academic_year)->update(['markrange' => null]);
+            return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
         }
 
         if ($request->isMethod('post')) {
@@ -524,7 +513,7 @@ class ExamController extends Controller
                 $exam['publish'] = $publishs[$key] ?? 'No';
                 if (isset($markranges[$key]) && $markranges[$key]->isValid()) {
                     $file = $markranges[$key];
-                    $filename = time() . '-' . $file->getClientOriginalName();
+                    $filename = $file->getClientOriginalName();
                     $file->move('assets/markrange', $filename);
                     $exam['markrange'] = 'assets/markrange/' . $filename;
                 }
@@ -562,5 +551,36 @@ class ExamController extends Controller
         }
 
         return view('exam.perviousexamresult', compact('exams', 'category', 'exam', 'headers'));
+    }
+
+    public function PreviousExamUpload(Request $request, ImportController $import){
+        
+        if ($request->isMethod('post')) {
+            $exam = Exam::where('name', $request->examname)->where('academic_year', $this->academic_year)->first();
+            $rows = $import->parseCSV($request->file('perviousexamfile')->getRealPath());
+            $rows = array_map(function ($row) use ($exam, $request) {
+                $row['subject'] = $request->examname;
+                $row['exdate'] = date('d-m-Y', strtotime($exam->exam_date));
+                return $row;
+            }, $rows);
+
+            try{
+            ExamSubjectReport::insert($rows);
+            }
+            catch(\Exception $e){
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+            
+            return redirect()->back()->with('success', "Previous Exam Result Uploaded Successfully.");
+        }
+
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $exam = [];
+
+        if ($request->testcategory) {
+            $exam = Exam::where('testcategory', $request->testcategory)->where('academic_year', $this->academic_year)->groupBy('name')->get();
+        }
+     
+        return view('exam.previousexamupload',compact('category', 'exam'));
     }
 }
