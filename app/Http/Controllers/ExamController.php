@@ -239,10 +239,7 @@ class ExamController extends Controller
         $studentId = $request->student_id;
         $testId = $request->test_id;
 
-        DB::table('exam_answer')
-            ->where('student_id', $studentId)
-            ->where('test_id', $testId)
-            ->delete();
+        ExamAnswer::where('student_id', $studentId)->where('test_id', $testId)->delete();
 
         return redirect()->back()->with('success', 'Exam enabled successfully!');
     }
@@ -482,19 +479,7 @@ class ExamController extends Controller
             );
         }
     }
-    public function Dump_Report(Request $request)
-    {
-        $test_name = $request->test_name ?? '';
-        $tests = Exam::where('academic_year', $this->academic_year)->groupBy('name')->get();
-        $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->implode('testid', ',');
 
-        if (empty($test_ids)) {
-            return view('exam.dump_report', compact('test_name', 'tests'))->with('results', collect());
-        }
-
-        $results = DB::select("SELECT test_id,a.student_id,mode as stmode,GROUP_CONCAT(DISTINCT subject)subjects,sum(mark)mark,b.student_name,c.name,b.coaching_type,b.gender,b.section FROM `exam_answer` a join student b on a.student_id=b.student_id join branch c on b.campus=c.id where test_id in ($test_ids)  group by student_id order by mark desc");
-        return view('exam.dump_report', compact('test_name', 'results', 'tests', 'test_ids'));
-    }
 
     public function deleteAnswerKey($id, $test_id)
     {
@@ -573,11 +558,19 @@ class ExamController extends Controller
         if ($request->isMethod('post')) {
             $exam = Exam::where('name', $request->examname)->where('academic_year', $this->academic_year)->first();
             $rows = $import->parseCSV($request->file('perviousexamfile')->getRealPath());
-            $rows = array_map(function ($row) {
+            $rows = array_map(function ($row) use ($exam, $request) {
                 $row['subject'] = $request->examname;
                 $row['exdate'] = date('d-m-Y', strtotime($exam->exam_date));
+                return $row;
             }, $rows);
+
+            try{
             ExamSubjectReport::insert($rows);
+            }
+            catch(\Exception $e){
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+            
             return redirect()->back()->with('success', "Previous Exam Result Uploaded Successfully.");
         }
 
@@ -585,9 +578,9 @@ class ExamController extends Controller
         $exam = [];
 
         if ($request->testcategory) {
-            $exam = Exam::where('name', $request->examname)->where('academic_year', $this->academic_year)->get();
+            $exam = Exam::where('testcategory', $request->testcategory)->where('academic_year', $this->academic_year)->groupBy('name')->get();
         }
      
-        return view('exam.previousexamresultupload',compact('category', 'exam'));
+        return view('exam.previousexamupload',compact('category', 'exam'));
     }
 }

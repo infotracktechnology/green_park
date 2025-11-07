@@ -6,15 +6,23 @@
 <div class="main-content">
   <section class="section">
     <div class="section-body">
+      @if(session('success'))
+      <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
+      @endif
+
+      @if(session('error'))
+      <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
+      @endif
+
       <div class="card card-primary">
-        <form method="post" enctype="multipart/form-data" action="{{ route('exam.perviousexamresultupload') }}">
+        <form method="post" enctype="multipart/form-data" action="{{ route('exam.previousexamupload') }}">
           @csrf
 
           <div class="card-header">
-            <div class="col-md-6">
-            <h4>Previous Exam Result Upload</h4>
+            <div class="col-md-8">
+              <h4>Previous Exam Result Upload</h4>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <a href="{{ env('APP_URL').'template/pervoiusexamtemplate.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Previous Exam Result Upload Template (Format)</a>
             </div>
           </div>
@@ -37,7 +45,7 @@
                 <select name="examname" id="examname" class="select2" required>
                   <option value="">Select Test</option>
                   @foreach ($exam as $row)
-                  <option value="{{ $row->subject }}" @selected($row->subject==request('examname'))>{{ $row->subject }}</option>
+                  <option value="{{ $row->name }}" @selected($row->name==request('examname'))>{{ $row->name }}</option>
                   @endforeach
                 </select>
               </div>
@@ -45,11 +53,10 @@
               <div class="form-group col-lg-4">
                 <label>Upload File</label>
                 <input type="file" name="perviousexamfile" class="form-control form-control-sm" accept=".csv" required>
-                <span class="text-muted">Please upload only CSV file and file size should be less than 2MB</span>
+                <span class="text-danger">File size should be less than 2MB</span>
               </div>
 
               <div class="form-group col-lg-2">
-                <label>&nbsp;</label>
                 <button type="submit" class="btn btn-primary btn-block">Submit</button>
               </div>
             </div>
@@ -67,7 +74,7 @@
 <script>
   $('#testcategory').change(() => {
     const category = $('#testcategory').val();
-    window.location = `{{ route('exam.perviousexamresultupload') }}?testcategory=${category}`;
+    window.location = `{{ route('exam.previousexamupload') }}?testcategory=${category}`;
   });
 </script>
 @endsection
