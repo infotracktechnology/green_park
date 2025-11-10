@@ -83,7 +83,7 @@ class Student extends Authenticatable
  }
 
     private static function generateName($course,$student_id){
-        if($course == "XI - OB" || $course == "XII - OB"){
+        if($course == "XI-OB" || $course == "XII-OB"){
             return 'S'.$student_id;
         }else{
             return 'L'.$student_id;

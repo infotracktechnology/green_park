@@ -32,8 +32,8 @@
                                  <label>Type</label>
                                  <select name="type" id="type" class="form-control form-control-sm" required>
                                     <option value="">Select</option>
-                                    <option value="Boys">Boys</option>
-                                    <option value="Girls">Girls</option>
+                                    <option value="MALE">Boys</option>
+                                    <option value="FEMALE">Girls</option>
                                  </select>
                               </div>
                               <div class="form-group col-lg-3">

@@ -19,32 +19,32 @@ use App\Models\HostelAttendance;
 class HostelController extends Controller
 {
     public function index(Request $request)
-{
-    $hostels = Hostel::when(auth()->user()->branch, function ($query) {
-        $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-    })
-    ->get();
+    {
+        $hostels = Hostel::when(auth()->user()->branch, function ($query) {
+            $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+        })
+            ->get();
 
 
 
-    $branches = Branch::all();
-    $staffs = Staff::all();
+        $branches = Branch::all();
+        $staffs = Staff::all();
 
-    return view('hostel.index', compact('hostels', 'branches', 'staffs'));
-}
+        return view('hostel.index', compact('hostels', 'branches', 'staffs'));
+    }
 
 
     public function create(Request $request)
     {
         // $branches = DB::table('branch')->select('id', 'name')->get(); 
         $staffs = DB::table('staff')->select('id', 'name')->get();
-        $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get(); 
+        $states = DB::table('district_list')->select('State')->distinct()->orderby('State')->get();
         if ($request->has('state')) {
             $districts = DB::table('district_list')->where('State', $request->state)->select('District')->distinct()->orderby('District')->get();
             return response()->json($districts);
         }
 
-        return view('hostel.create', compact('states', 'staffs')); 
+        return view('hostel.create', compact('states', 'staffs'));
     }
 
     public function store(Request $request)
@@ -57,19 +57,18 @@ class HostelController extends Controller
             'room_type' => 'required|string',
         ]);
 
-        $hostel = Hostel::create($request->only(['branch_id','name','type','warden_name','room_type']));
+        $hostel = Hostel::create($request->only(['branch_id', 'name', 'type', 'warden_name', 'room_type']));
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $room) {
-                for ($i=1; $i <= $room['no_of_cots'] ; $i++) { 
-                   $hostel->rooms()->create([
-                    'floor' => $room['floor'],
-                    'room_no' => $room['room_no'],
-                    'no_of_cots' => $room['no_of_cots'],
-                    'cart_no' => "C-".$i,
-                ]); 
+                for ($i = 1; $i <= $room['no_of_cots']; $i++) {
+                    $hostel->rooms()->create([
+                        'floor' => $room['floor'],
+                        'room_no' => $room['room_no'],
+                        'no_of_cots' => $room['no_of_cots'],
+                        'cart_no' => "C-" . $i,
+                    ]);
                 }
-                
             }
         }
 
@@ -80,7 +79,7 @@ class HostelController extends Controller
     public function edit(Request $request, $id)
     {
         $hostel = Hostel::with('rooms')->findOrFail($id);
-      
+
         $staffs = Staff::all();
         $rooms = HostelRoom::where('hostel_id', $id)->groupBy('room_no')->orderBy('id')->get()->toArray();
         return view('hostel.edit', compact('hostel',  'staffs', 'rooms'));
@@ -109,27 +108,25 @@ class HostelController extends Controller
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $row) {
-                for ($i=1; $i <= $row['no_of_cots'] ; $i++) { 
-                  $cart_no = "C-".$i;
-                  $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $row['room_no'])->where('cart_no', $cart_no)->first();
-                  if($room){
-                    $room->update([
-                      'floor' => $room['floor'],
-                      'room_no' => $room['room_no'],
-                      'no_of_cots' => $room['no_of_cots'],
-                      'cart_no' => $cart_no,
-                  ]);
-                  }
-                  else{
-                    $hostel->rooms()->create([
-                      'floor' => $row['floor'],
-                      'room_no' => $row['room_no'],
-                      'no_of_cots' => $row['no_of_cots'],
-                      'cart_no' => $cart_no,
-                  ]);
-                  }
+                for ($i = 1; $i <= $row['no_of_cots']; $i++) {
+                    $cart_no = "C-" . $i;
+                    $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $row['room_no'])->where('cart_no', $cart_no)->first();
+                    if ($room) {
+                        $room->update([
+                            'floor' => $room['floor'],
+                            'room_no' => $room['room_no'],
+                            'no_of_cots' => $room['no_of_cots'],
+                            'cart_no' => $cart_no,
+                        ]);
+                    } else {
+                        $hostel->rooms()->create([
+                            'floor' => $row['floor'],
+                            'room_no' => $row['room_no'],
+                            'no_of_cots' => $row['no_of_cots'],
+                            'cart_no' => $cart_no,
+                        ]);
+                    }
                 }
-                
             }
         }
 
@@ -161,7 +158,7 @@ class HostelController extends Controller
     {
         $branches = Branch::all();
         $hostels = [];
-    
+
         if ($request->has('branch')) {
             $branch = $request->branch;
             $hostels = Hostel::where('branch_id', $branch)->get();
@@ -177,9 +174,9 @@ class HostelController extends Controller
 
         return view('hostel.allocation', compact('branches', 'hostels'));
     }
-    public function storeAllocation(Request $request,ImportController $import)
+    public function storeAllocation(Request $request, ImportController $import)
     {
-       
+
         $csvFile = $request->file('file');
         $csvData = $import->parseCSV($csvFile->getRealPath());
 
@@ -189,8 +186,8 @@ class HostelController extends Controller
         if ($dataRowCount > $totalRooms) {
             return redirect()->back()->with('error', "The number of rows in the CSV file ($dataRowCount) exceeds the total number of rooms in the selected hostel ($totalRooms).");
         }
-       
-       foreach ($csvData as $key => $row) {
+
+        foreach ($csvData as $key => $row) {
             $no = $key + 1;
 
             if (!isset($row['stuid'])) {
@@ -198,18 +195,51 @@ class HostelController extends Controller
             }
 
             $room  = HostelRoom::where('hostel_id', $request->hostel)->where('room_no', $row['room_no'])->where('cart_no', $row['cot_no'])->first();
-            if($room){
+            if ($room) {
                 $stuid = $row['stuid'] ?? 0;
                 $student = Student::where('student_id', $stuid)->first();
-                if($student){
-                $student->update(['hostel_id' => $request->hostel,'room_no' => $row['room_no'], 'cots_no' => $row['cot_no'],'hostel_dayscholar' => 'Hostel']);
+                if ($student) {
+                    $student->update(['hostel_id' => $request->hostel, 'room_no' => $row['room_no'], 'cots_no' => $row['cot_no']]);
                 }
             }
-       }
+        }
 
-        return redirect()->route('allocation.hostel')->with('success', 'Hostel Allocation Successfully Updated.');
+        return redirect()->route('allocation.hostel')->with('success', 'Hostel Allocation Successfully Updated Check Hostel Room Wise Report.');
     }
-    
+
+    public function RoomReallocation(Request $request)
+    {
+        $branchId = $request->branch;
+        $hostelId = $request->hostel;
+        $roomNo   = $request->room;
+        $deleteId = $request->delete;
+
+        if ($request->isMethod('post')) {
+            $data = $request->except(['_token','student_id']);
+            $student = Student::where('student_id', $request->student_id)->update($data);
+            return back()->with('success', "New students allocated successfully for student $request->student_id in room $request->room_no");
+        }
+
+        if ($deleteId) {
+            Student::where('student_id', $deleteId)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '']);
+            return back()->with('success', "Cot removed successfully for student $deleteId");
+        }
+
+        $hostel = $branchId ? Hostel::where('branch_id', $branchId)->get() : collect();
+
+        $room = $hostelId ? HostelRoom::where('hostel_id', $hostelId)->distinct()->pluck('room_no') : collect();
+
+        $availableStudents = collect();
+
+        if ($branchId && $hostelId) {
+            $type = Hostel::find($hostelId)?->type;
+            $availableStudents = Student::where('campus', $branchId)->where('hostel_dayscholar', 'HOSTEL')->when($type, fn($q) => $q->where('gender', $type))->where(fn($q) => $q->whereNull('cots_no')->orWhere('cots_no',''))->get();
+        }
+
+        $allocatedStudents = ($hostelId && $roomNo) ? Student::where('hostel_id', $hostelId)->where('room_no', $roomNo)->get() : collect();
+
+        return view('hostel.reallocation', compact('hostel', 'room', 'availableStudents', 'allocatedStudents'));
+    }
 
 
     public function attendanceEntry(Request $request)
@@ -220,25 +250,23 @@ class HostelController extends Controller
         $attendances = [];
         $branches = DB::table('branch')->select('id', 'name')->get();
         // $academicyear = DB::table('student')->select('academic_year')->distinct()->get();
-    
+
         if ($request->has('show')) {
-            $students = Student ::where('hostel_id', $request->hostel)
-               
+            $students = Student::where('hostel_id', $request->hostel)
+
                 ->where('room_no', $request->room_no)
                 ->select('student_id', 'student_name', 'academic_year', 'coaching_type')
                 ->get();
         }
-    
-        return view('hostel.hostelattendance', compact(
-             'hostels', 'rooms', 'students', 'attendances', 'branches'
-        ));
+
+        return view('hostel.hostelattendance', compact('hostels','rooms','students','attendances','branches'));
     }
 
-  
+
     public function storeAttendance(Request $request)
     {
-    
-    HostelAttendance::where('attendance_date', $request->attendance_date)->where('timing', $request->timing)->where('hostel', $request->hostel)->where('room_no', $request->room_no)->delete();
+
+        HostelAttendance::where('attendance_date', $request->attendance_date)->where('timing', $request->timing)->where('hostel', $request->hostel)->where('room_no', $request->room_no)->delete();
 
         foreach ($request->student_id as $key => $student_id) {
             $status = $request->status[$key] ?? 'A';
@@ -253,10 +281,7 @@ class HostelController extends Controller
                 'status'           => $status,
             ]);
         }
-    
+
         return redirect()->route('hostelattendance')->with('success', 'Attendance saved successfully.');
     }
-
 }
-    
- 

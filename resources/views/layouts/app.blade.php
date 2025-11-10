@@ -20,6 +20,7 @@
     .select2{
       width: 100% !important;
     }
+  
   </style>
   @yield('css')
 </head>
@@ -181,6 +182,7 @@
             <ul class="dropdown-menu">
               <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
               <li><a href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
+              <li><a href="{{ route('room.reallocation') }}" class="nav-link">Room Reallocation</a></li>
               <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
               <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
               <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li>

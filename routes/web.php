@@ -72,14 +72,17 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('student', StudentController::class);
     Route::resource('announcement', AnnouncementController::class);
     Route::resource('hostel', HostelController::class);
+
     Route::post('room/delete', [HostelController::class, 'deleteRoom'])->name('room.delete');
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
     Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
     Route::get('export/student', [\App\Http\Controllers\ExportController::class, 'student_export'])->name('export.student');
+
     Route::get('allocation/hostel', [HostelController::class, 'allocation'])->name('allocation.hostel');
     Route::post('allocation/hostel', [HostelController::class, 'storeAllocation'])->name('allocation.store');
     Route::get('/hostel-attendance', [HostelController::class, 'attendanceEntry'])->name('hostelattendance');
     Route::post('/hostel-attendance/store', [HostelController::class, 'storeAttendance'])->name('hostelattendance.store');
+    Route::match(['get', 'post'],'hostel/room/reallocation', [HostelController::class, 'RoomReallocation'])->name('room.reallocation'); 
 
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
     Route::put('sickroom/{id}', [SickRoomEntryController::class, 'update'])->name('sickroom.update');
