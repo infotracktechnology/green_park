@@ -4,6 +4,8 @@
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css" />
 @endsection
 
 @section('main')
@@ -92,7 +94,7 @@
                           <th>Section</th>
                           <th>Room</th>
                           <th>Cot No</th>
-                          <th>Action</th>
+                          <th>Vacate</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -105,7 +107,7 @@
                           <td>{{ $row->room_no }}</td>
                           <td>{{ $row->cots_no }}</td>
                           <td>
-                            <a href="{{ route('room.reallocation', ['delete'=> $row->student_id]) }}" class="btn btn-danger text-white"><i class="fa fa-trash-alt"></i></a>
+                            <button type="button" data-student="{{ json_encode($row) }}" class="btn btn-danger vacate">Vacate</button>
                           </td>
                         </tr>
                         @endforeach
@@ -131,7 +133,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Add Student</h5>
+        <h5 class="modal-title">Add New Student</h5>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <form method="post" action="{{ route('room.reallocation') }}" enctype="multipart/form-data">
@@ -161,16 +163,80 @@
   </div>
 </div>
 
+
+<div id="vacatemodal" class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Vacate Form</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <form method="get" action="{{ route('room.reallocation') }}" enctype="multipart/form-data">
+        <input type="hidden" name="hostel_id" value="{{ request('hostel') }}">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Student ID</label>
+            <input type="text" name="student_id" class="form-control form-control-sm" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Student Name</label>
+            <input type="text" name="student_name" class="form-control form-control-sm" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Room No</label>
+            <input type="text" name="room_no" class="form-control form-control-sm" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Cot No</label>
+            <input type="text" name="cots_no" class="form-control form-control-sm" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Vacate Datetime</label>
+            <input type="text" name="datetime" class="datetime-picker form-control form-control-sm" required>
+          </div>
+
+          <div class="form-group">
+            <label>Vacate Reason</label>
+            <textarea name="reason" rows="3" class="form-control form-control-sm" required></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit"  class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @section('js')
 <script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
   $('.table').DataTable({
       searching: false,
       paging: false
+  });
+
+   flatpickr(".datetime-picker", {
+     enableTime: true,
+     allowInput: true,
+     dateFormat: "Y-m-d H:i",
+     plugins: [
+         new confirmDatePlugin({
+             confirmText: "OK",
+             showAlways: false,
+         })
+     ]
   });
   
   const goToMenu = (params = {}) => {
@@ -193,12 +259,14 @@
     });
   });
   
-  $('.btn-danger').click(function(e){
+  $('.vacate').click(function(e){
     e.preventDefault();
-    var href = $(this).attr('href');
-    if(confirm('Are you sure you want to remove this student?')) {
-      window.location.href = href;
-    }
+    var student = $(this).data('student');
+    $('#vacatemodal').modal('show');
+    $('#vacatemodal').find('input[name="student_id"]').val(student.student_id);
+    $('#vacatemodal').find('input[name="student_name"]').val(student.student_name);
+    $('#vacatemodal').find('input[name="room_no"]').val(student.room_no);
+    $('#vacatemodal').find('input[name="cots_no"]').val(student.cots_no);
   });
 </script>
 @endsection

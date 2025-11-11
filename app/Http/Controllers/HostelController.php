@@ -211,7 +211,7 @@ class HostelController extends Controller
         $branchId = $request->branch;
         $hostelId = $request->hostel;
         $roomNo   = $request->room;
-        $deleteId = $request->delete;
+
 
         if ($request->isMethod('post')) {
             $data = $request->except(['_token','student_id']);
@@ -219,10 +219,12 @@ class HostelController extends Controller
             return back()->with('success', "New students allocated successfully for student $request->student_id in room $request->room_no");
         }
 
-        if ($deleteId) {
-            Student::where('student_id', $deleteId)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '']);
-            return back()->with('success', "Cot removed successfully for student $deleteId");
+        if($request->reason && $request->datetime){
+           $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '']);
+            $vacate = DB::table('vacate_log')->insert($request->all());
+            return back()->with('success',"Room vacated successfully for student $request->student_id");
         }
+        
 
         $hostel = $branchId ? Hostel::where('branch_id', $branchId)->get() : collect();
 
