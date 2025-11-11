@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Hostel Room Allocation Report")
+@section('title', "In/Out Register Report")
 
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
@@ -15,15 +15,15 @@
 
           <div class="card card-primary">
             <div class="card-header">
-              <h4>Hostel Room Allocation Report</h4>
+              <h4>In/Out Register Report</h4>
             </div>
             <div class="card-body">
-              <form method="get" action="{{ route('report.roomallocation') }}">
+              <form method="get" action="{{ route('report.inoutregister') }}">
                 <div class="row">
 
                   <div class=" form-group col-2">
                     <label>Branch</label>
-                    <select name="branch" id="branch" class="select2" required>
+                    <select name="branch" id="branchid" class="select2" required>
                       <option value="">Choose Branch</option>
                       @foreach ($branches as $row)
                       <option value="{{ $row->id }}" @selected($row->id == request('branch'))>{{ $row->name }}</option>
@@ -67,31 +67,33 @@
                 <div class="col-lg-12">
                   <div class="table-responsive">
                     <table class="table table-striped" style="width:100%;">
-                      <thead>
+                     <thead>
                         <tr>
-                          <th>S.No</th>
+                          <th>#</th>
+                          <th>Room No</th>
                           <th>Student ID</th>
-                          <th>Course</th>
-                          <th>Coaching Type</th>
                           <th>Name</th>
-                          <th>Gender</th>
+                          <th>Coaching Type</th>
                           <th>Section</th>
-                          <th>Room</th>
-                          <th>Cot No</th>
+                          <th>Date & Time Leaving (Out)</th>
+                          <th>Purpose/Reason</th>
+                          <th>Contact No</th>
+                          <th>Date & Time Return (In)</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @foreach ($student as $key => $row)
+                       @foreach ($register as $key => $row)
                         <tr>
                           <td>{{ $key+1 }}</td>
-                          <td>{{ $row->student_id }}</td>
-                          <td>{{ $row->course }}</td>
-                          <td>{{ $row->coaching_type }}</td>
-                          <td>{{ $row->student_name }}</td>
-                          <td>{{ $row->gender }}</td>
-                          <td>{{ $row->section }}</td>
                           <td>{{ $row->room_no }}</td>
-                          <td>{{ $row->cots_no }}</td>
+                          <td>{{ $row->student_id }}</td>
+                          <td>{{ $row->student?->student_name }}</td>
+                          <td>{{ $row->student?->coaching_type }}</td>
+                          <td>{{ $row->student?->section }}</td>
+                          <td>{{ $row->datetime_out->format('d/m/Y h:i A') }}</td>
+                          <td>{{ $row->reason }}</td>
+                          <td>{{ $row->contact_out }}</td>
+                          <td>{{ $row->datetime_in->format('d/m/Y h:i A') }}</td>
                         </tr>
                         @endforeach
                       </tbody>
@@ -132,10 +134,10 @@
   
   const goToMenu = (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    window.location = `{{ route('report.roomallocation') }}?${query}`;
-     };
+    window.location = `{{ route('report.inoutregister') }}?${query}`;
+  };
   
-  $("#branch").change(function() {
+  $("#branchid").change(function() {
       if(!this.value) return;
     goToMenu({
       branch: this.value,
@@ -145,7 +147,7 @@
   $("#hostel").change(function() {
       if(!this.value) return;
     goToMenu({
-      branch: $("#branch").val(),
+      branch: $("#branchid").val(),
       hostel: this.value,
     });
   });

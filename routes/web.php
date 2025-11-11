@@ -67,25 +67,25 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('staff/import', 'import')->name('staff.import');
         Route::get('biometric/report', 'biometric_report')->name('biometric.report');
     });
+
     Route::resource('staff', StaffProfileController::class);
-
     Route::resource('student', StudentController::class);
-    Route::resource('announcement', AnnouncementController::class);
-    Route::resource('hostel', HostelController::class);
-
-    Route::post('room/delete', [HostelController::class, 'deleteRoom'])->name('room.delete');
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
     Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
     Route::get('export/student', [\App\Http\Controllers\ExportController::class, 'student_export'])->name('export.student');
 
+    Route::resource('announcement', AnnouncementController::class);
+    Route::resource('hostel', HostelController::class);
+    Route::post('room/delete', [HostelController::class, 'deleteRoom'])->name('room.delete');
     Route::get('allocation/hostel', [HostelController::class, 'allocation'])->name('allocation.hostel');
     Route::post('allocation/hostel', [HostelController::class, 'storeAllocation'])->name('allocation.store');
     Route::get('/hostel-attendance', [HostelController::class, 'attendanceEntry'])->name('hostelattendance');
     Route::post('/hostel-attendance/store', [HostelController::class, 'storeAttendance'])->name('hostelattendance.store');
     Route::match(['get', 'post'],'hostel/room/reallocation', [HostelController::class, 'RoomReallocation'])->name('room.reallocation'); 
-
+    Route::match(['get','post'],'hostel/room/inoutregister', [HostelController::class,'InOutRegister'])->name('hostel.inoutregister');
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
     Route::put('sickroom/{id}', [SickRoomEntryController::class, 'update'])->name('sickroom.update');
+
 
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {
@@ -172,6 +172,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('/examination/subjectwisemarks', [ReportController::class, 'SubjectWiseMarks'])->name('subjectwisemarks');
         Route::post('/examination/overallmarkanalysis', [ReportController::class, 'OverallMarkAnalysis'])->name('overallmarkanalysis');
         Route::get('/hostel/roomallocation', [ReportController::class, 'RoomAllocation'])->name('roomallocation');
+        Route::get('/hostel/inoutregister', [ReportController::class, 'InOutRegister'])->name('inoutregister');
     });
 });
 
