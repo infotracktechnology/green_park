@@ -159,9 +159,10 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/log', [ReportController::class, 'LogReport'])->name('log');
         Route::get('/attendance', [ReportController::class, 'AttendanceReport'])->name('attendance');
         Route::get('/section_exam', [ReportController::class, 'section_exam'])->name('section_exam');
-        Route::get('/examination/analysis', [ReportController::class, 'ExaminationAnalysis'])->name('exam_analyisis');
         Route::get('/batchlist', [ReportController::class, 'BatchList'])->name('batchlist');
         Route::match(['get', 'post'],'/sectionlist', [ReportController::class, 'SectionList'])->name('sectionlist');
+
+        Route::get('/examination/analysis', [ReportController::class, 'ExaminationAnalysis'])->name('exam_analyisis');
         Route::post('/examination/leastattempted', [ReportController::class, 'LeastAttempted'])->name('leastattempted');
         Route::post('/examination/commontracktopper', [ReportController::class, 'CommonTrackTopper'])->name('commontracktopper');
         Route::post('/examination/errorlist', [ReportController::class, 'ErrorList'])->name('errorlist');
@@ -170,6 +171,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('/examination/sectionwisetopper', [ReportController::class, 'SectionWiseTopper'])->name('sectionwisetopper');
         Route::post('/examination/subjectwisemarks', [ReportController::class, 'SubjectWiseMarks'])->name('subjectwisemarks');
         Route::post('/examination/overallmarkanalysis', [ReportController::class, 'OverallMarkAnalysis'])->name('overallmarkanalysis');
+        Route::get('/hostel/roomallocation', [ReportController::class, 'RoomAllocation'])->name('roomallocation');
     });
 });
 

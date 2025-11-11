@@ -186,6 +186,8 @@
               <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
               <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
               <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li>
+              {{-- Reports  --}}
+              <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
             </ul>
           </li>
 
@@ -216,9 +218,9 @@
           <li class="dropdown">
             <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
             <ul class="dropdown-menu">
-              <li><a href="{{ route('report.log') }}" class="nav-link">Log Report</a></li>
-              <li><a href="{{ route('report.batchlist') }}" class="nav-link">BatchList Report</a></li>
-              <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList Report</a></li>
+              <li><a href="{{ route('report.log') }}" class="nav-link">Logs Report</a></li>
+              <li><a href="{{ route('report.batchlist') }}" class="nav-link">BatchList</a></li>
+              <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList</a></li>
             </ul>
           </li>
 

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Hostel;
-use App\Models\HostelAllocation;
 use App\Models\HostelRoom;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
