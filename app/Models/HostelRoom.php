@@ -16,6 +16,6 @@ class HostelRoom extends Model
     {
         return $this->belongsTo(Hostel::class);
     }
-    
+
 }
 
