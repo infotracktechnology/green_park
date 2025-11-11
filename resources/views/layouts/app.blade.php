@@ -183,11 +183,13 @@
               <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
               <li><a href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
               <li><a href="{{ route('room.reallocation') }}" class="nav-link">Room Reallocation</a></li>
+              <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
               <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
               <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
               <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li>
               {{-- Reports  --}}
               <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
+              <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
             </ul>
           </li>
 

@@ -14,6 +14,7 @@ use App\Models\Staff;
 use App\Models\Student;
 use App\Http\Controllers\ImportController;
 use App\Models\HostelAttendance;
+use App\Models\InOutRegister;
 
 class HostelController extends Controller
 {
@@ -214,17 +215,17 @@ class HostelController extends Controller
 
 
         if ($request->isMethod('post')) {
-            $data = $request->except(['_token','student_id']);
+            $data = $request->except(['_token', 'student_id']);
             $student = Student::where('student_id', $request->student_id)->update($data);
             return back()->with('success', "New students allocated successfully for student $request->student_id in room $request->room_no");
         }
 
-        if($request->reason && $request->datetime){
-           $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '']);
+        if ($request->reason && $request->datetime) {
+            $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '']);
             $vacate = DB::table('vacate_log')->insert($request->all());
-            return back()->with('success',"Room vacated successfully for student $request->student_id");
+            return back()->with('success', "Room vacated successfully for student $request->student_id");
         }
-        
+
 
         $hostel = $branchId ? Hostel::where('branch_id', $branchId)->get() : collect();
 
@@ -234,7 +235,7 @@ class HostelController extends Controller
 
         if ($branchId && $hostelId) {
             $type = Hostel::find($hostelId)?->type;
-            $availableStudents = Student::where('campus', $branchId)->where('hostel_dayscholar', 'HOSTEL')->when($type, fn($q) => $q->where('gender', $type))->where(fn($q) => $q->whereNull('cots_no')->orWhere('cots_no',''))->get();
+            $availableStudents = Student::where('campus', $branchId)->where('hostel_dayscholar', 'HOSTEL')->when($type, fn($q) => $q->where('gender', $type))->where(fn($q) => $q->whereNull('cots_no')->orWhere('cots_no', ''))->get();
         }
 
         $allocatedStudents = ($hostelId && $roomNo) ? Student::where('hostel_id', $hostelId)->where('room_no', $roomNo)->get() : collect();
@@ -250,7 +251,6 @@ class HostelController extends Controller
         $students = [];
         $attendances = [];
         $branches = DB::table('branch')->select('id', 'name')->get();
-        // $academicyear = DB::table('student')->select('academic_year')->distinct()->get();
 
         if ($request->has('show')) {
             $students = Student::where('hostel_id', $request->hostel)
@@ -260,7 +260,7 @@ class HostelController extends Controller
                 ->get();
         }
 
-        return view('hostel.hostelattendance', compact('hostels','rooms','students','attendances','branches'));
+        return view('hostel.hostelattendance', compact('hostels', 'rooms', 'students', 'attendances', 'branches'));
     }
 
 
@@ -284,5 +284,38 @@ class HostelController extends Controller
         }
 
         return redirect()->route('hostelattendance')->with('success', 'Attendance saved successfully.');
+    }
+
+    public function InOutRegister(Request $request)
+    {
+        $register = InOutRegister::with(['hostel', 'student'])->latest()->get();
+
+        if ($request->isMethod('post')) {
+            $data = $request->except(['_token', 'branch']);
+            $outer = InOutRegister::create($data);
+            return back()->with('success', "Register Outer entry added successfully");
+        }
+
+        if ($request->update) {
+            $update = InOutRegister::find($request->update)->update(['datetime_in' => $request->datetime_in]);
+            return back()->with('success', "Register In entry updated successfully");
+        }
+
+        if ($request->ajax()) {
+            if ($request->has('room')) {
+                $students = Student::where('hostel_id', $request->hostel)->where('room_no', $request->room)->get();
+                return response()->json($students);
+            }
+            if ($request->has('hostel')) {
+                $rooms = HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no');
+                return response()->json($rooms);
+            }
+            if ($request->has('branch')) {
+                $hostels = Hostel::where('branch_id', $request->branch)->get();
+                return response()->json($hostels);
+            }
+        }
+
+        return view('hostel.inoutregister', compact('register'));
     }
 }

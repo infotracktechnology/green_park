@@ -74,9 +74,9 @@ class Student extends Authenticatable
 
    private static function generateId($course){
     $lastId = self::where('course', $course)->max('student_id');
-    $nextyear = substr(date('Y')+1, -2);
+    $nextyear = date('y')+1;
     if ($lastId) {
-        return $lastId + 1;
+        return $lastId+1;
     } else {
         return $nextyear.'00001';
     }
