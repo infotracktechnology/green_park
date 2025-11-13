@@ -122,10 +122,7 @@ class HolidayController extends Controller
         $attendance = [];
 
         if ($request->has('branch_id')) {
-            $sections = Student::whereIn('campus', explode(',', $request->branch_id))
-                ->select('section')
-                ->distinct()
-                ->get();
+            $sections = Student::whereIn('campus', explode(',', $request->branch_id))->select('section')->distinct()->get();
         }
 
         if ($request->has('show')) {

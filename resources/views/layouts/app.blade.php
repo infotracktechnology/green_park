@@ -191,6 +191,7 @@
               <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
               <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
               <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
+               <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
             </ul>
           </li>
 
