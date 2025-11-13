@@ -1,85 +1,93 @@
 @extends('layouts.app')
 @section('title', 'Sickroom')
 @section('css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
 @endsection
 @section('main')
 <div class="main-content">
-   <section class="section">
-      <div class="section-body"> 
-          <div class="row">
-              <div class="col-12">
-                  <div class="card card-primary">
-                     <form method="post" id="myForm" action="{{ route('sickroom.store') }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="card-body">
-                           <div class="row">
-                            <div class="col-md-12 col-sm-12 mb-3">
-                                <h6 class="col-deep-purple">Sick Room Entry</h6>
-                             </div>
-   
-        <div class="form-group col-lg-3">
-            <label>Class</label>
-            <input type="text" name="student_class" class="form-control form-control-sm" required>
-        </div>
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12">
+          <div class="card card-primary">
+            <form method="post" id="myForm" action="{{ route('sickroom.store') }}" enctype="multipart/form-data">
+              @csrf
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12 col-sm-12 mb-3">
+                    <h6 class="col-deep-purple">Sick Room Entry</h6>
+                  </div>
 
-        <div class="form-group col-lg-3">
-            <label>Section</label>
-            <select name="section" id="section" class="form-control form-control-sm" required>
-                <option value="">Select Section</option>
-                @foreach($sections as $section)
-                    <option value="{{ $section }}">{{ $section }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-lg-3">
-            <label>Student</label>
-            <select name="student_id" id="student_id" class="form-control select2" required>
-                <option value="">Select Student</option>
-            </select>
-        </div>
-        
-        <div class="form-group col-lg-3">
-            <label>Room No</label>
-            <input type="text" name="room_no" class="form-control form-control-sm" required>
-        </div>
+                  <div class="form-group col-lg-2">
+                    <label>Branch</label>
+                    <select class="select2" id="branchid" name="branch_id" required>
+                      <option value="">Choose Branch</option>
+                      @foreach ($branches as $branch)
+                      <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
-        <div class="form-group col-lg-3">
-            <label>In Time</label>
-            <input type="text" name="in_time" id="in_time" class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d H:i') }}" required>
-        </div>
-        
-        <div class="form-group col-lg-3">
-            <label>Out Time</label>
-            <input type="text" name="out_time" id="out_time" class="datetime-picker form-control form-control-sm">
-        </div>
-        
-        <div class="form-group col-lg-3">
-            <label>Total no. of hours spent in sick room</label>
-            <input type="number" name="hours_spent" id="hours_spent" class="form-control form-control-sm" min="0" step="0.1" placeholder="e.g., 1.5" required readonly>
-        </div>
-        
-        
+                  <div class="form-group col-lg-3">
+                    <label>Hostel</label>
+                    <select class="select2" id="hostel" name="hostel_id" required>
+                      <option value="">Choose Hostel</option>
+                    </select>
+                  </div>
 
-        <div class="form-group col-lg-3">
-            <label>Reason</label>
-            <textarea name="reason" class="form-control form-control-sm"></textarea>
+                  <div class="form-group col-lg-2">
+                    <label>Room No</label>
+                    <select class="select2" id="room" name="room_no" required>
+                      <option value="">Choose Room</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Student</label>
+                    <select class="select2" id="student" name="student_id" required>
+                      <option value="">Choose Student</option>
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-lg-2">
+                    <label>In Time</label>
+                    <input type="text" name="in_time" id="in_time" class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d H:i') }}" required>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Type of Illness/Injury</label>
+                    <textarea name="illness" rows="3" class="form-control form-control-sm" required></textarea>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Action Taken</label>
+                    <textarea name="action_taken" rows="3" class="form-control form-control-sm"></textarea>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Medical Officer's/Nurse's Note</label>
+                    <textarea name="medical_note" rows="3" class="form-control form-control-sm"></textarea>
+                  </div>
+
+                  <div class="form-group col-lg-2">
+                    <label>Out Time</label>
+                    <input type="text" name="out_time" id="out_time" class="datetime-picker form-control form-control-sm" required>
+                    <input type="hidden" name="hours_spent" id="hours_spent">
+                  </div>
+
+
+                  <div class="form-group col-lg-12">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+            </form>
+          </div>
         </div>
-        <div class="form-group col-lg-3">
-            <label>Result</label>
-            <textarea name="result" class="form-control form-control-sm"></textarea>
-        </div>
-        <div class="form-group col-lg-12">
-            <button type="submit" class="btn btn-primary">Submit</button>
-         </div>
-                        </form>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </section>
-     </div>
+      </div>
+    </div>
+  </section>
+</div>
 @endsection
 
 @section('js')
@@ -89,96 +97,56 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
-    flatpickr(".datetime-picker", {
-        enableTime: true,
-        allowInput: true,
-        dateFormat: "Y-m-d H:i",
-        maxDate: "today",
-        plugins: [
-            new confirmDatePlugin({
-                confirmText: "OK",
-                showAlways: false,
-                theme: "light"
-            })
-        ]
-    });
+  flatpickr(".datetime-picker", {
+      enableTime: true,
+      allowInput: true,
+      dateFormat: "Y-m-d H:i",
+      maxDate: "today",
+      plugins: [new confirmDatePlugin({ confirmText: "OK"})]
+  });
+  $('#out_time').change(function() {
+      var startTime = new Date($('#in_time').val());
+      var endTime = new Date($(this).val());
+      var diff = endTime - startTime;
+      var hours = diff / (1000 * 60 * 60);
+      $('#hours_spent').val(hours.toFixed(1));
+  });
 
-    $('#out_time').change(function () {
-        $('#out_time_error').text('');
-        const start = new Date($('#in_time').val());
-        const end = new Date($('#out_time').val());
+ const Hostelfetch = (params) => $.get('{{ route("hostel.inoutregister") }}', params);
+   const hostel = $('#hostel');
+   const room = $('#room');
+   const student= $('#student');
 
-        if ($('#in_time').val() && end <= start) {
-            $('#out_time_error').text('End time must be greater than start time.');
-            $('#out_time').val('');
-        }
-    });
-</script>
-<script>
-function calculateHoursSpent() {
-    const inTimeVal = document.getElementById('in_time').value;
-    const outTimeVal = document.getElementById('out_time').value;
+   $("#branchid").change(function(){
+      Hostelfetch({branch: $(this).val()}).then((data) => {
+        hostel.empty();
+        hostel.append(`<option value="">Choose Hostel</option>`);
+        $.each(data, (key, value) => {
+          hostel.append(`<option value="${value.id}">${value.name}</option>`);
+        });
+      });
+   });
 
-    if (inTimeVal && outTimeVal) {
-        const inTime = new Date(inTimeVal);
-        const outTime = new Date(outTimeVal);
+   $("#hostel").change(function(){
+      Hostelfetch({hostel: hostel.val()}).then((data) => {
+        room.empty();
+        room.append(`<option value="">Choose Room</option>`);
+        $.each(data, (key, value) => {
+          room.append(`<option value="${value}">${value}</option>`);
+        });
+      });
+   });
 
-        if (outTime > inTime) {
-            const diffMs = outTime - inTime;
-            const hours = (diffMs / 1000 / 60 / 60).toFixed(2); // Convert ms to hours
-            document.getElementById('hours_spent').value = hours;
-        } else {
-            document.getElementById('hours_spent').value = '';
-            alert('Out Time must be later than In Time.');
-        }
-    }
-}
+   $("#room").change(function(){
+      Hostelfetch({room: room.val(), hostel: hostel.val()}).then((data) => {
+        student.empty();
+        student.append(`<option value="">Choose Student</option>`);
+        $.each(data, (key, value) => {
+          student.append(`<option value="${value.student_id}">${value.student_id} - ${value.student_name}</option>`);
+        });
+      });
+   });
 
-document.getElementById('in_time').addEventListener('change', calculateHoursSpent);
-document.getElementById('out_time').addEventListener('change', calculateHoursSpent);
 
-</script>
-{{-- <script>
-    const allStudents = @json($students);
-
-    document.getElementById('section').addEventListener('change', function () {
-        const selectedSection = this.value;
-        const studentSelect = document.getElementById('student_id');
-        studentSelect.innerHTML = '<option value="">Select Student</option>';
-
-        if (selectedSection) {
-            const filtered = allStudents.filter(s => s.section === selectedSection);
-            filtered.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.student_id; // ✅ Use student_id here!
-                option.text = `${student.user_name} - ${student.student_name}`;
-                studentSelect.appendChild(option);
-            });
-        }
-    });
-</script> --}}
-<script>
-    const allStudents = @json($students);
-
-    document.getElementById('section').addEventListener('change', function () {
-        const selectedSection = this.value;
-        const studentSelect = document.getElementById('student_id');
-        studentSelect.innerHTML = '<option value="">Select Student</option>';
-
-        if (selectedSection) {
-            const filtered = allStudents.filter(s => s.section === selectedSection);
-
-           
-            filtered.sort((a, b) => a.student_name.localeCompare(b.student_name));
-
-            filtered.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.student_id; // Use student_id here
-                option.text = `${student.user_name} - ${student.student_name}`;
-                studentSelect.appendChild(option);
-            });
-        }
-    });
 </script>
 @endsection
-
