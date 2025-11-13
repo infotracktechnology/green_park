@@ -173,6 +173,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('/examination/overallmarkanalysis', [ReportController::class, 'OverallMarkAnalysis'])->name('overallmarkanalysis');
         Route::get('/hostel/roomallocation', [ReportController::class, 'RoomAllocation'])->name('roomallocation');
         Route::get('/hostel/inoutregister', [ReportController::class, 'InOutRegister'])->name('inoutregister');
+        Route::get('/hostel/sickroom', [ReportController::class, 'Sickroom'])->name('sickroom');
     });
 });
 
