@@ -6,5 +6,13 @@
  {
      use HasFactory;
      protected $table = 'hostel_attendance'; 
-     protected $guarded = []; // Allow all attributes for mass assignment
+     protected $guarded = [];
+     public function hostel()
+     {
+         return $this->belongsTo(Hostel::class, 'hostel_id', 'id');
+     }
+     public function student()
+     {
+         return $this->belongsTo(Student::class, 'student_id', 'student_id');
+     }
  }

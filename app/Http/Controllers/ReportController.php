@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Exam,ExamAnswer,Student,Announcement,Attendance,Branch,Options,Hostel,HostelRoom,InOutRegister,SickRoomEntry};
+use App\Models\{Exam,ExamAnswer,Student,Announcement,Attendance,Branch,Options,Hostel,HostelRoom,InOutRegister,SickRoomEntry,HostelAttendance};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -427,5 +427,15 @@ class ReportController extends Controller
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
         $sickroom = $request->room ? SickRoomEntry::where('hostel_id', $request->hostel)->when($request->room!='all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
         return view('report.sickroom', compact('hostel', 'room', 'sickroom'));
+     }
+
+     public function HostelAttendance(Request $request){
+     $hostel = $request->branch_id ? Hostel::where('branch_id', $request->branch_id)->get() : collect();   
+     
+     $section = $request->hostel_id ? Student::where('hostel_id', $request->hostel_id)->distinct()->pluck('section') : collect();
+
+     $attendance = $request->date ? HostelAttendance::with('student')->where('hostel_id', $request->hostel_id)->where('section', $request->section)->where('attendance_date', $request->date)->get()->groupBy('student_id') : collect();
+
+     return view('report.hostelattendance', compact('hostel', 'section', 'attendance'));
      }
 }

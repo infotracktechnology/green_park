@@ -246,44 +246,50 @@ class HostelController extends Controller
 
     public function attendanceEntry(Request $request)
     {
-        $hostels = DB::table('hostel')->select('id', 'branch_id', 'name')->get();
-        $rooms = DB::table('hostel_rooms')->select('hostel_id', 'room_no')->distinct()->get();
-        $students = [];
-        $attendances = [];
-        $branches = DB::table('branch')->select('id', 'name')->get();
+        $hostel = $request->branch_id ? Hostel::where('branch_id', $request->branch_id)->get() : collect();
+        
+        $section = $request->hostel_id ? Student::where('hostel_id', $request->hostel_id)->distinct()->pluck('section') : collect();
 
-        if ($request->has('show')) {
-            $students = Student::where('hostel_id', $request->hostel)
+        $students = $request->section ? Student::where('hostel_id', $request->hostel_id)->when($request->section, fn($q) => $q->where('section', $request->section))->get() : collect();
+        $attendance = $request->attendance_date ? HostelAttendance::where('hostel_id', $request->hostel_id)->where('section', $request->section)->where('attendance_date', $request->attendance_date)->get() : collect();
 
-                ->where('room_no', $request->room_no)
-                ->select('student_id', 'student_name', 'academic_year', 'coaching_type')
-                ->get();
+        if ($request->has('delete')) {
+            $attendance = HostelAttendance::where('hostel_id', $request->hostel_id)->where('section', $request->section)->where('attendance_date', $request->attendance_date)->whereIn('timing', explode(',', $request->timing))->delete();
+            return response()->json(['success' => 'Attendance deleted successfully!']);
         }
 
-        return view('hostel.hostelattendance', compact('hostels', 'rooms', 'students', 'attendances', 'branches'));
+        return view('hostel.hostelattendance', compact('hostel', 'section', 'students', 'attendance'));
     }
 
 
     public function storeAttendance(Request $request)
     {
-
-        HostelAttendance::where('attendance_date', $request->attendance_date)->where('timing', $request->timing)->where('hostel', $request->hostel)->where('room_no', $request->room_no)->delete();
-
-        foreach ($request->student_id as $key => $student_id) {
-            $status = $request->status[$key] ?? 'A';
-            HostelAttendance::create([
-                'academic_year'    => $request->academic_year,
-                'branch_id'        => $request->branch_id,
-                'attendance_date'  => $request->attendance_date,
-                'timing'           => $request->timing,
-                'student_id'       => $student_id,
-                'hostel'           => $request->hostel,
-                'room_no'          => $request->room_no,
-                'status'           => $status,
-            ]);
+         $attendanceData = [];
+        foreach ($request->status as $key => $status) {
+            $room_no = $request->room_no[$key];
+            foreach ($status as $time => $value) {
+                if ($request->has('attendance_id')) {
+                    $attendance_id = $request->attendance_id[$key][$time];
+                    $attendanceData[] = ['id' => $attendance_id, 'status' => $value ?? 'A'];
+                } else {
+                    $student_id = $request->student_id[$key][$time];
+                    $attendanceData[] = [
+                        'academic_year' => $this->academic_year,
+                        'branch_id' => $request->branch_id,
+                        'attendance_date' => $request->attendance_date,
+                        'hostel_id' => $request->hostel_id,
+                        'timing' => $time,
+                        'student_id' => $student_id,
+                        'section' => $request->section,
+                        'room_no' => $room_no,
+                        'status' => $value ?? 'A',
+                    ];
+                }
+            }
         }
 
-        return redirect()->route('hostelattendance')->with('success', 'Attendance saved successfully.');
+        $attendance = HostelAttendance::upsert($attendanceData, ['id'], ['status']);
+        return redirect()->back()->with('success', 'Hostel Attendance saved successfully.');
     }
 
     public function InOutRegister(Request $request)
