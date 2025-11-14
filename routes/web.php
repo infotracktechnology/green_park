@@ -83,6 +83,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::post('/hostel-attendance/store', [HostelController::class, 'storeAttendance'])->name('hostelattendance.store');
     Route::match(['get', 'post'],'hostel/room/reallocation', [HostelController::class, 'RoomReallocation'])->name('room.reallocation'); 
     Route::match(['get','post'],'hostel/room/inoutregister', [HostelController::class,'InOutRegister'])->name('hostel.inoutregister');
+    Route::match(['get','post'],'hostel/room/courier', [HostelController::class,'HostelCourier'])->name('hostel.courier');
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
     Route::put('sickroom/{id}', [SickRoomEntryController::class, 'update'])->name('sickroom.update');
 

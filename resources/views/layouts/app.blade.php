@@ -185,13 +185,14 @@
               <li><a href="{{ route('room.reallocation') }}" class="nav-link">Room Reallocation</a></li>
               <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
               <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
+              <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li>
               <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
               <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li>
               {{-- Reports  --}}
               <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
               <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
               <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
-               <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
+              <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
             </ul>
           </li>
 
