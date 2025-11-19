@@ -56,7 +56,7 @@
     </tr>
   </table>
 
-  <h3>SEC: {{ $section }}</h3>
+  {{-- <h3>SEC: {{ $section }}</h3> --}}
   <table class="table">
     <tr>
       <th>S.No</th>

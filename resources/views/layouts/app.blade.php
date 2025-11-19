@@ -193,6 +193,8 @@
               <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
               <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
               <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
+              <li><a href="{{ route('report.hostelcourier') }}" class="nav-link">Hostel Courier Report</a></li>
+              <li><a href="{{ route('report.hostellist') }}" class="nav-link">Hostel List Report(<small>pdf</small>)</a></li>
             </ul>
           </li>
 

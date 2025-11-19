@@ -14,7 +14,7 @@
     <div class="section-body">
       <div class="row">
         <div class="col-md-12 col-sm-12">
-          
+
           @if(session()->has('success'))
           <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -63,7 +63,7 @@
                             <form action="{{ route('hostel.courier') }}" method="get" onsubmit="return confirm('Are you sure you want to delete this entry?')">
                               <input type="hidden" name="delete" value="{{ $row->id }}">
                               <button type="submit" class="btn btn-danger text-white"><i class="fa fa-trash"></i></button>
-                           </form>
+                            </form>
                           </td>
                         </tr>
                         @endforeach
@@ -96,62 +96,62 @@
         @csrf
         <div class="modal-body">
           <div class="row">
-          <div class="form-group col-lg-6">
-            <label>Branch</label>
-            <select class="select2" id="branchid"  name="branch" required>
-              <option value="">Choose Branch</option>
-              @foreach ($branches as $branch)
-              <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-              @endforeach
-            </select>
-          </div>
+            <div class="form-group col-lg-6">
+              <label>Branch</label>
+              <select class="select2" id="branchid" name="branch" required>
+                <option value="">Choose Branch</option>
+                @foreach ($branches as $branch)
+                <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                @endforeach
+              </select>
+            </div>
 
-          <div class="form-group col-lg-6">
-            <label>Hostel</label>
-            <select class="select2" id="hostel" name="hostel_id" required>
-              <option value="">Choose Hostel</option>
-            </select>
-          </div>
+            <div class="form-group col-lg-6">
+              <label>Hostel</label>
+              <select class="select2" id="hostel" name="hostel_id" required>
+                <option value="">Choose Hostel</option>
+              </select>
+            </div>
 
-          <div class="form-group col-lg-6">
-            <label>Room No</label>
-            <select class="select2" id="room" name="room_no" required>
-              <option value="">Choose Room</option>
-            </select>
-          </div>
+            <div class="form-group col-lg-6">
+              <label>Room No</label>
+              <select class="select2" id="room" name="room_no" required>
+                <option value="">Choose Room</option>
+              </select>
+            </div>
 
-          <div class="form-group col-lg-6">
-            <label>Student</label>
-            <select class="select2" id="student" name="student_id" required>
-              <option value="">Choose Student</option>
-            </select>
-          </div>
+            <div class="form-group col-lg-6">
+              <label>Student</label>
+              <select class="select2" id="student" name="student_id" required>
+                <option value="">Choose Student</option>
+              </select>
+            </div>
 
-          <div class="form-group col-lg-6">
-            <label>Date & Time of Arrival</label>
-            <input type="text" name="datetime_arrival" class="datetime-picker form-control form-control-sm" required>
-          </div>          
+            <div class="form-group col-lg-6">
+              <label>Date & Time of Arrival</label>
+              <input type="text" name="datetime_arrival" class="datetime-picker form-control form-control-sm" required>
+            </div>
 
-          <div class="form-group col-lg-6">
-            <label>Courier Company Name</label>
-            <input type="text" name="courier_company" class="form-control form-control-sm">
-          </div>
+            <div class="form-group col-lg-6">
+              <label>Courier Company Name</label>
+              <input type="text" name="courier_company" class="form-control form-control-sm">
+            </div>
 
-         <div class="form-group col-lg-6">
-            <label>Sender Information</label>
-            <textarea name="sender_info" rows="3" class="form-control form-control-sm"></textarea>
-          </div>
+            <div class="form-group col-lg-6">
+              <label>Sender Information</label>
+              <textarea name="sender_info" rows="3" class="form-control form-control-sm"></textarea>
+            </div>
 
-          <div class="form-group col-lg-6">
-            <label>Details of Courier</label>
-            <textarea name="courier_details" rows="3" class="form-control form-control-sm" required></textarea>
-          </div>
+            <div class="form-group col-lg-6">
+              <label>Details of Courier</label>
+              <textarea name="courier_details" rows="3" class="form-control form-control-sm" required></textarea>
+            </div>
 
           </div>
         </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
       </form>
     </div>
   </div>
@@ -180,12 +180,12 @@
          })
      ]
   });
-
+  
    const Hostelfetch = (params) => $.get('{{ route("hostel.inoutregister") }}', params);
    const hostel = $('#hostel');
    const room = $('#room');
    const student= $('#student');
-
+  
    $("#branchid").change(function(){
       Hostelfetch({branch: $(this).val()}).then((data) => {
         hostel.empty();
@@ -195,7 +195,7 @@
         });
       });
    });
-
+  
    $("#hostel").change(function(){
       Hostelfetch({hostel: hostel.val()}).then((data) => {
         room.empty();
@@ -205,7 +205,7 @@
         });
       });
    });
-
+  
    $("#room").change(function(){
       Hostelfetch({room: room.val(), hostel: hostel.val()}).then((data) => {
         student.empty();
@@ -215,6 +215,6 @@
         });
       });
    });
-
+  
 </script>
 @endsection

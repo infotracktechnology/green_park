@@ -176,6 +176,8 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/hostel/inoutregister', [ReportController::class, 'InOutRegister'])->name('inoutregister');
         Route::get('/hostel/sickroom', [ReportController::class, 'Sickroom'])->name('sickroom');
         Route::get('/hostel/attendance', [ReportController::class, 'HostelAttendance'])->name('hostelattendance');
+        Route::get('/hostel/courier', [ReportController::class, 'HostelCourier'])->name('hostelcourier');
+        Route::get('/hostel/list', [ReportController::class, 'HostelList'])->name('hostellist');
     });
 });
 
