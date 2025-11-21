@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport,HostelAttendance,InOutRegister};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport,HostelAttendance,InOutRegister,ExamAnswer};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -82,7 +82,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
-        $results = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$student_id and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
+        $results = DB::select("SELECT DATE_FORMAT(b.start_at, '%d-%m-%Y')exam_date,b.name,b.testid,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.id where student_id=$student_id and b.publish='Yes' group by test_id order by b.updated_at desc limit 5");
         $testgroup = ['CUMULATIVE (CHEBOT)', 'CUMULATIVE (PHYZOO)', 'GRAND TEST', 'WEEKEND (BOTANY)', 'WEEKEND (CHEMISTRY)', 'WEEKEND (PHYSICS)', 'WEEKEND (ZOOLOGY)'];
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);
@@ -101,9 +101,10 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json(['header' => $header, 'results' => $subjectexam]);
     });
 
-    Route::get('/marksheet/{student_id}/{exam}', function (Request $request, $student_id, Exam $exam) {
-        $student = Student::where('student_id', $student_id)->select('student_name', 'user_name')->first();
-        $answers = DB::table('exam_answer')->where('test_id', $exam->id)->where('student_id', $student_id)->orderBy('q_no')->get()->map(function ($answer) {
+    Route::get('/marksheet/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
+        $student = Student::where('student_id', $student_id)->select('student_name', 'user_name','academic_year')->first();
+        $exam = Exam::where(['testid' => $testid, 'academic_year' => $student->academic_year])->first();
+        $answers = ExamAnswer::where(['test_id' => $testid, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
             return [
                 'q_no' => $answer->q_no,
                 'answer_key' => $answer->answer_key,
@@ -112,7 +113,7 @@ Route::group(['prefix' => 'v2'], function () {
             ];
         })->chunk(45);
 
-        return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'test_id' => $exam->id, 'student' => $student]);
+        return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'test_id' => $testid, 'student' => $student]);
     });
 
     Route::get('/questionkey/{student_id}', function (Request $request, $student_id) {

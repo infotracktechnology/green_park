@@ -15,6 +15,7 @@ use App\Models\Student;
 use App\Http\Controllers\ImportController;
 use App\Models\HostelAttendance;
 use App\Models\InOutRegister;
+use App\Models\HostelCourier;
 
 class HostelController extends Controller
 {
@@ -324,4 +325,18 @@ class HostelController extends Controller
 
         return view('hostel.inoutregister', compact('register'));
     }
+     public function HostelCourier(Request $request)
+     {
+        if ($request->isMethod('post')) {
+            $data = $request->except(['_token', 'branch']);
+            $courier = HostelCourier::create($data);
+            return back()->with('success', "Courier entry added successfully");
+        }
+        if($request->delete) {
+           $courier = HostelCourier::find($request->delete)->delete();
+           return back()->with('success', "Courier entry deleted successfully");
+        }
+        $hostelcourier = HostelCourier::with(['hostel', 'student'])->latest()->get();
+        return view('hostel.hostelcourier', compact('hostelcourier'));
+     }
 }

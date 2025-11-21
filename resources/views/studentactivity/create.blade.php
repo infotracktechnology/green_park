@@ -73,33 +73,7 @@
         allowInput: true,
         dateFormat: "Y-m-d",
         maxDate: "today",
-        plugins: [
-            new confirmDatePlugin({
-                confirmText: "OK",
-                showAlways: false,
-                theme: "light"
-            })
-        ]
-    });
-
-    const allStudents = @json($students);
-
-    document.getElementById('section').addEventListener('change', function () {
-        const selectedSection = this.value;
-        const studentSelect = document.getElementById('student_id');
-        studentSelect.innerHTML = '<option value="">Select Student</option>';
-
-        if (selectedSection) {
-            const filtered = allStudents.filter(s => s.section === selectedSection);
-            filtered.sort((a, b) => a.student_name.localeCompare(b.student_name));
-
-            filtered.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.student_id;
-                option.text = `${student.user_name} - ${student.student_name}`;
-                studentSelect.appendChild(option);
-            });
-        }
+        plugins: [new confirmDatePlugin({confirmText: "OK",})]
     });
 </script>
 @endsection

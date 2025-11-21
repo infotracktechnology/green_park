@@ -83,6 +83,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::post('/hostel-attendance/store', [HostelController::class, 'storeAttendance'])->name('hostelattendance.store');
     Route::match(['get', 'post'],'hostel/room/reallocation', [HostelController::class, 'RoomReallocation'])->name('room.reallocation'); 
     Route::match(['get','post'],'hostel/room/inoutregister', [HostelController::class,'InOutRegister'])->name('hostel.inoutregister');
+    Route::match(['get','post'],'hostel/room/courier', [HostelController::class,'HostelCourier'])->name('hostel.courier');
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
     Route::put('sickroom/{id}', [SickRoomEntryController::class, 'update'])->name('sickroom.update');
 
@@ -175,6 +176,8 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/hostel/inoutregister', [ReportController::class, 'InOutRegister'])->name('inoutregister');
         Route::get('/hostel/sickroom', [ReportController::class, 'Sickroom'])->name('sickroom');
         Route::get('/hostel/attendance', [ReportController::class, 'HostelAttendance'])->name('hostelattendance');
+        Route::get('/hostel/courier', [ReportController::class, 'HostelCourier'])->name('hostelcourier');
+        Route::get('/hostel/list', [ReportController::class, 'HostelList'])->name('hostellist');
     });
 });
 

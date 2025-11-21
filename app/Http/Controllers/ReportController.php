@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Exam,ExamAnswer,Student,Announcement,Attendance,Branch,Options,Hostel,HostelRoom,InOutRegister,SickRoomEntry,HostelAttendance};
+use App\Models\{Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance,HostelCourier};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -47,7 +47,7 @@ class ReportController extends Controller
         if ($request->query('type') == 'omr') {
             $section = $request->section;
             $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->get();
-            
+
             $pdf = PDF::loadView('report.omr_print', compact('answers', 'test_name'));
             return $pdf->download("OMRPRINT-$test_name-$section.pdf");
         }
@@ -306,7 +306,7 @@ class ReportController extends Controller
             return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$high}-{$low}`";
         })->implode(',');
 
-        $csvHeaders = ['SNo', 'Branch Name', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
+        $csvHeaders = ['S.No', 'Branch Name', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
         foreach ($ranges as $r) {
             $csvHeaders = array_merge($csvHeaders, ["{$r[0]}-{$r[1]}"]);
         }
@@ -353,7 +353,7 @@ class ReportController extends Controller
             return "sum(if(c.total BETWEEN {$low} AND {$high}, 1, 0)) AS `{$low}-{$high}`";
         })->implode(',');
 
-        $csvHeaders = ['SNo', 'Section', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
+        $csvHeaders = ['S.No', 'Section', 'Actual STR', 'Appeared STR', 'AB', 'Max Marks', 'Min Marks'];
         foreach ($ranges as $r) {
             $csvHeaders = array_merge($csvHeaders, ["{$r[0]}-{$r[1]}"]);
         }
@@ -408,34 +408,62 @@ class ReportController extends Controller
 
         return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Overall_Marks_Analysis.csv"']);
     }
-     public function RoomAllocation(Request $request){
+    public function RoomAllocation(Request $request)
+    {
         $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $student = $request->room ? Student::where('hostel_id', $request->hostel)->when($request->room!='all', fn($q) => $q->where('room_no', $request->room))->get() : collect();
+        $student = $request->room ? Student::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->get() : collect();
         return view('report.roomallocation', compact('hostel', 'room', 'student'));
-     }
+    }
 
-     public function InOutRegister(Request $request){
+    public function InOutRegister(Request $request)
+    {
         $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $register = $request->room ? InOutRegister::where('hostel_id', $request->hostel)->when($request->room!='all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
+        $register = $request->room ? InOutRegister::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
         return view('report.inoutregister', compact('hostel', 'room', 'register'));
-     }
+    }
 
-      public function Sickroom(Request $request){
+    public function Sickroom(Request $request)
+    {
         $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $sickroom = $request->room ? SickRoomEntry::where('hostel_id', $request->hostel)->when($request->room!='all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
+        $sickroom = $request->room ? SickRoomEntry::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
         return view('report.sickroom', compact('hostel', 'room', 'sickroom'));
-     }
+    }
 
-     public function HostelAttendance(Request $request){
-     $hostel = $request->branch_id ? Hostel::where('branch_id', $request->branch_id)->get() : collect();   
-     
-     $section = $request->hostel_id ? Student::where('hostel_id', $request->hostel_id)->distinct()->pluck('section') : collect();
+    public function HostelAttendance(Request $request)
+    {
+        $hostel = $request->branch_id ? Hostel::where('branch_id', $request->branch_id)->get() : collect();
 
-     $attendance = $request->date ? HostelAttendance::with('student')->where('hostel_id', $request->hostel_id)->where('section', $request->section)->where('attendance_date', $request->date)->get()->groupBy('student_id') : collect();
+        $section = $request->hostel_id ? Student::where('hostel_id', $request->hostel_id)->distinct()->pluck('section') : collect();
 
-     return view('report.hostelattendance', compact('hostel', 'section', 'attendance'));
-     }
+        $attendance = $request->date ? HostelAttendance::with('student')->where('hostel_id', $request->hostel_id)->where('section', $request->section)->where('attendance_date', $request->date)->get()->groupBy('student_id') : collect();
+
+        return view('report.hostelattendance', compact('hostel', 'section', 'attendance'));
+    }
+
+    public function HostelCourier(Request $request)
+    {
+        $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
+        $hostel_courier = $request->room ? HostelCourier::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
+
+        return view('report.hostelcourier', compact('hostel', 'room', 'hostel_courier'));
+    }
+
+    public function HostelList(Request $request)
+    {
+        $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+
+        if ($request->view) {
+            $hostel = Hostel::find($request->hostel)?->name;
+            $students = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)->where('campus', $request->branch)->get();
+            $branchname = $students->first()->branch->name ?? '';
+            $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'hostel'));
+            return $pdf->download("$hostel-$request->view.pdf");
+        }
+
+        return view('report.hostellist', compact('hostel'));
+    }
 }
