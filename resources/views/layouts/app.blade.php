@@ -89,6 +89,7 @@
           </li>
         </ul>
       </nav>
+
       <div class="main-sidebar sidebar-style-2">
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
@@ -112,22 +113,19 @@
             <li class="dropdown">
               <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a>
             </li>
+
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
                 <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
-                {{-- <li><a href="{{ route('section.student') }}" class="nav-link">Section Shuffling</a>
-            </li> --}}
           </ul>
           </li>
 
           <li class="dropdown">
             <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
             <ul class="dropdown-menu">
-              {{-- <li><a href="{{ route('studentmenu.branch') }}" class="nav-link"> Branch Assign</a>
-          </li> --}}
           <li><a href="{{ route('studentmenu.type') }}" class="nav-link"> Type Assign</a></li>
           <li><a href="{{ route('studentmenu.student') }}" class="nav-link"> Student Assign</a></li>
           </ul>
@@ -183,18 +181,18 @@
               <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
               <li><a href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
               <li><a href="{{ route('room.reallocation') }}" class="nav-link">Room Reallocation</a></li>
+              <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
               <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
               <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
               <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li>
-              <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
-              <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li>
+              {{-- <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a></li> --}}
               {{-- Reports  --}}
+              <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
               <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
               <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
               <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
-              <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
               <li><a href="{{ route('report.hostelcourier') }}" class="nav-link">Hostel Courier Report</a></li>
-              <li><a href="{{ route('report.hostellist') }}" class="nav-link">Hostel List Report(<small>pdf</small>)</a></li>
+              <li><a href="{{ route('report.hostellist') }}" class="nav-link">Phone/Sign List (<small>pdf</small>)</a></li>
             </ul>
           </li>
 
