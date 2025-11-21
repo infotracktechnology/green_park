@@ -37,7 +37,7 @@
                                     <option value="Girls" @selected($hostel->type == 'Girls')>Girls</option>
                                  </select>
                               </div>
-                              <div class="form-group col-lg-3">
+                              {{-- <div class="form-group col-lg-3">
                                  <label>Warden Name</label>
                                  <select name="warden_name" id="staff" class="form-control form-control-sm" required>
                                      <option value="" disabled selected>-- Choose Warden --</option>
@@ -45,7 +45,7 @@
                                          <option value="{{ $staff->name }}" @selected($staff->name == $hostel->warden_name)>{{ $staff->name }}</option>
                                      @endforeach
                                  </select>
-                             </div>
+                             </div> --}}
                              
                              <div class="form-group col-lg-3">
                               <label>Room Type</label>

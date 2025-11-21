@@ -50,15 +50,9 @@ class HostelController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'branch_id' => 'required|exists:branch,id',
-            'name' => 'required|string|max:255',
-            'type' => 'required|string',
-            'warden_name' => 'required|string',
-            'room_type' => 'required|string',
-        ]);
+       
 
-        $hostel = Hostel::create($request->only(['branch_id', 'name', 'type', 'warden_name', 'room_type']));
+        $hostel = Hostel::create($request->only(['branch_id', 'name', 'type','room_type']));
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $room) {
@@ -88,22 +82,9 @@ class HostelController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'branch_id' => 'required|exists:branch,id',
-            'name' => 'required|string|max:255',
-            'type' => 'required|string',
-            'warden_name' => 'required|string',
-            'room_type' => 'required|string',
-        ]);
-
+      
         $hostel = Hostel::findOrFail($id);
-        $hostel->update($request->only([
-            'branch_id',
-            'name',
-            'type',
-            'warden_name',
-            'room_type'
-        ]));
+        $hostel->update($request->only(['branch_id','name','type','room_type']));
 
         // $hostel->rooms()->delete();
 

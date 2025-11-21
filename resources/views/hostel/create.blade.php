@@ -36,7 +36,7 @@
                                     <option value="FEMALE">Girls</option>
                                  </select>
                               </div>
-                              <div class="form-group col-lg-3">
+                              {{-- <div class="form-group col-lg-3">
                                  <label>Warden Name</label>
                                  <select name="warden_name" id="staff" class="form-control form-control-sm" required>
                                      <option value="" disabled selected>-- Choose Warden --</option>
@@ -44,7 +44,7 @@
                                          <option value="{{ $staff->name }}" @if(old('warden_name') == $staff->name) selected @endif>{{ $staff->name }}</option>
                                      @endforeach
                                  </select>
-                             </div>
+                             </div> --}}
                              
                              <div class="form-group col-lg-3">
                               <label>Room Type</label>
