@@ -77,7 +77,7 @@
                           <td>
                             @if($exam->markrange)
                             <a href="{{ env('APP_URL').$exam->markrange }}" download>Download</a>
-                            <a class="btn btn-danger" href="{{ route('exam.markrange')?delete=$exam->testcategory }}"><i class="fas fa-trash"></i></a>
+                            <a class="btn btn-danger" href="{{ route('exam.markrange',['delete'=>$exam->testcategory])}}"><i class="fas fa-trash"></i></a>
                             @else
                             <input type="file" name="markrange[]" accept="application/pdf" class="form-control form-control-sm">
                             @endif

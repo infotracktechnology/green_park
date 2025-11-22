@@ -75,6 +75,12 @@ class StudentController extends Controller
         return redirect()->route('student.index')->with('success', 'Student details successfully updated.');
     }
 
+    public function RestoreStudent(Request $request)
+    {
+        $students = Student::onlyTrashed()->get();
+        return view('student.restore', compact('students'));
+    }
+
 
     public function destroy(Student $student)
     {
