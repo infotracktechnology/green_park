@@ -511,12 +511,16 @@ class ExamController extends Controller
             $publishs = $request->input('publish', []);
             foreach ($request->names as $key => $name) {
                 $exam['publish'] = $publishs[$key] ?? 'No';
-                if (isset($markranges[$key]) && $markranges[$key]->isValid()) {
-                    $file = $markranges[$key];
-                    $filename = $file->getClientOriginalName();
-                    $file->move('assets/markrange', $filename);
-                    $exam['markrange'] = 'assets/markrange/' . $filename;
+                $markrangesForExam = $markranges[$key] ?? [];
+                $markrangeFiles = [];
+                foreach ($markrangesForExam as $file) {
+                    if ($file->isValid()) {
+                        $filename = $file->getClientOriginalName();
+                        $file->move('assets/markrange', $filename);
+                        $markrangeFiles[] = 'assets/markrange/'.$filename;
+                    }
                 }
+                $exam['markrange'] = implode(',', $markrangeFiles);
                 Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
             }
             return redirect()->back()->with('success', "Exams Publish Updated Successfully.");
