@@ -70,6 +70,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
 
     Route::resource('staff', StaffProfileController::class);
     Route::resource('student', StudentController::class);
+    Route::match(['get', 'post'],'students/restore',[StudentController::class,'RestoreStudent'])->name('students.restore'); 
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
     Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
     Route::get('export/student', [\App\Http\Controllers\ExportController::class, 'student_export'])->name('export.student');
@@ -106,7 +107,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('examination/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
         Route::match(['get', 'post'],'examination/publish','Publish')->name('exam.publish');
         Route::get('examination/perviousexamresult/', 'PerviousExamResult')->name('exam.perviousexamresult');
-       Route::match(['get', 'post'],'examination/previousexamupload','PreviousExamUpload')->name('exam.previousexamupload'); 
+        Route::match(['get', 'post'],'examination/previousexamupload','PreviousExamUpload')->name('exam.previousexamupload'); 
     });
     
     Route::resource('examportion', ExamPortionController::class);

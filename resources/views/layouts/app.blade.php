@@ -118,6 +118,7 @@
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
+                <li><a href="{{ route('students.restore') }}" class="nav-link">Restore Student</a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
                 <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
           </ul>
