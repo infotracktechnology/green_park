@@ -25,9 +25,9 @@
                   <h6 class="col-deep-purple">Students Details</h6>
                 </div>
 
-                <div class="col-md-2 col-sm-12 mb-3">
+                {{-- <div class="col-md-2 col-sm-12 mb-3">
                   <a href="{{ route('student.create') }}" class="btn btn-primary btn-block">Add Students</a>
-                </div>
+                </div> --}}
 
               </div>
 
