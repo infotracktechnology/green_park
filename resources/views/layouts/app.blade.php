@@ -54,8 +54,8 @@
         </div>
         <ul class="navbar-nav navbar-right">
           <li class="dropdown dropdown-list-toggle">
-            <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
-            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
+            <a href="#" class="nav-link nav-link-lg"><i data-feather="settings"></i></a>
+            {{-- <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
               <div class="dropdown-header">Notifications</div>
               <div class="dropdown-list-content dropdown-list-icons">
                 <a href="#" class="dropdown-item dropdown-item-unread">
@@ -69,7 +69,7 @@
               <div class="dropdown-footer text-center">
                 <a href="#">View All <i class="fas fa-chevron-right"></i></a>
               </div>
-            </div>
+            </div> --}}
           </li>
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
@@ -117,6 +117,7 @@
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
+                <li><a href="{{ route('student.create') }}" class="nav-link">Add Student</a></li>
                 <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
                 <li><a href="{{ route('students.restore') }}" class="nav-link">Restore Student</a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
