@@ -16,9 +16,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the students.
-     */
     public function index(Request $request)
     {
         $students = [];
@@ -45,7 +42,7 @@ class StudentController extends Controller
         $data = $request->all();
         $data['academic_year'] = $this->academic_year;
         Student::create($data);
-        return redirect()->route('student.index')->with('success', 'Student created successfully.');
+        return redirect()->back()->with('success', 'Student created successfully.');
     }
 
 
@@ -72,29 +69,30 @@ class StudentController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('student.index')->with('success', 'Student details successfully updated.');
+        return redirect()->back()->with('success', 'Student details successfully updated.');
     }
 
     public function RestoreStudent(Request $request)
     {
         $students = Student::onlyTrashed()->get();
+        if($request->isMethod('post')){
+            $restore = Student::withTrashed()->find($request->id)->update(['deleted_at' => null, 'remarks' => null]);
+            return redirect()->back()->with('success', 'Student Reactivated successfully.');
+        }
         return view('student.restore', compact('students'));
     }
 
 
-    public function destroy(Student $student)
+    public function destroy(Request $request, Student $student)
     {
-        $student->delete();
-        return redirect()->route('student.index')->with('success', 'Student deleted successfully.');
+        $student->update(['deleted_at' => date('Y-m-d H:i:s'), 'remarks' => $request->remarks]);
+        return redirect()->back()->with('success', 'Student Inactivated successfully.');
     }
 
 
     public function section()
     {
-        $students = DB::table('student')
-            ->join('branch', 'student.campus', '=', 'branch.id')
-            ->select('student.*', 'branch.name as campus')
-            ->get();
+        $students = Student::all();
 
         return view('student.section', compact('students'));
     }
@@ -118,11 +116,11 @@ class StudentController extends Controller
     {
         return view('student.profile');
     }
- 
+
 
     public function dashboard()
     {
-        $student = Student::where('student_id',auth()->user()->student_id)->first();
+        $student = Student::where('student_id', auth()->user()->student_id)->first();
         $exam = $student->GetExam();
 
         $examStartTime = $exam ? $exam->start_at->toIso8601String() : null;
@@ -131,10 +129,7 @@ class StudentController extends Controller
         $endOfMonth = now()->endOfMonth();
 
 
-        $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
-            ->where('student_id', $student->student_id)
-            ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
-            ->distinct();
+        $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')->where('student_id', $student->student_id)->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])->distinct();
 
         $stats = DB::query()->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')->selectRaw("COUNT(DISTINCT attendance_date) as total_days,SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) as present_days")->first();
 
@@ -151,12 +146,12 @@ class StudentController extends Controller
         $sid = auth()->user()->student_id;
 
         $exams = DB::table("exam_answer as a")->join('exam as b', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(q_no)*4)total,markrange")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) {
-            return ['exam_date' => $test->exam_date,'name' => $test->name,'test_id' => $test->test_id,'mark' => $test->mark,'total' => $test->total,'markrange' => $test->markrange,'first_mark' => ExamAnswer::where('test_id', $test->test_id)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderByDesc('mark')->value('mark')];
+            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total, 'markrange' => $test->markrange, 'first_mark' => ExamAnswer::where('test_id', $test->test_id)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderByDesc('mark')->value('mark')];
         });
 
         $subjectexam = null;
-        if($request->exam){
-           $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+        if ($request->exam) {
+            $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         }
         return view('student.marksheet', compact('exams', 'subjectexam'));
     }
@@ -196,19 +191,7 @@ class StudentController extends Controller
     public function attendance()
     {
         $student_id = Auth::user()->student_id;
-        $attendance = DB::table('attendance')
-            ->selectRaw("
-            student_id,
-            DATE_FORMAT(attendance_date, '%Y-%m') AS month,
-            GROUP_CONCAT(timing) AS timings,
-            GROUP_CONCAT(status) AS statuses,
-            COUNT(DISTINCT attendance_date) AS total_days,
-            SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days
-        ")
-            ->where('student_id', $student_id)
-            ->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")
-            ->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")
-            ->get();
+        $attendance = DB::table('attendance')->selectRaw("student_id,DATE_FORMAT(attendance_date, '%Y-%m') AS month,GROUP_CONCAT(timing) AS timings,GROUP_CONCAT(status) AS statuses,COUNT(DISTINCT attendance_date) AS total_days,SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days")->where('student_id', $student_id)->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")->get();
 
         $total_present = $attendance->sum('present_days');
         $total_days = $attendance->sum('total_days');

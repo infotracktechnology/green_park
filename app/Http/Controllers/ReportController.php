@@ -13,10 +13,7 @@ class ReportController extends Controller
 {
     public function section_exam(Request $request)
     {
-        $sections = Student::when(auth()->user()->branch, fn($query) => $query->where('campus', auth()->user()->branch))->where('section', '!=', '')->select('section')->distinct()->orderBy('section')->get();
-
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
-
         $exams = [];
 
         if ($request->has('testcategory')) {
@@ -24,6 +21,8 @@ class ReportController extends Controller
         }
 
         $test_name = $request->test_name ?? 0;
+
+        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')->where([['a.testname', $test_name], ['section', '!=', ''],['section', '!=', null]])->select('section')->distinct()->orderBy('section')->get();
 
         if ($request->query('type') == 'overall') {
             $section = $request->section;

@@ -128,8 +128,18 @@ class StaffProfileController extends Controller
                 Storage::delete($certificate);
             }
         }
-        $staff->delete();
-        return redirect()->route('staff.index')->with('success', 'Staff deleted successfully');
+        $staff->update(['deleted_at' => date('Y-m-d H:i:s'),'remarks' => $request->remarks]);
+        return redirect()->route('staff.index')->with('success', 'Staff Inactived successfully');
+    }
+
+     public function RestoreStaff(Request $request)
+    {
+        $staffs = Staff::onlyTrashed()->get();
+        if($request->isMethod('post')){
+            $restore = Staff::withTrashed()->find($request->id)->update(['deleted_at' => null, 'remarks' => null]);
+            return redirect()->back()->with('success', 'Staff Reactivated successfully.');
+        }
+        return view('staff.restore', compact('staffs'));
     }
 
     public function import(Request $request, ImportController $import)

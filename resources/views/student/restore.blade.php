@@ -17,7 +17,7 @@
           @endif
 
           <div class="card card-primary">
-            <div class="card-header"><h4>Restore Student</h4></div>
+            <div class="card-header"><h4>Reactive Student</h4></div>
             <div class="card-body">
 
               {{-- <form action="{{route('students.restore')}}" method="get">
@@ -52,9 +52,9 @@
                         <th>H/D</th>
                         <th>Section</th>
                         <th>Batch</th>
-                        <th>Father No</th>
-                        <th>Mother No</th>
-                        <th>Restore</th>
+                        <th>Inactive Date & Time</th>
+                        <th>Reason/Remarks</th>
+                        <th>Reactive</th>
                       </tr>
                     </thead>
 
@@ -69,8 +69,8 @@
                         <td>{{$student->hostel_dayscholar}}</td>
                         <td>{{$student->section}}</td>
                         <td>{{$student->batch}}</td>
-                        <td>{{$student->father_ph_no}}</td>
-                        <td>{{$student->mother_ph_no}}</td>
+                        <td>{{$student->deleted_at->format('d-m-Y h:i A')}}</td>
+                        <td>{{$student->remarks}}</td>
                         <td>
                            <form action="{{route('students.restore')}}" class="no-loader" method="post" onsubmit="return confirm('Are you sure you want to restore this student?')">
                             @csrf

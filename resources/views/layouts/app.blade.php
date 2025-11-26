@@ -54,7 +54,7 @@
         </div>
         <ul class="navbar-nav navbar-right">
           <li class="dropdown dropdown-list-toggle">
-            <a href="#" class="nav-link nav-link-lg"><i data-feather="settings"></i></a>
+            <a href="{{ route('admin.setting') }}" class="nav-link nav-link-lg"><i data-feather="settings"></i></a>
             {{-- <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
               <div class="dropdown-header">Notifications</div>
               <div class="dropdown-list-content dropdown-list-icons">
@@ -119,7 +119,7 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('student.create') }}" class="nav-link">Add Student</a></li>
                 <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
-                <li><a href="{{ route('students.restore') }}" class="nav-link">Restore Student</a></li>
+                <li><a href="{{ route('students.restore') }}" class="nav-link">Reactivate Student</a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
                 <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
           </ul>
@@ -128,8 +128,8 @@
           <li class="dropdown">
             <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
             <ul class="dropdown-menu">
-          <li><a href="{{ route('studentmenu.type') }}" class="nav-link"> Type Assign</a></li>
-          <li><a href="{{ route('studentmenu.student') }}" class="nav-link"> Student Assign</a></li>
+          <li><a href="{{ route('studentmenu.type') }}" class="nav-link">Type Assign</a></li>
+          <li><a href="{{ route('studentmenu.student') }}" class="nav-link">Student Assign</a></li>
           </ul>
           </li>
 
@@ -137,16 +137,17 @@
             <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>
             <ul class="dropdown-menu">
               <li><a href="{{ route('staff.index') }}" class="nav-link"> Staff</a></li>
+              <li><a href="{{ route('staffs.restore') }}" class="nav-link">Reactivate Staff</a></li>
               <li><a href="{{ route('workshift.index') }}" class="nav-link">Staff Shift</a></li>
-              <li><a href="{{ route('workshift.assign') }}" class="nav-link"> Shift Assign</a></li>
-              <li><a href="{{ route('biometric.report') }}" class="nav-link"> Biometric Daily Report</a></li>
+              <li><a href="{{ route('workshift.assign') }}" class="nav-link">Shift Assign</a></li>
+              <li><a href="{{ route('biometric.report') }}" class="nav-link">Biometric Daily Report</a></li>
               <li><a href="{{ route('staff.class') }}" class="nav-link"> Class Assign</a></li>
             </ul>
           </li>
           <li class="dropdown">
             <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
             <ul class="dropdown-menu">
-              <li><a href="{{ route('announcement.index') }}" class="nav-link"> Announcement</a></li>
+              <li><a href="{{ route('announcement.index') }}" class="nav-link">Announcement</a></li>
               <li><a href="{{route('chairmanvideo.index')}}" class="nav-link"> Chairman Video</a></li>
               <li><a href="{{route('classvideo.index')}}" class="nav-link"> Class Video</a></li>
               <li><a href="{{route('revisionvideo.index')}}" class="nav-link"> Revision Video</a></li>
@@ -252,11 +253,9 @@
   <script src="{{asset('bundles/summernote/summernote-bs4.js')}}"></script>
   <script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
   <script>
-    window.addEventListener("pageshow", function (event) {
-        if (event.persisted) {
-            window.location.reload(); 
-        }
-    });
+    setTimeout(() => $('.alert').alert('close'), 5000);
+
+    window.addEventListener('pageshow', e => e.persisted && location.reload());
 
     const backbutton = `<div class="row m-b-10"><div class="col-md-2 offset-md-10"><a href="{{ url()->previous() }}" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back</a></div></div>`;
     $('.section-body').prepend(backbutton);
