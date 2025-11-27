@@ -77,7 +77,7 @@
                           <td>
                             @if($exam->markrange)
                             @foreach(explode(',', $exam->markrange) as $markrange)
-                             <a href="{{ env('APP_URL').$exam->markrange }}" download>{{ basename($markrange) }}</a><br>
+                             <a href="{{ env('APP_URL').$markrange }}" download>{{ basename($markrange) }}</a><br>
                             @endforeach
                             <a class="btn  btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name])}}"><i class="fas fa-trash"></i></a>
                             @else
