@@ -16,7 +16,7 @@ use Carbon\Carbon;
 use App\Models\Attendance;
 use App\Models\Exam;
 use App\Models\ParentConcern;
-
+use App\Models\Setting;
 class HomeController extends Controller
 {
     public function index(Request $request){
@@ -243,7 +243,13 @@ class HomeController extends Controller
         return response()->json(['announcements' => $announcements]);
     }
 
-    
-
+    public function Setting(Request $request){
+       $setting = Setting::all();
+       if($request->isMethod('POST')) {
+        $row = Setting::find($request->id)->update(['value' => $request->value]);
+        return redirect()->back()->with('success', 'Setting new value updated successfully!');
+       }
+       return view('setting',compact('setting'));
+    }
 
 }

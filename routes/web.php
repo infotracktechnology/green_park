@@ -53,6 +53,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/dashboard/staff', 'dashboardStaff')->name('dashboard.staff');
         Route::get('/dashboard/announcement', 'dashboardAnnouncement')->name('dashboard.announcement');
         Route::match(['get', 'post'], '/parent_concern', 'parent_concern')->name('parent_concern');
+        Route::match(['get', 'post'], '/setting','Setting')->name('admin.setting');
         Route::get('/chat', 'chat')->name('chat.index');
         Route::get('studentmenu/branch', 'studentmenu_branch')->name('studentmenu.branch');
         Route::get('studentmenu/type', 'studentmenu_type')->name('studentmenu.type');
@@ -66,6 +67,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('staff/export', 'export')->name('staff.export');
         Route::post('staff/import', 'import')->name('staff.import');
         Route::get('biometric/report', 'biometric_report')->name('biometric.report');
+        Route::match(['get', 'post'],'staffs/restore','RestoreStaff')->name('staffs.restore');
     });
 
     Route::resource('staff', StaffProfileController::class);

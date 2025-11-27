@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -10,7 +11,7 @@ use Carbon\Carbon;
 class Staff extends Model
 {
  
-
+	use SoftDeletes;
     public $table = 'staff';
 
     protected $guarded = [];

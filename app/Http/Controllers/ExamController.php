@@ -509,9 +509,9 @@ class ExamController extends Controller
         if ($request->isMethod('post')) {
             $markranges = $request->file('markrange', []);
             $publishs = $request->input('publish', []);
-            foreach ($request->names as $key => $name) {
-                $exam['publish'] = $publishs[$key] ?? 'No';
-                $markrangesForExam = $markranges[$key] ?? [];
+            foreach ($request->publish as $name => $publish) {
+                $exam['publish'] = $publish ?? 'No';
+                $markrangesForExam = $markranges[$name] ?? [];
                 $markrangeFiles = [];
                 foreach ($markrangesForExam as $file) {
                     if ($file->isValid()) {

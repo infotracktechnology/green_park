@@ -6,6 +6,13 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12">
+
+          @if(session()->has('success'))
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+          </div>
+          @endif
+
           <div class="card card-primary" x-data="app">
             <form method="post" id="myForm" action="{{ route('student.store') }}" enctype="multipart/form-data">
               @csrf
@@ -79,9 +86,9 @@
                     <label>Gender</label>
                     <select name="gender" class="form-control form-control-sm" required>
                       <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
+                      <option value="MALE">Male</option>
+                      <option value="FEMALE">Female</option>
+                      <option value="OTHER">Other</option>
                     </select>
                   </div>
 
@@ -168,8 +175,7 @@
   document.getElementById('coaching_type').addEventListener('change', function() {
       var selectedCoachingType = this.value;
       var hostelSelect = document.getElementById('hostel_dayscholar');
-  
-      if (selectedCoachingType === 'Offline') {
+      if (selectedCoachingType === 'OFFLINE') {
           hostelSelect.disabled = false;  
       } else {
           hostelSelect.value = '';
@@ -177,34 +183,24 @@
       }
   });
   
-  // Initial check if the page loads with a predefined value
   window.onload = function() {
       var selectedCoachingType = document.getElementById('coaching_type').value;
       var hostelSelect = document.getElementById('hostel_dayscholar');
-      
-      if (selectedCoachingType !== 'Offline') {
-          hostelSelect.disabled = true;  // Disable if the value is not "Offline"
+      if (selectedCoachingType !== 'OFFLINE') {
+          hostelSelect.disabled = true;
       }
   };
-</script>
-
-
-<script>
+  
   document.getElementById('dob').addEventListener('change', function () {
-      const dob = new Date(this.value); // Get the selected date of birth
-      const today = new Date(); // Get the current date
-      
-      let age = today.getFullYear() - dob.getFullYear(); // Calculate the year difference
+      const dob = new Date(this.value);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
       const monthDiff = today.getMonth() - dob.getMonth(); 
       const dayDiff = today.getDate() - dob.getDate();
-  
-      // Adjust the age if the birth date hasn't occurred yet this year
       if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
           age--;
       }
-  
-      // Display the calculated age in the "Age" field
-      document.getElementById('age').value = age > 0 ? age : 0; // Ensure age is non-negative
+      document.getElementById('age').value = age > 0 ? age : 0;
   });
 </script>
 

@@ -6,6 +6,13 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12">
+
+           @if(session()->has('success'))
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+          </div>
+          @endif
+
           <div class="card card-primary">
 
             <form id="wizard_with_validation" method="POST" novalidate="novalidate" action="{{ route('student.update', $Student->id) }}" class="my-4" enctype="multipart/form-data">
@@ -222,16 +229,16 @@
 
 
                 <div class="form-group col-lg-3">
-                  <label>Bill Type</label>
-                  <select name="bill_type" id="bill_type" class="form-control form-control-sm" required>
+                  <label>Institution Bill Type</label>
+                  <select name="institution_bill_type" id="bill_type" class="form-control form-control-sm" required>
                     <option value="">Select Bill Type</option>
-                    <option value="GPCC,NKL" @selected($Student->bill_type == 'GPCC,NKL')>GPCC,NKL</option>
-                    <option value="GPI,NKL" @selected($Student->bill_type == 'GPI,NKL')>GPI,NKL</option>
-                    <option value="GPCI,NKL" @selected($Student->bill_type == 'GPCI,NKL')>GPCI,NKL</option>
-                    <option value="GPCI,KARUR" @selected($Student->bill_type == 'GPCI,KARUR')>GPCI,KARUR</option>
-                    <option value="GPCI,ERODE" @selected($Student->bill_type == 'GPCI,ERODE')>GPCI,ERODE</option>
-                    <option value="GPCA,COIMBATORE" @selected($Student->bill_type == 'GPCA,COIMBATORE')>GPCA,COIMBATORE</option>
-                    <option value="GPA,CHENNAI" @selected($Student->bill_type == 'GPA,CHENNAI')>GPA,CHENNAI</option>
+                    <option value="GPCC,NKL" @selected($Student->institution_bill_type == 'GPCC,NKL')>GPCC,NKL</option>
+                    <option value="GPI,NKL" @selected($Student->institution_bill_type == 'GPI,NKL')>GPI,NKL</option>
+                    <option value="GPCI,NKL" @selected($Student->institution_bill_type == 'GPCI,NKL')>GPCI,NKL</option>
+                    <option value="GPCI,KARUR" @selected($Student->institution_bill_type == 'GPCI,KARUR')>GPCI,KARUR</option>
+                    <option value="GPCI,ERODE" @selected($Student->institution_bill_type == 'GPCI,ERODE')>GPCI,ERODE</option>
+                    <option value="GPCA,COIMBATORE" @selected($Student->institution_bill_type == 'GPCA,COIMBATORE')>GPCA,COIMBATORE</option>
+                    <option value="GPA,CHENNAI" @selected($Student->institution_bill_type == 'GPA,CHENNAI')>GPA,CHENNAI</option>
                   </select>
                 </div>
 
@@ -565,21 +572,7 @@
                 </div>
 
 
-                <div class="form-group col-lg-3">
-                  <label>Institution Bill Type</label>
-                  <select name="institution_bill_type" class="form-control form-control-sm">
-                    <option value="">Select Bill Type</option>
-                    <option value="GPCC, Namakkal" {{ $Student->institution_bill_type == 'GPCC, Namakkal' ? 'selected' : '' }}>GPCC, Namakkal</option>
-                    <option value="GPI, Namakkal" {{ $Student->institution_bill_type == 'GPI, Namakkal' ? 'selected' : '' }}>GPI, Namakkal</option>
-                    <option value="GPCI, Erode" {{ $Student->institution_bill_type == 'GPCI, Erode' ? 'selected' : '' }}>GPCI, Erode</option>
-                    <option value="GPCI, Karur" {{ $Student->institution_bill_type == 'GPCI, Karur' ? 'selected' : '' }}>GPCI, Karur</option>
-                    <option value="GPCA, Coimbatore" {{ $Student->institution_bill_type == 'GPCA, Coimbatore' ? 'selected' : '' }}>GPCA, Coimbatore</option>
-                    <option value="GPA, Chennai" {{ $Student->institution_bill_type == 'GPA, Chennai' ? 'selected' : '' }}>GPA, Chennai</option>
-                    <option value="Others" {{ $Student->institution_bill_type == 'Others' ? 'selected' : '' }}>Others</option>
-                  </select>
-                </div>
-
-              </fieldset>
+                </fieldset>
 
 
 
