@@ -63,27 +63,29 @@
                           <th>Test Name</th>
                           <th>Test Category</th>
                           <th>Total Questions</th>
-                          <th>Mark Range(File)</th>
+                          <th>Mark Range(Multiple File)</th>
                           <th>Publish</th>
                         </tr>
                       </thead>
                       <tbody>
                         @foreach($exams as $exam)
                         <tr>
-                          <td>{{ $exam->testid }}<input type="hidden" name="names[]" value="{{ $exam->name }}"></td>
+                          <td>{{ $exam->testid }}</td>
                           <td>{{ $exam->name }}</td>
                           <td>{{ $exam->testcategory }}</td>
                           <td>{{ $exam->total_questions }}</td>
                           <td>
                             @if($exam->markrange)
-                            <a href="{{ env('APP_URL').$exam->markrange }}" download>Download</a>
-                            <a class="btn btn-danger" href="{{ route('exam.markrange',['delete'=>$exam->testcategory])}}"><i class="fas fa-trash"></i></a>
+                            @foreach(explode(',', $exam->markrange) as $markrange)
+                             <a href="{{ env('APP_URL').$exam->markrange }}" download>{{ basename($markrange) }}</a><br>
+                            @endforeach
+                            <a class="btn  btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name])}}"><i class="fas fa-trash"></i></a>
                             @else
-                            <input type="file" name="markrange[]" accept="application/pdf" class="form-control form-control-sm">
+                            <input type="file" name="markrange[{{ $exam->name }}][]" accept="application/pdf" multiple class="form-control form-control-sm">
                             @endif
                           </td>
                           <td>
-                            <select name="publish[]" class="form-control form-control-sm" required>
+                            <select name="publish[{{ $exam->name }}]" class="form-control form-control-sm" required>
                              <option value="">Select Option</option>
                              <option value="Yes" @selected($exam->publish == 'Yes')>Yes</option>
                              <option value="No" @selected($exam->publish == 'No')>No</option>
