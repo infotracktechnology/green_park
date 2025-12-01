@@ -1,8 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Fees Collection / Payment')
 @section('css')
-<!-- Bootstrap 5 CSS -->
-
 
 <style>
   .student-info-section {
@@ -81,30 +79,51 @@
     color: #007bff;
     margin-left: 5px;
   }
+  #studentList {
+  max-height: 200px;
+  overflow-y: auto;
+}
 </style>
-<!-- Bootstrap 5 CSS -->
-
-
 @endsection
 
 @section('main')
 
-<div class="main-content" x-data="feecollection()">
+<div class="main-content">
   <section class="section">
-    <div class="section-header">
-      <h1>Fees Collection / Payment</h1>
-    </div>
 
-    <div class="card shadow-sm mb-4">
+    <div class="card card-primary shadow-sm mb-4">
+      @if(session()->has('success'))
+              <div class="row">
+                <div class="col-12">
+                  <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  {{ session('success') }}
+                  </div>
+                </div>
+              </div>
+           @endif
+           @if(session()->has('error'))
+              <div class="row">
+                <div class="col-12">
+                  <div class="alert alert-error alert-dismissible fade show" role="alert">
+                  {{ session('error') }}
+                  </div>
+                </div>
+              </div>
+           @endif
+           <div class="card-header">
+            <h4>Fees Collection / Payment</h4>
+           </div>
       <div class="card-body p-3">
-        <form method="GET" action="{{ route('fees.collection') }}">
+        <form method="GET" action="{{ route('fees.collection') }}" id="searchform">
           <div class="row align-items-end gy-2">
 
-            <!-- Branch Input -->
+    
             <div class="col-md-3">
               <label for="branch_filter" class="form-label">Branch</label>
               <select name="branch" id="branch_filter" class="form-control form-control-sm">
-                <option value="">All Branches</option>
+                @if (!auth()->user()->branch)
+                  <option value="all">All Branches</option>
+                @endif
                 @foreach ($branches as $id => $branch)
                   <option value="{{ $id }}" {{ request('branch') == $id ? 'selected' : '' }}>{{ $branch }}</option>
                 @endforeach
@@ -115,7 +134,7 @@
             <div class="col-md-2">
               <label for="coaching_type" class="form-label">Coaching Type</label>
               <select name="coaching_type" id="coaching_type" class="form-control form-control-sm">
-                <option value="">All Types</option>
+                <option value="all">All Types</option>
                 @foreach ($coachingTypes as $coachingType)
                   <option value="{{ $coachingType->coaching_type }}" {{ request('coaching_type') == $coachingType->coaching_type ? 'selected' : '' }}>
                     {{ ucfirst($coachingType->coaching_type) }}
@@ -124,15 +143,6 @@
               </select>
             </div>
             
-           
-            <div class="col-md-2">
-              <label for="hostel_dayscholar" class="form-label">Hostel / Dayscholar</label>
-              <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm">
-                <option value="">All</option>
-                <option value="hostel" {{ request('hostel_dayscholar') == 'hostel' ? 'selected' : '' }}>Hostel</option>
-                <option value="Dayscholar" {{ request('hostel_dayscholar') == 'Dayscholar' ? 'selected' : '' }}>Days Scholar</option>
-              </select>
-            </div>
             <!-- Search By -->
             <div class="col-md-2">
               <label for="student_search_type" class="form-label">Search By</label>
@@ -141,22 +151,25 @@
                 <option value="student_id" @selected(request('student_search_type') == 'student_id')>Student ID</option>
                 <option value="father_name" @selected(request('student_search_type') == 'father_name')>Father Name</option>
                 <option value="mother_name" @selected(request('student_search_type') == 'mother_name')>Mother Name</option>
-                <option value="parent_mobile" @selected(request('student_search_type') == 'parent_mobile')>Parent Mobile No</option>
+                <option value="ph_no1" @selected(request('student_search_type') == 'ph_no1')>Mobile No</option>
               </select>
             </div>
 
-            <!-- Search Term -->
             <div class="col-md-3 position-relative">
               <label for="student_query" class="form-label">Search Term</label>
               <input type="text" name="student_query" id="student_query" class="form-control form-control-sm"
-                     placeholder="Enter Search Term..." value="{{ request('student_query') }}">
+                    placeholder="Enter Search Term..." autocomplete="off" value="{{ request('student_query') }}">
+
+              <!-- Dropdown container -->
+              <div id="studentList" class="list-group position-absolute w-100" style="z-index:1000;"></div>
             </div>
 
             <!-- Search Button -->
             <div class="col-md-2 text-end">
+              <input type="hidden" name="student_id" value="{{ request('student_id') }}" id="student_id">
               <label class="form-label d-none d-md-block">&nbsp;</label>
               <button type="submit" class="btn btn-primary btn-sm w-100">
-                <i class="fas fa-search me-1"></i> Search
+                Get
               </button>
             </div>
 
@@ -168,31 +181,77 @@
         <div class="student-info-section mt-4">
           <div class="row">
             <div class="col-md-6">
-              <ul class="list-unstyled">
-                <li><strong>Father Name:</strong> {{ $student->father_name }}</li>
-                <li><strong>Mother Name:</strong> {{ $student->mother_name }}</li>
-                <li><strong>Parent Mobile:</strong> {{ $student->ph_no1 }}</li>
-              </ul>
+              <table class="table table-sm table-borderless">
+                <tbody>
+                  <tr>
+                    <td><strong>Student Name:</strong></td>
+                    <td>{{ $student->student_name }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Student ID:</strong></td>
+                    <td>{{ $student->student_id }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Father Name:</strong></td>
+                    <td>{{ $student->father_name ?? '-' }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mother Name:</strong></td>
+                    <td>{{ $student->mother_name ?? '-' }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mobile No:</strong></td>
+                    <td>{{ $student->ph_no1 ?? '-' }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="col-md-6">
-              <ul class="list-unstyled">
-                <li><strong>Student Name:</strong> {{ $student->student_name }}</li>
-                <li><strong>Student ID:</strong> {{ $student->student_id }}</li>
-                <li><strong>Section:</strong> {{ $student->section }}</li>
-              </ul>
+              <table class="table table-sm table-borderless">
+                <tbody>
+                  <tr>
+                    <td><strong>Coaching Type:</strong></td>
+                    <td>{{ $student->coaching_type ?? '-' }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Branch:</strong></td>
+                    <td>{{ $student->branch->name ?? '-' }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Course:</strong></td>
+                    <td>{{ $student->course ?? '-' }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Batch:</strong></td>
+                    <td>{{ $student->batch ?? '-' }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Section:</strong></td>
+                    <td>{{ $student->section ?? '-' }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
         <div class="col-md-12">
-          <form method="POST" action="{{ route('fees.collection') }}">
+          <form method="POST" action="{{ route('fees.collection') }}" id="feesForm">
             @csrf
            <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Fee List</h5>
-            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#concessionModal">
-              Concession
-            </button>
-          </div>
+            <div>
+              <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#concessionModal">
+                  Apply Concession
+              </button>
 
+              <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#paymentHistoryModal">
+                Payment History
+              </button>
+            </div>
+            {{-- <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#concessionModal">
+              Concession
+            </button> --}}
+          </div>
           <div class="table-responsive">
             <table class="table table-sm table-bordered fee-breakdown-table">
               <thead>
@@ -200,20 +259,31 @@
                   <th>#</th>
                   <th>Installment</th>
                   <th>Fee Amount</th> 
-                  <th>Pay Amount</th>
                   <th>Balance</th>
+                  <th>Pay Amount</th>
                 </tr>
               </thead>
               <tbody>
-                <template x-for="(fee, index) in fees" :key="index">
+                @foreach($student->fees() as $fee)
                   <tr>
-                    <td><input type="checkbox" x-model="fee.check" :value="fee.id" :name="`fees[${index}][fee_id]`"></td>
-                    <td x-text="fee.instalment"></td>
-                    <td x-text="fee.amount"></td>
-                    <td><input type="text" class="form-control form-control-sm numberk" :name="`fees[${index}][payamount]`" x-model="fee.payamount" x-on:change="balance(fee)" :readonly="!fee.check"></td>
-                    <td><input type="text" class="form-control form-control-sm" :name="`fees[${index}][balance]`" x-model="fee.balance" readonly></td>
+                    <td>
+                      <input type="checkbox" class="fee-check" name="fees[{{$loop->index}}][feeplan_item_id]" value="{{$fee['id']}}">
+                    </td>
+                    <td>{{ $fee['instalment'] }}
+                      <input type="hidden" class="bill_type_id" value="{{ $fee['bill_type_id'] }}">
+                      <input type="hidden" name="studentID" value="{{$student->id}}">
+                      <input type="hidden" class="concession_id_{{$fee['id']}}" name="fees[{{$loop->index}}][concession_id]">
+                      <input type="hidden" class="concession_amt_{{$fee['id']}}" name="fees[{{$loop->index}}][concession_amount]">
+                    </td>
+                    <td class="feeamount fee_amount_{{$fee['id']}}">{{ $fee['amount'] }}</td>
+                    <td><input type="text" class="form-control form-control-sm numberk balance" readonly></td>
+                    <td>
+                      <input type="text" class="form-control form-control-sm numberk payamount"
+                            name="fees[{{$loop->index}}][payamount]" readonly>
+                    </td>
                   </tr>
-                </template>
+                @endforeach
+
               </tbody>
             </table>
           </div>
@@ -221,33 +291,32 @@
           <div class="row">
             <label class="col-lg-10 col-form-label font-weight-bold">Total amount:</label>
             <div class="col-lg-2">
-              <span class="font-weight-bold h5" x-text="total"></span> 
-              <input type="hidden" name="total" x-model="total">
+              <span class="font-weight-bold h5 totalspan"></span> 
+              <input type="hidden" name="total" id="total">
             </div>
           </div>
 
-     <div x-data="{ payment_mode: 'cash' }" class="mt-3">
+<div class="mt-3">
   <div class="form-group row mb-2">
     <label class="col-lg-2 col-form-label pt-0">Payment Mode:</label>
     <div class="col-lg-10">
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" x-model="payment_mode" name="payment_mode" id="mode_cash" value="cash" checked>
+        <input class="form-check-input" type="radio" name="payment_mode" id="mode_cash" value="cash" checked>
         <label class="form-check-label" for="mode_cash">Cash</label>
       </div>
 
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" x-model="payment_mode" name="payment_mode" id="mode_neft" value="neft">
+        <input class="form-check-input" type="radio" name="payment_mode" id="mode_neft" value="neft">
         <label class="form-check-label" for="mode_neft">RTGS / NEFT Payments/UPI</label>
       </div>
     </div>
   </div>
 
   <!-- Online Bank Transfer Fields -->
-  <div class="row" x-show="payment_mode === 'neft'" x-cloak x-transition>
+  <div class="row" id="neftDiv">
     <div class="col-md-3 mb-2">
   <label class="form-label">Transfer Date</label>
-  <input type="date" name="bank_transfer_date" class="form-control form-control-sm"
-         value="{{ date('Y-m-d') }}">
+  <input type="date" name="bank_transfer_date" class="form-control form-control-sm">
 </div>
   <div class="col-md-3 mb-2">
   <label class="form-label">Transfer Mode</label>
@@ -302,7 +371,7 @@
     <button type="submit" class="btn btn-primary">Save</button>
   </div>
 </div>
-
+          </form>
 </div>
 
       @endif
@@ -315,122 +384,477 @@
 
 
 @if($student)
-<!-- Concession Modal OUTSIDE the main form -->
+
+<!-- Modal to view the payment History -->
+<div class="modal fade" id="paymentHistoryModal" aria-labelledby="paymentHistoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentHistoryModalLabel">Payment History</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive mb-3">
+          <table class="table table-bordered table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Payment Date</th>
+                <th>Receipt No</th>
+                <th>Mode</th>
+                {{-- <th>Installment</th> --}}
+                <th>Amount</th>
+                <th>Print</th>
+              </tr>
+            </thead>
+            <tbody id="paymentHistoryModalBody">
+              @foreach ($student->feespaidhistory as $feecollection)
+                {{-- @foreach ($feecollection->item as $feecollectionitem)
+                  <tr @if ($feecollection->is_cancelled) class="table-danger" style="text-decoration: line-through; color: #6c757d;" @endif>
+                    <td>{{ $feecollection->payment_date }}</td>
+                    <td>{{ $feecollection->receipt_no }}</td>
+                    <td>{{ $feecollection->payment_mode }}</td>
+                    <td>{{ $feecollectionitem->feeplanitem->instalment }}</td>
+                    <td>{{ $feecollectionitem->payamount }}</td>
+                    <td>
+                      <button class="btn btn-primary btn-sm" target="_blank" onclick="{{ route('receipt.print', $feecollection->id) }}">
+                        <i class="fas fa-print"></i>
+                      </button>
+                    </td>
+                  </tr>
+                @endforeach --}}
+
+                <tr @if ($feecollection->is_cancelled) class="table-danger" style="text-decoration: line-through; color: #6c757d;" @endif>
+                  <td>{{ $feecollection->payment_date }}</td>
+                  <td>{{ $feecollection->receipt_no }}</td>
+                  <td>{{ $feecollection->payment_mode }}</td>
+                  {{-- <td>{{ $feecollectionitem->feeplanitem->instalment }}</td> --}}
+                  <td>{{ $feecollection->total ?? 0 }}</td>
+                  <td>
+                    <a class="btn btn-primary btn-sm" target="_blank" href="{{ route('fees.receipt', [$feecollection->id, 'copy' => 1]) }}">
+                      <i class="fas fa-print"></i>
+                    </a>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
 <div class="modal fade" id="concessionModal" tabindex="-1" aria-labelledby="concessionModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <form id="concessionForm">
         <div class="modal-header">
           <h5 class="modal-title" id="concessionModalLabel">Apply Concession</h5>
-          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body">
-          <div class="table-responsive mb-3">
-            <table class="table table-bordered table-sm align-middle">
+
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm">
               <thead>
                 <tr>
                   <th>Installment</th>
                   <th>Fee Amount</th>
-                  <th>Type</th>
-                  <th>Value</th>
+                  <th>Concession Type</th>
                   <th>Concession Amount</th>
-                  {{-- <th>Reason</th> --}}
+                  <th>Value</th>
                 </tr>
               </thead>
               <tbody>
                 @foreach($student->fees() as $fee)
-                  <tr>
+                  {{-- <tr @if($fee['concession'] > 0) class="table-danger" style="text-decoration: line-through; color: #6c757d;" @endif> --}}
+                    <tr>
                     <td>{{ $fee['instalment'] }}</td>
-                    <td>
-                      <span class="fee-amount" data-fee="{{ $fee['id'] }}">{{ $fee['amount'] }}</span>
-                      <input type="hidden" name="fee_amount[{{ $fee['id'] }}]" value="{{ $fee['amount'] }}">
+                    <td class="feeamount">{{ $fee['amount'] }}
+                      <input type="hidden" class="feeplan_{{$fee['id']}}" value="{{$fee['id']}}">
+                      <input type="hidden" class="feeamount_{{$fee['id']}}" value="{{ $fee['amount'] }}">
                     </td>
-       
-                    </td>             
+                    {{-- <td @if($fee['concession'] > 0) style="pointer-events: none;" @endif> --}}
                     <td>
-                      <select class="form-select form-select-sm concession-type" name="concession_type[{{ $fee['id'] }}]" data-fee="{{ $fee['id'] }}">
-                        3<option value="manual">Manual</option>
-                        <option value="percentage">Percentage</option>
+                      <select class="form-control form-control-sm concession_type">
+                        <option value="">Select Concession Type</option>
+                        @foreach($concessions as $concession)
+                          <option value="{{ $concession->id }}" data-con_type="{{ $concession->type }}" data-con_value="{{ $concession->value }}">{{ $concession->name }}</option>
+                        @endforeach
+                        <option value="0" data-con_type="manual" data-con_value="0">Manual</option>
                       </select>
-                    <td>
-                      <input type="number" class="form-control form-control-sm concession-value" name="concession_value[{{ $fee['id'] }}]" min="0" data-fee="{{ $fee['id'] }}">
                     </td>
                     <td>
-                      <input type="number" class="form-control form-control-sm concession-amount" name="concession_amount[{{ $fee['id'] }}]" min="0" readonly data-fee="{{ $fee['id'] }}">
+                      <input type="number" class="form-control form-control-sm concession_amount" value="0" readonly>
                     </td>
-                    {{-- <td>
-                      <input type="text" class="form-control form-control-sm" name="concession_reason[{{ $fee['id'] }}]">
-                    </td> --}}
+                    <td>
+                      <input type="text" class="form-control form-control-sm concession_value" value="{{ $fee['amount'] }}" readonly>
+                    </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
           </div>
+
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Apply</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary applyconcessionbtn">Apply</button>
         </div>
       </form>
     </div>
   </div>
 </div>
-@endif
 
+@endif
+@endsection
 
 
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  function feecollection() {
-    return {
-      payment_mode: 'cash',
-      total: 0.00,
-      fees: @json($student ? $student->fees() : []),
-      balance(fee) {
-        if(parseFloat(fee.payamount) > parseFloat(fee.amount)) {
-          alert('Amount cannot be greater than fee amount');
+$(document).ready(function(){
+  const students = @json($students);
+  $('#neftDiv').hide();
+
+  $('#branch_filter, #coaching_type, #student_search_type').on('change', function(){
+    $('#student_query').val('');
+    $('#student_id').val('');
+  });
+
+  $('#student_query').on('input', function(){
+    let query = $(this).val();
+
+    if(query.length > 1){ 
+      branch_filtered = [];
+      coaching_filtered = [];
+      students_filtered = [];
+      data = '';
+        branch_id = $('#branch_filter').val();
+        coaching_type = $('#coaching_type').val();
+        student_search_type = $('#student_search_type').val();
+        if(branch_id == '' || coaching_type == '' || student_search_type == '') {
           return;
         }
-        fee.balance = (parseFloat(fee.amount) - parseFloat(fee.payamount)).toFixed(2);
-        this.total = this.fees.reduce((sum, item) => {
-          let pay = parseFloat(item.payamount);
-          return sum + (isNaN(pay) ? 0 : pay);
-        }, 0).toFixed(2);
-      },
-      init() {
+        if(branch_id == 'all') {
+          branch_filtered = students;
+        } else {
+          branch_filtered = students.filter(student => student.campus == branch_id);
+        }
+        if(coaching_type == 'all') {
+          coaching_filtered = branch_filtered;
+        } else{
+          coaching_filtered = branch_filtered.filter(student => student.coaching_type == coaching_type);
+        }
+        if(student_search_type == 'student_name') {
+          students_filtered = coaching_filtered.filter(student => (student.student_name || '').toLowerCase().includes(query.toLowerCase()));
+        } else if(student_search_type == 'student_id') {
+          students_filtered = coaching_filtered.filter(student => (student.student_id || '').toLowerCase().includes(query.toLowerCase()));
+        } else if(student_search_type == 'father_name') {
+          students_filtered = coaching_filtered.filter(student => (student.father_name || '').toLowerCase().includes(query.toLowerCase()));
+        } else if(student_search_type == 'mother_name') {
+          students_filtered = coaching_filtered.filter(student => (student.mother_name || '').toLowerCase().includes(query.toLowerCase()));
+        } else if(student_search_type == 'ph_no1') {
+          students_filtered = coaching_filtered.filter(student => (student.ph_no1 || '').toLowerCase().includes(query.toLowerCase()));
+        }
         
+        students_filtered.forEach(student => {
+          data += '<a href="javascript:void(0);" class="list-group-item list-group-item-action student-item" data-student_id="' + student.id + '">' + student.student_name + '</a>'
+        });
+          $('#studentList').fadeIn().html(data);
+    } else {
+      $('#studentList').fadeOut();
+    }
+  });
+
+  // When user clicks on a suggestion
+  $(document).on('click', '.student-item', function(){
+    $('#student_query').val($(this).text());
+    $('#student_id').val($(this).data('student_id'));
+    $('#studentList').fadeOut();
+  });
+
+  // Hide dropdown if clicked outside
+  $(document).click(function(e){
+    if(!$(e.target).closest('#student_query, #studentList').length){
+      $('#studentList').fadeOut();
+    }
+  });
+  $('#searchform').on('submit', function(e){
+    e.preventDefault();
+    if($('#student_id').val() == '') {
+      alert('Please select a student');
+      return;
+    }
+    $('#studentList').fadeOut();
+    this.submit();
+  });
+
+  setTimeout(function() {
+            $(".alert").fadeOut(1500);
+        }, 3000);
+
+  @if($student)
+    $('.fee-check').on('change', function() {
+        let $payAmountInput = $(this).closest('tr').find('.payamount');
+        
+        if ($(this).is(':checked')) {
+            $payAmountInput.prop('readonly', false);
+            $payAmountInput.removeClass('readonly-style');
+            $payAmountInput.focus();
+        } else {
+            $payAmountInput.prop('readonly', true);
+            $payAmountInput.val('');
+            $payAmountInput.addClass('readonly-style');
+        }
+      let row = $(this).closest('tr');
+        calculatetotal(row);
+      calculatebalance(row);
+    });
+    
+    $('.payamount').prop('readonly', true);
+
+    $('.payamount').on('input', function() {
+      let row = $(this).closest('tr');
+      calculatetotal(row);
+      calculatebalance(row);
+      if($(this).val() <= 0) {
+        $(this).val('');
+      }
+
+      let rowfeeamount = parseFloat(row.find('.feeamount').text().trim());
+
+      if($(this).val() > rowfeeamount) {
+        $(this).val(rowfeeamount).trigger('input');
+      }
+      
+    });
+
+    function calculatebalance(row){
+      let feeamt = parseFloat(row.find('.feeamount').text().trim());
+      
+      let amt = parseFloat(row.find('.payamount').val()) || 0;
+      row.find('.balance').val(feeamt - amt);
+
+      
+      if((feeamt - amt) <= 0) {
+        row.find('.balance').val('');
+      }
+
+      if(!row.find('.fee-check').is(':checked')) {
+        row.find('.balance').val('');
       }
     }
-  }
-</script>
+
+    function calculatetotal(row){
+      let total = 0;
+      $('.payamount').each(function() {
+        let val = parseFloat($(this).val());
+        if (val) {
+          total += val;
+        }
+      });
+      
+      $('.totalspan').text(total.toFixed(2));
+      $('#total').val(total.toFixed(2));
+    }
+
+    $('#feesForm').on('submit', function(e) {
+      e.preventDefault();
+
+      if (!this.checkValidity()) {
+          return;
+      }
+      
+      if($('#total').val() <= 0 || $('#total').val() == null) {
+        alert('There is no valid amount to proceed');
+        return;
+      }
+      
+      if($('input[name="payment_mode"]:checked').val() == 'neft') {
+        
+       let firstBillType = null;
+       let hasError = false;
+    
+    $('.fee-breakdown-table').find('.fee-check:checked').each(function() {
+        let bill_type_id = $(this).closest('tr').find('.bill_type_id').val();
+        
+        if (firstBillType === null) {
+            firstBillType = bill_type_id;
+        } else if (firstBillType !== bill_type_id) {
+            alert('Bill type differs');
+            hasError = true;
+            return false;
+        }
+    });
+    
+    if (hasError) return;
+
+    if($('input[name="bank_transfer_mode"]').val == '' || $('input[name="bank_name"]').val == '' || $('input[name="transaction_id"]').val == '' || $('input[name="bank_transfer_date"]').val == '') {
+      alert('Please fill all the NEFT details');
+      return;
+    }
+   
+      } 
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  
-  document.querySelectorAll('.concession-type, .concession-value').forEach(function(el) {
-    el.addEventListener('input', function(e) {
-      var feeId = this.getAttribute('data-fee');
-      var type = document.querySelector('.concession-type[data-fee="'+feeId+'"]').value;
-      var value = parseFloat(document.querySelector('.concession-value[data-fee="'+feeId+'"]').value) || 0;
-      var feeAmount = parseFloat(document.querySelector('.fee-amount[data-fee="'+feeId+'"]').textContent) || 0;
-      var concessionAmountInput = document.querySelector('.concession-amount[data-fee="'+feeId+'"]');
-      if(type === 'percentage') {
-        concessionAmountInput.value = ((feeAmount * value) / 100).toFixed(2);
+    const submitBtn = $(this).find('button[type="submit"]');
+    submitBtn.prop('disabled', true).text('Please wait...');
+      this.submit();
+    });
+
+    $('#mode_neft').on('change', function() {
+      
+      if($('input[name="payment_mode"]:checked').val() == 'neft') {
+        $('input[name="bank_transfer_date"]').prop("required", true);
+        $('select[name="bank_transfer_mode"]').prop("required", true);
+        $('input[name="bank_name"]').prop("required", true);
+        $('input[name="transaction_id"]').prop("required", true);
+        $('#neftDiv').show();
+
       } else {
-        concessionAmountInput.value = value.toFixed(2);
+        $('#neftDiv').hide();
       }
     });
-  });
- 
-  document.querySelectorAll('.concession-type').forEach(function(el) {
-    el.addEventListener('change', function(e) {
-      var feeId = this.getAttribute('data-fee');
-      document.querySelector('.concession-value[data-fee="'+feeId+'"]').dispatchEvent(new Event('input'));
+    $('#mode_cash').on('change', function() {
+      
+      if($('input[name="payment_mode"]:checked').val() == 'cash') {
+        $('input[name="bank_transfer_date"]').prop("required", false).val('');
+        $('select[name="bank_transfer_mode"]').prop("required", false).val('').trigger('change');
+        $('input[name="bank_name"]').prop("required", false).val('');
+        $('input[name="transaction_id"]').prop("required", false).val('');
+        $('#neftDiv').hide();
+      } else {
+        $('#neftDiv').show();
+      }
     });
+
+    $(document).on('change', '.concession_type', function() {
+
+      let row = $(this).closest('tr');
+
+      let feeID = row.find('input[class^="feeplan_"]').val();
+      let originalAmount = parseFloat(row.find('input[class^="feeamount_"]').val());
+
+      let selected = $(this).find('option:selected');
+
+      let conType = selected.data('con_type');   // percentage or fixed
+      let conValue = parseFloat(selected.data('con_value')) || 0;
+      
+
+      let newAmount = originalAmount;
+
+      if (conType === "percentage") {
+          newAmount = originalAmount - (originalAmount * (conValue / 100));
+          if (newAmount < 0) {
+              newAmount = 0;
+          }
+      }
+      else if (conType === "fixed") {
+          newAmount = originalAmount - conValue;
+          if (newAmount < 0) {
+              newAmount = 0;
+          }
+      } else if (conType === "manual") {
+        // Enable user to type new amount
+        row.find('.concession_amount').val("").prop("readonly", false);
+        row.find('.concession_value').val("");
+        return; // IMPORTANT — keep existing flow untouched
+    }
+      concession_amount = originalAmount - newAmount;
+      // Update the concession value input
+      row.find('.concession_value').prop("readonly", true).val(newAmount);
+      row.find('.concession_amount').prop("readonly", true).val(concession_amount);
+
   });
+
+  $(document).on("keyup", ".concession_amount", function() {
+
+      let row = $(this).closest("tr");
+
+      // Only if manual selected
+      if (row.find(".concession_type option:selected").data("con_type") !== "manual") return;
+
+      let originalAmount = parseFloat(row.find('input[class^="feeamount_"]').val());
+
+      conValue = parseFloat($(this).val()) || 0;
+
+      newAmount = originalAmount - conValue;
+      if (newAmount < 0) {
+          newAmount = 0;
+      }
+      // let newAmount = parseFloat($(this).val()) || 0;
+
+      // // Boundaries
+      // if (newAmount < 0) newAmount = 0;
+      // if (newAmount > originalAmount) newAmount = originalAmount;
+
+      // $(this).val(newAmount);
+
+      row.find('.concession_value').prop("readonly", true).val(newAmount);
+
+      // let concession_amount = originalAmount - newAmount;
+
+      // row.find('.concession_amount').val(concession_amount.toFixed(2));
+
+      // // Update the concession value input
+      // row.find('.concession_value').val(newAmount.toFixed(2));
+  });
+
+
+  $(document).on('click', '.applyconcessionbtn', function () {
+
+    $('#concessionModal tbody tr').each(function () {
+
+        let row = $(this);
+
+        let feeID = row.find('input[class^="feeplan_"]').val();
+        let revisedAmount = parseFloat(row.find('.concession_value').val());
+        let concession_amount = parseFloat(row.find('.concession_amount').val() || 0);
+        let concession_id = row.find('.concession_type').val();
+
+        if (!feeID || isNaN(revisedAmount)) return;
+
+        // Update main table fee amount
+        $('.fee_amount_' + feeID).text(revisedAmount.toFixed(2));
+        $('.concession_id_' + feeID).val(concession_id);
+        // Update main table concession amount
+        $('.concession_amt_' + feeID).val(concession_amount.toFixed(2));
+
+        // Update main table payamount input
+        // $('.fee_pay_' + feeID).val(revisedAmount.toFixed(2));
+    });
+
+    $('#concessionModal').modal('hide');
 });
+
+
+  @endif
+
+  // $('#feesForm').on('submit', function () {
+  //       // If form is NOT valid → prevent disable
+  //       if (!this.checkValidity()) {
+  //           return; // Let browser show validation errors
+  //       }
+  //       const submitBtn = $(this).find('button[type="submit"]');
+  //       submitBtn.prop('disabled', true).text('Please wait...');
+  //   });
+  });
+</script>
+<script>
+@if(session('last_receipt_id'))
+    // Open receipt in a new tab and trigger print
+    let receiptUrl = "{{ route('fees.receipt', session('last_receipt_id')) }}";
+    let win = window.open(receiptUrl, '_blank');
+    // // Optional: print after tab loads
+    // win.onload = function() {
+    //     win.print();
+    // };
+@endif
 </script>
 @endsection
