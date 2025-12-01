@@ -41,7 +41,7 @@
 
                   <div class="form-group col-lg-3">
                     <label for="branch_id">Campus</label>
-                    <select name="campus" class="form-control form-control-sm" required>
+                    <select name="campus" id="branch" class="form-control form-control-sm" required>
                       <option value="" disabled selected>Select Campus</option>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}">{{ $branch->name }}</option>

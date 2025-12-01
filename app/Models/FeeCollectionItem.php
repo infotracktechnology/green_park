@@ -21,4 +21,10 @@ class FeeCollectionItem extends Model
     {
         return $this->belongsTo(Student::class, 'studentid', 'id');
     }
+
+
+    public function feeplanitem()
+    {
+        return $this->belongsTo(FeesPlanItem::class, 'feeplan_item_id', 'id');
+    }
 }

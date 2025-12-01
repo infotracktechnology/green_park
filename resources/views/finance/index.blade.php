@@ -17,6 +17,11 @@
                   {{ session('success') }}
               </div>
            @endif
+           @if(session()->has('error'))
+              <div class="alert alert-error alert-dismissible fade show" style="background-color:red ! important" role="alert">
+                  {{ session('error') }}
+              </div>
+           @endif
                  
         
                 <div class="card card-primary">
@@ -40,13 +45,23 @@
         <tr role="row">
           <th>#</th>
           <th>Academic Year</th>
+          <th>
+            <select id="branchFilter" class="form-control form-control-sm">
+              @if(!auth()->user()->branch)
+              <option value="">All Branches</option>              
+              @endif
+                @foreach ($fees_plan->pluck('branch.name')->unique() as $branch_name)
+                  <option value="{{ $branch_name }}">{{ $branch_name }}</option>
+                @endforeach
+            </select>
+          </th>
           <th>Plan Name</th>
           <th>Coaching Type</th>
-          <th>Installment</th>
-          <th>Amount</th>
-          <th>Due Date</th>
+          <th>Batch</th>
+          <th>Segment Name</th>
+          <th>Status</th>
           <th>Edit</th>
-          <th>Delete</th>
+          {{-- <th>Delete</th> --}}
         </tr>
   
         </thead>
@@ -55,20 +70,27 @@
           @foreach ($fees_plan as $row)
           <tr>
             <td>{{$loop->iteration}}</td>
-            <td >{{$row->academic_year}}</td>
+            <td>{{$row->academic_year}}</td>
+            <td>{{optional($row->branch)->name}}</td>
             <td>{{$row->name}}</td>
             <td>{{$row->coaching_type}}</td>
-            <td>{{$row->instalment}}</td>
-            <td>{{$row->amount}}</td>
-            <td>{{$row->due_date}}</td>
-            <td></td>
-            <td> <form action="{{ route('feesplan.destroy', $row->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')" class="d-inline">
+            <td>{{$row->batch}}</td>
+            <td>{{optional($row->segment)->name}}</td>
+            <td>
+              @if($row->is_active == 1)
+              <span class="badge badge-success bg-success text-white">Active</span>
+              @else
+              <span class="badge badge-danger bg-danger text-white">Inactive</span>
+              @endif
+            </td>
+            <td><a href="{{route('feesplan.edit', $row->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a></td>
+            {{-- <td> <form action="{{ route('feesplan.destroy', $row->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')" class="d-inline">
               @csrf
               @method('DELETE')
               <button type="submit" class="btn btn-danger">
                  <i class="fas fa-trash"></i>
               </button>
-           </form></td>
+           </form></td> --}}
         </tr>
         @endforeach
           
@@ -100,8 +122,16 @@
   const table = $('#myTable').DataTable({
 
     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    "ordering": false,
 
   });
+  $('#branchFilter').on('change', function(){
+  table.column(2).search(this.value).draw(); // Assuming Branch is column index 2
+});
+
+  setTimeout(function() {
+            $(".alert").fadeOut(1500);
+        }, 3000);
 
 </script>
 

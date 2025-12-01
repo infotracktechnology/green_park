@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -23,7 +24,7 @@ class Student extends Authenticatable
     {
         return $this->belongsTo(Branch::class, 'campus', 'id');
     }
-   
+
 
     function attendance()
     {
@@ -37,33 +38,56 @@ class Student extends Authenticatable
             $model->student_id = self::generateId($model->course);
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
-            $model->user_name = self::generateName($model->course,$model->student_id);
+            $model->user_name = self::generateName($model->course, $model->student_id);
         });
     }
 
-  
 
-    public function fees()
+
+    public function feespaidhistory()
     {
-        return FeesPlanItem::where('coaching_type', $this->coaching_type)->get()->map(function ($item) {
-            $payed = FeeCollectionItem::where('studentid', $this->student_id)->where('feeid', $item->id)->sum('payamount');
-            return [
-                'id' => $item->id,
-                'check' => false,
-                'amount' => $item->amount - $payed,
-                'instalment' => $item->instalment,
-            ];
-        });
+        return $this->hasMany(FeeCollection::class, 'student_id', 'id')->with('item');
     }
 
     public function feespaid()
     {
-       $amount = FeesPlanItem::where('coaching_type', $this->coaching_type)->sum('amount');
-       $payed = FeeCollectionItem::where('studentid', $this->student_id)->sum('payamount');
-       return $amount - $payed;
+        $amount = FeesPlanItem::where('coaching_type', $this->coaching_type)->sum('amount');
+        $payed = FeeCollectionItem::where('studentid', $this->student_id)->sum('payamount');
+        return $amount - $payed;
     }
 
-    private static function generatePassword($length = 6){
+    public function fees()
+    {
+        $masters = FeePlanMaster::whereIn('segment_id', explode(',', $this->segments))->where('is_active', 1)->with('feePlanItems')->get();
+
+        $result = [];
+
+        foreach ($masters as $master) {
+            foreach ($master->feePlanItems as $item) {
+                $query = FeeCollectionItem::where([
+                    'studentid' => $this->id,
+                    'feeplan_item_id' => $item->id,
+                ]);
+                $paid = $query->sum('payamount') ?? 0;
+                $concession = $query->sum('concession_amount') ?? 0;
+                $result[] = [
+                    'id' => $item->id,
+                    'instalment'      => $item->instalment,   // text value
+                    'amount'          => $item->amount - $paid - $concession,
+                    'concession'      => $concession,
+                    'bill_type_id'    => $item->bill_type_id,
+                ];
+            }
+        }
+        usort($result, function ($a, $b) {
+            return strcmp($a['instalment'], $b['instalment']);
+        });
+        
+        return $result;
+    }
+
+    private static function generatePassword($length = 6)
+    {
         $characters = 'ACFHJKMRXY23456789';
         $password = '';
         for ($i = 0; $i < $length; $i++) {
@@ -72,33 +96,35 @@ class Student extends Authenticatable
         return $password;
     }
 
-   private static function generateId($course){
-    $lastId = self::where('course', $course)->max('student_id');
-    $y = date('y')+1; 
-    if ($lastId) {
-        return $lastId+1;
-    } else {
-       $setting = Setting::firstWhere('key','like',"%$course Admission No%");
-       $lastId =  $setting->value ?? $y.'00001';
-       return $lastId;
-    }
- }
-
-    private static function generateName($course,$student_id){
-        if($course == "XI-OB" || $course == "XII-OB"){
-            return 'S'.$student_id;
-        }else{
-            return 'L'.$student_id;
+    private static function generateId($course)
+    {
+        $lastId = self::where('course', $course)->max('student_id');
+        $y = date('y') + 1;
+        if ($lastId) {
+            return $lastId + 1;
+        } else {
+            $setting = Setting::firstWhere('key', 'like', "%$course Admission No%");
+            $lastId =  $setting->value ?? $y . '00001';
+            return $lastId;
         }
     }
-    
+
+    private static function generateName($course, $student_id)
+    {
+        if ($course == "XI-OB" || $course == "XII-OB") {
+            return 'S' . $student_id;
+        } else {
+            return 'L' . $student_id;
+        }
+    }
+
     public function calculateCurrentMonthStats(string $studentId): object
     {
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
         $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')
             ->where('student_id', $studentId)
-            ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth]) 
+            ->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])
             ->distinct();
         $stats = DB::query()
             ->fromSub($distinctAttendanceSubQuery, 'distinct_attendance')
@@ -109,40 +135,41 @@ class Student extends Authenticatable
             ->first();
         $totalDays = $stats->total_days ?? 0;
         $presentDays = $stats->present_days ?? 0;
-        $percentage = ($totalDays > 0) 
-                      ? round(($presentDays / $totalDays) * 100, 2) 
-                      : 0;
+        $percentage = ($totalDays > 0)
+            ? round(($presentDays / $totalDays) * 100, 2)
+            : 0;
         return (object) [
             'total_days' => $totalDays,
             'present_days' => $presentDays,
             'percentage' => $percentage,
         ];
     }
-    public static function StudentFilterQuery($branch,$course,$type=null,$category=null,$batch=null,$gender=null){
+    public static function StudentFilterQuery($branch, $course, $type = null, $category = null, $batch = null, $gender = null)
+    {
         $query = self::query();
-        if($course){
+        if ($course) {
             $query->where('course', $course);
         }
-        if($branch){
+        if ($branch) {
             $query->whereIn('campus', explode(',', $branch));
         }
-        if($type){
-            $query->whereIn('coaching_type', explode(',',$type));
+        if ($type) {
+            $query->whereIn('coaching_type', explode(',', $type));
         }
-        
-        if($category){
+
+        if ($category) {
             $query->whereIn('hostel_dayscholar', explode(',', $category));
         }
-        if($batch){
+        if ($batch) {
             $query->whereIn('batch', explode(',', $batch));
         }
-        if($gender && $gender != 'All'){
+        if ($gender && $gender != 'All') {
             $query->where('gender', $gender);
         }
         return $query;
     }
 
-     public  function GetExam()
+    public  function GetExam()
     {
         return Exam::query()
             ->where(function ($query) {
@@ -151,12 +178,12 @@ class Student extends Authenticatable
                     ->where('start_at', '<=', date('Y-m-d H:i:s'))
                     ->where('end_at', '>=', date('Y-m-d H:i:s'));
             })
-            ->orWhere(function ($query){
+            ->orWhere(function ($query) {
                 $query->where('academic_year', $this->academic_year)
                     ->where('course', $this->course)
                     ->where('branch', 'like', "%{$this->campus}%")
                     ->where('coaching_type', 'like', "%{$this->coaching_type}%")
-                    ->when($this->coaching_type === 'OFFLINE', function ($q){
+                    ->when($this->coaching_type === 'OFFLINE', function ($q) {
                         if (in_array($this->course, ['NEET', 'JEE'])) {
                             if (in_array($this->campus, [1, 4, 5])) {
                                 $q->where('category', 'like', "%{$this->hostel_dayscholar}%");
@@ -170,5 +197,4 @@ class Student extends Authenticatable
                     ->where('end_at', '>=', date('Y-m-d H:i:s'));
             })->first();
     }
-   
 }

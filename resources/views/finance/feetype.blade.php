@@ -15,7 +15,6 @@
               @if(session()->has('success'))
               <div class="alert alert-success alert-dismissible fade show" role="alert">
                   {{ session('success') }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
            @endif
                  
@@ -41,7 +40,7 @@
         <tr role="row">
           <th>S.No</th>
           <th>Fee Type</th>
-          <th>Amount</th>
+          {{-- <th>Amount</th> --}}
           <th>Edit </th>
           <th>Action</th>
         </tr>
@@ -53,7 +52,7 @@
           <tr>
             <td>{{$key+1}}</td>
             <td>{{$row['feetype']}}</td>
-            <td>{{$row['amount']}}</td>
+            {{-- <td>{{$row['amount']}}</td> --}}
             <td>
               <button type="button" class="btn btn-warning text-white" X-on:click="edit({{$key}},{{ json_encode($row) }})">
                  <i class="fas fa-edit"></i>
@@ -107,10 +106,10 @@
               <input type="text" x-model="fees.feetype"  name="feetype" class="form-control form-control-sm" required>
           </div>
           
-          <div class="form-group col-12">
+          {{-- <div class="form-group col-12">
               <label>Amount</label>
               <input type="text" x-model="fees.amount"  name="amount" class="form-control form-control-sm numberk" required>
-          </div>
+          </div> --}}
           
          
           
@@ -154,7 +153,7 @@ function fee_type(){
     edit(index,row){
       this.fees.index = index;
       this.fees.feetype = row.feetype;
-      this.fees.amount = row.amount;
+      // this.fees.amount = row.amount;
       this.submit='update';
       this.title='Edit Fee Type';
       $('#FeeType').modal('show');

@@ -27,7 +27,12 @@ use App\Http\Controllers\{
     StudentDocumentController,
     StudentActivityController,
     UsersController,
-    ReportController
+    ReportController,
+    FinanceController,
+    FinanceReportController,
+    ReceiptCancellationController,
+    SegmentController,
+    ConcessionController
 };
 
 use App\Models\{Student, Exam};
@@ -43,6 +48,7 @@ Route::get('/notify', [HomeController::class, 'notify']);
 // ------------------------------------------------------
 // Admin routes
 // ------------------------------------------------------
+
 Route::prefix('admin')->middleware('auth:web')->group(function () {
 
     Route::get('/home', [HomeController::class, 'index'])->name('admin.home');
@@ -53,7 +59,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/dashboard/staff', 'dashboardStaff')->name('dashboard.staff');
         Route::get('/dashboard/announcement', 'dashboardAnnouncement')->name('dashboard.announcement');
         Route::match(['get', 'post'], '/parent_concern', 'parent_concern')->name('parent_concern');
-        Route::match(['get', 'post'], '/setting','Setting')->name('admin.setting');
+        Route::match(['get', 'post'], '/setting', 'Setting')->name('admin.setting');
         Route::get('/chat', 'chat')->name('chat.index');
         Route::get('studentmenu/branch', 'studentmenu_branch')->name('studentmenu.branch');
         Route::get('studentmenu/type', 'studentmenu_type')->name('studentmenu.type');
@@ -61,35 +67,44 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     });
 
     Route::resource('branch', \App\Http\Controllers\BranchController::class);
+
     Route::controller(StaffProfileController::class)->group(function () {
         Route::match(['get', 'post'], '/staff-class', 'classAssign')->name('staff.class');
         Route::post('/staff-subject', 'subjectAssign')->name('staff.subjectAssign');
         Route::post('staff/export', 'export')->name('staff.export');
         Route::post('staff/import', 'import')->name('staff.import');
         Route::get('biometric/report', 'biometric_report')->name('biometric.report');
-        Route::match(['get', 'post'],'staffs/restore','RestoreStaff')->name('staffs.restore');
+        Route::match(['get', 'post'], 'staffs/restore', 'RestoreStaff')->name('staffs.restore');
     });
 
     Route::resource('staff', StaffProfileController::class);
     Route::resource('student', StudentController::class);
-    Route::match(['get', 'post'],'students/restore',[StudentController::class,'RestoreStudent'])->name('students.restore'); 
+    Route::match(['get', 'post'], 'students/restore', [StudentController::class, 'RestoreStudent'])->name('students.restore');
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
     Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
     Route::get('export/student', [\App\Http\Controllers\ExportController::class, 'student_export'])->name('export.student');
 
     Route::resource('announcement', AnnouncementController::class);
-    Route::resource('hostel', HostelController::class);
-    Route::post('room/delete', [HostelController::class, 'deleteRoom'])->name('room.delete');
-    Route::get('allocation/hostel', [HostelController::class, 'allocation'])->name('allocation.hostel');
-    Route::post('allocation/hostel', [HostelController::class, 'storeAllocation'])->name('allocation.store');
-    Route::get('/hostel-attendance', [HostelController::class, 'attendanceEntry'])->name('hostelattendance');
-    Route::post('/hostel-attendance/store', [HostelController::class, 'storeAttendance'])->name('hostelattendance.store');
-    Route::match(['get', 'post'],'hostel/room/reallocation', [HostelController::class, 'RoomReallocation'])->name('room.reallocation'); 
-    Route::match(['get','post'],'hostel/room/inoutregister', [HostelController::class,'InOutRegister'])->name('hostel.inoutregister');
-    Route::match(['get','post'],'hostel/room/courier', [HostelController::class,'HostelCourier'])->name('hostel.courier');
-    Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
-    Route::put('sickroom/{id}', [SickRoomEntryController::class, 'update'])->name('sickroom.update');
-
+    Route::resource('examportion', ExamPortionController::class);
+    Route::resource('chairmanvideo', ChairmanVideoController::class);
+    Route::resource('questionkey', QuestionKeyController::class);
+    Route::get('questionkey/download/{id}', [QuestionKeyController::class, 'download'])->name('questionkey.download');
+    Route::resource('answerkey', AnswerKeyController::class);
+    Route::get('answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
+    Route::resource('download', DownloadController::class);
+    Route::get('download/download/{id}', [AnswerKeyController::class, 'download'])->name('download.download');
+    Route::resource('worksheet', WorksheetController::class);
+    Route::get('worksheet/download/{id}', [WorksheetController::class, 'download'])->name('worksheet.download');
+    Route::resource('achievement', AchievementController::class);
+    Route::resource('classvideo', ClassVideoController::class)->except(['show']);
+    Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
+    Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
+    Route::post('classvideo/schedule', [ClassVideoController::class, 'schedule'])->name('classvideo.schedule');
+    Route::post('classvideo/bulk-delete', [ClassVideoController::class, 'bulkDelete'])->name('classvideo.bulk-delete');
+    Route::resource('discussionvideo', DiscussionVideoController::class);
+    Route::post('discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
+    Route::resource('revisionvideo', RevisionVideoController::class);
+    Route::post('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
 
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {
@@ -107,39 +122,22 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::delete('examination/answerkey/delete/{id}/{test_id}', 'deleteAnswerKey')->name('answerkey.delete');
         Route::delete('examination/offline/delete/{id}/{test_id}', 'deleteOfflineKey')->name('offline.delete');
         Route::get('examination/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
-        Route::match(['get', 'post'],'examination/publish','Publish')->name('exam.publish');
+        Route::match(['get', 'post'], 'examination/publish', 'Publish')->name('exam.publish');
         Route::get('examination/perviousexamresult/', 'PerviousExamResult')->name('exam.perviousexamresult');
-        Route::match(['get', 'post'],'examination/previousexamupload','PreviousExamUpload')->name('exam.previousexamupload'); 
+        Route::match(['get', 'post'], 'examination/previousexamupload', 'PreviousExamUpload')->name('exam.previousexamupload');
     });
-    
-    Route::resource('examportion', ExamPortionController::class);
 
-    Route::resource('chairmanvideo', ChairmanVideoController::class);
-    Route::resource('questionkey', QuestionKeyController::class);
-    Route::get('questionkey/download/{id}', [QuestionKeyController::class, 'download'])->name('questionkey.download');
+    Route::resource('hostel', HostelController::class);
+    Route::post('room/delete', [HostelController::class, 'deleteRoom'])->name('room.delete');
+    Route::get('allocation/hostel', [HostelController::class, 'allocation'])->name('allocation.hostel');
+    Route::post('allocation/hostel', [HostelController::class, 'storeAllocation'])->name('allocation.store');
+    Route::get('/hostel-attendance', [HostelController::class, 'attendanceEntry'])->name('hostelattendance');
+    Route::post('/hostel-attendance/store', [HostelController::class, 'storeAttendance'])->name('hostelattendance.store');
+    Route::match(['get', 'post'], 'hostel/room/reallocation', [HostelController::class, 'RoomReallocation'])->name('room.reallocation');
+    Route::match(['get', 'post'], 'hostel/room/inoutregister', [HostelController::class, 'InOutRegister'])->name('hostel.inoutregister');
+    Route::match(['get', 'post'], 'hostel/room/courier', [HostelController::class, 'HostelCourier'])->name('hostel.courier');
+    Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
 
-    Route::resource('answerkey', AnswerKeyController::class);
-    Route::get('answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
-
-    Route::resource('download', DownloadController::class);
-    Route::get('download/download/{id}', [AnswerKeyController::class, 'download'])->name('download.download');
-
-    Route::resource('worksheet', WorksheetController::class);
-    Route::get('worksheet/download/{id}', [WorksheetController::class, 'download'])->name('worksheet.download');
-
-    Route::resource('achievement', AchievementController::class);
-
-    Route::resource('classvideo', ClassVideoController::class)->except(['show']);
-    Route::get('classvideo/upload', [ClassVideoController::class, 'showUploadForm'])->name('classvideo.upload.form');
-    Route::post('classvideo/upload', [ClassVideoController::class, 'upload'])->name('classvideo.upload.store');
-    Route::post('classvideo/schedule', [ClassVideoController::class, 'schedule'])->name('classvideo.schedule');
-    Route::post('classvideo/bulk-delete', [ClassVideoController::class, 'bulkDelete'])->name('classvideo.bulk-delete');
-
-    Route::resource('discussionvideo', DiscussionVideoController::class);
-    Route::post('discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
-
-    Route::resource('revisionvideo', RevisionVideoController::class);
-    Route::post('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
 
     Route::resources([
         'academicyear' => \App\Http\Controllers\AcademicYearController::class,
@@ -153,18 +151,51 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::post('attendance/store', [\App\Http\Controllers\HolidayController::class, 'attendance_store'])->name('attendance.store');
     Route::get('/attendance', [\App\Http\Controllers\HolidayController::class, 'attendance'])->name('attendance');
 
-    Route::match(['get', 'post'], '/fees/collection', [\App\Http\Controllers\FinanceController::class, 'collection'])->name('fees.collection');
-    Route::get('/feetype', [\App\Http\Controllers\FinanceController::class, 'feetype'])->name('feetype');
-    Route::resource('feesplan', \App\Http\Controllers\FinanceController::class);
-
     Route::match(['get', 'post'], '/shiftwork/assign', [\App\Http\Controllers\WorkshiftController::class, 'assign'])->name('workshift.assign');
+
+    // Finance
+
+    Route::resource('feesplan', FinanceController::class);
+    Route::controller(FinanceController::class)->group(function () {
+        Route::match(['get', 'post'], '/fees/collection', 'collection')->name('fees.collection');
+        Route::get('/fees', 'fees')->name('fees');
+        Route::get('/feetype', 'feetype')->name('feetype');
+        Route::get('/fees/receipt/{id}', 'receipt')->name('fees.receipt');
+        Route::post('billtype/store', 'billTypestore')->name('billtype.store');
+        Route::get('billtype/{id}/edit', 'billTypeedit')->name('billtype.edit');
+        Route::put('billtype/{id}/update', 'billTypeupdate')->name('billtype.update');
+        Route::get('bank/create', 'bankcreate')->name('bank.create');
+        Route::post('bank/store', 'bankstore')->name('bank.store');
+        Route::get('bank/{id}/edit', 'bankedit')->name('bank.edit');
+        Route::put('bank/{id}/update', 'bankupdate')->name('bank.update');
+    });
+    Route::controller(FinanceReportController::class)->group(function () {
+        Route::get('dfc', 'dfc')->name('fees.report.dfc');
+        Route::get('report/collection', 'collectionreport')->name('fees.report.collection');
+        Route::get('report/due', 'dueReport')->name('fees.report.due');
+    });
+    Route::controller(ReceiptCancellationController::class)->group(function () {
+        Route::get('/feereceiptlist', 'requestindex')->name('feereceiptlist');
+        Route::get('/pendingfeereceiptlist', 'pendingindex')->name('pendingfeereceiptlist');
+        Route::get('/receipt/cancel/requests', 'pendingRequests')->name('receipt.cancel.requests');
+        Route::post('/receipt/request-cancel', 'requestCancel')->name('receipt.request.cancel');
+        Route::get('/receipt/cancel/view/{id}', 'viewRequest')->name('receipt.cancel.view');
+        Route::put('/receipt/cancel/approve/{id}', 'receiptcancelapprove')->name('receipt.cancel.approve');
+        Route::put('/receipt/cancel/reject/{id}', 'receiptcancelreject')->name('receipt.cancel.reject');
+    });
+
+    Route::resource('segment', SegmentController::class);
+    Route::get('assignsegment',[SegmentController::class,'assign'])->name('assignsegment');
+    Route::put('assignsegment',[SegmentController::class,'assignSegment'])->name('assignsegment');
+    Route::match(['get', 'post'],'/fees/migration', [FinanceController::class,'FeesMigration'])->name('fees.migration');
+    Route::resource('concession', ConcessionController::class);
 
     Route::prefix('report')->as('report.')->group(function () {
         Route::get('/log', [ReportController::class, 'LogReport'])->name('log');
         Route::get('/attendance', [ReportController::class, 'AttendanceReport'])->name('attendance');
         Route::get('/section_exam', [ReportController::class, 'section_exam'])->name('section_exam');
         Route::get('/batchlist', [ReportController::class, 'BatchList'])->name('batchlist');
-        Route::match(['get', 'post'],'/sectionlist', [ReportController::class, 'SectionList'])->name('sectionlist');
+        Route::match(['get', 'post'], '/sectionlist', [ReportController::class, 'SectionList'])->name('sectionlist');
 
         Route::get('/examination/analysis', [ReportController::class, 'ExaminationAnalysis'])->name('exam_analyisis');
         Route::post('/examination/leastattempted', [ReportController::class, 'LeastAttempted'])->name('leastattempted');
