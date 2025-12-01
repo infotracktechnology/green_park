@@ -57,7 +57,7 @@
 
                                                 <div class=" form-group col-3">
                                                     <label>Branch</label>
-                                                    <select name="branch" id="branch" class="form-control form-control-sm" onchange="location.href = `{{ route('allocation.hostel') }}?branch=${this.value}&academic_year=${document.getElementById('academic_year').value}`" required>
+                                                    <select name="branch" id="branch" class="form-control form-control-sm" required>
                                                         <option value="" disabled selected>Choose Branch</option>
                                                         @foreach ($branches as $row)
                                                             <option value="{{ $row->id }}" @selected($row->id == request('branch'))>{{ $row->name }}</option>
@@ -66,23 +66,7 @@
                                                 </div>
 
                                                 
-                                                <div class="form-group  col-3">
-                                                    <label>Hostel</label>
-                                                    <select name="hostel" id="hostel" class="form-control form-control-sm" onchange="updateTotalRooms(this.value)" required>
-                                                        <option value="">Select </option>
-                                                        @foreach ($hostels as $row)
-                                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-
-
-                                                <div class="form-group col-3">
-                                                    <label>Total Rooms</label>
-                                                    <input type="text" id="total_rooms" class="form-control form-control-sm" readonly>
-                                                </div>
-
-
+                                              
                                                 <div class="form-group col-3">
                                                     <label>Upload File</label>
                                                     <input type="file" name="file" id="file" accept=".csv" class="form-control form-control-sm" required>
@@ -116,36 +100,6 @@
     // Initialize DataTables
     const table = $('#myTable').DataTable({
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
-    });
-
-    function updateTotalRooms(hostel_id) {
-        $.ajax({
-            url: "{{ route('allocation.hostel') }}",
-            type: 'GET',
-            data: { hostel_id: hostel_id },
-            success: function(data) {
-                $('#total_rooms').val(data.length); // Display the number of rooms in readonly input
-            }
-        });
-    }
-
-    $(document).ready(function() {
-        var hostel_id = $('#hostel').val();
-        if (hostel_id) {
-            updateTotalRooms(hostel_id);
-        }
-    });
-
-    $('#hostel').on('change', function() {
-        updateTotalRooms(this.value);
-    });
-
-    $('#file').on('change', function() {
-        var file = this.files[0];
-        if (file.type !== 'text/csv') {
-            alert('Please select a CSV file.');
-            this.value = '';
-        }
     });
 </script>
 
