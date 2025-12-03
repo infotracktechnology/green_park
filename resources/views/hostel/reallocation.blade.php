@@ -196,7 +196,7 @@
 
           <div class="form-group">
             <label>Vacate Datetime</label>
-            <input type="text" name="datetime" class="datetime-picker form-control form-control-sm" required>
+            <input type="text" name="datetime"  value="{{ date('Y-m-d H:i') }}" class="datetime-picker form-control form-control-sm" required>
           </div>
 
           <div class="form-group">

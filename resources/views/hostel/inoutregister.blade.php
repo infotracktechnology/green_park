@@ -90,7 +90,7 @@
           <div class="form-group">
             <label>Date & Time of Return (In)</label>
             <input type="hidden" name="update">
-            <input type="text" name="datetime_in" class="datetime-picker form-control form-control-sm" required>
+            <input type="text" name="datetime_in"  value="{{ date('Y-m-d H:i') }}" class="datetime-picker form-control form-control-sm" required>
           </div> 
         </div>
 
@@ -146,13 +146,13 @@
 
           <div class="form-group col-lg-6">
             <label>Datetime Leaving (Out)</label>
-            <input type="text" name="datetime_out" class="datetime-picker form-control form-control-sm" required>
+            <input type="text" name="datetime_out" value="{{ date('Y-m-d H:i') }}" class="datetime-picker form-control form-control-sm" required>
           </div>          
 
-          <div class="form-group col-lg-6">
+          {{-- <div class="form-group col-lg-6">
             <label>Contact No (Out)</label>
             <input type="text" name="contact_out" class="form-control form-control-sm">
-          </div>
+          </div> --}}
 
           <div class="form-group col-lg-12">
             <label>Purpose/Reason</label>

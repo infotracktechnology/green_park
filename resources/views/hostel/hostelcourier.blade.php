@@ -129,7 +129,7 @@
 
             <div class="form-group col-lg-6">
               <label>Date & Time of Arrival</label>
-              <input type="text" name="datetime_arrival" class="datetime-picker form-control form-control-sm" required>
+              <input type="text" name="datetime_arrival"  value="{{ date('Y-m-d H:i') }}" class="datetime-picker form-control form-control-sm" required>
             </div>
 
             <div class="form-group col-lg-6">

@@ -181,7 +181,7 @@
   });
   
   
-  $('.inactive').on('click',function () {
+  $(document).on('click', '.inactive', function() {
     var id = $(this).data('id');
     $('#InactiveForm').attr("action", "{{ route('staff.destroy', ':id') }}".replace(':id', id));
     $('#Inactive').modal('show');

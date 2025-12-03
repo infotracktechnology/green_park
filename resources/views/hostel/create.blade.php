@@ -32,8 +32,8 @@
                     <label>Type</label>
                     <select name="type" id="type" class="form-control form-control-sm" required>
                       <option value="">Select</option>
-                      <option value="MALE">Boys</option>
-                      <option value="FEMALE">Girls</option>
+                      <option value="BOYS">BOYS</option>
+                      <option value="GIRLS">GIRLS</option>
                     </select>
                   </div>
                   {{-- <div class="form-group col-lg-3">
@@ -57,7 +57,7 @@
 
                 <div class="col-md-12 col-sm-12 mb-3">
                   <h6 class="col-deep-purple">Room Details</h6>
-               </div>
+                </div>
 
 
                 <div id="roomDetails">
@@ -77,6 +77,17 @@
                         <label for="no_of_beds">No of Cots</label>
                         <div class="d-flex align-items-center">
                           <input type="number" :name="`rooms[${index}][no_of_cots]`" class="form-control form-control-sm me-2" required>
+                        </div>
+                      </div>
+
+                      <div class="form-group col-lg-3">
+                        <label for="no_of_beds">Cot Type</label>
+                        <div class="d-flex align-items-center">
+                          <select :name="`rooms[${index}][cot_type]`" class="form-control form-control-sm me-2" required>
+                          <option value="C-">C- NORMAL</option>
+                          <option value="L-">L- LOW</option>
+                          <option value="U-">U - UPPER</option>
+                          </select>
                         </div>
                       </div>
 
