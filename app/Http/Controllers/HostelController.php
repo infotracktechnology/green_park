@@ -57,11 +57,13 @@ class HostelController extends Controller
         if ($request->has('rooms')) {
             foreach ($request->rooms as $room) {
                 for ($i = 1; $i <= $room['no_of_cots']; $i++) {
+                    $cart_no = $room['cot_type'].$i;
                     $hostel->rooms()->create([
                         'floor' => $room['floor'],
                         'room_no' => $room['room_no'],
                         'no_of_cots' => $room['no_of_cots'],
-                        'cart_no' => "C-" . $i,
+                        'cot_type' => $room['cot_type'],
+                        'cart_no' => $cart_no,
                     ]);
                 }
             }
@@ -89,13 +91,14 @@ class HostelController extends Controller
         if ($request->has('rooms')) {
             foreach ($request->rooms as $row) {
                 for ($i = 1; $i <= $row['no_of_cots']; $i++) {
-                    $cart_no = "C-" . $i;
+                    $cart_no = $row['cot_type'].$i;
                     $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $row['room_no'])->where('cart_no', $cart_no)->first();
                     if ($room) {
                         $room->update([
                             'floor' => $room['floor'],
                             'room_no' => $room['room_no'],
                             'no_of_cots' => $room['no_of_cots'],
+                            'cot_type' => $room['cot_type'],
                             'cart_no' => $cart_no,
                         ]);
                     } else {
@@ -103,6 +106,7 @@ class HostelController extends Controller
                             'floor' => $row['floor'],
                             'room_no' => $row['room_no'],
                             'no_of_cots' => $row['no_of_cots'],
+                            'cot_type' => $row['cot_type'],
                             'cart_no' => $cart_no,
                         ]);
                     }
@@ -163,7 +167,7 @@ class HostelController extends Controller
             if($room){
                 $student = Student::firstWhere('student_id', $row['stuid']);
                 if($student){
-                    $student->update(['hostel_id' => $hostel->id, 'room_no' => $row['room_no'], 'cots_no' => $row['cot_no']]);
+                    $student->update(['hostel_id' => $hostel->id, 'room_no' => $row['room_no'], 'cots_no' => $row['cot_no'],'section' => $row['sec']]);
                 }
             }
         }

@@ -33,8 +33,8 @@
                     <label>Type</label>
                     <select name="type" id="type" class="form-control form-control-sm" required>
                       <option value="">Select</option>
-                      <option value="Boys" @selected($hostel->type == 'Boys')>Boys</option>
-                      <option value="Girls" @selected($hostel->type == 'Girls')>Girls</option>
+                      <option value="BOYS" @selected($hostel->type == 'BOYS')>BOYS</option>
+                      <option value="GIRLS" @selected($hostel->type == 'GIRLS')>GIRLS</option>
                     </select>
                   </div>
                   {{-- <div class="form-group col-lg-3">
@@ -79,7 +79,18 @@
                           <input type="number" x-model="room.no_of_cots" :name="`rooms[${index}][no_of_cots]`" class="form-control form-control-sm me-2" required>
                         </div>
                       </div>
-                      <div class="form-group col-lg-2">
+                      <div class="form-group col-lg-3">
+                        <label for="no_of_beds">Cot Type</label>
+                        <div class="d-flex align-items-center">
+                          <select x-model="room.cot_type" :name="`rooms[${index}][cot_type]`" class="form-control form-control-sm me-2" required>
+                          <option value="C-">C- NORMAL</option>
+                          <option value="L-">L- LOW</option>
+                          <option value="U-">U - UPPER</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="form-group col-lg-1">
                         <template x-if="!room.id">
                           <button style="margin-top: 25px;" type="button" class="btn btn-danger" @click="removeRoom(index)"><i class="fa fa-minus"></i></button>
                         </template>
@@ -112,7 +123,7 @@
      return {
         rooms: [],
         addRoom() {
-           this.rooms.push({ floor: '', room_no: '', no_of_cots: '' });
+           this.rooms.push({ floor: '', room_no: '', no_of_cots: '', cot_type: 'C-' });
         },
         removeRoom(index) {
            if(confirm('Are you sure you want to remove this room?')){
