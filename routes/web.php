@@ -207,11 +207,13 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('/examination/subjectwisemarks', [ReportController::class, 'SubjectWiseMarks'])->name('subjectwisemarks');
         Route::post('/examination/overallmarkanalysis', [ReportController::class, 'OverallMarkAnalysis'])->name('overallmarkanalysis');
         Route::get('/hostel/roomallocation', [ReportController::class, 'RoomAllocation'])->name('roomallocation');
+        Route::get('/hostel/vacate', [ReportController::class, 'HostelVacate'])->name('hostelvacate');
         Route::get('/hostel/inoutregister', [ReportController::class, 'InOutRegister'])->name('inoutregister');
         Route::get('/hostel/sickroom', [ReportController::class, 'Sickroom'])->name('sickroom');
         Route::get('/hostel/attendance', [ReportController::class, 'HostelAttendance'])->name('hostelattendance');
         Route::get('/hostel/courier', [ReportController::class, 'HostelCourier'])->name('hostelcourier');
-        Route::get('/hostel/list', [ReportController::class, 'HostelList'])->name('hostellist');
+        Route::get('/hostel/roomlist', [ReportController::class, 'HostelRoomList'])->name('hostelroomlist');
+        Route::get('/hostel/sectionlist', [ReportController::class, 'HostelSectionList'])->name('hostelsectionlist');
     });
 });
 
