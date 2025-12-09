@@ -62,9 +62,7 @@
                       </select>
                     </div>
 
-
-                 
-
+                    
                   <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
                     <button type="submit" class="btn m-t-25 btn-primary">Submit</button>
