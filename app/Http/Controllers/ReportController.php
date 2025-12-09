@@ -451,18 +451,44 @@ class ReportController extends Controller
         return view('report.hostelcourier', compact('hostel', 'room', 'hostel_courier'));
     }
 
-    public function HostelList(Request $request)
+    public function HostelRoomList(Request $request)
     {
         $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
+    
+        if ($request->view) {
+            $hostel = Hostel::find($request->hostel)?->name;
+            $students = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('room_no', $request->room)->get();
+            $branchname = $students->first()->branch->name ?? '';
+            $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'hostel'));
+            return $pdf->download("$hostel-$request->room-$request->view.pdf");
+        }
+
+        return view('report.hostelroomlist', compact('hostel', 'room'));
+    }
+
+    public function HostelSectionList(Request $request)
+    {
+        $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $section = $request->hostel ? Student::where('hostel_id', $request->hostel)->distinct()->pluck('section') : collect();
 
         if ($request->view) {
             $hostel = Hostel::find($request->hostel)?->name;
-            $students = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)->where('campus', $request->branch)->get();
+            $students = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('section', $request->section)->get();
             $branchname = $students->first()->branch->name ?? '';
             $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'hostel'));
-            return $pdf->download("$hostel-$request->view.pdf");
+            return $pdf->download("$hostel-$request->section-$request->view.pdf");
         }
 
-        return view('report.hostellist', compact('hostel'));
+        return view('report.hostelsectionlist', compact('hostel', 'section'));
+    }
+
+    public function HostelVacate(Request $request)
+    {
+        $hostel = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
+        $vacate_log = $request->room ? DB::table('vacate_log')->where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->get() : collect();
+
+        return view('report.hostelvacate', compact('hostel', 'room', 'vacate_log'));
     }
 }

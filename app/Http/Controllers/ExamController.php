@@ -499,28 +499,29 @@ class ExamController extends Controller
     {
         $exams = [];
         if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange")->groupBy('name')->get();
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,batch_a_markrange,batch_b_markrange")->groupBy('name')->get();
         }
-        if ($request->delete) {
-            Exam::where('name', $request->delete)->where('academic_year', $this->academic_year)->update(['markrange' => null]);
+        if ($request->delete && $request->col) {
+            Exam::where('name', $request->delete)->where('academic_year', $this->academic_year)->update([$request->col => null]);
             return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
         }
 
         if ($request->isMethod('post')) {
-            $markranges = $request->file('markrange', []);
-            $publishs = $request->input('publish', []);
             foreach ($request->publish as $name => $publish) {
                 $exam['publish'] = $publish ?? 'No';
-                $markrangesForExam = $markranges[$name] ?? [];
-                $markrangeFiles = [];
-                foreach ($markrangesForExam as $file) {
-                    if ($file->isValid()) {
-                        $filename = $file->getClientOriginalName();
-                        $file->move('assets/markrange', $filename);
-                        $markrangeFiles[] = 'assets/markrange/'.$filename;
-                    }
+                $batch_a_markrange = $request->batch_a_markrange[$name] ?? null;
+                $batch_b_markrange = $request->batch_b_markrange[$name] ?? null;
+                if($batch_a_markrange){
+                    $filename = $batch_a_markrange->getClientOriginalName();
+                    $batch_a_markrange->move('assets/markrange', $filename);
+                    $exam['batch_a_markrange'] = 'assets/markrange/'.$filename;
                 }
-                $exam['markrange'] = implode(',', $markrangeFiles);
+                if($batch_b_markrange){
+                    $filename = $batch_b_markrange->getClientOriginalName();
+                    $batch_b_markrange->move('assets/markrange', $filename);
+                    $exam['batch_b_markrange'] = 'assets/markrange/'.$filename;
+                }
+
                 Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
             }
             return redirect()->back()->with('success', "Exams Publish Updated Successfully.");

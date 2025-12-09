@@ -25,12 +25,14 @@
       <div class="row">
         <div class="col-md-12 col-sm-12">
 
-         @if(session('success'))
+          @if(session('success'))
           <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
           @endif
 
           <div class="card card-primary">
-            <div class="card-header"><h4>Examinations Publish</h4></div>
+            <div class="card-header">
+              <h4>Examinations Publish</h4>
+            </div>
             <div class="card-body">
               <form method="get" id="myForm" action="{{ route('exam.publish') }}" enctype="multipart/form-data">
                 <div class="row">
@@ -53,54 +55,65 @@
 
               <form method="post" id="myForm" action="{{ route('exam.publish') }}" enctype="multipart/form-data">
                 @csrf
-              <div class="row">
-                <div class="col-lg-12">
-                <div class="table-responsive m-t-10">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Test ID</th>
-                          <th>Test Name</th>
-                          <th>Test Category</th>
-                          <th>Total Questions</th>
-                          <th>Mark Range(Multiple File)</th>
-                          <th>Publish</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @foreach($exams as $exam)
-                        <tr>
-                          <td>{{ $exam->testid }}</td>
-                          <td>{{ $exam->name }}</td>
-                          <td>{{ $exam->testcategory }}</td>
-                          <td>{{ $exam->total_questions }}</td>
-                          <td>
-                            @if($exam->markrange)
-                            @foreach(explode(',', $exam->markrange) as $markrange)
-                             <a href="{{ env('APP_URL').$markrange }}" download>{{ basename($markrange) }}</a><br>
-                            @endforeach
-                            <a class="btn  btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name])}}"><i class="fas fa-trash"></i></a>
-                            @else
-                            <input type="file" name="markrange[{{ $exam->name }}][]" accept="application/pdf" multiple class="form-control form-control-sm">
-                            @endif
-                          </td>
-                          <td>
-                            <select name="publish[{{ $exam->name }}]" class="form-control form-control-sm" required>
-                             <option value="">Select Option</option>
-                             <option value="Yes" @selected($exam->publish == 'Yes')>Yes</option>
-                             <option value="No" @selected($exam->publish == 'No')>No</option>
-                            </select>
-                          </td>
-                        </tr>
-                        @endforeach
-                    </table>
-                </div>
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="table-responsive m-t-10">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Test ID</th>
+                            <th>Test Name</th>
+                            <th>Test Category</th>
+                            <th>Total Questions</th>
+                            <th>Mark Range(BATCH A)</th>
+                            <th>Mark Range(BATCH B)</th>
+                            <th>Publish</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @foreach($exams as $exam)
+                          <tr>
+                            <td>{{ $exam->testid }}</td>
+                            <td>{{ $exam->name }}</td>
+                            <td>{{ $exam->testcategory }}</td>
+                            <td>{{ $exam->total_questions }}</td>
 
-                <div class="d-flex m-t-20 justify-content-center">
-                  <button type="submit" class="btn btn-primary">Publish All</button>
+                            <td>
+                              @if($exam->batch_a_markrange)
+                              <a href="{{ env('APP_URL').$exam->batch_a_markrange }}" download>{{ basename($exam->batch_a_markrange) }}</a><br>
+                              <a class="btn  btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name,'col'=>'batch_a_markrange'])}}"><i class="fas fa-trash"></i></a>
+                              @else
+                              <input type="file" name="batch_a_markrange[{{ $exam->name }}]" accept="application/pdf" multiple class="form-control form-control-sm">
+                              @endif
+                            </td>
+
+                            <td>
+                              @if($exam->batch_b_markrange)
+                              <a href="{{ env('APP_URL').$exam->batch_b_markrange }}" download>{{ basename($exam->batch_b_markrange) }}</a><br>
+                              <a class="btn  btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name,'col'=>'batch_b_markrange'])}}"><i class="fas fa-trash"></i></a>
+                              @else
+                              <input type="file" name="batch_b_markrange[{{ $exam->name }}]" accept="application/pdf" multiple class="form-control form-control-sm">
+                              @endif
+                            </td>
+
+
+                            <td>
+                              <select name="publish[{{ $exam->name }}]" class="form-control form-control-sm" required>
+                                <option value="">Select Option</option>
+                                <option value="Yes" @selected($exam->publish == 'Yes')>Yes</option>
+                                <option value="No" @selected($exam->publish == 'No')>No</option>
+                              </select>
+                            </td>
+                          </tr>
+                          @endforeach
+                      </table>
+                    </div>
+
+                    <div class="d-flex m-t-20 justify-content-center">
+                      <button type="submit" class="btn btn-primary">Publish All</button>
+                    </div>
+                  </div>
                 </div>
-                </div>
-              </div>
               </form>
 
             </div>
@@ -109,4 +122,15 @@
       </div>
   </section>
 </div>
+@endsection
+@section('js')
+<script>
+  $(document).on('change', `input[type="file"]`, function(){
+    const file = this.files[0];
+    if (file && (file.type !== "application/pdf" || file.size >= 2 * 1024 * 1024)) {
+      alert("Only PDF files with size less than 2MB are allowed.");
+      this.value = "";
+    }
+  });
+</script>
 @endsection

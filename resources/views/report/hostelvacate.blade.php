@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Hostel List Report")
+@section('title', "Hostel Vacate Entry Report")
 
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
@@ -15,10 +15,10 @@
 
           <div class="card card-primary">
             <div class="card-header">
-              <h4>Hostel List Report</h4>
+              <h4>Hostel Vacate Entry Report</h4>
             </div>
             <div class="card-body">
-              <form method="get" action="{{ route('report.hostellist') }}">
+              <form method="get" action="{{ route('report.hostelvacate') }}">
                 <div class="row">
 
                   <div class=" form-group col-2">
@@ -42,18 +42,17 @@
                     </select>
                   </div>
 
-                  <div class="form-group col-lg-3">
-                      <label>Reports</label>
-                      <select name="view" class="form-control form-control-sm" required>
-                      <option value="">Select Report</option>
-                      @foreach(["Phone Number"=>"phonelist","SIGN LIST"=>"signlist"] as $key => $link)                
-                        <option value="{{ $link }}" @selected($link == request('view'))>{{ $key }}</option>
+
+                  <div class="form-group col-2">
+                    <label>Rooms</label>
+                    <select name="room" id="room" class="select2" required>
+                      <option value="">Select Room</option>
+                      <option value="all" @selected(request('room')=='all' )>All Rooms</option>
+                      @foreach ($room as $row)
+                      <option value="{{ $row }}" @selected($row==request('room'))>{{ $row }}</option>
                       @endforeach
-                      </select>
-                    </div>
-
-
-                 
+                    </select>
+                  </div>
 
                   <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
@@ -63,10 +62,48 @@
                 </div>
               </form>
 
+
+              <div class="row m-t-20">
+                <div class="col-lg-12">
+                  <div class="table-responsive">
+                    <table class="table table-striped" style="width:100%;">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Room No</th>
+                          <th>Student ID</th>
+                          <th>Name</th>
+                          <th>Cot No</th>
+                          <th>Date & Time of Vacate</th>
+                          <th>Vacate Reason</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @foreach ($vacate_log as $key => $row)
+                        <tr>
+                          <td>{{ $key+1 }}</td>
+                          <td>{{ $row->room_no }}</td>
+                          <td>{{ $row->student_id }}</td>
+                          <td>{{ $row->student_name }}</td>
+                          <td>{{ $row->cots_no }}</td>
+                          <td>{{ date('d-m-Y h:i A', strtotime($row->datetime)) }}</td>
+                          <td>{{ $row->reason }}</td>
+                        </tr>
+                        @endforeach
+                      </tbody>
+                    </table>
+
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
+
+
       </div>
+
     </div>
   </section>
 </div>
@@ -91,7 +128,7 @@
   
   const goToMenu = (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    window.location = `{{ route('report.hostellist') }}?${query}`;
+    window.location = `{{ route('report.hostelvacate') }}?${query}`;
   };
   
   $("#branchid").change(function() {
