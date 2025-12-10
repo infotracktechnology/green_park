@@ -341,10 +341,6 @@ class ExamController extends Controller
                 return back()->with('error', "Exam with ID {$answer['test_id']} not found.");
             }
 
-            if (($answer['mode']) !== 'OMR') {
-                continue;
-            }
-
             $exists = ExamAnswer::where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->exists();
 
             if ($exists) {
@@ -417,7 +413,7 @@ class ExamController extends Controller
                 $testId = $answer['test_id'];
                 $uniqueTests[$testId] = $answer['test_name'] ?? '';
 
-                DB::table('exam_answer')->where('test_id', $testId)->where('answer', '>', 0)->where('academic_year', $this->academic_year)->orderBy('id')->chunk(20000, function ($examAnswers) use ($answer, &$processedCount) {
+                ExamAnswer::where('test_id', $testId)->where('answer', '>', 0)->where('academic_year', $this->academic_year)->orderBy('id')->chunk(20000, function ($examAnswers) use ($answer, &$processedCount) {
                     $bulkData = [];
 
                     foreach ($examAnswers as $row) {
