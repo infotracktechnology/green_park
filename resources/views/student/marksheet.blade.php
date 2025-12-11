@@ -47,9 +47,9 @@
                         <td><a href="{{ route('student.mark_subject', $test['test_id']) }}">{{ $test['mark']  }} / {{ $test['total'] }}</a></td>
                         <td> {{ $test['first_mark'] }} </td>
                         <td>
-                          @if($test['markrange'])
+                          {{-- @if($test['markrange'])
                           <a href="{{ env('APP_URL').$test['markrange'] }}" class="btn btn-primary">Markrange</a>
-                          @endif
+                          @endif --}}
                         </td>
                         <td><a href="{{ route('student.mark_download', $test['test_id']) }}" class="btn btn-primary">Download</a></td>
                       </tr>
