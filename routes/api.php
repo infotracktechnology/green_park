@@ -39,7 +39,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/chairmanvideo/{student_id}',  function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $chairmanvideo = $student->chairmanvideo();
+        $chairmanvideo = Chairmanvideo::ForStudent($student);
         return response()->json($chairmanvideo);
     });
 
@@ -82,7 +82,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
-        $results = DB::select("SELECT exam_date,b.name,b.testid,sum(mark)mark,(count(q_no)*4)total,b.markrange FROM `exam_answer` a join exam b on a.test_id=b.testid where student_id=$student_id and b.publish='Yes' order by b.updated_at desc limit 5");
+        $results = DB::select("SELECT exam_date,b.name,b.testid,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.testid where student_id=$student_id and b.publish='Yes' order by b.updated_at desc limit 5");
         $testgroup = ['CUMULATIVE (CHEBOT)', 'CUMULATIVE (PHYZOO)', 'GRAND TEST', 'WEEKEND (BOTANY)', 'WEEKEND (CHEMISTRY)', 'WEEKEND (PHYSICS)', 'WEEKEND (ZOOLOGY)'];
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);
