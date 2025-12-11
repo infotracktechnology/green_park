@@ -138,9 +138,11 @@
                   <label for="images">Upload Images <span class="text-danger">(max size: 2MB*)</span></label>
                   <input type="file" name="images[]" id="images" class="form-control form-control-sm" accept="image/*" multiple>
                   <div class="mt-2 text-muted">
-                    @foreach ($achievement->images as $img)
+                    @if($achievement->images)
+                    @foreach ($achievement->images  as $img)
                     <div>Image: {{ basename($img) }}</div>
                     @endforeach
+                    @endif
                   </div>
                 </div>
 
