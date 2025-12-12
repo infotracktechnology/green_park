@@ -116,6 +116,11 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'test_id' => $testid, 'student' => $student]);
     });
 
+    Route::get('/mark_subject/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
+        $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject")->where('test_id', $testid)->where('student_id', $student_id)->groupBy('subject')->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")->get();
+        return response()->json($subjects);
+    });
+
     Route::get('/questionkey/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
         $questionkey = QuestionKey::ForStudent($student);
@@ -195,6 +200,7 @@ Route::group(['prefix' => 'v2'], function () {
         $parent_concern = DB::table('parent_concern')->insert($data);
         return response()->json($parent_concern);
     });
+
     Route::get('/parent_concern/{student_id}', function (Request $request, $student_id) {
         $parent_concern = DB::table('parent_concern')->where('student_id', $student_id)->get();
         return response()->json($parent_concern ?? []);

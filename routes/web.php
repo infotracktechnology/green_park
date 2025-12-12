@@ -16,7 +16,7 @@ use App\Http\Controllers\{
     ExamController,
     ChairmanVideoController,
     QuestionKeyController,
-    AnswerKeyController,
+    AnswerkeyController,
     DownloadController,
     WorksheetController,
     AchievementController,
@@ -89,10 +89,10 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('chairmanvideo', ChairmanVideoController::class);
     Route::resource('questionkey', QuestionKeyController::class);
     Route::get('questionkey/download/{id}', [QuestionKeyController::class, 'download'])->name('questionkey.download');
-    Route::resource('answerkey', AnswerKeyController::class);
-    Route::get('answerkey/download/{id}', [AnswerKeyController::class, 'download'])->name('answerkey.download');
+    Route::resource('answerkey', AnswerkeyController::class);
+    Route::get('answerkey/download/{id}', [AnswerkeyController::class, 'download'])->name('answerkey.download');
     Route::resource('download', DownloadController::class);
-    Route::get('download/download/{id}', [AnswerKeyController::class, 'download'])->name('download.download');
+    Route::get('download/download/{id}', [AnswerkeyController::class, 'download'])->name('download.download');
     Route::resource('worksheet', WorksheetController::class);
     Route::get('worksheet/download/{id}', [WorksheetController::class, 'download'])->name('worksheet.download');
     Route::resource('achievement', AchievementController::class);
@@ -246,9 +246,8 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::get('examportion', 'examportion')->name('student.examportion');
     });
 
-    Route::controller(AnswerKeyController::class)->group(function () {
-        Route::get('answerkey', 'answerkey')->name('student.answerkey');
-    });
+    Route::get('answerkey', [AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
+    
 
     Route::controller(QuestionKeyController::class)->group(function () {
         Route::get('questionkey', 'questionkey')->name('student.questionKey');

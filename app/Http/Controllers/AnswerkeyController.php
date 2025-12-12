@@ -8,16 +8,14 @@ use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
 
-class AnswerKeyController extends Controller
+class AnswerkeyController extends Controller
 {
     public function index()
     {
         $answerkeys = AnswerKey::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-            })
-            ->latest()
-            ->get();
+                $query->where('branch', 'like', '%'.auth()->user()->branch.'%');
+            })->latest()->get();
 
         return view('answerkey.index', compact('answerkeys'));
     }
