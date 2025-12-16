@@ -85,7 +85,7 @@ class ClassVideoController extends Controller
         $subject = $request->subject ?? 0;
         $student = Student::where('student_id', auth()->user()->student_id)->first();
         $classvideos = ClassVideo::ForStudent($student, $subject);
-        $classvideos = $classvideos->groupBy('period');
+        $classvideos = $classvideos->groupBy('date');
         return view('student.classvideo', compact('classvideos', 'subject'));
     }
 
@@ -116,7 +116,7 @@ class ClassVideoController extends Controller
             if (empty($record['subject']) || empty($record['video_id'])) {
                 return back()->with('error', 'Subject and Video ID fields are required.');
             }
-            $classVideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown']);
+            $classVideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown','day'=>$record['day'] ?? '','date'=>$record['date'] ?? '']);
         }
 
         ClassVideo::insert($classVideos);

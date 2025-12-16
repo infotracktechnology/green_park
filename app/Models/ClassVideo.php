@@ -11,6 +11,11 @@ class ClassVideo extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
+    ];
+
    
     public static function boot()
 	{
