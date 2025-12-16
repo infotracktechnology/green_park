@@ -16,6 +16,16 @@
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
+  thead th{
+    background-color: #2b66a2 !important;
+     color: #fff !important;
+  }
+  table th,table td {
+  border: 1px solid #222 !important;
+  height: 45px !important;
+  }
+</style>
+  <style>
     .select2 {
       width: 100% !important;
     }

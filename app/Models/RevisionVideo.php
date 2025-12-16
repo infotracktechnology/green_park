@@ -9,6 +9,9 @@ class RevisionVideo extends Model
 {
     public $table = 'revision_videos';
     protected $guarded = [];
+    protected $casts = [
+        'expire_at' => 'datetime',
+    ];
 
     public static function boot()
     {

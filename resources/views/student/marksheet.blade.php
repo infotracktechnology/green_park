@@ -1,16 +1,6 @@
 @extends('layouts.dashboard')
 @section('title', 'Mark Details')
 @section('css')
-<style>
-  thead th{
-    background-color: #56ade8 !important;
-     color: #fff !important;
-  }
-  table th,table td {
-  border: 1px solid #222 !important;
-  height: 45px !important;
-  }
-</style>
 @endsection
 @section('main')
 <div class="main-content">

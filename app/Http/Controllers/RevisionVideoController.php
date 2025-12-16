@@ -51,7 +51,7 @@ class RevisionVideoController extends Controller
             if (empty($record['subject']) || empty($record['video_id'])) {
                 return back()->with('error', 'Subject and Video ID fields are required.');
             }
-            $revisionvideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown']);
+            $revisionvideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown','day'=> $record['day'] ?? '','date' => $record['date'] ?? '']);
         }
 
         RevisionVideo::insert($revisionvideos);
