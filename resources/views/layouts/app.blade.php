@@ -30,7 +30,7 @@
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
       <div class="navbar-bg"></div>
-      <nav class="navbar navbar-expand-lg bg-blue main-navbar sticky">
+      <nav class="navbar navbar-expand-lg main-navbar sticky" style="background-color: #2b66a2;">
         <div class="form-inline mr-auto">
           <ul class="navbar-nav mr-3">
             <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i data-feather="align-justify"></i></a></li>
@@ -89,8 +89,8 @@
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
             <a href="#">
-              <img alt="image" src="{{asset('img/favicon.png')}}" class="header-logo" />
-              <span class="logo-name">{{ env('APP_NAME') }}</span>
+              <img alt="image" src="{{asset('img/logo.jpg')}}" class="header-logo" style="height: 70px;"/>
+              {{-- <span class="logo-name">{{ env('APP_NAME') }}</span> --}}
             </a>
           </div>
           <ul class="sidebar-menu">
