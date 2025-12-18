@@ -30,7 +30,7 @@
                   <label for="subject">Subject</label>
                   <select name="subject" id="subject" class="form-control form-control-sm" required>
                     <option value="">Select Subject</option>
-                    @foreach (['PHYSICS', 'CHEMISTRY', 'ZOOLOGY', 'BOTANY'] as $row)
+                    @foreach (['PHYSICS', 'CHEMISTRY', 'BOTANY', 'ZOOLOGY'] as $row)
                     <option value="{{$row}}" @selected($row==$subject)>{{$row}}</option>
                     @endforeach
                   </select>
@@ -48,7 +48,7 @@
       </div>
       @if($subject)
 
-      <div class="col-lg-12">
+      {{-- <div class="col-lg-12">
         <div class="card card-info">
           <div class="card-body">
             <ul class="nav nav-pills" id="myTab3" role="tablist">
@@ -70,9 +70,7 @@
               @endphp
               <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="part{{$index}}" role="tabpanel" aria-labelledby="part{{$index}}-tab">
                 @forelse(isset($discussionvideos[$part]) ? $discussionvideos[$part] : collect() as $video)
-                <?php
-                $videoId = $video->video_id ?? null;
-                ?>
+                //$videoId = $video->video_id ?? null;
                 <iframe src="https://player.vimeo.com/video/{{ $videoId }}" frameborder="0" class="m-t-15" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; gyroscope; accelerometer;" style="height:500px;width:100%;" title="video_20240822_142621"></iframe>
                 <script src="https://player.vimeo.com/api/player.js"></script>
                 @empty
@@ -82,7 +80,7 @@
               @endforeach
             </div>
           </div>
-        </div>
+        </div> --}}
         @endif
 
       </div>
