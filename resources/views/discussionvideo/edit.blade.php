@@ -127,12 +127,22 @@
                     </select>
                   </div>
 
+                  <div class="form-group col-lg-2">
+                     <label>Day</label>
+                     <input name="day" type="text" id="day" value="{{ $discussionvideo->day }}" class="form-control form-control-sm" required>
+                  </div>
+
+                  <div class="form-group col-lg-2">
+                     <label>Date</label>
+                     <input name="date" type="date" value="{{ $discussionvideo->date }}" id="date" class="form-control form-control-sm" required>
+                  </div>
+
 
                   <div class="form-group col-lg-4">
                     <label>Subject</label>
                     <select name="subject" class="form-control form-control-sm" required>
                       <option value="">Select Subject</option>
-                      @foreach (['PHYSICS', 'CHEMISTRY', 'ZOOLOGY', 'BOTANY'] as $row)
+                      @foreach (['PHYSICS', 'CHEMISTRY', 'BOTANY', 'ZOOLOGY'] as $row)
                       <option value="{{$row}}" @selected($row==$discussionvideo->subject)>{{$row}}</option>
                       @endforeach
                     </select>

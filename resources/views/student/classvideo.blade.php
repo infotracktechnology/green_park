@@ -93,9 +93,9 @@
               @foreach ($videos as $video)
               <tr>
                 <td>{{ $loop->iteration }}</td>
+                <td>{{ $video->period }}</td>
                 <td>{{ $video->day }}</td>
                 <td>{{ $video->date }}</td>
-                <td>{{ $video->subject }}</td>
                 <td>{{ $video->chapter }}</td>
                 <td>{{ $video->end_at->format('d/m/Y H:i') }}</td>
                 <td><a href="{{ route('video', base64_encode($video->video_id)) }}" target="_blank">Watch</a></td>

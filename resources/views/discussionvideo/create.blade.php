@@ -117,6 +117,16 @@
                     </select>
                   </div>
 
+                  <div class="form-group col-lg-2">
+                     <label>Day</label>
+                     <input name="day" type="text" id="day" class="form-control form-control-sm" required>
+                  </div>
+
+                  <div class="form-group col-lg-2">
+                     <label>Date</label>
+                     <input name="date" type="date" value="{{ date('Y-m-d') }}" id="date" class="form-control form-control-sm" required>
+                  </div>
+
 
                   <div class="form-group col-lg-2">
                     <label>Subject</label>
