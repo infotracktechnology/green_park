@@ -7,6 +7,7 @@ use App\Models\ClassVideo;
 use App\Models\Student;
 use App\Models\RevisionVideo;
 use App\Models\AcademicYear;
+use Carbon\Carbon;
 
 class ClassVideoController extends Controller
 {
@@ -115,7 +116,8 @@ class ClassVideoController extends Controller
             if (empty($record['subject']) || empty($record['video_id'])) {
                 return back()->with('error', 'Subject and Video ID fields are required.');
             }
-            $classVideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? '','day'=>$record['day'] ?? '','date'=>$record['date'] ?? '','part'=>$record['part'] ?? '']);
+           
+            $classVideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? '','day'=>$record['day'] ?? '','part'=>$record['part'] ?? '','date' => $record['date'] ?? '']);
         }
 
         ClassVideo::insert($classVideos);

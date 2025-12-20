@@ -135,7 +135,10 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
   $(document).ready(function() {
-      $('#myTable').DataTable();
+      $('#myTable').DataTable({
+        pageLength: 25,
+        searching: false,
+      });
   });
   
   flatpickr(".datetime-picker", {
