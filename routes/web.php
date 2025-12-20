@@ -32,7 +32,8 @@ use App\Http\Controllers\{
     FinanceReportController,
     ReceiptCancellationController,
     SegmentController,
-    ConcessionController
+    ConcessionController,
+    ReferencevideoController
 };
 
 use App\Models\{Student, Exam};
@@ -103,8 +104,11 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::post('classvideo/bulk-delete', [ClassVideoController::class, 'bulkDelete'])->name('classvideo.bulk-delete');
     Route::resource('discussionvideo', DiscussionVideoController::class);
     Route::post('discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
-    Route::resource('revisionvideo', RevisionVideoController::class);
+    
+    Route::resource('revisionvideo', RevisionVideoController::class)->except(['show']);
     Route::post('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
+    Route::resource('referencevideo', ReferenceVideoController::class)->except(['show']);
+    Route::post('referencevideo/bulk-delete', [ReferenceVideoController::class, 'bulkDelete'])->name('referencevideo.bulkDelete');
 
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {
