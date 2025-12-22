@@ -7,6 +7,7 @@ use App\Models\ClassVideo;
 use App\Models\Student;
 use App\Models\RevisionVideo;
 use App\Models\AcademicYear;
+use Carbon\Carbon;
 
 class ClassVideoController extends Controller
 {
@@ -82,11 +83,10 @@ class ClassVideoController extends Controller
 
     public function classvideo(Request $request)
     {
-        $subject = $request->subject ?? 0;
         $student = Student::where('student_id', auth()->user()->student_id)->first();
-        $classvideos = ClassVideo::ForStudent($student, $subject);
+        $classvideos = ClassVideo::ForStudent($student);
         $classvideos = $classvideos->groupBy('date');
-        return view('student.classvideo', compact('classvideos', 'subject'));
+        return view('student.classvideo', compact('classvideos'));
     }
 
     public function showUploadForm()
@@ -116,7 +116,8 @@ class ClassVideoController extends Controller
             if (empty($record['subject']) || empty($record['video_id'])) {
                 return back()->with('error', 'Subject and Video ID fields are required.');
             }
-            $classVideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown','day'=>$record['day'] ?? '','date'=>$record['date'] ?? '']);
+           
+            $classVideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? '','day'=>$record['day'] ?? '','part'=>$record['part'] ?? '','date' => $record['date'] ?? '']);
         }
 
         ClassVideo::insert($classVideos);

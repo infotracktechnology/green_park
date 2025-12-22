@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Class Videos')
+@section('title', 'Revision Video')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
@@ -28,44 +28,16 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-8 col-sm-12 mb-3">
-                  <h6 class="col-deep-purple">Class Videos</h6>
+                  <h6 class="col-deep-purple">Revision Videos</h6>
+                  <button type="button" class="btn btn-danger mt-3" id="deleteSelected">
+                    <i class="fas fa-trash"></i> Delete Selected
+                  </button>
                 </div>
+
+
                 <div class="col-md-2 col-sm-12 mb-3">
-                  <a href="{{ route('classvideo.upload.form') }}" class="btn btn-primary btn-block">Class Video Upload</a>
+                  <a href="{{ route('revisionvideo.create') }}" class="btn btn-primary btn-block">Revision Video Upload</a>
                 </div>
-
-                <div class="col-md-2 col-sm-12 mb-3">
-                  <a href="{{ route('classvideo.create') }}" class="btn btn-primary btn-block">Add Class Video</a>
-                </div>
-              </div>
-
-              <form method="post" class="my-3" id="myForm" enctype="multipart/form-data">
-                @csrf
-                <h6 class="col-deep-purple">Class Videos Schedule</h6>
-                <div class="row">
-                  <div class="form-group col-lg-3 mt-6">
-                    <label>Start Datetime</label>
-                    <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" required>
-                  </div>
-
-                  <!-- End Date -->
-                  <div class="form-group col-lg-3">
-                    <label>End Datetime</label>
-                    <input type="text" id="end_at" name="end_at" class="datetime-picker form-control form-control-sm" required>
-                    <div id="end_at_error" class="text-danger"></div>
-                  </div>
-
-                  <!-- Submit Button -->
-                  <div class="form-group col-lg-3 ">
-                    <button type="submit" class="btn btn-primary m-t-25">Update Schedule</button>
-                  </div>
-                </div>
-              </form>
-
-              <div class="col-md-6 col-sm-12 mb-3">
-                <button type="button" class="btn btn-danger mt-3" id="deleteSelected">
-                  <i class="fas fa-trash"></i> Delete Selected
-                </button>
               </div>
 
 
@@ -73,38 +45,44 @@
                 <table class="table table-striped table-sm" id="myTable">
                   <thead>
                     <tr>
-                      <th><input type="checkbox" id="checkAll" /></th>
+                      <th><input type="checkbox" id="selectAllRevision"></th>
+                      <th>Academic Year</th>
+                      <th>User Type</th>
+                      <th>Course</th>
+                      <th>Branch </th>
                       <th>Coaching Type</th>
+                      <th>H/D</th>
+                      <th>Batch</th>
                       <th>Subject</th>
                       <th>Period</th>
-                      <th>Chapter</th>
-                      <th>Part</th>
                       <th>Video Id</th>
-                      <th>Start At</th>
-                      <th>End At</th>
+                      <th>Expire At</th>
                       <th>Edit</th>
                       <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @foreach ($classvideos as $classvideo)
+                    @foreach ($revisionvideos as $row)
                     <tr>
-                      <td><input type="checkbox" class='ids' name="ids[]" value="{{$classvideo->id}}" /></td>
-                      <td>{{ $classvideo->coaching_type }}</td>
-                      <td>{{ $classvideo->subject }}</td>
-                      <td>{{ $classvideo->period }}</td>
-                      <td>{{ $classvideo->chapter }}</td>
-                      <td>{{ $classvideo->part }}</td>
-                      <td>{{ $classvideo->video_id }}</td>
-                      <td>{{ $classvideo->start_at }}</td>
-                      <td>{{ $classvideo->end_at }}</td>
+                      <td><input type="checkbox" class="checked_ids_revision" name="ids[]" value="{{ $row->id }}"></td>
+                      <td>{{ $row->academic_year }}</td>
+                      <td>{{ $row->usertype }}</td>
+                      <td>{{ $row->course }}</td>
+                      <td>{{ $row->branchNames() }}</td>
+                      <td>{{ $row->coaching_type }}</td>
+                      <td>{{ $row->category}}</td>
+                      <td>{{ $row->batch}}</td>
+                      <td>{{ $row->subject }}</td>
+                      <td>{{ $row->period }}</td>
+                      <td>{{ $row->video_id }}</td>
+                      <td>{{ $row->expire_at }}</td>
                       <td>
-                        <a href="{{ route('classvideo.edit', $classvideo->id) }}" class="btn btn-primary">
+                        <a href="{{ route('revisionvideo.edit', $row->id) }}" class="btn btn-primary">
                           <i class="fas fa-edit"></i>
                         </a>
                       </td>
                       <td>
-                        <form action="{{ route('classvideo.destroy', $classvideo->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this?');">
+                        <form action="{{ route('revisionvideo.destroy', $row->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this video?');">
                           @csrf
                           @method('DELETE')
                           <button type="submit" class="btn btn-danger">
@@ -116,7 +94,6 @@
                     @endforeach
                   </tbody>
                 </table>
-                
               </div>
             </div>
           </div>
@@ -134,13 +111,6 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
-  $(document).ready(function() {
-      $('#myTable').DataTable({
-        pageLength: 25,
-        searching: false,
-      });
-  });
-  
   flatpickr(".datetime-picker", {
       enableTime: true,
       allowInput: true,
@@ -195,43 +165,62 @@
           }
       });
   });
-  
-   
-  
-  $('#deleteSelected').click(function() {
-  let selectedIds = [];
-  $('.ids:checked').each(function() {
-      selectedIds.push($(this).val());
-  });
-  
-  if (selectedIds.length === 0) {
-      alert("Please select at least one video to delete.");
-      return;
-  }
-  
-  if (!confirm("Are you sure you want to delete the selected videos?")) {
-      return;
-  }
-  
-  $.ajax({
-      url: "{{ route('classvideo.bulk-delete') }}",
-      type: "POST",
-      data: {
-          _token: "{{ csrf_token() }}",
-          ids: selectedIds
-      },
-      success: function(response) {
-          sessionStorage.setItem('successMessage', 'Selected videos deleted successfully!');
-          location.reload();
-      },
-      error: function(xhr, status, error) {
-          alert('An error occurred while deleting the videos.');
-          console.log(xhr.responseText);
-      }
-  });
-  });
-  
-  
-  
 </script>
+
+<script>
+  $(document).ready(function () {
+      $('#myTable').DataTable();
+      $('#selectAllRevision').click(function () {
+          $('.checked_ids_revision').prop('checked', this.checked);
+      });
+      if (sessionStorage.getItem('successMessage')) {
+          let message = sessionStorage.getItem('successMessage');
+          $('.section-body').prepend(`
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  ${message}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+          `);
+          sessionStorage.removeItem('successMessage');
+      }
+  
+      $('#deleteSelected').click(function (e) {
+          e.preventDefault();
+  
+          let selectedIds = [];
+          $('input:checkbox[name="ids[]"]:checked').each(function () {
+              selectedIds.push($(this).val());
+          });
+  
+          if (selectedIds.length === 0) {
+              alert("Please select at least one video to delete.");
+              return;
+          }
+  
+          if (!confirm("Are you sure you want to delete the selected videos?")) {
+              return;
+          }
+  
+          $.ajax({
+              url: "{{ route('revisionvideo.bulkDelete') }}",
+              type: "POST",
+              data: {
+                  _token: "{{ csrf_token() }}",
+                  ids: selectedIds.join(",")
+              },
+              success: function (response) {
+                  sessionStorage.setItem('successMessage', response.message || 'Selected videos deleted successfully!');
+                  location.reload();
+              },
+              error: function (xhr) {
+                  alert('An error occurred while deleting the videos.');
+                  console.log(xhr.responseText);
+              }
+          });
+      });
+  });
+</script>
+
 @endsection
