@@ -153,7 +153,7 @@ class ExamController extends Controller
         $exams = Exam::whereIn('id', $request->ids)->get();
         foreach ($exams as $exam) {
             foreach ($exam->questions as $key => $question) {
-                unlink($question['image']);
+               if(file_exists($question['image'])) unlink($question['image']);
             }
             $exam->delete();
         }
