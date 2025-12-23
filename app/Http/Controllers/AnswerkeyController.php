@@ -81,16 +81,19 @@ class AnswerkeyController extends Controller
     }
 
 
-    public function destroy(AnswerKey $answerkey)
+    public function destroy(Request $request, $id=null)
     {
-        if (file_exists($answerkey->file_path)) {
-            unlink($answerkey->file_path);
+        if($request->has('ids')) {
+            $answerkeys = AnswerKey::whereIn('id', $request->ids)->get();
+            foreach ($answerkeys as $answerkey) {
+                if (file_exists($answerkey->file_path)) {
+                    unlink($answerkey->file_path);
+                }
+                $answerkey->delete();
+            }
         }
-        $answerkey->delete();
-
-        return redirect()->route('answerkey.index')->with('success', 'Answer Key deleted successfully!');
+        return redirect()->back()->with('success', 'Answer Key deleted successfully!');
     }
-
 
 
     public function answerkey()

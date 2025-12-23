@@ -19,17 +19,16 @@ class DiscussionVideo extends Model
         return Branch::whereIn('id', explode(',', $this->branch))->get()->implode('name', '/');
     }
 
-    public static function ForStudent(Student $student, $subject)
+    public static function ForStudent(Student $student)
     {
         return self::query()
-            ->where(function ($query) use ($student, $subject) {
+            ->where(function ($query) use ($student) {
                 $query->where('usertype', 'INDIVIDUAL')
                     ->where('students', $student->student_id)
-                    ->where('subject', $subject)
                     ->where('start_at', '<=', date('Y-m-d H:i:s'))
                     ->where('end_at', '>=', date('Y-m-d H:i:s'));
             })
-            ->orWhere(function ($query) use ($student, $subject) {
+            ->orWhere(function ($query) use ($student) {
                 $query->where('academic_year', $student->academic_year)
                     ->where('course', $student->course)
                     ->where('branch', 'like', "%{$student->campus}%")
@@ -44,7 +43,6 @@ class DiscussionVideo extends Model
                         $q->where('section', 'like', "%{$student->section}%");
                     })
                     ->whereIn('gender', [$student->gender, 'All'])
-                    ->where('subject', $subject)
                     ->where('start_at', '<=', date('Y-m-d H:i:s'))
                     ->where('end_at', '>=', date('Y-m-d H:i:s'));
             })->get();

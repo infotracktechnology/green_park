@@ -29,11 +29,16 @@
                 </div>
               </div>
               <div class="col-12">
+                <form action="{{ route('achievement.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger m-b-10">Delete Selected</button>
+
                 <div class="table-responsive">
                   <table class="table table-striped table-sm" id="myTable">
                     <thead>
                       <tr role="row">
-                        <th>Academic Year</th>
+                        <th>#</th>
                         <th>User Type</th>
                         <th>Course</th>
                         <th>Branch </th>
@@ -42,14 +47,13 @@
                         <th>Batch</th>
                         <th>File Type</th>
                         <th>Edit</th>
-                        <th>Delete</th>
                       </tr>
                     </thead>
 
                     <tbody>
                       @foreach($achievements as $achievement)
                       <tr>
-                        <td>{{ $achievement->academic_year }}</td>
+                        <td><input type="checkbox" class='ids' name="ids[]" value="{{$achievement->id}}" /></td>
                         <td>{{ $achievement->usertype }}</td>
                         <td>{{ $achievement->course }}</td>
                         <td>{{ $achievement->branchNames() }}</td>
@@ -58,18 +62,12 @@
                         <td>{{ $achievement->batch }}</td>
                         <td>{{ $achievement->filecategory }}</td>
                         <td><a href="{{ route('achievement.edit', $achievement->id) }}" class="btn btn-primary"><i class="fa fa-edit"></i></a></td>
-                        <td>
-                          <form action="{{ route('achievement.destroy', $achievement->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
-                          </form>
-                        </td>
                       </tr>
                       @endforeach
                     </tbody>
                   </table>
                 </div>
+                </form>
               </div>
             </div>
           </div>

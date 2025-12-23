@@ -32,13 +32,15 @@
                 </div>
               </div>
               <div class="col-12">
+                <form action="{{ route('answerkey.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger m-b-10">Delete Selected</button>
                 <div class="table-responsive">
                   <table class="table table-striped table-sm" id="myTable">
-
-
                     <thead>
                       <tr>
-                        <th>Academic Year</th>
+                        <th>#</th>
                         <th>User Type</th>
                         <th>Course</th>
                         <th>Branch </th>
@@ -47,13 +49,12 @@
                         <th>Batch</th>
                         <th>File</th>
                         <th>Edit</th>
-                        <th>Delete</th>
                       </tr>
                     </thead>
                     <tbody>
                       @foreach($answerkeys as $row)
                       <tr>
-                        <td>{{ $row->academic_year }}</td>
+                        <td><input type="checkbox" class='ids' name="ids[]" value="{{$row->id}}" /></td>
                         <td>{{ $row->usertype }}</td>
                         <td>{{ $row->course }}</td>
                         <td>{{ $row->branchNames() }}</td>
@@ -70,22 +71,12 @@
                             <i class="fas fa-edit"></i>
                           </a>
                         </td>
-                        <td>
-                          <form action="{{ route('answerkey.destroy', $row->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this video?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
-                              <i class="fas fa-trash"></i>
-                            </button>
-                          </form>
-                        </td>
                       </tr>
                       @endforeach
                     </tbody>
                   </table>
-
-                  </table>
                 </div>
+                </form>
               </div>
             </div>
           </div>

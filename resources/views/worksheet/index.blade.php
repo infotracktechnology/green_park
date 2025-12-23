@@ -15,7 +15,6 @@
           @if(session()->has('success'))
           <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
-            {{-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> --}}
           </div>
           @endif
 
@@ -33,11 +32,16 @@
                 </div>
               </div>
               <div class="col-12">
+                <form action="{{ route('worksheet.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger m-b-10">Delete Selected</button>
+
                 <div class="table-responsive">
                   <table class="table table-striped table-sm" id="myTable">
                     <thead>
                       <tr role="row">
-                        <th>Academic Year</th>
+                        <th>#</th>
                         <th>User Type</th>
                         <th>Course</th>
                         <th>Branch </th>
@@ -46,13 +50,12 @@
                         <th>Batch</th>
                         <th>Attachment</th>
                         <th>Edit</th>
-                        <th>Delete</th>
                       </tr>
                     </thead>
                     <tbody>
                       @foreach( $worksheets as $key => $worksheet)
                       <tr>
-                        <td>{{ $worksheet->academic_year }}</td>
+                        <td><input type="checkbox" class='ids' name="ids[]" value="{{$worksheet->id}}" /></td>
                         <td>{{ $worksheet->usertype }}</td>
                         <td>{{ $worksheet->course }}</td>
                         <td>{{ $worksheet->branchNames() }}</td>
@@ -69,20 +72,12 @@
                             <i class="fas fa-edit"></i>
                           </a>
                         </td>
-                        <td>
-                          <form action="{{ route('worksheet.destroy', $worksheet->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this video?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
-                              <i class="fas fa-trash"></i>
-                            </button>
-                          </form>
-                        </td>
                       </tr>
                       @endforeach
                     </tbody>
                   </table>
                 </div>
+                </form>
               </div>
             </div>
           </div>
@@ -90,8 +85,6 @@
 
 
         </div>
-
-
       </div>
     </div>
 
@@ -105,11 +98,7 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script>
   const table = $('#myTable').DataTable({
-  
     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-  
   });
-  
 </script>
-
 @endsection

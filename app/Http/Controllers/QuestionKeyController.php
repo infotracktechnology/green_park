@@ -9,8 +9,6 @@ use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
 
-
-
 class QuestionKeyController extends Controller
 {
     public function index()
@@ -83,15 +81,19 @@ class QuestionKeyController extends Controller
     }
 
 
-    public function destroy(QuestionKey $questionkey)
+    public function destroy(Request $request,$id=null)
     {
-        if (file_exists($questionkey->file_path)) {
-            unlink($questionkey->file_path);
+       if($request->has('ids')) {
+        $questionkeys = QuestionKey::whereIn('id', $request->ids)->get();
+        foreach ($questionkeys as $questionkey) {
+            if (file_exists($questionkey->file_path)) {
+                unlink($questionkey->file_path);
+            }
+            $questionkey->delete();
         }
-
-        $questionkey->delete();
-
-        return redirect()->route('questionkey.index')->with('success', 'Question Key deleted successfully!');
+       }
+       
+        return redirect()->back()->with('success', 'Question Key deleted successfully!');
     }
 
     public function questionkey()

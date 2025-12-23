@@ -14,7 +14,6 @@
                 <h4 class="text-center">Please read the instructions carefully</h4>
                 <h4><strong><u>General Instructions:</u></strong></h4>
                 <ol>
-                    <li>Total duration of NEET  is 180 min.</li>
                     
                     <li>The clock will be set at the server. The countdown timer in the top right corner of screen will display the remaining time available for you to complete the examination. When the timer reaches zero, the examination will end by itself. You will not be required to end or submit your examination.</li>
                     <li>

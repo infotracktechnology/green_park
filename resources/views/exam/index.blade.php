@@ -34,13 +34,17 @@
 
               </div>
               <div class="col-12">
+                <form action="{{ route('exam.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger m-b-10">Delete Selected</button>
+
                 <div class="table-responsive">
                   <table class="table table-striped table-sm" id="myTable">
                     <thead>
                       <tr role="row">
+                        <th>#</th>
                         <th>Test ID</th>
-                        <th>Academic Year</th>
-                        <th>User Type</th>
                         <th>Course</th>
                         <th>Branch </th>
                         <th>Coaching Type</th>
@@ -56,16 +60,14 @@
                         <th>Test attend</th>
                         <th>Perview</th>
                         <th>Edit</th>
-                        <th>Action</th>
                       </tr>
                     </thead>
 
                     <tbody>
                       @foreach ($tests as $test)
                       <tr>
+                        <td><input type="checkbox" name="ids[]" value="{{ $test->id }}"></td>
                         <td>{{ $test->testid }}</td>
-                        <td>{{ $test->academic_year }}</td>
-                        <td>{{ $test->usertype }}</td>
                         <td>{{ $test->course }}</td>
                         <td>{{ $test->branchNames() }}</td>
                         <td>{{ $test->coaching_type }}</td>
@@ -85,15 +87,8 @@
                         <td>
                           <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>
                         </td>
-                        <td><a href="{{ route('exam.edit', $test->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a></td>
                         <td>
-                          <form action="{{ route('exam.destroy', $test->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
-                              <i class="fas fa-trash"></i>
-                            </button>
-                          </form>
+                          <a href="{{ route('exam.edit', $test->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                         </td>
                       </tr>
                       @endforeach
@@ -101,6 +96,7 @@
 
                   </table>
                 </div>
+                </form>
               </div>
             </div>
           </div>

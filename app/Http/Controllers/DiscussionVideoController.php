@@ -90,8 +90,8 @@ class DiscussionVideoController extends Controller
     {
         $subject = $request->subject ?? 0;
         $student = Student::where('student_id', auth()->user()->student_id)->first();
-        $discussionvideos = DiscussionVideo::ForStudent($student, $subject);
-        $discussionvideos = $discussionvideos->groupBy('part');
+        $discussionvideos = DiscussionVideo::ForStudent($student);
+        $discussionvideos = $discussionvideos->groupBy('date');
 
         return view('student.discussionvideo', compact('discussionvideos', 'subject'));
     }

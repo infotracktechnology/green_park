@@ -55,7 +55,7 @@ class WorksheetController extends Controller
         $students = Student::StudentFilterQuery($worksheet->branch, $worksheet->course, $worksheet->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
 
-        return view('worksheet.edit', compact('worksheet'));
+        return view('worksheet.edit', compact('worksheet', 'type', 'section', 'students'));
     }
 
 
@@ -80,10 +80,18 @@ class WorksheetController extends Controller
     }
 
 
-    public function destroy(Worksheet $worksheet)
+    public function destroy(Request $request, $id=null)
     {
-        $worksheet->delete();
-        return redirect()->route('worksheet.index')->with('success', 'Worksheet deleted.');
+        if($request->has('ids')) {
+            $worksheets = Worksheet::whereIn('id', $request->ids)->get();
+            foreach ($worksheets as $worksheet) {
+                if (file_exists($worksheet->file_path)) {
+                    unlink($worksheet->file_path);
+                }
+                $worksheet->delete();
+            }
+        }
+        return redirect()->back()->with('success', 'Worksheet deleted.');
     }
 
     public function worksheet()
