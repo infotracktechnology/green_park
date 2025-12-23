@@ -76,11 +76,12 @@ class ChairmanVideoController extends Controller
 
     return redirect()->route('chairmanvideo.index')->with('success', 'Video updated successfully!');
 }
-    public function destroy(Request $request, Chairmanvideo $chairmanvideo)
+    public function destroy(Request $request,$id=null)
     {
-        $chairmanvideo->delete();
-        session()->flash('success', 'Video deleted successfully');
-        return to_route('chairmanvideo.index');
+       if($request->has('ids')) {
+        Chairmanvideo::whereIn('id', $request->ids)->delete();
+       }
+       return redirect()->back()->with('success', 'Chairman video deleted successfully.');
     }
     public function chairmanvideo(Request $request)
     {

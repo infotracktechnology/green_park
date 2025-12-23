@@ -78,25 +78,26 @@ class DownloadController extends Controller
             $request->file('file')->move('download', $fileName);
             $data['file_path'] = 'download/' . $fileName;
         }
-
         $download->update($data);
 
         return redirect()->route('download.index')->with('success', 'Answer Key updated successfully!');
     }
 
 
-    public function destroy(Download $download)
+    public function destroy(Request $request,$id=null)
     {
-        if (file_exists($download->file_path)) {
-            unlink($download->file_path);
+        if($request->has('ids')) {
+            $downloads = Download::whereIn('id', $request->ids)->get();
+            foreach ($downloads as $download) {
+                if (file_exists($download->file_path)) {
+                    unlink($download->file_path);
+                }
+                $download->delete();
+            }
         }
-
-        $download->delete();
-
-        return redirect()->route('download.index')->with('success', 'Answer Key deleted successfully!');
+        
+        return redirect()->back()->with('success', 'Answer Key deleted successfully!');
     }
-
-
 
 
     public function download()

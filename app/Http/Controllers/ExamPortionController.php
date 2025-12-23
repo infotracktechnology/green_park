@@ -79,16 +79,19 @@ class ExamPortionController extends Controller
     }
 
 
-    public function destroy(Request $request, Examportion $examportion)
+    public function destroy(Request $request, $id=null)
     {
-
-        if ($examportion->attachment && file_exists(public_path($examportion->attachment))) {
-            unlink(public_path($examportion->attachment));
+       if($request->has('ids')) {
+        $examportions = Examportion::whereIn('id', $request->ids)->get();
+        foreach ($examportions as $examportion) {
+            if (file_exists($examportion->attachment)) {
+                unlink($examportion->attachment);
+            }
+            $examportion->delete();
         }
-        $examportion->delete();
-
-        session()->flash('success', 'Examportion deleted successfully');
-        return to_route('examportion.index');
+       }
+       
+        return redirect()->back()->with('success', 'Examportion deleted successfully.');
     }
 
     public function examportion(Request $request)

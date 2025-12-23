@@ -108,7 +108,6 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('revisionvideo', RevisionVideoController::class)->except(['show']);
     Route::post('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
     Route::resource('referencevideo', ReferenceVideoController::class)->except(['show']);
-    Route::post('referencevideo/bulk-delete', [ReferenceVideoController::class, 'bulkDelete'])->name('referencevideo.bulkDelete');
 
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {

@@ -20,9 +20,7 @@
 
 
           <div class="card card-primary">
-
             <div class="card-body">
-
               <div class="row">
                 <div class="col-md-10 col-sm-12 mb-3">
                   <h6 class="col-deep-purple">Download</h6>
@@ -32,63 +30,55 @@
                 </div>
               </div>
               <div class="col-12">
-                <div class="table-responsive">
-                  <table class="table table-striped table-sm" id="myTable">
-                    <thead>
-                      <tr role="row">
-                        <th>Academic Year</th>
-                        <th>User Type</th>
-                        <th>Course</th>
-                        <th>Branch </th>
-                        <th>Coaching Type</th>
-                        <th>H/D</th>
-                        <th>Batch</th>
-                        <th>Attachment</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($downloads as $key => $download)
-                    <tr>
-                        <td>{{ $download->academic_year }}</td>
-                        <td>{{ $download->usertype }}</td>
-                        <td>{{ $download->course }}</td>
-                        <td>{{ $download->branchNames() }}</td>
-                        <td>{{ $download->coaching_type }}</td>
-                        <td>{{ $download->category }}</td>
-                        <td>{{ $download->batch }}</td>
-                         <td>
-                          @if($download->file_path)
-                          <a href="{{ env('APP_URL').'/'.$download->file_path }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
-                          @endif
-                        </td>
-                        <td>
-                          <a href="{{ route('download.edit', $download->id) }}" class="btn btn-primary">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                        </td>
-                        <td>
-                          <form action="{{ route('download.destroy', $download->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this video?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
-                              <i class="fas fa-trash"></i>
-                            </button>
-                          </form>
-                        </td>
-                      </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
+                <form action="{{ route('download.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger m-b-10">Delete Selected</button>
 
-                </div>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-sm" id="myTable">
+                      <thead>
+                        <tr role="row">
+                          <th>#</th>
+                          <th>User Type</th>
+                          <th>Course</th>
+                          <th>Branch </th>
+                          <th>Coaching Type</th>
+                          <th>H/D</th>
+                          <th>Batch</th>
+                          <th>Attachment</th>
+                          <th>Edit</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @foreach($downloads as $key => $download)
+                        <tr>
+                          <td><input type="checkbox" class='ids' name="ids[]" value="{{$download->id}}" /></td>
+                          <td>{{ $download->usertype }}</td>
+                          <td>{{ $download->course }}</td>
+                          <td>{{ $download->branchNames() }}</td>
+                          <td>{{ $download->coaching_type }}</td>
+                          <td>{{ $download->category }}</td>
+                          <td>{{ $download->batch }}</td>
+                          <td>
+                            @if($download->file_path)
+                            <a href="{{ env('APP_URL').'/'.$download->file_path }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                            @endif
+                          </td>
+                          <td>
+                            <a href="{{ route('download.edit', $download->id) }}" class="btn btn-primary">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                          </td>
+                        </tr>
+                        @endforeach
+                      </tbody>
+                    </table>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
-
-
-
         </div>
 
 
@@ -105,11 +95,8 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script>
   const table = $('#myTable').DataTable({
-  
     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-  
   });
-  
 </script>
 
 @endsection
