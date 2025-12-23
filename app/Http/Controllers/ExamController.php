@@ -147,17 +147,18 @@ class ExamController extends Controller
     }
 
 
-
-
-    function destroy(Request $request, Exam $exam)
+    function destroy(Request $request,$id=null)
     {
-        foreach ($exam->questions as $key => $question) {
-            unlink($question['image']);
+        if($request->has('ids')){
+        $exams = Exam::whereIn('id', $request->ids)->get();
+        foreach ($exams as $exam) {
+            foreach ($exam->questions as $key => $question) {
+                unlink($question['image']);
+            }
+            $exam->delete();
         }
-        $exam->delete();
-        // ExamAnswer::where('test_id', $exam->id)->delete();
-        session()->flash('success', 'Test deleted successfully');
-        return to_route('exam.index');
+        }
+        return redirect()->back()->with('success', 'Exams deleted successfully');
     }
 
     function student_instruction(Request $request, $test_id)

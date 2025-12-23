@@ -53,13 +53,13 @@ class AnnouncementController extends Controller
 
         $announcement = Announcement::create($data);
 
-        $students = $announcement->StudentList()->map(function ($student) use ($fcm) {
-            return $student->device_token;
-        })->toArray();
+        // $students = $announcement->StudentList()->map(function ($student) use ($fcm) {
+        //     return $student->device_token;
+        // })->toArray();
 
-        if (!empty($students)) {
-            $fcm->sendMulticast($students, "Announcement", $request->title);
-        }
+        // if (!empty($students)) {
+        //     $fcm->sendMulticast($students, "Announcement", $request->title);
+        // }
 
         return to_route('announcement.index')->with('success', 'Announcement created successfully.');
     }

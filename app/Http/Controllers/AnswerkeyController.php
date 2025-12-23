@@ -96,7 +96,6 @@ class AnswerkeyController extends Controller
     }
 
 
-
     public function answerkey()
     {
         $student = Student::where('student_id', auth('student')->user()->student_id)->first();

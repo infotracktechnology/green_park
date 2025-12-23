@@ -87,7 +87,7 @@ class AchievementController extends Controller
         foreach (['coaching_type', 'branch', 'category', 'batch', 'filecategory'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
- // Video Upload
+ 
         if ($request->hasFile('video')) {
             $videoFile = $request->file('video');
             $videoName = time() . '_' . $videoFile->getClientOriginalName();
@@ -95,7 +95,6 @@ class AchievementController extends Controller
             $data['video'] = 'achievement/' . $videoName;
         }
 
-        // Image Upload
         if ($request->hasFile('images')) {
             $images = [];
             foreach ($request->file('images') as $image) {
@@ -119,8 +118,11 @@ class AchievementController extends Controller
     }
 
 
-    public function destroy(Achievement $achievement)
+    public function destroy(Request $request, $id = null)
     {
+        if($request->has('ids')) {
+        $achievements = Achievement::whereIn('id', $request->ids)->get();
+        foreach ($achievements as $achievement) {
         if ($achievement->video && file_exists($achievement->video)) unlink($achievement->video);
         if ($achievement->images) {
             foreach (($achievement->images) as $img) {
@@ -129,7 +131,9 @@ class AchievementController extends Controller
         }
         if ($achievement->pdf && file_exists($achievement->pdf)) unlink($achievement->pdf);
         $achievement->delete();
-
-        return redirect()->route('achievement.index')->with('success', 'Achievement deleted successfully!');
+        }
+        }
+        
+        return redirect()->back()->with('success', 'Achievement deleted successfully!');
     }
 }
