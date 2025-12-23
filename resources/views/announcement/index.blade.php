@@ -32,16 +32,14 @@
               <form action="{{ route('announcement.index') }}" method="get">
                 <div class="row">
                   <div class="form-group col-lg-3">
-                    <label>Coaching Type</label>
                     <select name="coaching_type" class="select2" required>
                       <option value="">Select Coaching Type</option>
                       @foreach ($coachingtype as $row)
-                      <option value="{{$row}}">{{$row}}</option>
+                      <option value="{{$row}}" @selected(request('coaching_type')==$row)>{{$row}}</option>
                       @endforeach
                     </select>
                   </div>
                   <div class="form-group col-lg-2">
-                    <label>&nbsp;</label>
                     <button type="submit" class="btn btn-primary btn-block">Filter</button>
                   </div>
                 </div>

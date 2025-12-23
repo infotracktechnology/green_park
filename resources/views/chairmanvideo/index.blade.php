@@ -50,7 +50,6 @@
                         <th>Batch</th>
                         <th>Title</th>
                         <th>Edit</th>
-                        <th>Delete</th>
                       </tr>
 
                     </thead>
