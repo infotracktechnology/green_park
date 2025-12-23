@@ -1,6 +1,17 @@
 @extends('layouts.app')
 @section('title', 'Examinations')
-@section('css')>
+@section('css')
+<style>
+  table th,table td {
+  border: 1px solid #222 !important;
+  height: 0px !important;
+  padding: 0px 5px !important;
+  }
+  thead th{
+    background-color: #2b66a2 !important;
+     color: #fff !important;
+  }
+</style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css" />
 @endsection
@@ -140,7 +151,7 @@
 
                   <div class="form-group col-lg-4">
                     <label>Test Name</label>
-                    <input type="text" name="name" value="{{ $exam->name }}" id="name" class="form-control form-control-sm" required>
+                    <input type="text" name="name" value="{{ $exam->name }}" id="name" class="form-control form-control-sm" readonly>
                   </div>
 
                   <div class="form-group col-lg-2">
@@ -169,9 +180,42 @@
               </div>
             </form>
           </div>
+
+          <div class="card card-primary">
+            <div class="card-header">
+              <h4>Questions Replace Form</h4>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <button type="button" class="btn btn-primary m-b-10" data-toggle="modal" data-target="#replaceModal">Add Replace Images</button>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr class="">
+                        <th>Q.No</th>
+                        <th>Subject</th>
+                        <th>File Name</th>
+                        <th>Download</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach ($exam->questions as $row)
+                      <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $row['subject'] }}</td>
+                        <td>{{ basename($row['image']) }}</td>
+                        <td><a href="{{ env('APP_URL').$row['image'] }}" class="btn btn-link font-16" download>Download</a></td>
+                      </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
-    </div>
   </section>
 </div>
 @endsection

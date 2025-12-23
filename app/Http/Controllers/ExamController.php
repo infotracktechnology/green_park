@@ -55,15 +55,16 @@ class ExamController extends Controller
         }
 
         $data['status'] = 'preview';
+        $data['name'] = $data['testcategory']."- (".date('d-m-Y', strtotime($data['exam_date'])).")";
         $questions = [];
 
         foreach (['physics', 'chemistry', 'botany', 'zoology', 'maths'] as $subject) {
             if ($request->hasFile($subject . "_files")) {
                 foreach ($request->file($subject . "_files") as $key => $file) {
                     $q_no = $key + 1;
-                    $filename = time() . '-' . $subject . '-' . $q_no . '.' . $file->getClientOriginalExtension();
+                    $filename = $data['name'].'-'.$q_no.'.'.$file->getClientOriginalExtension();
                     $file->move('questions', $filename);
-                    $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/" . $filename];
+                    $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/".$filename];
                 }
             }
         }
