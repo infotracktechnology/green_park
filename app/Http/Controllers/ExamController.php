@@ -60,7 +60,7 @@ class ExamController extends Controller
 
         foreach (['physics', 'chemistry', 'botany', 'zoology', 'maths'] as $subject) {
             if ($request->hasFile($subject . "_files")) {
-                foreach ($request->file($subject . "_files") as $key => $file) {
+                foreach ($request->file($subject."_files") as $key => $file) {
                     $q_no = $key + 1;
                     $filename = $data['name'].'-'.$q_no.'.'.$file->getClientOriginalExtension();
                     $file->move('questions', $filename);
