@@ -187,6 +187,7 @@
             </form>
           </div>
 
+          @if(count($exam->questions) > 0)
           <div class="card card-primary">
             <div class="card-header">
               <h4>Questions Replace Form</h4>
@@ -244,8 +245,9 @@
                 @endforeach
               </div>
             </div>
-
           </div>
+          @endif
+
         </div>
       </div>
   </section>
