@@ -185,9 +185,9 @@
                
 
                 @foreach ($exam->questions as $row)
-                <div class="col-lg-2 photo-item">
+                <div class="col-lg-1 photo-item">
                   <div class="card">
-                    <img src="{{ env('APP_URL').$row['image'] }}" class="card-img-top" alt="Photo" style="height: 150px; object-fit: cover;">
+                    <img src="{{ env('APP_URL').$row['image'] }}" class="card-img-top" alt="Photo" style="height: 100px; object-fit: cover;">
                     <div class="card-footer p-2 text-center">
                       <small class="text-muted d-block">{{ basename($row['image']) }}</small>
                       <a href="{{ env('APP_URL').$row['image'] }}" download class="btn btn-sm btn-primary"> Download</a>
