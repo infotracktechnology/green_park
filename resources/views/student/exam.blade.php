@@ -149,7 +149,7 @@
                ?>
               <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
                 <div class="question-panel" style="max-height: 400px;overflow-x: hidden;">
-                  <h4>Question {{ $key }}</h4>
+                  <p>Question {{ $key }}</p>
                 <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
                 </div>
 
