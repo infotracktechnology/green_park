@@ -1,6 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Examinations')
-@section('css')>
+@section('css')
+<style>
+  .photo-item:hover {
+     transform: scale(1.05);
+   }
+</style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css" />
 @endsection
@@ -140,7 +145,7 @@
 
                   <div class="form-group col-lg-4">
                     <label>Test Name</label>
-                    <input type="text" name="name" value="{{ $exam->name }}" id="name" class="form-control form-control-sm" required>
+                    <input type="text" name="name" value="{{ $exam->name }}" id="name" class="form-control form-control-sm" readonly>
                   </div>
 
                   <div class="form-group col-lg-2">
@@ -169,10 +174,68 @@
               </div>
             </form>
           </div>
+
+          <div class="card card-primary">
+            <div class="card-header">
+              <h4>Questions Replace Form</h4>
+            </div>
+            <div class="card-body">
+               <button type="button" class="btn btn-primary m-b-10" data-toggle="modal" data-target="#replaceModal">Add Replace Images</button>
+              <div class="row">
+               
+
+                @foreach ($exam->questions as $row)
+                <div class="col-lg-2 photo-item">
+                  <div class="card">
+                    <img src="{{ env('APP_URL').$row['image'] }}" class="card-img-top" alt="Photo" style="height: 150px; object-fit: cover;">
+                    <div class="card-footer p-2 text-center">
+                      <small class="text-muted d-block">{{ basename($row['image']) }}</small>
+                      <a href="{{ env('APP_URL').$row['image'] }}" download class="btn btn-sm btn-primary"> Download</a>
+                    </div>
+                  </div>
+                </div>
+                @endforeach
+
+                </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </section>
+
+  <div class="modal fade" id="replaceModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Replace Images</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ route('exam.index') }}" method="get" enctype="multipart/form-data">
+          <div class="row">
+            <div class="form-group col-12">
+              <label>Images</label>
+              <input type="hidden" name="id" value="{{ $exam->id }}">
+              <input type="file" name="images[]" accept="image/*" multiple class="form-control form-control-sm" required>
+            </div>
+
+            <div class="form-group col-12">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 @endsection
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -190,7 +253,8 @@
          })
      ]
       });
-      $('#end_at').change(function() {
+
+    $('#end_at').change(function() {
      $('#end_at_error').text('');
      const startTime = new Date($('#start_at').val());
      const endTime = new Date($(this).val());
@@ -198,6 +262,6 @@
          $('#end_at_error').text('End time must be greater than start time.');
          $(this).val('');
      }
-      })
+  });
 </script>
 @endsection

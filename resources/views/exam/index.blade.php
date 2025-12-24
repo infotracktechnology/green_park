@@ -45,13 +45,10 @@
                       <tr role="row">
                         <th>#</th>
                         <th>Test ID</th>
-                        <th>Course</th>
                         <th>Branch </th>
                         <th>Coaching Type</th>
-                        <th>H/D</th>
-                        <th>Batch</th>
                         <th>Test Category</th>
-                        <th>Name</th>
+                        <th>Test Name</th>
                         <th>Subject</th>
                         <th>Total Questions</th>
                         <th>Start Time</th>
@@ -68,11 +65,8 @@
                       <tr>
                         <td><input type="checkbox" name="ids[]" value="{{ $test->id }}"></td>
                         <td>{{ $test->testid }}</td>
-                        <td>{{ $test->course }}</td>
                         <td>{{ $test->branchNames() }}</td>
                         <td>{{ $test->coaching_type }}</td>
-                        <td>{{ $test->category }}</td>
-                        <td>{{ $test->batch }}</td>
                         <td>{{ $test->testcategory }}</td>
                         <td>{{ $test->name }}</td>
                         <td>{{ $test->subject_name }}</td>

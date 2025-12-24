@@ -129,10 +129,10 @@
                     <input type="number" name="testid" class="form-control form-control-sm numberk" required>
                   </div>
 
-                  <div class="form-group col-lg-3">
+                  {{-- <div class="form-group col-lg-3">
                     <label>Test Name</label>
                     <input type="text" name="name" id="name" class="form-control form-control-sm" required>
-                  </div>
+                  </div> --}}
 
                   <div class="form-group col-lg-2">
                     <label>Exam Date</label>
@@ -358,7 +358,10 @@
     $check.on('change', function() {
       const checked = this.checked;
       $inputs.toggle(checked);
-      $inputs.find('input').prop('disabled', !checked).prop('required', checked && this.type !== 'file');
+      $inputs.find('input').each(function() { 
+        this.disabled = !checked;
+        if(this.type !== 'file') this.required = checked;
+      });
       if (!checked) $inputs.find('input').val('');
       calcTotal();
     });
