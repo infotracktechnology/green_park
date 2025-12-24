@@ -92,12 +92,24 @@ class ExamController extends Controller
     public function update(Request $request, Exam $exam)
     {
         $data = $request->all();
+        if($request->hasFile('images')) {
+            $questions = $exam->questions;
+            foreach ($request->file('images') as $key => $file) {
+                $q_no = (int)$request->q_no[$key];
+                $filename = $exam->name.'-'.$q_no.'.'.$file->getClientOriginalExtension();
+                $file->move('questions', $filename);
+                $questions[$q_no-1]['image'] = "questions/".$filename;
+                $exam->update(['questions' => $questions]);
+            }
+            return redirect()->back()->with('success', 'Questions Images Replaced Successfully');    
+        }
+
         foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $exam->update($data);
         session()->flash('success', 'Test updated successfully');
-        return to_route('exam.index');
+        return to_route('exam.index')->with('success', 'Exam updated successfully');
     }
     public function TestCategory(Request $request)
     {

@@ -4,7 +4,7 @@
 <style>
   table th,table td {
   border: 1px solid #222 !important;
-  height: 0px !important;
+  height: 35px !important;
   padding: 0px 5px !important;
   }
   thead th{
@@ -22,6 +22,11 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12">
+
+          @if(session('success'))
+          <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
+          @endif
+
           <div class="card card-primary">
             <form method="post" id="myForm" action="{{ route('exam.update', $exam->id) }}" enctype="multipart/form-data">
               @method('PUT')
@@ -186,23 +191,48 @@
               <h4>Questions Replace Form</h4>
             </div>
             <div class="card-body">
+
+              <form method="post" id="myForm" action="{{ route('exam.update', $exam->id) }}" enctype="multipart/form-data">
+                @method('PUT')
+                @csrf
+                <div class="row">
+
+                  <div class="form-group col-lg-4">
+                    <label>Select Questions(multiple)</label>
+                    <select name="q_no[]" class="select2" multiple required>
+                      @foreach ($exam->questions as $row)
+                      <option value="{{$loop->iteration}}">{{$loop->iteration}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label>Upload Questions(Replace Images)</label>
+                    <input type="file" name="images[]" accept="image/*" multiple class="form-control form-control-sm" required>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary btn-block">Upload</button>
+                  </div>
+                </div>
+              </form>
+
               <div class="row">
-                <button type="button" class="btn btn-primary m-b-10" data-toggle="modal" data-target="#replaceModal">Add Replace Images</button>
-                <div class="table-responsive">
+                <?php $q = 1; ?>
+                @foreach (array_chunk($exam->questions,count($exam->questions)/3) as $questions)
+                <div class="col-lg-4">
                   <table class="table">
                     <thead>
                       <tr class="">
                         <th>Q.No</th>
-                        <th>Subject</th>
                         <th>File Name</th>
                         <th>Download</th>
                       </tr>
                     </thead>
                     <tbody>
-                      @foreach ($exam->questions as $row)
+                      @foreach ($questions as $row)
                       <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $row['subject'] }}</td>
+                        <td>{{ $q++ }}</td>
                         <td>{{ basename($row['image']) }}</td>
                         <td><a href="{{ env('APP_URL').$row['image'] }}" download class="btn btn-sm btn-primary"> Download</a></td>
                       </tr>
@@ -210,6 +240,7 @@
                     </tbody>
                   </table>
                 </div>
+                @endforeach
               </div>
             </div>
 
@@ -217,35 +248,7 @@
         </div>
       </div>
   </section>
-  
-  <div class="modal fade" id="replaceModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Replace Images</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form action="{{ route('exam.index') }}" method="get" enctype="multipart/form-data">
-          <div class="row">
-            <div class="form-group col-12">
-              <label>Images</label>
-              <input type="hidden" name="id" value="{{ $exam->id }}">
-              <input type="file" name="images[]" accept="image/*" multiple class="form-control form-control-sm" required>
-            </div>
 
-            <div class="form-group col-12">
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
 
 </div>
 @endsection
