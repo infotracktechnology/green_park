@@ -29,6 +29,12 @@
       background-repeat: no-repeat !important;
       background-position: center !important;
   }
+  table th,table td {
+    border: none !important;
+  }
+  .info-table td {
+    height: 20px !important;
+  }
 </style>
 @endsection
 
@@ -51,9 +57,9 @@
             <table>
               <tbody>
                 <tr>
-                  <td style="padding: 5px 15px; border: 2px solid #666"><i class="fa fa-user" style="font-size:90px;"></i></td>
+                  <td style="padding: 5px 15px;"><i class="fa fa-user" style="font-size:90px;"></i></td>
                   <td>
-                    <table>
+                    <table class="info-table">
                       <tbody>
                         <tr>
                           <td style="padding: 0px 5px;">Candidate Name</td>
@@ -135,7 +141,6 @@
 
           </div>
           <div class="col-md-8">
-            <!-- Question Display -->
             <div class="question-container p-t-30 p-b-10">
               <input type="hidden" name="total_question" value="{{ count($exam->questions) }}">
               @foreach ($exam->questions as $index => $question)
@@ -143,10 +148,12 @@
                 $key = $index + 1;
                ?>
               <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
-                <div class="question-panel" style="overflow-y: scroll;max-height: 400px;overflow-x: hidden;">
+                <div class="question-panel" style="max-height: 400px;overflow-x: hidden;">
                   <h4>Question {{ $key }}</h4>
-                  <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
-                  <input type="hidden" name="subject[{{ $key }}]" value="{{ $question['subject'] }}">
+                <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
+                </div>
+
+                 <input type="hidden" name="subject[{{ $key }}]" value="{{ $question['subject'] }}">
                   <table class="table table-borderless mb0">
                     <tbody>
                       <tr>
@@ -157,7 +164,7 @@
                       </tr>
                     </tbody>
                   </table>
-                </div>
+
                 <input type="hidden" name="status[{{ $key }}]" id="status-{{ $key }}" value="not-attempted">
                 <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}"> {{ $key == $exam->total_questions ? 'Save & Submit' : 'Save & Next' }} </button>
                 <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
@@ -173,14 +180,15 @@
                   <button type="button" class="btn btn-link float-left" id="btnNextQue">Next >></button>
                   <button type="button" class="btn btn-success btn-submit-answer ml-auto">Submit</button>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
             </div>
+
           </div>
           <div class="col-md-4">
             <div class="panel" style="overflow-y: scroll;">
               <ul class="pagination test-questions my-4">
                 @foreach ($exam->questions as $index => $question)
                 <?php
-                                $key = $index + 1;
-                                ?>
+                  $key = $index + 1;
+                ?>
                 <li data-seq="{{ $key }}">
                   <a href="javascript:void(0);" class="not-attempted" data-index="{{ $key }}">
                     {{ $key < 10 ? '0' : '' }}{{ $key }}
@@ -439,13 +447,11 @@
   openQuestion(max_qno);
   updateCounts();
   
-  // on page load
   $(document).ready(function () {
       Object.keys(answers).forEach(qno => {
           const answer = answers[qno];
           const status = answer.status;
           const ans = answer.answer;
-  
           if (status === 'que-save' || status === 'que-save-mark') {
               $(`#question-${qno} input[type="radio"][value="${ans}"]`).prop('checked', true);
           }
