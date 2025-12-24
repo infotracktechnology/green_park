@@ -243,7 +243,8 @@
   var activeQuestion = {{ $maxQuestions }};
   const questions = @json($exam->questions);
   const form = $('#examForm');
-  var testid = Number({{ $exam->id }});
+  var testid = Number({{ $exam->testid }});
+  var testname = {{ $exam->name }};
   var max_qno = Number({{ $maxQuestions }});
   max_qno = max_qno > 0 ? max_qno : 1;
   const answers = @json($answers);
@@ -276,6 +277,7 @@
           method: 'POST',
           data: {
               test_id: testid,
+              testname: testname,
               q_no: qno,
               subject: subject,
               status: status,
