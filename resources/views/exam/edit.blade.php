@@ -2,9 +2,15 @@
 @section('title', 'Examinations')
 @section('css')
 <style>
-  .photo-item:hover {
-     transform: scale(1.05);
-   }
+  table th,table td {
+  border: 1px solid #222 !important;
+  height: 0px !important;
+  padding: 0px 5px !important;
+  }
+  thead th{
+    background-color: #2b66a2 !important;
+     color: #fff !important;
+  }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css" />
@@ -180,33 +186,38 @@
               <h4>Questions Replace Form</h4>
             </div>
             <div class="card-body">
-               <button type="button" class="btn btn-primary m-b-10" data-toggle="modal" data-target="#replaceModal">Add Replace Images</button>
               <div class="row">
-               
-
-                @foreach ($exam->questions as $row)
-                <div class="col-lg-2 photo-item">
-                  <div class="card">
-                    <img src="{{ env('APP_URL').$row['image'] }}" class="card-img-top" alt="Photo" style="height: 150px; object-fit: cover;">
-                    <div class="card-footer p-2 text-center">
-                      <small class="text-muted d-block">{{ basename($row['image']) }}</small>
-                      <a href="{{ env('APP_URL').$row['image'] }}" download class="btn btn-sm btn-primary"> Download</a>
-                    </div>
-                  </div>
+                <button type="button" class="btn btn-primary m-b-10" data-toggle="modal" data-target="#replaceModal">Add Replace Images</button>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr class="">
+                        <th>Q.No</th>
+                        <th>Subject</th>
+                        <th>File Name</th>
+                        <th>Download</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach ($exam->questions as $row)
+                      <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $row['subject'] }}</td>
+                        <td>{{ basename($row['image']) }}</td>
+                        <td><a href="{{ env('APP_URL').$row['image'] }}" download class="btn btn-sm btn-primary"> Download</a></td>
+                      </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
                 </div>
-                @endforeach
-
-                </tbody>
-                </table>
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
-    </div>
   </section>
-
+  
   <div class="modal fade" id="replaceModal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -253,8 +264,7 @@
          })
      ]
       });
-
-    $('#end_at').change(function() {
+      $('#end_at').change(function() {
      $('#end_at_error').text('');
      const startTime = new Date($('#start_at').val());
      const endTime = new Date($(this).val());
@@ -262,6 +272,6 @@
          $('#end_at_error').text('End time must be greater than start time.');
          $(this).val('');
      }
-  });
+      })
 </script>
 @endsection
