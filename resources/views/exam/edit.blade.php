@@ -5,6 +5,7 @@
   table th,table td {
   border: 1px solid #222 !important;
   height: 35px !important;
+  font-size: 12px !important;
   padding: 0px 5px !important;
   }
   thead th{
