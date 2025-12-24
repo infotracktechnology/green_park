@@ -149,7 +149,7 @@
                ?>
               <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
                 <div class="question-panel" style="max-height: 400px;overflow-x: hidden;">
-                  <h4>Question {{ $key }}</h4>
+                  <p>Question {{ $key }}</p>
                 <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
                 </div>
 
@@ -243,7 +243,8 @@
   var activeQuestion = {{ $maxQuestions }};
   const questions = @json($exam->questions);
   const form = $('#examForm');
-  var testid = Number({{ $exam->id }});
+  var testid = Number({{ $exam->testid }});
+  var testname = {{ $exam->name }};
   var max_qno = Number({{ $maxQuestions }});
   max_qno = max_qno > 0 ? max_qno : 1;
   const answers = @json($answers);
@@ -276,6 +277,7 @@
           method: 'POST',
           data: {
               test_id: testid,
+              testname: testname,
               q_no: qno,
               subject: subject,
               status: status,
