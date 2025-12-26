@@ -62,13 +62,28 @@
                 </div>
               </form>
 
+               <form action="{{ route('classvideo.index') }}" method="get">
+                <div class="row">
+                  <div class="form-group col-lg-3">
+                    <select name="coaching_type" class="select2" required>
+                      <option value="">Select Coaching Type</option>
+                      @foreach ($coachingtype as $row)
+                      <option value="{{$row}}" @selected(request('coaching_type')==$row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                  </div>
+                </div>
+              </form>
+
               <div class="col-md-6 col-sm-12 mb-3">
                 <button type="button" class="btn btn-danger mt-3" id="deleteSelected">
                   <i class="fas fa-trash"></i> Delete Selected
                 </button>
               </div>
-
-
+              
               <div class="table-responsive">
                 <table class="table table-striped table-sm" id="myTable">
                   <thead>

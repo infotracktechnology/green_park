@@ -152,7 +152,12 @@
           </div>
           <div class="form-group">
             <label>Cot No</label>
-            <input type="text" name="cots_no" class="form-control form-control-sm" required>
+             <select class="select2" required name="cots_no">
+              <option value="">Choose Cot</option>
+              @foreach ($carts as $row)
+              <option value="{{ $row }}">{{ $row }}</option>
+              @endforeach
+            </select>
           </div>
         </div>
         <div class="modal-footer">

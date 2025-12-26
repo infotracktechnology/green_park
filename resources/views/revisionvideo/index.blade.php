@@ -40,19 +40,33 @@
                 </div>
               </div>
 
+               <form action="{{ route('revisionvideo.index') }}" method="get">
+                <div class="row">
+                  <div class="form-group col-lg-3">
+                    <select name="coaching_type" class="select2" required>
+                      <option value="">Select Coaching Type</option>
+                      @foreach ($coachingtype as $row)
+                      <option value="{{$row}}" @selected(request('coaching_type')==$row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                  </div>
+                </div>
+              </form>
+
 
               <div class="table-responsive">
                 <table class="table table-striped table-sm" id="myTable">
                   <thead>
                     <tr>
                       <th><input type="checkbox" id="selectAllRevision"></th>
-                      <th>Academic Year</th>
                       <th>User Type</th>
                       <th>Course</th>
                       <th>Branch </th>
                       <th>Coaching Type</th>
-                      <th>H/D</th>
-                      <th>Batch</th>
+                      <th>Date</th>
                       <th>Subject</th>
                       <th>Period</th>
                       <th>Video Id</th>
@@ -65,13 +79,11 @@
                     @foreach ($revisionvideos as $row)
                     <tr>
                       <td><input type="checkbox" class="checked_ids_revision" name="ids[]" value="{{ $row->id }}"></td>
-                      <td>{{ $row->academic_year }}</td>
                       <td>{{ $row->usertype }}</td>
                       <td>{{ $row->course }}</td>
                       <td>{{ $row->branchNames() }}</td>
                       <td>{{ $row->coaching_type }}</td>
-                      <td>{{ $row->category}}</td>
-                      <td>{{ $row->batch}}</td>
+                      <td>{{ $row->date }}</td>
                       <td>{{ $row->subject }}</td>
                       <td>{{ $row->period }}</td>
                       <td>{{ $row->video_id }}</td>

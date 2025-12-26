@@ -17,15 +17,9 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         $announcements = Announcement::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-            });
-
-        if ($request->has('coaching_type')) {
-            $announcements = $announcements->where('coaching_type','like','%'.$request->coaching_type.'%');
-        }
-
-        $announcements = $announcements->latest()->get();
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->latest()->get();
 
         return view('announcement.index', compact('announcements'));
     }

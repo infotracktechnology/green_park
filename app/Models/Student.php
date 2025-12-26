@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 
 class Student extends Authenticatable
@@ -39,6 +40,9 @@ class Student extends Authenticatable
             $model->password_1 = self::generatePassword(6);
             $model->password = bcrypt($model->password_1);
             $model->user_name = self::generateName($model->course, $model->student_id);
+        });
+        static::addGlobalScope('order', function (Builder $builder) {
+            $builder->orderBy('student_name');
         });
     }
 

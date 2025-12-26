@@ -12,12 +12,12 @@ use App\Models\AcademicYear;
 class DownloadController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $downloads = Download::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-            })->get();
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->latest()->get();
 
         return view('download.index', compact('downloads'));
     }
