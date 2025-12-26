@@ -11,14 +11,15 @@ use Illuminate\Support\Facades\DB;
 
 class ChairmanVideoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
 {
 
     $chairmanvideos = Chairmanvideo::where('academic_year', $this->academic_year)
     ->when(auth()->user()->branch, function ($query) {
         $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-    })
-    ->get();
+    })->when($request->coaching_type,fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+    ->latest()->get();
+    
     return view('chairmanvideo.index', compact('chairmanvideos'));
 }
 
