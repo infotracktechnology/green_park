@@ -14,13 +14,12 @@ use Illuminate\Support\Facades\DB;
 
 class ExamPortionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $examportions = Examportion::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-            })
-            ->get();
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->latest()->get();
 
         return view('examportion.index', compact('examportions'));
     }

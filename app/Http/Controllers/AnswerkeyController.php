@@ -10,12 +10,12 @@ use App\Models\AcademicYear;
 
 class AnswerkeyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $answerkeys = AnswerKey::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch', 'like', '%'.auth()->user()->branch.'%');
-            })->latest()->get();
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->latest()->get();
 
         return view('answerkey.index', compact('answerkeys'));
     }

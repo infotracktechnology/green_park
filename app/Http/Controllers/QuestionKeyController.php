@@ -11,14 +11,13 @@ use App\Models\AcademicYear;
 
 class QuestionKeyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $questionkeys = QuestionKey::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-            })
-            ->latest()
-            ->get();
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->latest()->get();
+
         return view('questionkey.index', compact('questionkeys'));
     }
 
@@ -92,7 +91,7 @@ class QuestionKeyController extends Controller
             $questionkey->delete();
         }
        }
-       
+
         return redirect()->back()->with('success', 'Question Key deleted successfully!');
     }
 

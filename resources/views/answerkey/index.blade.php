@@ -31,6 +31,23 @@
                   <a href="{{route('answerkey.create')}}" class="btn btn-primary btn-block">Add Answer Key</a>
                 </div>
               </div>
+
+               <form action="{{ route('answerkey.index') }}" method="get">
+                <div class="row">
+                  <div class="form-group col-lg-3">
+                    <select name="coaching_type" class="select2" required>
+                      <option value="">Select Coaching Type</option>
+                      @foreach ($coachingtype as $row)
+                      <option value="{{$row}}" @selected(request('coaching_type')==$row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                  </div>
+                </div>
+              </form>
+
               <div class="col-12">
                 <form action="{{ route('answerkey.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
                   @csrf
@@ -45,8 +62,7 @@
                         <th>Course</th>
                         <th>Branch </th>
                         <th>Coaching Type</th>
-                        <th>H/D</th>
-                        <th>Batch</th>
+                        <th>Title</th>
                         <th>File</th>
                         <th>Edit</th>
                       </tr>
@@ -59,8 +75,7 @@
                         <td>{{ $row->course }}</td>
                         <td>{{ $row->branchNames() }}</td>
                         <td>{{ $row->coaching_type }}</td>
-                        <td>{{ $row->category}}</td>
-                        <td>{{ $row->batch}}</td>
+                        <td>{{ $row->title }}</td>
                         <td>
                           @if($row->file_path)
                           <a href="{{ env('APP_URL').'/'.$row->file_path }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>

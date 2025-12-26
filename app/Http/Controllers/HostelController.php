@@ -199,16 +199,13 @@ class HostelController extends Controller
 
         $room = $hostelId ? HostelRoom::where('hostel_id', $hostelId)->distinct()->pluck('room_no') : collect();
 
-        $availableStudents = collect();
-
-        if ($branchId && $hostelId) {
-            $type = Hostel::find($hostelId)?->type;
-            $availableStudents = Student::where('campus', $branchId)->where('hostel_dayscholar', 'HOSTEL')->when($type, fn($q) => $q->where('gender', $type))->where(fn($q) => $q->whereNull('cots_no')->orWhere('cots_no', ''))->get();
-        }
+        $availableStudents = Student::where('hostel_dayscholar', 'HOSTEL')->whereNull('cots_no')->get();
 
         $allocatedStudents = ($hostelId && $roomNo) ? Student::where('hostel_id', $hostelId)->where('room_no', $roomNo)->get() : collect();
 
-        return view('hostel.reallocation', compact('hostel', 'room', 'availableStudents', 'allocatedStudents'));
+        $carts = HostelRoom::where('hostel_id', $hostelId)->where('room_no', $roomNo)->whereNotIn('cart_no',fn($q) => $q->select('cots_no')->from('student')->where('hostel_id', $hostelId)->where('room_no', $roomNo))->get()->pluck('cart_no');
+
+        return view('hostel.reallocation', compact('hostel', 'room', 'availableStudents', 'allocatedStudents', 'carts'));
     }
 
 

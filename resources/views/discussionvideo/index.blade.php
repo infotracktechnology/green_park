@@ -34,6 +34,21 @@
                 </div>
               </div>
 
+               <form action="{{ route('discussionvideo.index') }}" method="get">
+                <div class="row">
+                  <div class="form-group col-lg-3">
+                    <select name="coaching_type" class="select2" required>
+                      <option value="">Select Coaching Type</option>
+                      @foreach ($coachingtype as $row)
+                      <option value="{{$row}}" @selected(request('coaching_type')==$row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                  </div>
+                </div>
+              </form>
 
               <div class="col-12">
                 <div class="table-responsive">
@@ -46,8 +61,7 @@
                         <th>Course</th>
                         <th>Branch </th>
                         <th>Coaching Type</th>
-                        <th>H/D</th>
-                        <th>Batch</th>
+                        <th>Date</th>
                         <th>Part</th>
                         <th>Subject</th>
                         <th>Video Id</th>
@@ -66,8 +80,7 @@
                         <td>{{ $discussionvideo->course}}</td>
                         <td>{{ $discussionvideo->branchNames()}}</td>
                         <td>{{ $discussionvideo->coaching_type}}</td>
-                        <td>{{ $discussionvideo->category}}</td>
-                        <td>{{ $discussionvideo->batch}}</td>
+                        <td>{{ $discussionvideo->date}}</td>
                         <td>{{ $discussionvideo->part }}</td>
                         <td>{{ $discussionvideo->subject }}</td>
                         <td>{{ $discussionvideo->video_id }}</td>
