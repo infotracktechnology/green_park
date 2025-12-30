@@ -245,11 +245,22 @@ class HomeController extends Controller
 
     public function Setting(Request $request){
        $setting = Setting::all();
+       $category = Options::where('type', 'testcategory')->first()->value ?? [];
+
        if($request->isMethod('POST')) {
         $row = Setting::find($request->id)->update(['value' => $request->value]);
         return redirect()->back()->with('success', 'Setting new value updated successfully!');
        }
-       return view('setting',compact('setting'));
+
+       if($request->action && $request->action == 'delete') {
+        if (($key = array_search($request->value, $category)) !== false) {
+            unset($category[$key]);
+        }
+        Options::where('type', 'testcategory')->update(['value' => $category]);
+        return redirect()->back()->with('success', 'Test Category deleted successfully!');
+       }
+       
+       return view('setting',compact('setting','category'));
     }
 
 }

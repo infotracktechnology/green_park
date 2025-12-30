@@ -571,14 +571,7 @@ class ExamController extends Controller
     public function PreviousExamUpload(Request $request, ImportController $import){
         
         if ($request->isMethod('post')) {
-            $exam = Exam::where('name', $request->examname)->where('academic_year', $this->academic_year)->first();
             $rows = $import->parseCSV($request->file('perviousexamfile')->getRealPath());
-            $rows = array_map(function ($row) use ($exam, $request) {
-                $row['subject'] = $request->examname;
-                $row['exdate'] = date('d-m-Y', strtotime($exam->exam_date));
-                return $row;
-            }, $rows);
-
             try{
             ExamSubjectReport::insert($rows);
             }
@@ -588,14 +581,7 @@ class ExamController extends Controller
             
             return redirect()->back()->with('success', "Previous Exam Result Uploaded Successfully.");
         }
-
-        $category = Options::where('type', 'testcategory')->first()->value ?? [];
-        $exam = [];
-
-        if ($request->testcategory) {
-            $exam = Exam::where('testcategory', $request->testcategory)->where('academic_year', $this->academic_year)->groupBy('name')->get();
-        }
-     
-        return view('exam.previousexamupload',compact('category', 'exam'));
+ 
+        return view('exam.previousexamupload');
     }
 }

@@ -25,7 +25,7 @@
             </div>
             <div class="card-body">
               <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-6">
                   <div class="table-responsive">
                     <table class="table table-striped" style="width:100%;">
                       <thead>
@@ -54,6 +54,33 @@
 
                   </div>
                 </div>
+
+                <div class="col-lg-6">
+                  <div class="table-responsive">
+                    <table class="table table-striped" style="width:100%;">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Test Category</th>
+                          <th>Delete</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @foreach ($category as $key => $row)
+                        <tr>
+                          <td>{{ $key+1 }}</td>
+                          <td>{{ $row }}</td>
+                          <td>
+                            <a href="{{ route('admin.setting',['value' => $row, 'action' => 'delete']) }}" class="btn btn-danger text-white" onclick="return confirm('Are you sure you want to delete this?')"><i class="fas fa-trash"></i></a>
+                          </td>
+                        </tr>
+                        @endforeach
+                      </tbody>
+                    </table>
+
+                  </div>
+                </div>
+                
               </div>
 
             </div>
@@ -98,7 +125,7 @@
 <script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
 <script>
-  $('.table').DataTable();
+ // $('.table').DataTable();
   $('.set-value').on('click', function() {
     let data = $(this).data('row');
     $('#SetValue').modal('show');
