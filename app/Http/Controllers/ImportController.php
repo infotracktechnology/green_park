@@ -72,15 +72,16 @@ class ImportController extends Controller
                 continue;
             }
             foreach ($row as $key => $value) {
-                if ($value === '')
+                if ($value === ''){
                     $value = null;
+                }
              $row[$key] = trim($value);
             }
             $csvData[] = array_combine($header, $row);
         }
         fclose($handle);
     }
-    
+
     return $csvData;
 }
 
