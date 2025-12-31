@@ -71,12 +71,7 @@ class ImportController extends Controller
             if (count($header) !== count($row)) {
                 continue;
             }
-            foreach ($row as $key => $value) {
-                if ($value === ''){
-                    $value = null;
-                }
-             $row[$key] = trim($value);
-            }
+            
             $csvData[] = array_combine($header, $row);
         }
         fclose($handle);
