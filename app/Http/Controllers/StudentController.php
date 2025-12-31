@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Models\Announcement;
 use App\Models\Attendance;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Options;
 
 class StudentController extends Controller
 {
