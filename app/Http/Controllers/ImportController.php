@@ -59,21 +59,19 @@ class ImportController extends Controller
         $header = null;
 
         while (($row = fgetcsv($handle, 10000, ',')) !== false) {
-            // Ignore empty rows
             if (empty(array_filter($row))) {
                 continue;
             }
 
-            // Capture header from the first row
             if (!$header) {
                 $header = array_map('strtolower', $row);
                 continue;
             }
-
            
             if (count($header) !== count($row)) {
                 continue;
             }
+            
             $csvData[] = array_combine($header, $row);
         }
         fclose($handle);
