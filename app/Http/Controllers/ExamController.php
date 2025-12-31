@@ -573,7 +573,10 @@ class ExamController extends Controller
         if ($request->isMethod('post')) {
             $rows = $import->parseCSV($request->file('perviousexamfile')->getRealPath());
             try{
-            ExamSubjectReport::insert($rows);
+            $chunks = array_chunk($rows, 500);
+            foreach ($chunks as $chunk) {
+                ExamSubjectReport::insert($chunk);
+            }
             }
             catch(\Exception $e){
                 return redirect()->back()->with('error', $e->getMessage());
