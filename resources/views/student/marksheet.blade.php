@@ -60,7 +60,7 @@
                     <div class="form-group col-lg-4">
                       <select name="exam" class="form-control form-control-sm" required>
                         <option value="">Select Exam</option>
-                        @foreach (['CUMULATIVE (CHEBOT)','CUMULATIVE (PHYZOO)','GRAND TEST','WEEKEND (BOTANY)','WEEKEND (CHEMISTRY)','WEEKEND (PHYSICS)','WEEKEND (ZOOLOGY)'] as $row)
+                        @foreach ($category as $row)
                         <option value="{{ $row }}" @selected(request('exam')==$row)>{{ $row }}</option>
                         @endforeach
                       </select>
