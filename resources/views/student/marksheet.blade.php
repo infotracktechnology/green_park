@@ -77,26 +77,53 @@
               <div class="col-md-12">
                 <div class="table-responsive">
                   <table class="table">
+                    <?php
+                    $first = $subjectexam->first();
+                     $subjects = [
+                      'PHYSICS'   => ['tot' => 'ptot', 'r' => 'pr', 'w' => 'pw', 'l' => 'pl'],
+                      'CHEMISTRY' => ['tot' => 'ctot', 'r' => 'cr', 'w' => 'cw', 'l' => 'cl'],
+                      'BOTANY'    => ['tot' => 'btot', 'r' => 'br', 'w' => 'bw', 'l' => 'bl'],
+                      'ZOOLOGY'   => ['tot' => 'ztot', 'r' => 'zr', 'w' => 'zw', 'l' => 'zl'],
+                     ];
+                    ?>
                     <thead>
                       <tr>
                         <th>#</th>
                         <th>EXAM DATE</th>
                         <th>EXAM NAME</th>
-                        @foreach($subjectexam->first()?->Header(request('exam')) as $subject)
-                        <th>{{ $subject }}</th>
+                        @if($first->tot)
+                        <th>{{ \Str::between($first->category, '(',')') }}</th>
+                        <th>TOTAL</th>
+                        @else
+                        @foreach($subjects as $name => $cols)
+                        @if($first->{$cols['tot']})
+                        <th>{{ $name }}</th>
+                        @endif
                         @endforeach
                         <th>TOTAL</th>
+                        @endif
                       </tr>
                     </thead>
+
                     <tbody>
-                      @foreach($subjectexam as $key=>$row)
+                      @foreach($subjectexam as $key => $row)
                       <tr>
-                        <td>{{ $key+1 }}</td>
+                        <td>{{ $key + 1 }}</td>
                         <td>{{ $row->exdate }}</td>
                         <td>{{ $row->subject }}</td>
-                        @foreach($row->getScoresForHeader(request('exam')) as $subject => $mark)
-                        <td>{{ $mark[0] }} / {{ $mark[1] }}</td>
+                        @if($row->tot)
+                        <td>{{ $row->tot }} / {{ ($row->r + $row->w + $row->l) * 4 }}</td>
+                        <td>{{ $row->tot }} / {{ $row->totmark }}</td>
+                        @else
+                        @foreach($subjects as $cols)
+                        @if($row->{$cols['tot']})
+                        <td>
+                          {{ $row->{$cols['tot']} }} / {{ ($row->{$cols['r']} + $row->{$cols['w']} + $row->{$cols['l']}) * 4 }}
+                        </td>
+                        @endif
                         @endforeach
+                        <td>{{ $row->nettot }} / {{ $row->totmark }}</td>
+                        @endif
                       </tr>
                       @endforeach
                     </tbody>

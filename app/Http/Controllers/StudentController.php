@@ -150,7 +150,7 @@ class StudentController extends Controller
             return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('test_id', $test->test_id)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderByDesc('mark')->value('mark')];
         });
 
-        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $category = ExamSubjectReport::where([['stuid', $sid], ['category', '!=', '']])->pluck('category')->unique();
         $subjectexam = collect();
         if ($request->exam) {
             $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
