@@ -73,7 +73,7 @@
               </div>
 
 
-              @if($subjectexam)
+              @if($subjectexam->isNotEmpty())
               <div class="col-md-12">
                 <div class="table-responsive">
                   <table class="table">
