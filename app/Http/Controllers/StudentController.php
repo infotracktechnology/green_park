@@ -151,7 +151,7 @@ class StudentController extends Controller
         });
 
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
-        $subjectexam = null;
+        $subjectexam = collect();
         if ($request->exam) {
             $subjectexam = ExamSubjectReport::where("subject", "like", "%$request->exam%")->where("stuid", $sid)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         }
