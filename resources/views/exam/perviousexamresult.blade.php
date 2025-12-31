@@ -44,6 +44,9 @@
             @if($exams->count())
             <div class="table-responsive">
               <table class="table">
+                <?php
+                  $first = $exams->first();
+                ?>
                 <thead>
                   <tr>
                     <th>#</th>
