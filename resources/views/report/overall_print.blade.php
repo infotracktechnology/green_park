@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <title>Overall Mark Sheet</title>
+  <title>Overall Mark Sheet- {{ $test_name }} - {{ $section }}</title>
   <style>
     body{font-family:Helvetica,Arial,sans-serif;font-size:11px;margin:0;padding:0;}
     table{border-collapse:collapse;width:100%;margin-bottom:10px;}
@@ -66,5 +66,13 @@
       </tbody>
     </table>
   </div>
+  <script>
+    window.onload = function() {
+      window.print();
+    }
+    window.onafterprint = function() {
+      window.close();
+    }
+  </script>
 </body>
 </html>

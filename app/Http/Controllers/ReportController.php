@@ -38,17 +38,17 @@ class ReportController extends Controller
                 });
                 return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total')];
             })->values();
-
-            $pdf = Pdf::loadView('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
-            return $pdf->download("OVERALLPRINT-$test_name - $section.pdf");
+            return view('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
+            // $pdf = Pdf::loadView('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
+            // return $pdf->download("OVERALLPRINT-$test_name - $section.pdf");
         }
 
         if ($request->query('type') == 'omr') {
             $section = $request->section;
             $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->get();
-
-            $pdf = PDF::loadView('report.omr_print', compact('answers', 'test_name'));
-            return $pdf->download("OMRPRINT-$test_name-$section.pdf");
+            return view('report.omr_print', compact('answers', 'test_name'));
+            //$pdf = PDF::loadView('report.omr_print', compact('answers', 'test_name'));
+            //return $pdf->download("OMRPRINT-$test_name-$section.pdf");
         }
 
 

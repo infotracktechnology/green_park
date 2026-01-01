@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>OMR VALUATION REPORT</title>
+  <title>OMR VALUATION REPORT {{ $test_name }}</title>
   <style>
      body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; padding: 0; }
     .title { text-align: center; font-weight: bold; margin-bottom: 10px; }
@@ -93,6 +93,13 @@
 
   </div>
   @endforeach
+  <script>
+    window.onload = function() {
+      window.print();
+    }
+    window.onafterprint = function() {
+      window.close();
+    }
+  </script>
 </body>
-
 </html>
