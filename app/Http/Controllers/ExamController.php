@@ -339,7 +339,7 @@ class ExamController extends Controller
     public function offlineUpload(Request $request, ImportController $import)
     {
         $request->validate([
-            'offline' => 'required|mimes:csv,txt|max:2048',
+            'offline' => 'required|mimes:csv,txt|max:4096',
         ]);
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
@@ -544,7 +544,7 @@ class ExamController extends Controller
     {
         $exams = collect();
         $headers = [];
-        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $category = $category = ExamSubjectReport::where('category', '!=', '')->pluck('category')->unique();
         $exam = [];
         if ($request->testcategory) {
             $exam = ExamSubjectReport::where('subject', 'like', "%{$request->testcategory}%")->select('subject')->distinct()->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
@@ -552,20 +552,9 @@ class ExamController extends Controller
 
         if ($request->testcategory && $request->examname) {
             $exams = ExamSubjectReport::where('subject', $request->examname)->get();
-            $headers = $exams->first()?->Header($request->testcategory);
-            $exams = $exams->map(function ($row) use ($request, $headers) {
-                $scores = [];
-                foreach ($headers as $subject) {
-                    $map = ExamSubjectReport::SUBJECT_MAP[$subject] ?? null;
-                    $total = ($row->{$map['r']} + $row->{$map['w']} + $row->{$map['l']}) * 4;
-                    $scores[$subject] = ['mark' => $row->{$map['tot']}, 'total' => $total];
-                }
-                $row->score_data = $scores;
-                return $row;
-            });
         }
 
-        return view('exam.perviousexamresult', compact('exams', 'category', 'exam', 'headers'));
+        return view('exam.perviousexamresult', compact('exams', 'category', 'exam'));
     }
 
     public function PreviousExamUpload(Request $request, ImportController $import){
