@@ -14,8 +14,7 @@ class UsersController extends Controller{
 
     public function index(Request $request){
         $users = User::where('id','!=', auth()->user()->id)->get();
-        $branches = DB::table('branch')->select('id', 'name')->get();
-        return view('users.index',compact('users' ,'branches'));
+        return view('users.index',compact('users'));
     }
 
     public function create(Request $request){
