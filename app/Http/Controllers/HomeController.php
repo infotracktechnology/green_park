@@ -21,6 +21,7 @@ class HomeController extends Controller
 {
     public function index(Request $request){
         $branchId = auth()->user()->branch;
+
         $today = date('Y-m-d');
 
         $data = Branch::when($branchId, fn($q) => $q->where('id', $branchId))->get();
@@ -32,7 +33,7 @@ class HomeController extends Controller
         $present = Attendance::when($branchId, fn($q) => $q->where('branch_id', $branchId))
         ->where('status', 'P')->where('attendance_date', $today)->distinct('student_id')->count();
 
-         $staffs = collect(Staff::select('department')->when($branchId, function ($query) {$query->where('branch_id', $branchId);})->get())->groupBy('department');
+         $staffs = collect(Staff::select('department')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->get())->groupBy('department');
 
     $concerns = ParentConcern::all();
 
