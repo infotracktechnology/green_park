@@ -115,6 +115,7 @@
                 <li><a href="{{ route('student.create') }}" class="nav-link">Add Student</a></li>
                 <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
                 <li><a href="{{ route('students.restore') }}" class="nav-link">Reactivate Student</a></li>
+                 <li><a href="{{ route('import.secbatchupdate') }}" class="nav-link">Sec/Batch Update<small> (CSV import)</small></a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
                 <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
               </ul>
