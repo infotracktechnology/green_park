@@ -27,9 +27,6 @@ class UsersController extends Controller{
     {
         $request->validate([
             'username' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'min:8'],
-            'confirm_password' => ['required', 'string', 'min:8', 'same:password'],
-          
             'email' => ['nullable', 'email', 'unique:users,email'],
             'type' => ['required', 'in:1,2'],
         ]);
@@ -39,11 +36,8 @@ class UsersController extends Controller{
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'type' => $request->type,
-            'branch' => $request->branch, // single branch
+            'branch' => $request->branch,
         ]);
-    
-    
-      
         $user->save();
         return to_route('users.index');
     }
@@ -67,6 +61,7 @@ class UsersController extends Controller{
         $user->username = $request->username;
         $user->email = $request->email;
         $user->branch = $request->branch;
+        $user->password = bcrypt($request->password);
         $user->save();
     
         return redirect()->route('users.index')->with('success', 'User updated successfully');
