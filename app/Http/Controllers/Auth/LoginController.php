@@ -17,16 +17,12 @@ class LoginController extends Controller
             
              return redirect()->route('admin.home')->with('success', 'Welcome back!');
          }
-         elseif(Auth::guard('student')->attempt(['user_name' => $request->username, 'password' => $request->password])) {
-             // Update the active column to 1
+        elseif(Auth::guard('student')->attempt(['user_name' => $request->username, 'password' => $request->password])) {
         $student = Auth::guard('student')->user();
         $student->active = 1;
         if ($student instanceof \Illuminate\Database\Eloquent\Model) {
             $student->save();
-        }
-        
-        
-            
+        }    
             return redirect()->route('studentdashboard')->with('success', 'Welcome back!');
         }
     
