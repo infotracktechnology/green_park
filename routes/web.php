@@ -84,6 +84,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
     Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
     Route::get('export/student', [\App\Http\Controllers\ExportController::class, 'student_export'])->name('export.student');
+    Route::match(['get', 'post'],'import/secbatchupdate', [ImportController::class, 'secbatchupdate'])->name('import.secbatchupdate');
 
     Route::resource('announcement', AnnouncementController::class);
     Route::resource('examportion', ExamPortionController::class);

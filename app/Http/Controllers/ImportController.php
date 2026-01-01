@@ -33,20 +33,15 @@ class ImportController extends Controller
         }
 
         $header = array_map('strtolower', array_keys($data[0]));
-        $existingColumns = array_map('strtolower', array_column(DB::getSchemaBuilder()->listColumns('students'), 'column_name'));
-        $newColumns = array_diff($header, $existingColumns);
+        $existingColumns = array_map('strtolower', Schema::getColumnListing('student'));
+        $tableColumns = array_flip($existingColumns);
 
         DB::beginTransaction();
         try {
-            if (!empty($newColumns)) {
-                Schema::table('students', function (Blueprint $table) use ($newColumns) {
-                    foreach ($newColumns as $column) {
-                        if (!Schema::hasColumn('students', $column)) {
-                            $table->string($column)->nullable();
-                        }
-                    }
-                });
-            }
+
+            $data = array_map(function ($row) use ($tableColumns) {
+                return array_intersect_key(array_change_key_case($row, CASE_LOWER), $tableColumns);
+            }, $data);
 
             if ($request->operation === 'add') {
                 $data = array_map(function ($row) use ($request) {
@@ -70,6 +65,30 @@ class ImportController extends Controller
             DB::rollBack();
             return back()->with('error', 'Error:' . $e->getMessage());
         }
+    }
+
+    public function secBatchUpdate(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $filePath = $request->file('csv_file')->getRealPath();
+            $data = $this->parseCSV($filePath);
+            if (empty($data)) {
+                return back()->with('error', 'No data found in CSV.');
+            }
+            DB::beginTransaction();
+            try {
+                foreach ($data as $row) {
+                    if (empty($row['student_id']) || !isset($row['student_id'])) continue;
+                    Student::where('student_id', $row['student_id'])->update($row);
+                }
+                DB::commit();
+                return back()->with('success', 'Students Second Batch Data has been Updated successfully.');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return back()->with('error', 'Error:' . $e->getMessage());
+            }
+        }
+        return view('import.secbatchupdate');
     }
 
     public function parseCSV($filePath)
