@@ -17,72 +17,70 @@ use App\Models\Attendance;
 use App\Models\Exam;
 use App\Models\ParentConcern;
 use App\Models\Setting;
+
 class HomeController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $branchId = auth()->user()->branch;
-
         $today = date('Y-m-d');
 
-        $data = Branch::when($branchId, fn($q) => $q->where('id', $branchId))->get();
-        $students = Student::when($branchId, fn($q) => $q->where('campus', $branchId))->get();
+        $data = Branch::when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
+        $students = Student::when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
+
         $boys = $students->where('gender', 'MALE')->count();
         $girls = $students->where('gender', 'FEMALE')->count();
         $total = $students->count();
 
-        $present = Attendance::when($branchId, fn($q) => $q->where('branch_id', $branchId))
-        ->where('status', 'P')->where('attendance_date', $today)->distinct('student_id')->count();
+        $present = Attendance::when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))->where('status', 'P')->where('attendance_date', $today)->distinct('student_id')->count();
 
-         $staffs = collect(Staff::select('department')->when($branchId, fn($q) => $q->where('branch_id', $branchId))->get())->groupBy('department');
+        $staffs = collect(Staff::select('department')->when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))->get())->groupBy('department');
 
-    $concerns = ParentConcern::all();
+        $concerns = ParentConcern::all();
 
-    $announcement = $data->map(fn($item) => [
-        'branch' => $item->name,
-        'count'  => Announcement::where('academic_year', $this->academic_year)
-            ->where('branch', 'like', "%{$item->id}%")
-            ->count()
-    ]);
+        $announcement = $data->map(fn($item) => [
+            'branch' => $item->name,
+            'count'  => Announcement::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count()
+        ]);
 
-    $chairman = $data->map(fn($item) => [
-        'branch' => $item->name,
-        'count'  => Chairmanvideo::where('academic_year', $this->academic_year)
-            ->where('branch', 'like', "%{$item->id}%")
-            ->count()
-    ]);
+        $chairman = $data->map(fn($item) => [
+            'branch' => $item->name,
+            'count'  => Chairmanvideo::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count()
+        ]);
 
-     return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
+        return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
     }
-    
 
-    public function parent_concern(Request $request){
 
-    $parentconcerns = ParentConcern::where('status', '!=', 'Closed')->get();
+    public function parent_concern(Request $request)
+    {
 
-    if ($request->has('submit')) {
-        $parentconcern = ParentConcern::findOrFail($request->id);
-        $updateData = ['status' => $request->status];
+        $parentconcerns = ParentConcern::where('status', '!=', 'Closed')->get();
 
-        if ($request->status === 'Closed') {
-            if ($request->hasFile('file')) {
-                if ($parentconcern->file && file_exists($parentconcern->file)) {
-                    unlink($parentconcern->file);
+        if ($request->has('submit')) {
+            $parentconcern = ParentConcern::findOrFail($request->id);
+            $updateData = ['status' => $request->status];
+
+            if ($request->status === 'Closed') {
+                if ($request->hasFile('file')) {
+                    if ($parentconcern->file && file_exists($parentconcern->file)) {
+                        unlink($parentconcern->file);
+                    }
+                    $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
+                    $path = $request->file('file')->move('uploads/concern', $fileName);
+                    $updateData['file'] = $path;
                 }
-                $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
-                $path = $request->file('file')->move('uploads/concern', $fileName);
-                $updateData['file'] = $path;
+
+                $updateData['remark'] = $request->remark;
             }
 
-            $updateData['remark'] = $request->remark;
+            $parentconcern->update($updateData);
+
+            return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
         }
 
-        $parentconcern->update($updateData);
-
-        return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');
+        return view('announcement.parent_concern', compact('parentconcerns'));
     }
-
-    return view('announcement.parent_concern', compact('parentconcerns'));
-}
 
 
 
@@ -106,15 +104,15 @@ class HomeController extends Controller
         return view('chat', compact('users'));
     }
 
-   
+
     public function studentmenu_type(Request $request)
     {
-        $menus = Options::where('type','student menu')->first();
+        $menus = Options::where('type', 'student menu')->first();
         $menus = $menus->value ?? [];
 
-         $types = $request->filled('branch')
-        ? Student::where('campus', $request->branch)->distinct()->pluck('coaching_type')
-        : collect();
+        $types = $request->filled('branch')
+            ? Student::where('campus', $request->branch)->distinct()->pluck('coaching_type')
+            : collect();
 
         $menu_type = [];
         if ($request->filled('branch') && $request->filled('type')) {
@@ -123,110 +121,106 @@ class HomeController extends Controller
             $menu_type = collect($menu_type)->pluck('title')->toArray();
         }
 
-        if($request->has('assign')) {
-        $menu = collect($request->fields)->map(fn($m) => json_decode($m, true))->toArray();
-        Options::updateOrCreate(['type' => "{$request->course}{$request->branch_name}{$request->type} menu"],['value' => $menu]);
-        Student::where('course', $request->course)->where('campus', $request->branch)->where('coaching_type', $request->type)->update(['menu' => $menu]);
-        return redirect()->route('studentmenu.type')->with('success', 'Menu updated successfully!');
+        if ($request->has('assign')) {
+            $menu = collect($request->fields)->map(fn($m) => json_decode($m, true))->toArray();
+            Options::updateOrCreate(['type' => "{$request->course}{$request->branch_name}{$request->type} menu"], ['value' => $menu]);
+            Student::where('course', $request->course)->where('campus', $request->branch)->where('coaching_type', $request->type)->update(['menu' => $menu]);
+            return redirect()->route('studentmenu.type')->with('success', 'Menu updated successfully!');
         }
-       
-        return view('studentmenu.type', compact('menus','menu_type','types'));
+
+        return view('studentmenu.type', compact('menus', 'menu_type', 'types'));
     }
     public function studentmenu_student(Request $request)
     {
-        $menus = Options::where('type','student menu')->first();
+        $menus = Options::where('type', 'student menu')->first();
         $menus = $menus->value ?? [];
         $types = [];
-        $menu_student =[];
+        $menu_student = [];
         $students = [];
-        if($request->has('branch')) {
+        if ($request->has('branch')) {
             $types =  Student::where('campus', $request->branch)->select('coaching_type')->distinct()->get();
         }
 
-        if($request->has('type')) {
+        if ($request->has('type')) {
             $students =  Student::where('campus', $request->branch)->where('coaching_type', $request->type)->get();
         }
-        
-        if($request->has('student')) {
+
+        if ($request->has('student')) {
             $menu_student = Student::where('student_id', $request->student)->first();
             $menu_student = collect($menu_student->menu ?? [])->map(function ($menu) {
                 return $menu['title'];
             })->toArray();
         }
 
-        if($request->has('assign')) {
+        if ($request->has('assign')) {
             $menu = collect($request->fields)->map(function ($menu) {
-               return json_decode($menu, true);
+                return json_decode($menu, true);
             })->toArray();
             Student::where('student_id', $request->student)->update(['menu' => $menu]);
             return redirect()->route('studentmenu.student')->with('success', 'Menu updated successfully!');
         }
-       
-        return view('studentmenu.student', compact('menus','menu_student','types','students'));
+
+        return view('studentmenu.student', compact('menus', 'menu_student', 'types', 'students'));
     }
 
     public function Filter(Request $request)
     {
-         if($request->has('gender')) {
-            $section = Student::StudentFilterQuery($request->branch,$request->course,$request->type,$request->category,$request->batch,$request->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section');
+        if ($request->has('gender')) {
+            $section = Student::StudentFilterQuery($request->branch, $request->course, $request->type, $request->category, $request->batch, $request->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section');
             return response()->json($section);
         }
 
-        if($request->has('type')) {
-            $students = Student::StudentFilterQuery($request->branch,$request->course,$request->type,null,null)->get()->pluck('student_name','student_id');
+        if ($request->has('type')) {
+            $students = Student::StudentFilterQuery($request->branch, $request->course, $request->type, null, null)->get()->pluck('student_name', 'student_id');
             return response()->json($students);
         }
 
-        if($request->has('branch')) {
-            $type = Student::StudentFilterQuery($request->branch,$request->course,null,null,null)->select('coaching_type')->distinct()->get()->pluck('coaching_type');
+        if ($request->has('branch')) {
+            $type = Student::StudentFilterQuery($request->branch, $request->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type');
             return response()->json($type);
         }
-
-       
     }
 
     public function ExaminationFilter(Request $request)
     {
-       if($request->has('testcategory')) {
-        $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
-        return $request->ajax() ? response()->json($exams) : $exams;
-       }
+        if ($request->has('testcategory')) {
+            $exams = Exam::where('testcategory', $request->testcategory)->select('name')->distinct()->get()->pluck('name');
+            return $request->ajax() ? response()->json($exams) : $exams;
+        }
     }
 
     public function dashboardGender(Request $request)
     {
         $user = auth()->user();
-        $query = Student::with('branch')->select('student_id', 'student_name','section','coaching_type','gender','campus')->where('campus', $request->campus);
-       
-        if($request->has('section')) {
-            if($request->section == '-') {
+        $query = Student::with('branch')->select('student_id', 'student_name', 'section', 'coaching_type', 'gender', 'campus')->where('campus', $request->campus);
+
+        if ($request->has('section')) {
+            if ($request->section == '-') {
                 $query->where('section', '=', '');
             } else {
-            $query->where('section', $request->section);
+                $query->where('section', $request->section);
             }
         }
-        if($request->has('gender')) {
-            if($request->gender == 'all') {
-                
-            } else{
-            $query->where('gender', $request->gender);
+        if ($request->has('gender')) {
+            if ($request->gender == 'all') {
+            } else {
+                $query->where('gender', $request->gender);
             }
         }
 
         $students = $query->get();
 
-        
-        return response()->json(['students' => $students]);
 
+        return response()->json(['students' => $students]);
     }
 
     public function dashboardStaff(Request $request)
     {
         $user = auth()->user();
-        $query = Staff::with('branch')->select('name','gender','department','school_initial','designation','branch_id')->when(auth()->user()->branch, function ($query) {
+        $query = Staff::with('branch')->select('name', 'gender', 'department', 'school_initial', 'designation', 'branch_id')->when(auth()->user()->branch, function ($query) {
             $query->where('branch_id', auth()->user()->branch);
         });
-        if($request->has('department')) {
+        if ($request->has('department')) {
             $query->where('department', $request->department);
         }
 
@@ -234,7 +228,8 @@ class HomeController extends Controller
         return response()->json(['staffs' => $staffs]);
     }
 
-    public function dashboardAnnouncement(Request $request){
+    public function dashboardAnnouncement(Request $request)
+    {
         $start_date = $request->start_date ? Carbon::createFromFormat('Y-m-d H:i', $request->start_date)->format('Y-m-d H:i:s') : Carbon::now()->startOfDay()->format('Y-m-d H:i:s');
         $end_date = $request->end_date ? Carbon::createFromFormat('Y-m-d H:i', $request->end_date)->endOfDay()->format('Y-m-d H:i:s') : Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
         $query = Announcement::when(auth()->user()->branch, function ($query) {
@@ -244,24 +239,24 @@ class HomeController extends Controller
         return response()->json(['announcements' => $announcements]);
     }
 
-    public function Setting(Request $request){
-       $setting = Setting::all();
-       $category = Options::where('type', 'testcategory')->first()->value ?? [];
+    public function Setting(Request $request)
+    {
+        $setting = Setting::all();
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
 
-       if($request->isMethod('POST')) {
-        $row = Setting::find($request->id)->update(['value' => $request->value]);
-        return redirect()->back()->with('success', 'Setting new value updated successfully!');
-       }
-
-       if($request->action && $request->action == 'delete') {
-        if (($key = array_search($request->value, $category)) !== false) {
-            unset($category[$key]);
+        if ($request->isMethod('POST')) {
+            $row = Setting::find($request->id)->update(['value' => $request->value]);
+            return redirect()->back()->with('success', 'Setting new value updated successfully!');
         }
-        Options::where('type', 'testcategory')->update(['value' => $category]);
-        return redirect()->back()->with('success', 'Test Category deleted successfully!');
-       }
-       
-       return view('setting',compact('setting','category'));
-    }
 
+        if ($request->action && $request->action == 'delete') {
+            if (($key = array_search($request->value, $category)) !== false) {
+                unset($category[$key]);
+            }
+            Options::where('type', 'testcategory')->update(['value' => $category]);
+            return redirect()->back()->with('success', 'Test Category deleted successfully!');
+        }
+
+        return view('setting', compact('setting', 'category'));
+    }
 }
