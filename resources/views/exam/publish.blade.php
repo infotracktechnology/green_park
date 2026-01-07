@@ -65,8 +65,9 @@
                             <th>Test Name</th>
                             <th>Test Category</th>
                             <th>Total Questions</th>
-                            <th>Mark Range(BATCH A)</th>
-                            <th>Mark Range(BATCH B)</th>
+                            @foreach($batch as $row)
+                            <th>Mark Range(BATCH {{ $row }})</th>
+                            @endforeach
                             <th>Publish</th>
                           </tr>
                         </thead>
@@ -78,24 +79,16 @@
                             <td>{{ $exam->testcategory }}</td>
                             <td>{{ $exam->total_questions }}</td>
 
+                           @foreach($batch as $row)
                             <td>
-                              @if($exam->batch_a_markrange)
-                              <a href="{{ env('APP_URL').$exam->batch_a_markrange }}" download>{{ basename($exam->batch_a_markrange) }}</a><br>
-                              <a class="btn  btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name,'col'=>'batch_a_markrange'])}}"><i class="fas fa-trash"></i></a>
+                              @if(isset($exam->markrange_file[$row]))
+                              <a href="{{ env('APP_URL').$exam->markrange_file[$row] }}" download>{{ basename($exam->markrange_file[$row]) }}</a><br>
+                              <a class="btn btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name,'batch'=>$row])}}"><i class="fas fa-trash"></i></a>
                               @else
-                              <input type="file" name="batch_a_markrange[{{ $exam->name }}]" accept="application/pdf" multiple class="form-control form-control-sm">
-                              @endif
+                              <input type="file" name="batch[{{ $exam->name }}][{{ $row }}]" accept="application/pdf" class="form-control form-control-sm">
                             </td>
-
-                            <td>
-                              @if($exam->batch_b_markrange)
-                              <a href="{{ env('APP_URL').$exam->batch_b_markrange }}" download>{{ basename($exam->batch_b_markrange) }}</a><br>
-                              <a class="btn  btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name,'col'=>'batch_b_markrange'])}}"><i class="fas fa-trash"></i></a>
-                              @else
-                              <input type="file" name="batch_b_markrange[{{ $exam->name }}]" accept="application/pdf" multiple class="form-control form-control-sm">
-                              @endif
-                            </td>
-
+                            @endif
+                            @endforeach
 
                             <td>
                               <select name="publish[{{ $exam->name }}]" class="form-control form-control-sm" required>

@@ -83,22 +83,14 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
         $results = DB::select("SELECT exam_date,b.name,b.testid,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.testid where student_id=$student_id and b.publish='Yes' order by b.updated_at desc limit 5");
-        $testgroup = ['CUMULATIVE (CHEBOT)', 'CUMULATIVE (PHYZOO)', 'GRAND TEST', 'WEEKEND (BOTANY)', 'WEEKEND (CHEMISTRY)', 'WEEKEND (PHYSICS)', 'WEEKEND (ZOOLOGY)'];
+        $testgroup = ExamSubjectReport::where('category', '!=', '')->pluck('category')->unique();
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);
     });
 
     Route::get('/perviousexamresult/{student_id}/{subject}', function (Request $request, $student_id, $subject) {
         $subjectexam = ExamSubjectReport::where("subject", "like", "%$subject%")->where("stuid", $student_id)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
-        $header = $subjectexam->first()?->Header($subject);
-        $subjectexam = $subjectexam->map(function ($subjectexam) use ($subject) {
-            return [
-                'exam_date' => $subjectexam->exdate,
-                'subject' => $subjectexam->subject,
-                'scores' => $subjectexam->getScoresForHeader($subject),
-            ];
-        });
-        return response()->json(['header' => $header, 'results' => $subjectexam]);
+        return response()->json(['results' => $subjectexam]);
     });
 
     Route::get('/marksheet/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
