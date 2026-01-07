@@ -55,7 +55,7 @@ class ExamController extends Controller
         }
 
         $data['status'] = 'preview';
-        $data['name'] = $data['testcategory']."- (".date('d-m-Y', strtotime($data['exam_date'])).")";
+        $data['name'] = $data['testcategory']."_ (".date('d-m-Y', strtotime($data['exam_date'])).")";
         $questions = [];
 
         foreach (['physics', 'chemistry', 'botany', 'zoology', 'maths'] as $subject) {
@@ -509,29 +509,30 @@ class ExamController extends Controller
     {
         $exams = [];
         if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,batch_a_markrange,batch_b_markrange")->groupBy('name')->get();
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange_file")->groupBy('name')->get();
         }
-        if ($request->delete && $request->col) {
-            Exam::where('name', $request->delete)->where('academic_year', $this->academic_year)->update([$request->col => null]);
-            return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
+        if ($request->delete && $request->batch) {
+           $exam = Exam::where('name', $request->delete)->where('academic_year', $this->academic_year)->first();
+           $markrange_file = $exam->markrange_file;
+           if(file_exists($markrange_file[$request->batch])){
+               unlink($markrange_file[$request->batch]);
+           }
+           unset($markrange_file[$request->batch]);
+           Exam::where('name', $request->delete)->where('academic_year', $this->academic_year)->update(['markrange_file' => $markrange_file]);
+           return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
         }
 
         if ($request->isMethod('post')) {
             foreach ($request->publish as $name => $publish) {
                 $exam['publish'] = $publish ?? 'No';
-                $batch_a_markrange = $request->batch_a_markrange[$name] ?? null;
-                $batch_b_markrange = $request->batch_b_markrange[$name] ?? null;
-                if($batch_a_markrange){
-                    $filename = $batch_a_markrange->getClientOriginalName();
-                    $batch_a_markrange->move('assets/markrange', $filename);
-                    $exam['batch_a_markrange'] = 'assets/markrange/'.$filename;
+                $batch = Student::select('batch')->whereNotNull('batch')->where('batch', '!=', '')->distinct()->get()->pluck('batch');
+                foreach ($batch as $b) {
+                    if ($request->hasFile("batch.$name.$b")) {
+                        $file = $request->file("batch.$name.$b");
+                        $file->move('assets/markrange', $file->getClientOriginalName());
+                        $exam['markrange_file'][$b] = 'assets/markrange/'.$file->getClientOriginalName();
+                    }
                 }
-                if($batch_b_markrange){
-                    $filename = $batch_b_markrange->getClientOriginalName();
-                    $batch_b_markrange->move('assets/markrange', $filename);
-                    $exam['batch_b_markrange'] = 'assets/markrange/'.$filename;
-                }
-
                 Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
             }
             return redirect()->back()->with('success', "Exams Publish Updated Successfully.");
@@ -544,7 +545,7 @@ class ExamController extends Controller
     {
         $exams = collect();
         $headers = [];
-        $category = $category = ExamSubjectReport::where('category', '!=', '')->pluck('category')->unique();
+        $category = ExamSubjectReport::where('category', '!=', '')->pluck('category')->unique();
         $exam = [];
         if ($request->testcategory) {
             $exam = ExamSubjectReport::where('subject', 'like', "%{$request->testcategory}%")->select('subject')->distinct()->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();

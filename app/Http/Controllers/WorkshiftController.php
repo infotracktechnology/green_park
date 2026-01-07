@@ -34,14 +34,15 @@ class WorkshiftController extends Controller
     }
 
     public function edit(Workshift $workshift)
-    {       
-        return view('worksheet.edit', compact('workshift'));
+    {  
+        return view('workshift.edit', compact('workshift'));
     }
     
 
     public function update(Request $request, Workshift $workshift)
     {
-       
+        $data = $request->all();
+        $workshift->update($data);
         return redirect()->route('workshift.index')->with('success', 'Workshift updated successfully.');
     }
     

@@ -15,6 +15,7 @@ class Exam extends Model
     protected $guarded = [];
     protected $casts = [
         'questions' => 'json',
+        'markrange_file' => 'json',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
     ];
