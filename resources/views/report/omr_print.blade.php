@@ -20,6 +20,7 @@
   @foreach($answers->groupBy('student_id') as $student_id => $answer)
   <div class="page">
     <div class="title">OMR VALUATION REPORT {{ $test_name }}</div>
+    <div class="header">Q Type: {{ $answer->pluck('subject')->unique()->implode(',') }}</div>
      <table style="width: 100%;">
     <tr>
     <?php $cols = $answer->chunk(45); ?>
