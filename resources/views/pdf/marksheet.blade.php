@@ -55,7 +55,7 @@
         </tr>
         <tr>
             <td width="50%">Test ID: <?php echo $exam->testid; ?></td>
-            <td width="50%">Q Type: <?php echo $answers->pluck('subject')->unique()->implode(','); ?></td>
+            <td width="50%">Q Type: <?php echo $exam->subject_name; ?></td>
         </tr>
     </table>
     
