@@ -19,8 +19,7 @@
   <div class="container">
     <div style="text-align:center;">
       <h3 style="margin:0;">GREEN PARK COACHING CENTRE, NAMAKKAL</h3>
-      <h4 style="margin:5px 0;">{{ $test_name }}</h4>
-      <h4 style="margin:5px 0;">Section: {{ $section }}</h4>
+      <h4 style="margin:5px 0;color:#f40808;">{{ $test_name }}</h4>
     </div>
 
     <table>
