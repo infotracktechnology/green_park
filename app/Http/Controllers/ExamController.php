@@ -528,7 +528,7 @@ class ExamController extends Controller
                     if ($request->hasFile("batch.$name.$b")) {
                         $file = $request->file("batch.$name.$b");
                         $file->move('assets/markrange', $file->getClientOriginalName());
-                        $exam['markrange_file'][$b] = 'assets/markrange/' . $file->getClientOriginalName();
+                        $exam['markrange_file'][$b] = 'assets/markrange/'.$file->getClientOriginalName();
                     }
                 }
                 Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
