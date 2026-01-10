@@ -11,9 +11,7 @@ class ExportController extends Controller
   function student_export(Request $request)
   {
     if ($request->has('fields')) {
-      $students = Student::select($request->fields)->get()->toArray();
-
-      // Write data to CSV
+      $students = Student::select($request->fields)->when(auth()->user()->branch,fn($q) => $q->where('campus',auth()->user()->branch))->get()->toArray();
       $file = fopen('student_export.csv', 'w');
       $headers = array_keys($students[0]);
       fputcsv($file, $headers);

@@ -89,7 +89,7 @@
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
             <a href="#">
-              <img alt="image" src="{{asset('img/logo.jpg')}}" class="header-logo" style="height: 70px;"/>
+              <img alt="image" src="{{asset('img/logo.jpg')}}" class="header-logo" style="height: 70px;" />
               {{-- <span class="logo-name">{{ env('APP_NAME') }}</span> --}}
             </a>
           </div>
@@ -119,13 +119,13 @@
                 <li><a href="{{ route('student.create') }}" class="nav-link">Add Student</a></li>
                 <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
                 <li><a href="{{ route('students.restore') }}" class="nav-link">Reactivate Student</a></li>
-                 <li><a href="{{ route('import.secbatchupdate') }}" class="nav-link">Sec/Batch Update<small> (CSV import)</small></a></li>
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
-                <li><a href="{{ route('import.student') }}" class="nav-link">Import Students</a></li>
+                <li><a href="{{ route('import.student') }}" class="nav-link">Student Bulk Add</a></li>
+                <li><a href="{{ route('import.studentupdate') }}" class="nav-link">Student Bulk Update</a></li>
               </ul>
             </li>
 
-        
+
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
               <ul class="dropdown-menu">
@@ -133,7 +133,7 @@
                 <li><a href="{{ route('studentmenu.student') }}" class="nav-link">Student Assign</a></li>
               </ul>
             </li>
-            
+
 
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>

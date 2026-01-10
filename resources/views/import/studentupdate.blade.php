@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Student Sec/Batch Update')
+@section('title', 'Student Bulk Update')
 @section('main')
 
 <div class="main-content">
@@ -14,16 +14,16 @@
           <div class="alert alert-danger">{{ session('error') }}</div>
           @endif
           <div class="card card-primary">
-            <form action="{{ route('import.secbatchupdate') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('import.studentupdate') }}" method="POST" enctype="multipart/form-data">
               @csrf
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <h6 class="col-deep-purple">Student Sec/Batch Update</h6>
+                    <h6 class="col-deep-purple">Student Bulk Update</h6>
                   </div>
 
                   <div class="col-md-6 col-sm-12 mb-3">
-                    <a href="{{ env('APP_URL').'template/secbatchupdate.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Sec/Batch Update Template Format</a>
+                    <a href="{{ env('APP_URL').'template/student_update.csv'}}" class="btn btn-primary"><i class="fa fa-download"></i> Student Bulk Update Template Format</a>
                   </div>
 
                   <div class="form-group col-lg-3">

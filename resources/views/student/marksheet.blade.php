@@ -91,12 +91,12 @@
                         <th>#</th>
                         <th>EXAM DATE</th>
                         <th>EXAM NAME</th>
-                        @if($first->tot)
+                        @if($first->r+$first->w+$first->l)
                         <th>{{ \Str::between($first->category, '(',')') }}</th>
                         <th>TOTAL</th>
                         @else
                         @foreach($subjects as $name => $cols)
-                        @if($first->{$cols['tot']})
+                        @if($first->{$cols['r']}+$first->{$cols['w']}+$first->{$cols['l']})
                         <th>{{ $name }}</th>
                         @endif
                         @endforeach
@@ -111,12 +111,12 @@
                         <td>{{ $key + 1 }}</td>
                         <td>{{ $row->exdate }}</td>
                         <td>{{ $row->subject }}</td>
-                        @if($row->tot)
+                        @if($row->r+$row->w+$row->l)
                         <td>{{ $row->tot }} / {{ ($row->r + $row->w + $row->l) * 4 }}</td>
                         <td>{{ $row->tot }} / {{ $row->totmark }}</td>
                         @else
                         @foreach($subjects as $cols)
-                        @if($row->{$cols['tot']})
+                        @if($row->{$cols['r']}+$row->{$cols['w']}+$row->{$cols['l']})
                         <td>
                           {{ $row->{$cols['tot']} }} / {{ ($row->{$cols['r']} + $row->{$cols['w']} + $row->{$cols['l']}) * 4 }}
                         </td>
