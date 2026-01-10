@@ -62,12 +62,11 @@
                   <div class="form-group col-lg-3">
                     <label>Hostel/Dayscholar</label>
                     <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm" required>
-                      <option value="Dayscholar">Dayscholar</option>
-                      <option value="Hostel">Hostel</option>
+                      <option value="DAYSCHOLAR">Dayscholar</option>
+                      <option value="HOSTEL">Hostel</option>
 
                     </select>
                   </div>
-
 
 
                   <div class="form-group col-lg-3">
@@ -77,8 +76,6 @@
                     <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                     @enderror
                   </div>
-
-
 
 
 

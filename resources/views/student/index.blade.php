@@ -81,7 +81,7 @@
                       <td>{{$student->section}}</td>
                       <td>{{$student->batch}}</td>
                       <td>{{$student->user_name}}</td>
-                      <td>{{$student->password_1}}</td>
+                      <td>{{$student->password}}</td>
                       <td>{{$student->gender}}</td>
                       <td>{{$student->father_ph_no}}</td>
                       <td>{{$student->mother_ph_no}}</td>
