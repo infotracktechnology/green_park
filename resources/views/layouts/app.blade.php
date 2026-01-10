@@ -125,6 +125,7 @@
               </ul>
             </li>
 
+        
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
               <ul class="dropdown-menu">
@@ -132,6 +133,7 @@
                 <li><a href="{{ route('studentmenu.student') }}" class="nav-link">Student Assign</a></li>
               </ul>
             </li>
+            
 
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>

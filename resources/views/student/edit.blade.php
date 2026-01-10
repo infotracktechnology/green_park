@@ -20,11 +20,12 @@
               @method('PUT')
               <h3>Personal Details</h3>
               <fieldset class="row">
+                
                 <div class="form-group col-lg-3">
                   <label>Admission Date</label>
-                  <input type="date" name="admission_date" value="{{$Student->admission_date}}" class="form-control form-control-sm">
-
+                  <input type="date" name="admission_date" value="{{date('Y-m-d', strtotime($Student->admission_date))}}" class="form-control form-control-sm">
                 </div>
+
                 <div class="form-group col-lg-3">
                   <label for="branch_id">Campus</label>
                   <select name="campus" class="form-control form-control-sm" id="campus-select">
@@ -110,36 +111,36 @@
 
                 <div class="form-group col-lg-3">
                   <label>Date of Birth</label>
-                  <input type="date" name="dob" value="{{ $Student->dob }}" class="form-control form-control-sm" id="dobInput" onchange="calculateAge()">
+                  <input type="date" name="dob" value="{{date('Y-m-d', strtotime($Student->dob))}}" class="form-control form-control-sm" id="dobInput" onchange="calculateAge()">
                 </div>
 
                 <div class="form-group col-lg-3">
                   <label>Age</label>
-                  <input type="number" name="age" value="{{ \Carbon\Carbon::parse($Student->dob)->age }}" class="form-control form-control-sm" id="ageInput" readonly>
+                  <input type="text" name="age" value="{{ $Student->age }}" class="form-control form-control-sm" id="ageInput" readonly>
                 </div>
 
 
                 <div class="form-group col-lg-3">
                   <label for="father_name">Father Name</label>
-                  <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $Student->father_name) }}" class="form-control form-control-sm alphabetsOnly">
+                  <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $Student->father_name) }}" class="form-control form-control-sm">
 
                 </div>
 
                 <div class="form-group col-lg-3">
                   <label for="father_ph_no">Father Mobile No</label>
-                  <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $Student->father_ph_no) }}" class="form-control form-control-sm digits">
+                  <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $Student->father_ph_no) }}" class="form-control form-control-sm">
 
                 </div>
 
                 <div class="form-group col-lg-3">
                   <label for="mother_name">Mother Name</label>
-                  <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $Student->mother_name) }}" class="form-control form-control-sm alphabetsOnly">
+                  <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $Student->mother_name) }}" class="form-control form-control-sm">
 
                 </div>
 
                 <div class="form-group col-lg-3">
                   <label for="mother_ph_no">Mother Mobile No</label>
-                  <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $Student->mother_ph_no) }}" class="form-control form-control-sm digits">
+                  <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $Student->mother_ph_no) }}" class="form-control form-control-sm">
 
                 </div>
 
@@ -168,7 +169,7 @@
 
                 <div class="form-group col-lg-3">
                   <label for="aadhar_card_no">Aadhar Card No</label>
-                  <input type="number" name="aadhar_card_no" id="aadhar_card_no" value="{{ old('aadhar_card_no', $Student->aadhar_card_no) }}" class="form-control form-control-sm" pattern="^[0-9]{12}$">
+                  <input type="number" name="aadhar_card_no" id="aadhar_card_no" value="{{ old('aadhar_card_no', $Student->aadhar_card_no) }}" class="form-control form-control-sm">
                   <div class="invalid-feedback">
                     Aadhar card number should be exactly 12 digits.
                   </div>
@@ -180,24 +181,14 @@
 
                 <div class="form-group col-lg-3">
                   <label>Nationality</label>
-                  <select name="nationality" class="form-control form-control-sm">
-                    <option value="">Select Nationality</option>
-                    <option value="Indian" @if($Student->nationality == 'Indian') selected @endif>Indian</option>
-                    <option value="Foreign" @if($Student->nationality == 'Foreign') selected @endif>Foreign</option>
-                    <option value="NRI" @if($Student->nationality == 'NRI') selected @endif>NRI</option>
-                  </select>
+                 <input type="text" name="nationality" value="{{ $Student->nationality }}" class="form-control form-control-sm">
                 </div>
 
 
 
                 <div class="form-group col-lg-3">
                   <label>Religion</label>
-                  <select name="religion" class="form-control form-control-sm">
-                    <option value="">Select Religion</option>
-                    <option value="Hindu" @if($Student->religion == 'Hindu') selected @endif>Hindu</option>
-                    <option value="Christian" @if($Student->religion == 'Christian') selected @endif>Christian</option>
-                    <option value="Muslim" @if($Student->religion == 'Muslim') selected @endif>Muslim</option>
-                  </select>
+                  <input type="text" name="religion" value="{{ $Student->religion }}" class="form-control form-control-sm">
                 </div>
 
 
@@ -208,7 +199,7 @@
                     <option value="OC" @if($Student->community == 'OC') selected @endif>OC</option>
                     <option value="BC" @if($Student->community == 'BC') selected @endif>BC</option>
                     <option value="BCM" @if($Student->community == 'BCM') selected @endif>BCM</option>
-                    <option value="MBC / DNC" @if($Student->community == 'MBC / DNC') selected @endif>MBC / DNC</option>
+                    <option value="MBC/DNC" @if($Student->community == 'MBC/DNC') selected @endif>MBC/DNC</option>
                     <option value="SC" @if($Student->community == 'SC') selected @endif>SC</option>
                     <option value="SCA" @if($Student->community == 'SCA') selected @endif>SCA</option>
                     <option value="ST" @if($Student->community == 'ST') selected @endif>ST</option>
@@ -229,16 +220,7 @@
 
                 <div class="form-group col-lg-3">
                   <label>Institution Bill Type</label>
-                  <select name="institution_bill_type" id="bill_type" class="form-control form-control-sm" required>
-                    <option value="">Select Bill Type</option>
-                    <option value="GPCC,NKL" @selected($Student->institution_bill_type == 'GPCC,NKL')>GPCC,NKL</option>
-                    <option value="GPI,NKL" @selected($Student->institution_bill_type == 'GPI,NKL')>GPI,NKL</option>
-                    <option value="GPCI,NKL" @selected($Student->institution_bill_type == 'GPCI,NKL')>GPCI,NKL</option>
-                    <option value="GPCI,KARUR" @selected($Student->institution_bill_type == 'GPCI,KARUR')>GPCI,KARUR</option>
-                    <option value="GPCI,ERODE" @selected($Student->institution_bill_type == 'GPCI,ERODE')>GPCI,ERODE</option>
-                    <option value="GPCA,COIMBATORE" @selected($Student->institution_bill_type == 'GPCA,COIMBATORE')>GPCA,COIMBATORE</option>
-                    <option value="GPA,CHENNAI" @selected($Student->institution_bill_type == 'GPA,CHENNAI')>GPA,CHENNAI</option>
-                  </select>
+                  <input type="text" name="institution_bill_type" value="{{$Student->institution_bill_type}}" class="form-control form-control-sm">
                 </div>
 
 
