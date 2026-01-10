@@ -32,32 +32,16 @@ class ImportController extends Controller
             return back()->with('error', 'No data found in CSV.');
         }
 
-        $header = array_map('strtolower', array_keys($data[0]));
-        $existingColumns = array_map('strtolower', Schema::getColumnListing('student'));
-        $tableColumns = array_flip($existingColumns);
-
         DB::beginTransaction();
         try {
-
-            $data = array_map(function ($row) use ($tableColumns) {
-                return array_intersect_key(array_change_key_case($row, CASE_LOWER), $tableColumns);
+            $data = array_map(function ($row) use ($request) {
+                $row['academic_year'] = $request->academic_year;
+                $row['campus'] = $request->branch;
+                return $row;
             }, $data);
 
-            if ($request->operation === 'add') {
-                $data = array_map(function ($row) use ($request) {
-                    $row['academic_year'] = $request->academic_year;
-                    $row['campus'] = $request->branch;
-                    return $row;
-                }, $data);
-                foreach ($data as $row) {
-                    Student::create($row);
-                }
-            } else {
-                foreach ($data as $row) {
-                    if (empty($row['student_id']) || !isset($row['student_id'])) continue;
-                    unset($row['password'],$row['user_name']);
-                    Student::where('student_id', $row['student_id'])->update($row);
-                }
+            foreach ($data as $row) {
+                Student::create($row);
             }
             DB::commit();
             return back()->with('success', 'Students Data has been processed successfully.');
@@ -67,7 +51,7 @@ class ImportController extends Controller
         }
     }
 
-    public function secBatchUpdate(Request $request)
+    public function StudentUpdate(Request $request)
     {
         if ($request->isMethod('post')) {
             $filePath = $request->file('csv_file')->getRealPath();
@@ -88,7 +72,7 @@ class ImportController extends Controller
                 return back()->with('error', 'Error:' . $e->getMessage());
             }
         }
-        return view('import.secbatchupdate');
+        return view('import.studentupdate');
     }
 
     public function parseCSV($filePath)
