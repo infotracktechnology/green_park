@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Student;
 use illuminate\Database\Eloquent\Model;
 
 class LoginController extends Controller
@@ -14,15 +15,11 @@ class LoginController extends Controller
      {
          
          if (Auth::guard('web')->attempt(['username' => $request->username, 'password' => $request->password])) {
-            
              return redirect()->route('admin.home')->with('success', 'Welcome back!');
          }
-        elseif(Auth::guard('student')->attempt(['user_name' => $request->username, 'password' => $request->password])) {
-        $student = Auth::guard('student')->user();
-        $student->active = 1;
-        if ($student instanceof \Illuminate\Database\Eloquent\Model) {
-            $student->save();
-        }    
+        elseif($student = Student::where('user_name', $request->username)->where('password', $request->password)->first()) {
+            Auth::guard('student')->login($student);
+            $student->update(['active' => 1]);   
             return redirect()->route('studentdashboard')->with('success', 'Welcome back!');
         }
     

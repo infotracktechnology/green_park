@@ -37,8 +37,8 @@ class Student extends Authenticatable
         parent::boot();
         static::creating(function ($model) {
             $model->student_id = self::generateId($model->course);
-            $model->password_1 = self::generatePassword(6);
-            $model->password = bcrypt($model->password_1);
+            $model->password = self::generatePassword(6);
+            //$model->password = bcrypt($model->password_1);
             $model->user_name = self::generateName($model->course, $model->student_id);
         });
         static::addGlobalScope('order', function (Builder $builder) {
@@ -60,36 +60,6 @@ class Student extends Authenticatable
         return $amount - $payed;
     }
 
-    public function fees()
-    {
-        $masters = FeePlanMaster::whereIn('segment_id', explode(',', $this->segments))->where('is_active', 1)->with('feePlanItems')->get();
-
-        $result = [];
-
-        foreach ($masters as $master) {
-            foreach ($master->feePlanItems as $item) {
-                $query = FeeCollectionItem::where([
-                    'studentid' => $this->id,
-                    'feeplan_item_id' => $item->id,
-                ]);
-                $paid = $query->sum('payamount') ?? 0;
-                $concession = $query->sum('concession_amount') ?? 0;
-                $result[] = [
-                    'id' => $item->id,
-                    'instalment'      => $item->instalment,   // text value
-                    'amount'          => $item->amount - $paid - $concession,
-                    'concession'      => $concession,
-                    'bill_type_id'    => $item->bill_type_id,
-                ];
-            }
-        }
-        usort($result, function ($a, $b) {
-            return strcmp($a['instalment'], $b['instalment']);
-        });
-        
-        return $result;
-    }
-
     private static function generatePassword($length = 6)
     {
         $characters = 'ACFHJKMRXY23456789';
@@ -103,12 +73,12 @@ class Student extends Authenticatable
     private static function generateId($course)
     {
         $lastId = self::where('course', $course)->max('student_id');
-        $y = date('y') + 1;
+        $y = date('y')+1;
         if ($lastId) {
-            return $lastId + 1;
+            return $lastId+1;
         } else {
             $setting = Setting::firstWhere('key', 'like', "%$course Admission No%");
-            $lastId =  $setting->value ?? $y . '00001';
+            $lastId =  $setting->value ?? $y.'00001';
             return $lastId;
         }
     }

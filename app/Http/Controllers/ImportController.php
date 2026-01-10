@@ -55,7 +55,7 @@ class ImportController extends Controller
             } else {
                 foreach ($data as $row) {
                     if (empty($row['student_id']) || !isset($row['student_id'])) continue;
-                    unset($row['password_1'], $row['user_name']);
+                    unset($row['password'],$row['user_name']);
                     Student::where('student_id', $row['student_id'])->update($row);
                 }
             }

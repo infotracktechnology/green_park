@@ -2,9 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport,HostelAttendance,InOutRegister,ExamAnswer};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,8 +17,8 @@ use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo
 
 Route::group(['prefix' => 'v2'], function () {
 
-    Route::post('/login',  function (Request $request) {
-        $student = Student::where('user_name', $request->username)->where('password_1', $request->password)->first();
+    Route::post('/login', function (Request $request) {
+        $student = Student::where('user_name', $request->username)->where('password', $request->password)->first();
         if ($student) {
             $student->active = 1;
             $student->save();
@@ -37,7 +36,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($student);
     });
 
-    Route::get('/chairmanvideo/{student_id}',  function (Request $request, $student_id) {
+    Route::get('/chairmanvideo/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
         $chairmanvideo = Chairmanvideo::ForStudent($student);
         return response()->json($chairmanvideo);
@@ -83,7 +82,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
         $results = DB::select("SELECT exam_date,b.name,b.testid,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.testid where student_id=$student_id and b.publish='Yes' order by b.updated_at desc limit 5");
-        $testgroup = ExamSubjectReport::where('category', '!=', '')->pluck('category')->unique();
+        $testgroup = ExamSubjectReport::where([['category', '!=', ''], ['stuid', $student_id]])->pluck('category')->unique();
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);
     });
@@ -94,7 +93,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/marksheet/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
-        $student = Student::where('student_id', $student_id)->select('student_name', 'user_name','academic_year')->first();
+        $student = Student::where('student_id', $student_id)->select('student_name', 'user_name', 'academic_year')->first();
         $exam = Exam::where(['testid' => $testid, 'academic_year' => $student->academic_year])->first();
         $answers = ExamAnswer::where(['test_id' => $testid, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
             return [
@@ -209,13 +208,13 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($parent_concern);
     });
 
-    Route::get('/device_token/{student_id}/{device_token}',  function ($student_id, $device_token) {
+    Route::get('/device_token/{student_id}/{device_token}', function ($student_id, $device_token) {
         $student = Student::where('student_id', $student_id)->update(['device_token' => $device_token]);
         return response()->json($student);
     });
 
     #Hostel API
-   Route::get('/sickroomentry/{student_id}', function ($student_id) {
+    Route::get('/sickroomentry/{student_id}', function ($student_id) {
         $sickroomentry = SickRoomEntry::where('student_id', $student_id)->latest()->get();
         return response()->json($sickroomentry);
     });
@@ -226,7 +225,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
     });
 
-     Route::get('hostel/inoutregister/{student_id}/',  function ($student_id) {
+    Route::get('hostel/inoutregister/{student_id}/', function ($student_id) {
         $student = InOutRegister::where('student_id', $student_id)->latest()->get();
         return response()->json($student);
     });
