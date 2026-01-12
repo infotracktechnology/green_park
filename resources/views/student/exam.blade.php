@@ -308,6 +308,7 @@
       if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
           $(a).addClass("not-answered").removeClass("not-attempted");
       }
+      $(`#status-${index}`).val('not-answered');
       activeQuestion = index;
       updateCounts();
   }
@@ -398,7 +399,7 @@
       }
   
       $(`#question-${index} input[type="radio"]`).prop('checked', false);
-      $(`#status-${index}`).val('not-attempted');
+      $(`#status-${index}`).val('not-answered');
   
       $(`.pagination li[data-seq="${index}"] a`).removeClass('que-save que-mark que-save-mark')
           .addClass('not-answered');
