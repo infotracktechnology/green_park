@@ -37,7 +37,7 @@ class Student extends Authenticatable
         parent::boot();
         static::creating(function ($model) {
             $model->student_id = self::generateId($model->course);
-            $model->password = self::generatePassword(6);
+            $model->password = self::generatePassword(7);
             //$model->password = bcrypt($model->password_1);
             $model->user_name = self::generateName($model->course, $model->student_id);
         });
@@ -60,9 +60,9 @@ class Student extends Authenticatable
         return $amount - $payed;
     }
 
-    private static function generatePassword($length = 6)
+    private static function generatePassword($length)
     {
-        $characters = 'ACFHJKMRXY23456789';
+        $characters = 'ACFHJKMPRXY23456789';
         $password = '';
         for ($i = 0; $i < $length; $i++) {
             $password .= $characters[random_int(0, strlen($characters) - 1)];
@@ -86,9 +86,9 @@ class Student extends Authenticatable
     private static function generateName($course, $student_id)
     {
         if ($course == "XI-OB" || $course == "XII-OB") {
-            return 'S' . $student_id;
+            return 'S'.$student_id;
         } else {
-            return 'L' . $student_id;
+            return 'L'.$student_id;
         }
     }
 

@@ -115,10 +115,10 @@
           <div class="row">
             <div class="form-group col-12">
               <label for="branch">Test</label>
-              <select name="test_id" id="test_id" class="form-control form-control-sm" required>
+              <select name="test_id" class="select2" required>
                 <option value="">Select Test</option>
-                @foreach ($tests as $test)
-                <option value="{{ $test->id }}">{{ $test->name }}</option>
+                @foreach ($tests as $row)
+                <option value="{{ $row->id }}">{{ $row->testid }} - {{ $row->name }}</option>
                 @endforeach
               </select>
             </div>

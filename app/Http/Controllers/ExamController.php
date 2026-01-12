@@ -32,9 +32,7 @@ class ExamController extends Controller
                 'status' => 'scheduled',
                 'duration' => Carbon::parse($request->end_at)->diffInSeconds($request->start_at),
             ]);
-
-            session()->flash('success', 'Test Scheduled successfully');
-            return to_route('exam.index');
+            return to_route('exam.index')->with('success', 'Test Scheduled Successfully');
         }
 
         return view('exam.index', compact('tests'));
@@ -137,7 +135,7 @@ class ExamController extends Controller
         for ($i = 1; $i <= $request->total_question; $i++) {
             $status = $request->status[$i] ?? null;
             $subject = $request->subject[$i] ?? null;
-            $answer = $status == 'que-save' || $status == 'que-save-mark' ? $request->question[$i] : 0;
+            $answer = $request->question[$i] ?? 0;
 
             $data = [
                 'test_id' => $request->test_id,
@@ -151,11 +149,13 @@ class ExamController extends Controller
             ];
 
             if (!isset($exam_answers[$i])) {
-                DB::table('exam_answer')->insert($data);
+                ExamAnswer::insert($data);
+            }
+            else {
+                ExamAnswer::where('test_id', $request->test_id)->where('student_id', $student_id)->where('q_no', $i)->update($data);
             }
         }
-
-
+        
         return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.index');
     }
 
