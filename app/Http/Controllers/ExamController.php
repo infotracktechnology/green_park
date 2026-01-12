@@ -187,7 +187,7 @@ class ExamController extends Controller
     function student_exam(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
-        $answers = ExamAnswer::where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
+        $answers = ExamAnswer::where('testname',$exam->name)->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
         $maxQuestions = $answers->first()->q_no ?? 0;
         $answers = $answers->keyBy('q_no');
         $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
