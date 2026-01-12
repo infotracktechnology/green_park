@@ -35,6 +35,16 @@
   .info-table td {
     height: 20px !important;
   }
+
+.question-panel{
+  overflow-x:hidden;
+  height:auto;
+}
+.question-panel img{
+  max-width:100%;
+  height:auto;
+  display:block;
+}
 </style>
 @endsection
 
@@ -148,9 +158,9 @@
                 $key = $index + 1;
                ?>
               <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
-                <div class="question-panel" style="max-height: 400px;overflow-x: hidden;">
+                <div class="question-panel">
                   <p>Question {{ $key }}</p>
-                <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image" style="max-width: 100%;">
+                <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image">
                 </div>
 
                  <input type="hidden" name="subject[{{ $key }}]" value="{{ $question['subject'] }}">
@@ -267,7 +277,7 @@
   }
   
   function setStatus(qno, status, ans) {
-      document.getElementById('status-' + qno).value = status;
+      document.getElementById('status-'+qno).value = status;
       var subject = $(`[name="subject[${qno}]`).val();
       $.ajax({
           url: "{{ route('exam.save') }}",
@@ -388,9 +398,9 @@
       }
   
       $(`#question-${index} input[type="radio"]`).prop('checked', false);
+      $(`#status-${index}`).val('not-attempted');
   
-      $(`.pagination li[data-seq="${index}"] a`)
-          .removeClass('que-save que-mark que-save-mark')
+      $(`.pagination li[data-seq="${index}"] a`).removeClass('que-save que-mark que-save-mark')
           .addClass('not-answered');
       updateCounts();
   });
