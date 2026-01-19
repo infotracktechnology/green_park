@@ -130,9 +130,10 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($downloads);
     });
 
-    Route::get('/classvideos/{student_id}/{subject}/{period}', function ($student_id, $subject, $period) {
+    Route::get('/classvideos/{student_id}/', function ($student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $classvideos = ClassVideo::ForStudent($student, $subject)->where('period', $period);
+        $classvideos = ClassVideo::ForStudent($student);
+        $classvideos = $classvideos->groupBy('date');
         return response()->json($classvideos);
     });
 
@@ -142,10 +143,10 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
 
-    Route::get('/discussionvideo/{student_id}/{subject}', function ($student_id, $subject) {
+    Route::get('/discussionvideo/{student_id}', function ($student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $discussionvideos = DiscussionVideo::ForStudent($student, $subject);
-        $discussionvideos = $discussionvideos->groupBy('part');
+        $discussionvideos = DiscussionVideo::ForStudent($student);
+        $discussionvideos = $discussionvideos->groupBy('date');
         return response()->json($discussionvideos);
     });
 

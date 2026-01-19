@@ -89,8 +89,7 @@ class FcmServiceProvider {
         
         $androidConfig = AndroidConfig::fromArray([
             'notification' => [
-                'icon' => 'ic_launcher',
-                'color' => '#20295C',
+                'icon' => 'notification_icon',
                 'click_action' => $clickAction ?: 'FLUTTER_NOTIFICATION_CLICK',
             ],
         ]);
@@ -130,7 +129,4 @@ class FcmServiceProvider {
 
         return $this->messaging->sendMulticast($message, $tokens);
     }
-
-   
-
 }
