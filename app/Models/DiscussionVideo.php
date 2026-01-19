@@ -13,6 +13,11 @@ class DiscussionVideo extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
+    ];
+
 
     public function branchNames()
     {

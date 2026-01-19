@@ -47,13 +47,13 @@ class AnnouncementController extends Controller
 
         $announcement = Announcement::create($data);
 
-        // $students = $announcement->StudentList()->map(function ($student) use ($fcm) {
-        //     return $student->device_token;
-        // })->toArray();
+        $students = $announcement->StudentList()->map(function ($student) {
+            return $student->device_token;
+        })->toArray();
 
-        // if (!empty($students)) {
-        //     $fcm->sendMulticast($students, "Announcement", $request->title);
-        // }
+        if (count($students) > 0) {
+            $fcm->sendMulticast($students,"There is an announcement from GPCC",$request->title,env('APP_LOGO'));
+        }
 
         return to_route('announcement.index')->with('success', 'Announcement created successfully.');
     }

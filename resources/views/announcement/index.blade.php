@@ -60,8 +60,6 @@
                           <th>Branch </th>
                           <th>Coaching Type</th>
                           <th>H/D</th>
-                          <th>Section</th>
-                          <th>Batch</th>
                           <th>Title</th>
                           <th>Edit</th>
                         </tr>
@@ -76,8 +74,6 @@
                           <td>{{$announcement->branchNames() }}</td>
                           <td>{{$announcement->coaching_type}}</td>
                           <td>{{$announcement->category}}</td>
-                          <td>{{$announcement->section}}</td>
-                          <td>{{$announcement->batch}}</td>
                           <td>{{$announcement->title}}</td>
                           <td>
                             <a href="{{ route('announcement.edit', $announcement->id) }}" class="btn btn-warning text-white">
