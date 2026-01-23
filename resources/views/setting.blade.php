@@ -55,31 +55,7 @@
                   </div>
                 </div>
 
-                <div class="col-lg-6">
-                  <div class="table-responsive">
-                    <table class="table table-striped" style="width:100%;">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Test Category</th>
-                          <th>Delete</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @foreach ($category as $key => $row)
-                        <tr>
-                          <td>{{ $key+1 }}</td>
-                          <td>{{ $row }}</td>
-                          <td>
-                            <a href="{{ route('admin.setting',['value' => $row, 'action' => 'delete']) }}" class="btn btn-danger text-white" onclick="return confirm('Are you sure you want to delete this?')"><i class="fas fa-trash"></i></a>
-                          </td>
-                        </tr>
-                        @endforeach
-                      </tbody>
-                    </table>
-
-                  </div>
-                </div>
+               
                 
               </div>
 

@@ -51,26 +51,27 @@ class ExamController extends Controller
         foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
-
         $data['status'] = 'preview';
-        $data['name'] = $data['testcategory']."-(".date('d-m-Y', strtotime($data['exam_date'])).")";
-        $questions = [];
-        $q_no = 1;
-        foreach (['physics', 'chemistry', 'botany', 'zoology', 'maths'] as $subject) {
-            if ($request->hasFile($subject . "_files")) {
-                foreach ($request->file($subject."_files") as $key => $file) {
-                    $filename = $data['name']."-".$q_no.'.'.$file->getClientOriginalExtension();
-                    $file->move('questions', $filename);
-                    $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/" . $filename];
-                    $q_no++;
+        try {
+            $questions = [];
+            $q_no = 1;
+            foreach (['physics', 'chemistry', 'botany', 'zoology', 'maths'] as $subject) {
+                if ($request->hasFile($subject . "_files")) {
+                    foreach ($request->file($subject . "_files") as $key => $file) {
+                        $filename = $data['name'] . "-" . $q_no . '.' . $file->getClientOriginalExtension();
+                        $file->move('questions', $filename);
+                        $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/".$filename];
+                        $q_no++;
+                    }
                 }
             }
-        }
 
-        $data['questions'] = $questions;
-        Exam::create($data);
-        session()->flash('success', 'Test created successfully');
-        return to_route('exam.index');
+            $data['questions'] = $questions;
+            Exam::create($data);
+        } catch (\Exception $e) {
+            return to_route('exam.index')->with('error', $e->getMessage());
+        }
+        return to_route('exam.index')->with('success', 'Test Created Successfully');
     }
 
     public function edit(Request $request, Exam $exam)
@@ -94,9 +95,9 @@ class ExamController extends Controller
             $questions = $exam->questions;
             foreach ($request->file('images') as $key => $file) {
                 $q_no = (int)$request->q_no[$key];
-                $filename = $exam->name.'-'.$q_no.'.'.$file->getClientOriginalExtension();
+                $filename = $exam->name . '-' . $q_no . '.' . $file->getClientOriginalExtension();
                 $file->move('questions', $filename);
-                $questions[$q_no - 1]['image'] = "questions/".$filename;
+                $questions[$q_no - 1]['image'] = "questions/" . $filename;
                 $exam->update(['questions' => $questions]);
             }
             return redirect()->back()->with('success', 'Questions Images Replaced Successfully');
@@ -106,15 +107,22 @@ class ExamController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $exam->update($data);
-        session()->flash('success', 'Test updated successfully');
         return to_route('exam.index')->with('success', 'Exam updated successfully');
     }
     public function TestCategory(Request $request)
     {
-        $category = Options::where('type', 'testcategory')->first()->value ?? [];
-        array_push($category, $request->category);
-        $update = Options::where('type', 'testcategory')->update(['value' => $category]);
-        return redirect()->back()->with('success', 'Test Category added successfully!');
+        $category = Options::where('type', 'testcategory')->first()->value;
+        if($request->isMethod('POST')) {
+            array_push($category, $request->category);
+            $update = Options::where('type', 'testcategory')->update(['value' => $category]);
+            return redirect()->back()->with('success', 'Category Added Successfully');
+        }
+        if($request->isMethod("DELETE")) {
+            $category = array_diff($category, [$request->category]);
+            $update = Options::where('type', 'testcategory')->update(['value' => $category]);
+            return redirect()->back()->with('success', 'Category Deleted Successfully');
+        }
+        return view('exam.testcategory', compact('category'));
     }
 
     function show(Request $request, Exam $exam)
@@ -143,19 +151,19 @@ class ExamController extends Controller
                 'student_id' => $student_id,
                 'subject' => $subject,
                 'q_no' => $i,
-                'answer' => $answer,
+                'answer' => ($status == 'que-save' || $status == 'que-save-mark') ? $answer : 0,
                 'status' => $status,
                 'academic_year' => $this->academic_year
             ];
 
+
             if (!isset($exam_answers[$i])) {
                 ExamAnswer::insert($data);
-            }
-            else {
+            } else {
                 ExamAnswer::where('test_id', $request->test_id)->where('student_id', $student_id)->where('q_no', $i)->update($data);
             }
         }
-        
+
         return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.index');
     }
 
@@ -187,7 +195,7 @@ class ExamController extends Controller
     function student_exam(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
-        $answers = ExamAnswer::where('testname',$exam->name)->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
+        $answers = ExamAnswer::where('testname', $exam->name)->where('student_id', auth()->user()->student_id)->orderBy('updated_at', 'desc')->get();
         $maxQuestions = $answers->first()->q_no ?? 0;
         $answers = $answers->keyBy('q_no');
         $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
@@ -528,7 +536,7 @@ class ExamController extends Controller
                     if ($request->hasFile("batch.$name.$b")) {
                         $file = $request->file("batch.$name.$b");
                         $file->move('assets/markrange', $file->getClientOriginalName());
-                        $exam['markrange_file'][$b] = 'assets/markrange/'.$file->getClientOriginalName();
+                        $exam['markrange_file'][$b] = 'assets/markrange/' . $file->getClientOriginalName();
                     }
                 }
                 Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
@@ -541,16 +549,16 @@ class ExamController extends Controller
     public function MovePervious()
     {
         $sub = Exam::select('name')->groupBy('name')->orderByRaw('max(id) desc')->limit(5);
-        $exams = Exam::leftJoinSub($sub,'t',fn($j)=>$j->on('exam.name','=','t.name'))->whereNull('t.name')->select('exam.*')->get();
+        $exams = Exam::leftJoinSub($sub, 't', fn($j) => $j->on('exam.name', '=', 't.name'))->whereNull('t.name')->select('exam.*')->get();
 
         foreach ($exams as $exam) {
-            $subjects = array_map('strtolower', explode(',',$exam->subject_name));
-            $expr = collect($subjects)->map(function ($s){
-            $sr = substr($s, 0, 1);
-            return "sum(if(subject='$s' and mark=4,1,0)) as `{$sr}r`,sum(if(subject='$s' and mark=-1,1,0)) as `{$sr}w`,sum(if(subject='$s' and mark=0,1,0)) as `{$sr}l`,sum(if(subject='$s',mark,0)) as `{$sr}tot`";
+            $subjects = array_map('strtolower', explode(',', $exam->subject_name));
+            $expr = collect($subjects)->map(function ($s) {
+                $sr = substr($s, 0, 1);
+                return "sum(if(subject='$s' and mark=4,1,0)) as `{$sr}r`,sum(if(subject='$s' and mark=-1,1,0)) as `{$sr}w`,sum(if(subject='$s' and mark=0,1,0)) as `{$sr}l`,sum(if(subject='$s',mark,0)) as `{$sr}tot`";
             })->implode(',');
-            $answers = ExamAnswer::join('student as s','exam_answer.student_id','=','s.student_id')->where('testname', $exam->name)->selectRaw("s.student_id as stuid,s.student_name as sname,s.batch,test_id as testid,s.section as sec,sum(mark) totmark,$expr")->groupBy('stuid')->get()->map(function ($answer) use ($exam){
-                return array_merge($answer->toArray(),['category'=>$exam->testcategory,'subject'=>$exam->name,'exdate'=>date('d-m-Y', strtotime($exam->exam_date))]);
+            $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->where('testname', $exam->name)->selectRaw("s.student_id as stuid,s.student_name as sname,s.batch,test_id as testid,s.section as sec,sum(mark) totmark,$expr")->groupBy('stuid')->get()->map(function ($answer) use ($exam) {
+                return array_merge($answer->toArray(), ['category' => $exam->testcategory, 'subject' => $exam->name, 'exdate' => date('d-m-Y', strtotime($exam->exam_date))]);
             })->toArray();
             foreach (array_chunk($answers, 500) as $row) {
                 ExamSubjectReport::insert($row);

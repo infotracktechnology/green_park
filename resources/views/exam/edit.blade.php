@@ -155,9 +155,9 @@
                     <input type="number" name="id" value="{{ $exam->testid }}" id="id" class="form-control form-control-sm numberk" disabled>
                   </div>
 
-                  <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-3">
                     <label>Test Name</label>
-                    <input type="text" name="name" value="{{ $exam->name }}" id="name" class="form-control form-control-sm" readonly>
+                    <input type="text" name="name" value="{{ $exam->name }}" id="name" class="form-control form-control-sm">
                   </div>
 
                   <div class="form-group col-lg-2">

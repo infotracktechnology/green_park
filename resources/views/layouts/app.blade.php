@@ -68,7 +68,7 @@
           </li>
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-              <img alt="image" src="{{asset('img/user.png')}}" class="user-img-radious-style">
+              <img alt="image" src="{{asset('img/avather.png')}}" class="user-img-radious-style">
               <span class="d-sm-none d-lg-inline-block"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
@@ -168,6 +168,7 @@
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Examination</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('exam.index') }}" class="nav-link">Add Test</a></li>
+                <li><a href="{{ route('exam.testcategory') }}" class="nav-link">Test Category <small>(add / delete)</small></a></li>
                 <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
                 <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response(csv file)</a></li>
                 <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>

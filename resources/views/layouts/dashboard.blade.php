@@ -74,7 +74,7 @@
           <ul class="navbar-nav mr-3">
             <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i class="fas fa-bars"></i></a></li>
             <li><a href="#" class="nav-link nav-link-lg fullscreen-btn"><i class="fas fa-expand"></i></a></li>
-            <li>
+            {{-- <li>
               <form class="form-inline mr-auto">
                 <div class="search-element">
                   <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="200">
@@ -83,7 +83,7 @@
                   </button>
                 </div>
               </form>
-            </li>
+            </li> --}}
           </ul>
         </div>
         <ul class="navbar-nav navbar-right">
@@ -101,7 +101,7 @@
             </a>
         </li>
         
-          <li class="dropdown dropdown-list-toggle">
+          {{-- <li class="dropdown dropdown-list-toggle">
             <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
             <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
               <div class="dropdown-header">Notifications</div>
@@ -118,10 +118,10 @@
                 <a href="#">View All <i class="fas fa-chevron-right"></i></a>
               </div>
             </div>
-          </li>
+          </li> --}}
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-              <img alt="image" src="{{asset('img/user.png')}}" class="user-img-radious-style">
+              <img alt="image" src="{{asset('img/avather.png')}}" class="user-img-radious-style">
               <span class="d-sm-none d-lg-inline-block"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
@@ -148,9 +148,11 @@
             <ul class="sidebar-menu">
               <li class="menu-header">Main</li>
               <?php
+              //dd(auth()->user()->GetExam());
               $exam = auth()->user()->GetExam();
+              $examStartTime = $exam ? $exam->start_at->toIso8601String() : null;
               ?>
-              @if($exam)
+              @if($exam && ($exam->start_at <= now() && $exam->end_at >= now()))
               <li class="dropdown">
                 <a href="{{ route('student.instruction',base64_encode($exam->id)) }}" class="nav-link">
                   <i class="fas fa-file-alt" style="font-size: 20px; color: #2196f3;"></i><span>Online Exam</span>
@@ -198,73 +200,53 @@
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/easytimer.js/dist/easytimer.min.js"></script>
-  
   <script>
-    window.addEventListener("pageshow", function (event) {
+  window.addEventListener("pageshow", function (event) {
         if (event.persisted) {
             window.location.reload(); 
         }
     });
-</script>
-  <script>
-    $(document).on('contextmenu', event => event.preventDefault());
-   
-   document.addEventListener("DOMContentLoaded", function () {
-    var examStartTime = "{{ $examStartTime ?? '' }}";
+  $(document).on('contextmenu', event => event.preventDefault());
 
-    if (!examStartTime) {
-        console.log("No upcoming exams.");
-        return;
+$(function () {
+  const examStart = "{{ $examStartTime ?? '' }}";
+  if (!examStart) return;
+
+  const examTs = new Date(examStart).getTime();
+  if (isNaN(examTs)) return;
+
+  const $wrap = $("#exam-timer-container");
+  const $timer = $("#exam-timer");
+  const $clock = $("#clock");
+
+  const pad = n => String(n).padStart(2, "0");
+
+  function render() {
+    const now = Date.now();
+    const diff = examTs - now;
+
+    const d = new Date();
+    $clock.text(
+      d.toLocaleDateString("en-GB") + " " +
+      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+    );
+
+    if (diff < 0) {
+      $wrap.hide();
+      return;
     }
 
-    var examStart = new Date(examStartTime).getTime();
-    var timerElement = document.getElementById('exam-timer');
-    var timerContainer = document.getElementById('exam-timer-container');
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
 
-    function updateTimer() {
-        var now = new Date().getTime();
-        var timeDiff = examStart - now;
-
-        if (timeDiff <= 0) {
-            timerElement.innerHTML = "Exam has started!";
-            timerContainer.style.display = "none";
-            clearInterval(timerInterval);
-            return;
-        }
-
-        var hours = Math.floor(timeDiff / (1000 * 60 * 60));
-        var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
-        var timeString = (hours > 0 ? hours + "h " : "") + 
-                         (minutes > 0 ? minutes + "m " : "") + 
-                         seconds + "s";
-
-        timerElement.innerHTML = timeString;
-        timerContainer.style.display = "inline";
-    }
-
-    var timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
+    $timer.text(`${h ? h + "h " : ""}${m ? m + "m " : ""}${s}s`);
+    $wrap.show();
+  }
+  render();
+  setInterval(render, 1000);
 });
-
-      const timetimer = new easytimer.Timer();
-  
-            function updateClock() {
-                const now = new Date();
-                const time = now.toLocaleTimeString(undefined, { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                const date = now.toLocaleDateString('en-GB', {day: '2-digit',month: '2-digit',year: 'numeric'});
-                const formattedTime = `${date} ${time}`;
-                document.getElementById('clock').textContent = formattedTime;
-            }
-            
-            updateClock();
-            
-            timetimer.addEventListener('secondsUpdated', updateClock);
-            timetimer.start({ precision: 'seconds' });
-
 </script>
-
-  @yield('js')
+@yield('js')
 </body>
 </html>

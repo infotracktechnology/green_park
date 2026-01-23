@@ -113,7 +113,7 @@
                   </div>
 
                  <div class="form-group col-lg-2">
-                    <label>Test Category <button type="button" class="btn btn-link" data-toggle="modal" data-target="#categoryModal">Add <i class="fas fa-plus"></i></button></label>
+                    <label>Test Category </label>
                     <select name="testcategory" class="form-control form-control-sm" required>
                       <option value="">Select Test Category</option>
                       @foreach ($testcategory as $row)
@@ -129,10 +129,10 @@
                     <input type="number" name="testid" class="form-control form-control-sm numberk" required>
                   </div>
 
-                  {{-- <div class="form-group col-lg-3">
+                  <div class="form-group col-lg-3">
                     <label>Test Name</label>
                     <input type="text" name="name" id="name" class="form-control form-control-sm" required>
-                  </div> --}}
+                  </div>
 
                   <div class="form-group col-lg-2">
                     <label>Exam Date</label>
@@ -287,35 +287,7 @@
     </div>
   </section>
 
-  <div class="modal fade" id="categoryModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add Test Category</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <form action="{{ route('exam.testcategory') }}" method="post" enctype="multipart/form-data">
-            @csrf
-          <div class="row">
-            <div class="form-group col-12">
-               <label>Category Name</label>
-              <input type="text" name="category" class="form-control form-control-sm"  required>
-            </div>
-
-            <div class="form-group col-12">
-              <button type="submit" class="btn btn-primary">Add</button>
-            </div>
-
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+  
 
 </div>
 @endsection

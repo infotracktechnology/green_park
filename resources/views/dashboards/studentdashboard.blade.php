@@ -15,13 +15,11 @@
     <div class="row">
 
       <div class="col-lg-12">
-       @if(auth()->user()->GetExam())
-        <div class="alert alert-danger">
-          <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <b>⚠️ If the Exam Link Doesn't Work, Please logout and login again.</b>
-        </div>
+        <?php
+        $exam = auth()->user()->GetExam();
+        ?>
+        @if($exam && $exam->end_at >= now())
+        <div class="alert alert-danger">⚠️ If the Exam Link Doesn't Work, Please logout and login again or refresh the page.</div>
         @endif
         
         @if(session('success'))
@@ -59,7 +57,7 @@
         </div>
       </div>
 
-
+      @if(auth()->user()->coaching_type == "OFFLINE")
       <div class="col-xl-4 col-lg-6">
         <div class="card l-bg-orange">
           <div class="card-statistic-3">
@@ -78,6 +76,7 @@
           </div>
         </div>
       </div>
+      @endif
     </div>
 
   </div>
