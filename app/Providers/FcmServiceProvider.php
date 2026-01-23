@@ -37,7 +37,7 @@ class FcmServiceProvider {
     
         $webpushConfig = WebpushConfig::fromArray([
             'notification' => [
-                'icon' => $imageUrl ?: config('app.logo_url'),
+                'icon' => $imageUrl ?: env('APP_LOGO'),
                 'badge' => config('app.badge_url', ''),
                 'click_action' => $clickAction ?: url('/'),
             ],
@@ -82,23 +82,23 @@ class FcmServiceProvider {
             ->withNotification([
                 'title' => $title,
                 'body' => $body,
-                'image' => $imageUrl,
+                'image' => $imageUrl ?: env('APP_LOGO'),
             ])
             ->withData($data);
 
         
         $androidConfig = AndroidConfig::fromArray([
             'notification' => [
-                'icon' => 'notification_icon',
-                'click_action' => $clickAction ?: 'FLUTTER_NOTIFICATION_CLICK',
+                'icon' => $imageUrl ?: env('APP_LOGO'),
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
             ],
         ]);
         
         $webpushConfig = WebpushConfig::fromArray([
             'notification' => [
-                'icon' => $imageUrl ?: config('app.logo_url'),
+                'icon' => $imageUrl ?: env('APP_LOGO'),
                 'badge' => config('app.badge_url', ''),
-                'click_action' => $clickAction ?: url('/'),
+                'click_action' => url('/'),
             ],
         ]);
         

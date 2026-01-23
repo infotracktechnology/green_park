@@ -122,13 +122,8 @@ class StudentController extends Controller
     public function dashboard()
     {
         $student = Student::where('student_id', auth()->user()->student_id)->first();
-        $exam = $student->GetExam();
-
-        $examStartTime = $exam ? $exam->start_at->toIso8601String() : null;
-
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
-
 
         $distinctAttendanceSubQuery = Attendance::select('attendance_date', 'timing', 'status')->where('student_id', $student->student_id)->whereBetween('attendance_date', [$startOfMonth, $endOfMonth])->distinct();
 
@@ -139,7 +134,7 @@ class StudentController extends Controller
 
         $percentage = $totalDaysInMonth > 0 ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2) : 0;
 
-        return view('dashboards.studentdashboard', compact('examStartTime', 'totalDaysInMonth', 'presentDaysInMonth', 'percentage'));
+        return view('dashboards.studentdashboard', compact('totalDaysInMonth', 'presentDaysInMonth', 'percentage'));
     }
 
     function marksheet(Request $request)

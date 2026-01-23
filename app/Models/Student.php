@@ -149,8 +149,7 @@ class Student extends Authenticatable
             ->where(function ($query) {
                 $query->where('usertype', 'INDIVIDUAL')
                     ->where('students', $this->student_id)
-                    ->where('start_at', '<=', date('Y-m-d H:i:s'))
-                    ->where('end_at', '>=', date('Y-m-d H:i:s'));
+                    ->whereRaw("date(start_at) = ?", [date('Y-m-d')]);
             })
             ->orWhere(function ($query) {
                 $query->where('academic_year', $this->academic_year)
@@ -167,8 +166,7 @@ class Student extends Authenticatable
                         $q->where('section', 'like', "%{$this->section}%");
                     })
                     ->whereIn('gender', [$this->gender, 'All'])
-                    ->where('start_at', '<=', date('Y-m-d H:i:s'))
-                    ->where('end_at', '>=', date('Y-m-d H:i:s'));
+                    ->whereRaw("date(start_at) = ?", [date('Y-m-d')]);
             })->first();
     }
 }

@@ -469,13 +469,11 @@
               $(`#question-${qno} input[type="radio"][value="${ans}"]`).prop('checked', true);
           }
   
-          $(`.pagination li[data-seq="${qno}"] a`)
-              .removeClass('not-attempted not-answered que-mark que-save que-save-mark')
-              .addClass(status);
+          $(`.pagination li[data-seq="${qno}"] a`).removeClass('not-attempted not-answered que-mark que-save que-save-mark')
+          .addClass(status);
+          $(`#status-${qno}`).val(status);
       });
-  
       updateCounts();
   });
 </script>
-
 @endsection
