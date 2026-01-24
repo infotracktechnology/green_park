@@ -103,7 +103,7 @@ class ExamController extends Controller
             return redirect()->back()->with('success', 'Questions Images Replaced Successfully');
         }
 
-        foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
+        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $exam->update($data);
@@ -323,7 +323,7 @@ class ExamController extends Controller
             $csvData[] = $row;
         }
 
-        $filename = "OnlineResponse_" . $examname . ".csv";
+        $filename = "OnlineResponse_".$examname.".csv";
         return response()->stream(function () use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $line) {
@@ -435,27 +435,27 @@ class ExamController extends Controller
                 $testId = $answer['test_id'];
                 $uniqueTests[$testId] = $answer['test_name'] ?? '';
 
-                ExamAnswer::where('test_id', $testId)
-                    ->where('academic_year', $this->academic_year)
-                    ->orderBy('id')
+                ExamAnswer::where('test_id', $testId)->where('academic_year', $this->academic_year)->orderBy('id')
                     ->chunk(20000, function ($rows) use ($answer, &$processedCount) {
-                        $bulkData = $rows->map(function ($row) use ($answer) {
-                            $key = 'a' . $row->q_no;
+                        $bulkData = [];
+                        foreach ($rows as $row) {
+                            $key = 'a'.$row->q_no;
                             $ans = $answer[$key] ?? '';
                             $ansKey = array_filter(explode('|', $ans));
                             $answerKey = count($ansKey) ? $ans : 'DEL';
                             $mark = 0;
 
+                            if($answerKey === 'DEL') {
+                               ExamAnswer::where('id', $row->id)->delete();
+                               continue;
+                            }
+
                             if (count($ansKey) && $row->answer) {
                                 $mark = in_array($row->answer, $ansKey) ? 4 : -1;
                             }
 
-                            return [
-                                'id' => $row->id,
-                                'answer_key' => $answerKey,
-                                'mark' => $mark,
-                            ];
-                        })->toArray();
+                         $bulkData[] = [ 'id' => $row->id,'answer_key' => $answerKey,'mark' => $mark];
+                        }
 
                         $this->executeBatchUpdate($bulkData);
                         $processedCount += count($bulkData);
