@@ -468,10 +468,12 @@
           if (status === 'que-save' || status === 'que-save-mark') {
               $(`#question-${qno} input[type="radio"][value="${ans}"]`).prop('checked', true);
           }
-  
+
+          $(`#status-${qno}`).val(status);
+          
           $(`.pagination li[data-seq="${qno}"] a`).removeClass('not-attempted not-answered que-mark que-save que-save-mark')
           .addClass(status);
-          $(`#status-${qno}`).val(status);
+          
       });
       updateCounts();
   });

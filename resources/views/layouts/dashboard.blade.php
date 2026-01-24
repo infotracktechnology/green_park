@@ -16,31 +16,31 @@
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
-  thead th{
-    background-color: #2b66a2 !important;
-     color: #fff !important;
-  }
-  table th,table td {
-  border: 1px solid #222 !important;
-  height: 45px !important;
-  }
-</style>
+    thead th{
+      background-color: #2b66a2 !important;
+       color: #fff !important;
+    }
+    table th,table td {
+    border: 1px solid #222 !important;
+    height: 45px !important;
+    }
+  </style>
   <style>
     .select2 {
       width: 100% !important;
     }
-
+    
     .error {
       color: red;
       font-weight: bold;
     }
-
+    
     .nav-link i {
       font-size: 18px;
       margin-right: 10px;
       color: #333;
     }
-
+    
     .notification-badge {
       display: inline-block;
       width: 20px;
@@ -56,7 +56,7 @@
       top: 10px;
       right: 15px;
     }
-
+    
     .hidden {
       display: none !important;
     }
@@ -90,17 +90,17 @@
 
           <li class="nav-item dropdown">
             <a href="#" class="nav-link nav-link-lg">
-                <span class="col-white" id="clock"></span>
+              <span class="col-white" id="clock"></span>
             </a>
-        </li>
-        
+          </li>
+
 
           <li class="nav-item dropdown">
             <a href="#" class="nav-link nav-link-lg" id="exam-timer-container" style="display: none;">
-                <span style="font-size: 24px;">⏰</span> Exam starts in <span id="exam-timer" class="col-white"></span>
+              <span style="font-size: 24px;">⏰</span> Exam starts in <span id="exam-timer" class="col-white"></span>
             </a>
-        </li>
-        
+          </li>
+
           {{-- <li class="dropdown dropdown-list-toggle">
             <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
             <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
@@ -137,54 +137,53 @@
           </li>
         </ul>
       </nav>
-      <div class="main-sidebar sidebar-style-2" id="sidebar" >
+      <div class="main-sidebar sidebar-style-2" id="sidebar">
         <aside id="sidebar-wrapper">
-            <div class="sidebar-brand">
-                 <a href="#">
-              <img alt="image" src="{{asset('img/logo.jpg')}}" class="header-logo" style="height: 70px;"/>
+          <div class="sidebar-brand">
+            <a href="#">
+              <img alt="image" src="{{asset('img/logo.jpg')}}" class="header-logo" style="height: 70px;" />
               {{-- <span class="logo-name">{{ env('APP_NAME') }}</span> --}}
             </a>
-            </div>
-            <ul class="sidebar-menu">
-              <li class="menu-header">Main</li>
-              <?php
-              //dd(auth()->user()->GetExam());
+          </div>
+          <ul class="sidebar-menu">
+            <li class="menu-header">Main</li>
+            <?php
               $exam = auth()->user()->GetExam();
               $examStartTime = $exam ? $exam->start_at->toIso8601String() : null;
               ?>
-              @if($exam && ($exam->start_at <= now() && $exam->end_at >= now()))
+            @if($exam && ($exam->start_at <= now() && $exam->end_at >= now()))
               <li class="dropdown">
                 <a href="{{ route('student.instruction',base64_encode($exam->id)) }}" class="nav-link">
                   <i class="fas fa-file-alt" style="font-size: 20px; color: #2196f3;"></i><span>Online Exam</span>
                 </a>
               </li>
               @else
-                <li class="dropdown">
-                  <a href="{{ route('studentdashboard') }}" class="nav-link">
-                    <i class="fas fa-home" style="font-size: 20px; color: #2196f3;"></i><span>Home</span>
-                  </a>
-                </li>
-                <li class="dropdown">
-                  <a href="{{ route('student.profile') }}" class="nav-link">
-                    <i class="fas fa-user-circle" style="font-size: 20px; color: #2196f3;"></i><span>Profile</span>
-                  </a>
-                </li>
-                @foreach (auth()->user()->menu ?? [] as $menu)
-                @if($menu['route'] !='')
-                <li class="dropdown">
-                  <a href="{{ route($menu['route']) }}" class="nav-link">
-                    <i class="{{ $menu['icon'] }}" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
-                  </a>
-                </li>
-                @endif
-                @endforeach
+              <li class="dropdown">
+                <a href="{{ route('studentdashboard') }}" class="nav-link">
+                  <i class="fas fa-home" style="font-size: 20px; color: #2196f3;"></i><span>Home</span>
+                </a>
+              </li>
+              <li class="dropdown">
+                <a href="{{ route('student.profile') }}" class="nav-link">
+                  <i class="fas fa-user-circle" style="font-size: 20px; color: #2196f3;"></i><span>Profile</span>
+                </a>
+              </li>
+              @foreach (auth()->user()->menu ?? [] as $menu)
+              @if($menu['route'] !='')
+              <li class="dropdown">
+                <a href="{{ route($menu['route']) }}" class="nav-link">
+                  <i class="{{ $menu['icon'] }}" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
+                </a>
+              </li>
+              @endif
+              @endforeach
 
               @endif
-            </ul>
-          
+          </ul>
+
         </aside>
-    </div>
-    
+      </div>
+
       @yield('main')
       <footer class="main-footer">
         <div class="footer-center">
@@ -201,52 +200,65 @@
   <script src="{{asset('js/custom.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/easytimer.js/dist/easytimer.min.js"></script>
   <script>
-  window.addEventListener("pageshow", function (event) {
-        if (event.persisted) {
-            window.location.reload(); 
-        }
+    window.addEventListener("pageshow", function (event) {
+          if (event.persisted) {
+              window.location.reload(); 
+          }
+      });
+    $(document).on('contextmenu', event => event.preventDefault());
+    
+    $(function () {
+      const pad = n => String(n).padStart(2, "0");
+      
+      function initClock() {
+          const $clock = $("#clock");
+          function renderClock() {
+              const d = new Date();
+            $clock.text(d.toLocaleDateString("en-GB") + " " +`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`);
+          }
+          renderClock();
+          setInterval(renderClock, 1000);
+      }
+    
+      function initExamTimer() {
+          const examStart = "{{ $examStartTime ?? '' }}";
+          if (!examStart) return;
+    
+          const examTs = new Date(examStart).getTime();
+          if (isNaN(examTs)) return;
+    
+          const $wrap = $("#exam-timer-container");
+          const $timer = $("#exam-timer");
+    
+          if (Date.now() >= examTs) {
+              $wrap.hide();
+              return false;
+          }
+    
+          function renderTimer() {
+              const now = Date.now();
+              const diff = examTs - now;
+    
+              if (diff <= 0) {
+                  clearInterval(timerInterval);
+                 location.reload();
+                  return false;
+              }
+    
+              const h = Math.floor(diff / 3600000);
+              const m = Math.floor((diff % 3600000) / 60000);
+              const s = Math.floor((diff % 60000) / 1000);
+              $timer.text(`${h ? h + "h " : ""}${m ? m + "m " : ""}${s}s`);
+              $wrap.show();
+          }
+    
+          renderTimer();
+          const timerInterval = setInterval(renderTimer, 1000);
+      }
+      initClock();
+      initExamTimer();
     });
-  $(document).on('contextmenu', event => event.preventDefault());
-
-$(function () {
-  const examStart = "{{ $examStartTime ?? '' }}";
-  if (!examStart) return;
-
-  const examTs = new Date(examStart).getTime();
-  if (isNaN(examTs)) return;
-
-  const $wrap = $("#exam-timer-container");
-  const $timer = $("#exam-timer");
-  const $clock = $("#clock");
-
-  const pad = n => String(n).padStart(2, "0");
-
-  function render() {
-    const now = Date.now();
-    const diff = examTs - now;
-
-    const d = new Date();
-    $clock.text(
-      d.toLocaleDateString("en-GB") + " " +
-      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
-    );
-
-    if (diff < 0) {
-      $wrap.hide();
-      return;
-    }
-
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-
-    $timer.text(`${h ? h + "h " : ""}${m ? m + "m " : ""}${s}s`);
-    $wrap.show();
-  }
-  render();
-  setInterval(render, 1000);
-});
-</script>
-@yield('js')
+  </script>
+  @yield('js')
 </body>
 </html>
