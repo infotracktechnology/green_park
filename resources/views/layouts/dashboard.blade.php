@@ -121,7 +121,7 @@
           </li> --}}
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-              <img alt="image" src="{{asset('img/avather.png')}}" class="user-img-radious-style">
+              <img alt="image" src="{{ auth()->user()->photo }}" class="user-img-radious-style">
               <span class="d-sm-none d-lg-inline-block"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
