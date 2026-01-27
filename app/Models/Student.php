@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 
 class Student extends Authenticatable
@@ -30,6 +31,12 @@ class Student extends Authenticatable
     function attendance()
     {
         return $this->belongsTo(Attendance::class, 'student_id', 'id');
+    }
+
+    protected function photo():Attribute {
+        return Attribute::make(
+            get:fn()=> file_exists(base_path("assets/profilepic/{$this->student_id}.jpg")) ? asset("profilepic/{$this->student_id}.jpg") : asset('img/avather.png'),
+        );
     }
 
     public static function boot()

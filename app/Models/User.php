@@ -33,18 +33,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    function role()
+    public function branch_details()
     {
-        $role = [
-            1 => 'Branch Admin',
-            2 => 'Accountant'
-        ];
-        return $role[$this->type]; 
-    }
-
-    function status_text()
-    {
-        return '<span class="badge badge-' . ($this->status ? 'success' : 'danger') . '">' . ($this->status ? 'Active' : 'Inactive') . '</span>';
+        return $this->belongsTo(Branch::class, 'branch', 'id');
     }
 
     public static function boot()

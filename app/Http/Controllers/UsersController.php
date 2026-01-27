@@ -13,7 +13,7 @@ use Session;
 class UsersController extends Controller{
 
     public function index(Request $request){
-        $users = User::where('id','!=', auth()->user()->id)->get();
+        $users = User::where([['id', '!=', auth()->user()->id],['type', '!=', 'admin']])->get();
         return view('users.index',compact('users'));
     }
 
@@ -24,12 +24,6 @@ class UsersController extends Controller{
 
     public function store(Request $request)
     {
-        $request->validate([
-            'username' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'unique:users,email'],
-            'type' => ['required', 'in:1,2'],
-        ]);
-    
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
@@ -37,7 +31,7 @@ class UsersController extends Controller{
             'type' => $request->type,
             'branch' => $request->branch,
         ]);
-        $user->save();
+
         return to_route('users.index');
     }
     
@@ -51,16 +45,13 @@ class UsersController extends Controller{
     
     public function update(Request $request, User $user)
     {
-        $request->validate([
-            'username' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-           
-        ]);
-    
         $user->username = $request->username;
         $user->email = $request->email;
         $user->branch = $request->branch;
+        if(isset($request->reset_password)){
         $user->password = bcrypt($request->password);
+        }
+        $user->type = $request->type;
         $user->save();
     
         return redirect()->route('users.index')->with('success', 'User updated successfully');
