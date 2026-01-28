@@ -427,7 +427,6 @@ class ExamController extends Controller
                 return back()->with('error', 'File is not in the correct format.');
             }
 
-            $processedCount = 0;
             $uniqueTests = [];
             $uploadTime = now()->format('Y-m-d H:i:s');
 
@@ -436,7 +435,7 @@ class ExamController extends Controller
                 $uniqueTests[$testId] = $answer['test_name'] ?? '';
 
                 ExamAnswer::where('test_id', $testId)->where('academic_year', $this->academic_year)->orderBy('id')
-                    ->chunk(20000, function ($rows) use ($answer, &$processedCount) {
+                    ->chunk(20000, function ($rows) use ($answer) {
                         $bulkData = [];
                         foreach ($rows as $row) {
                             $key = 'a'.$row->q_no;
@@ -458,11 +457,10 @@ class ExamController extends Controller
                         }
 
                         $this->executeBatchUpdate($bulkData);
-                        $processedCount += count($bulkData);
                     });
             }
 
-            $filename = now()->format('Y-m-d_H-i-s') . '_' . $file->getClientOriginalName();
+            $filename = now()->format('Y-m-d_H-i-s').'_'.$file->getClientOriginalName();
             $file->move('answer_key', $filename);
 
             DB::table('key_log')->insert([
@@ -475,7 +473,7 @@ class ExamController extends Controller
                 'type'       => 'answer_key',
             ]);
 
-            return back()->with('success', "Answer key uploaded successfully. Processed {$processedCount} records.");
+            return back()->with('success', "Answer key validated successfully.");
         } catch (\Throwable $e) {
             \Log::error('Answer Key Upload Error', ['error' => $e->getMessage()]);
             return back()->with('error', 'An error occurred during upload. Check logs for details.');
