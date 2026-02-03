@@ -176,7 +176,7 @@
                 <li><a href="{{ route('exam.publish')}}" class="nav-link">Exam Publish</a></li>
                 <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
                 <li><a href="{{ route('report.exam_analyisis') }}" class="nav-link">Analyisis Report</a></li>
-                <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li>
+                {{-- <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li> --}}
                 <li><a href="{{ route('exam.perviousexamresult') }}" class="nav-link">Pervious Exam Results</a></li>
               </ul>
             </li>

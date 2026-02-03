@@ -138,7 +138,7 @@ class ExamController extends Controller
     {
         $student_id = $request->student_id ?? 0;
 
-        $exam_answers =  ExamAnswer::where('test_id', $request->test_id)->where('student_id', $student_id)->get()->keyBy('q_no');
+        $exam_answers =  ExamAnswer::where('testname',$request->testname)->where('student_id', $student_id)->get()->keyBy('q_no');
 
         for ($i = 1; $i <= $request->total_question; $i++) {
             $status = $request->status[$i] ?? null;
@@ -380,14 +380,14 @@ class ExamController extends Controller
 
         $file = $request->file('offline');
         $originalName = $file->getClientOriginalName();
-        $filename = now()->format('Y-m-d H-i-s') . '-' . $originalName;
-        $path = $file->storeAs('answer_key', $filename, 'public');
+        $filename = now()->format('Y-m-d H-i-s').'-'.$originalName;
+        $file->move('answer_key', $filename);
 
         DB::table('key_log')->insert([
             'file_name' => $originalName,
             'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
-            'path' => $path,
+            'path' => 'answer_key/'.$filename,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
             'no_rows' => count($answers),
             'type' => 'offline_key',
@@ -445,8 +445,7 @@ class ExamController extends Controller
                             $mark = 0;
 
                             if($answerKey === 'DEL') {
-                               ExamAnswer::where('id', $row->id)->delete();
-                               continue;
+                               $mark = null;
                             }
 
                             if (count($ansKey) && $row->answer) {
@@ -468,7 +467,7 @@ class ExamController extends Controller
                 'upload_time' => $uploadTime,
                 'test_name'  => implode(',', array_unique($uniqueTests)),
                 'test_id'    => implode(',', array_keys($uniqueTests)),
-                'path'       => 'answer_key/' . $filename,
+                'path'       => 'answer_key/'.$filename,
                 'no_rows'    => count($answers),
                 'type'       => 'answer_key',
             ]);
@@ -534,7 +533,7 @@ class ExamController extends Controller
                     if ($request->hasFile("batch.$name.$b")) {
                         $file = $request->file("batch.$name.$b");
                         $file->move('assets/markrange', $file->getClientOriginalName());
-                        $exam['markrange_file'][$b] = 'assets/markrange/' . $file->getClientOriginalName();
+                        $exam['markrange_file'][$b] = 'assets/markrange/'.$file->getClientOriginalName();
                     }
                 }
                 Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
