@@ -20,8 +20,8 @@
                     <label>Role</label>
                     <select name="type" class="form-control form-control-sm" required>
                       <option value="">Select Role</option>
-                      <option value="Admin" @selected($user->type == 'Admin')>Admin</option>
                       <option value="Branch Admin" @selected($user->type == 'Branch Admin')>Branch Admin</option>
+                      <option value="Accountant" @selected($user->type == 'Accountant')>Accountant</option>
                     </select>
                   </div>
 

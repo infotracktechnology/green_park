@@ -19,6 +19,7 @@ class User extends Authenticatable
         'password',
         'type',
         'branch',
+        'menu',
         'created_by',
         'updated_by',
     ];
@@ -31,6 +32,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'menu' => 'array',
     ];
 
     public function branch_details()
