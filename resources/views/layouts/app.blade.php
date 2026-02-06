@@ -93,28 +93,24 @@
               {{-- <span class="logo-name">{{ env('APP_NAME') }}</span> --}}
             </a>
           </div>
+
           <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
-            <li class="dropdown">
-              <a href="{{ route('admin.home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
+            <li class="dropdown"> 
+              <a href="{{ route('admin.home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a> 
             </li>
-
-            @if(!auth()->user()->branch)
-            <li class="dropdown">
-              <a href="{{ route('academicyear.index') }}" class="nav-link"><i data-feather="calendar"></i><span>Academic Year</span></a>
+            
+             @if(auth()->user()->type === 'Admin') 
+             <li class="dropdown"> <a href="{{ route('academicyear.index') }}" class="nav-link"><i data-feather="calendar"></i><span>Academic Year</span></a> 
             </li>
-
-            <li class="dropdown">
-              <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
+            <li class="dropdown"> 
+              <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a> 
             </li>
-
-            <li class="dropdown">
-              <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a>
-            </li>
-            @endif
-
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
+            <li class="dropdown"> 
+              <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a> 
+            </li> 
+            
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('student.create') }}" class="nav-link">Add Student</a></li>
                 <li><a href="{{ route('student.index') }}" class="nav-link">View Students</a></li>
@@ -124,19 +120,13 @@
                 <li><a href="{{ route('import.studentupdate') }}" class="nav-link">Student Bulk Update</a></li>
               </ul>
             </li>
-
-
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('studentmenu.type') }}" class="nav-link">Type Assign</a></li>
                 <li><a href="{{ route('studentmenu.student') }}" class="nav-link">Student Assign</a></li>
               </ul>
             </li>
-
-
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('staff.index') }}" class="nav-link"> Staff</a></li>
                 <li><a href="{{ route('staffs.restore') }}" class="nav-link">Reactivate Staff</a></li>
@@ -146,8 +136,7 @@
                 <li><a href="{{ route('staff.class') }}" class="nav-link"> Class Assign</a></li>
               </ul>
             </li>
-            <li class="dropdown">
-              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('announcement.index') }}" class="nav-link">Announcement</a></li>
                 <li><a href="{{route('chairmanvideo.index')}}" class="nav-link"> Chairman Video</a></li>
@@ -163,12 +152,12 @@
                 <li><a href="{{ route('parent_concern') }}" class="nav-link">Parent Concern</a></li>
               </ul>
             </li>
-
-            <li class="dropdown">
+            <li class="dropdown"> 
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Examination</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('exam.index') }}" class="nav-link">Add Test</a></li>
                 <li><a href="{{ route('exam.testcategory') }}" class="nav-link">Test Category <small>(add / delete)</small></a></li>
+
                 <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
                 <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response(csv file)</a></li>
                 <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
@@ -176,12 +165,11 @@
                 <li><a href="{{ route('exam.publish')}}" class="nav-link">Exam Publish</a></li>
                 <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
                 <li><a href="{{ route('report.exam_analyisis') }}" class="nav-link">Analyisis Report</a></li>
-                {{-- <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li> --}}
+                <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li>
                 <li><a href="{{ route('exam.perviousexamresult') }}" class="nav-link">Pervious Exam Results</a></li>
               </ul>
             </li>
-
-            <li class="dropdown">
+            <li class="dropdown"> 
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
@@ -190,66 +178,51 @@
                 <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
                 <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
                 <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
-                <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li>
-                {{-- <li><a href="{{ route('studentactivity.index') }}" class="nav-link">Student Activity</a>
-            </li> --}}
-            {{-- Reports  --}}
-            <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
-            <li><a href="{{ route('report.hostelvacate') }}" class="nav-link">Hostel Vacate Report</a></li>
-            <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
-            <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
-            <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
-            <li><a href="{{ route('report.hostelcourier') }}" class="nav-link">Hostel Courier Report</a></li>
-            <li><a href="{{ route('report.hostelroomlist') }}" class="nav-link">Phone/Sign List (Section)</a></li>
-            <li><a href="{{ route('report.hostelsectionlist') }}" class="nav-link">Phone/Sign List (Room)</a></li>
-          </ul>
-          </li>
+                <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li> 
+                {{-- Reports --}}
+                <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
+                <li><a href="{{ route('report.hostelvacate') }}" class="nav-link">Hostel Vacate Report</a></li>
+                <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
+                <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
+                <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
+                <li><a href="{{ route('report.hostelcourier') }}" class="nav-link">Hostel Courier Report</a></li>
+                <li><a href="{{ route('report.hostelroomlist') }}" class="nav-link">Phone/Sign List (Section)</a></li>
+                <li><a href="{{ route('report.hostelsectionlist') }}" class="nav-link">Phone/Sign List (Room)</a></li>
+              </ul>
+            </li>
+            <li class="dropdown"> 
+              <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
+            </li>
 
-
-          <li class="dropdown">
-            <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
-          </li>
-
-          <li class="dropdown">
-            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="save"></i><span>Attendance</span></a>
-            <ul class="dropdown-menu">
-              <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
-              <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
-              <li><a href="{{ route('report.attendance') }}" class="nav-link">Daily Attendance Report</a></li>
-            </ul>
-          </li>
-
-          <li class="dropdown">
-            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
-            <ul class="dropdown-menu">
-              <li><a href="{{ route('bank.create') }}" class="nav-link">Banks</a></li>
-              <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
-              <li><a href="{{ route('feesplan.index') }}" class="nav-link">Fees Plan</a></li>
-              <li><a href="{{ route('assignsegment') }}" class="nav-link">Segment Assign</a></li>
-              <li><a href="{{ route('fees.collection') }}" class="nav-link">Fees Collection</a></li>
-              <li><a href="{{ route('fees.migration') }}" class="nav-link">Fees Migration Upload</a></li>
-              <li class="dropdown">
-                <a href="#" class="menu-toggle nav-link has-dropdown"><span>Receipt Cancellation</span></a>
-                <ul class="dropdown-menu">
-                  <li><a href="{{ route('feereceiptlist') }}" class="nav-link">Request Cancel</a></li>
-                  <li><a href="{{ route('pendingfeereceiptlist') }}" class="nav-link">Approve / Reject Cancel</a></li>
-                </ul>
-              </li>
-
-              <li><a href="{{ route('fees.report.dfc') }}" class="nav-link">DFC</a></li>
-              <li><a href="{{ route('fees.report.collection') }}" class="nav-link">Collection Report</a></li>
-              <li><a href="{{ route('fees.report.due') }}" class="nav-link">Due Report</a></li>
-            </ul>
-          </li>
-
-          <li class="dropdown">
-            <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
-            <ul class="dropdown-menu">
-              <li><a href="{{ route('report.log') }}" class="nav-link">Logs Report</a></li>
-              <li><a href="{{ route('report.batchlist') }}" class="nav-link">BatchList</a></li>
-              <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList</a></li>
-            </ul>
-          </li>
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="save"></i><span>Attendance</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
+                <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
+                <li><a href="{{ route('report.attendance') }}" class="nav-link">Daily Attendance Report</a></li>
+              </ul>
+            </li>
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('bank.create') }}" class="nav-link">Banks</a></li>
+                <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
+                <li><a href="{{ route('feesplan.index') }}" class="nav-link">Fees Plan</a></li>
+                <li><a href="{{ route('assignsegment') }}" class="nav-link">Segment Assign</a></li>
+                <li><a href="{{ route('fees.collection') }}" class="nav-link">Fees Collection</a></li>
+                <li><a href="{{ route('feereceiptlist') }}" class="nav-link">Request Cancel</a></li>
+                <li><a href="{{ route('pendingfeereceiptlist') }}" class="nav-link">Approve / Reject Cancel</a></li>
+                <li><a href="{{ route('fees.report.dfc') }}" class="nav-link">DFC</a></li>
+                <li><a href="{{ route('fees.report.collection') }}" class="nav-link">Collection Report</a></li>
+                <li><a href="{{ route('fees.report.due') }}" class="nav-link">Due Report</a></li>
+              </ul>
+            </li>
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('report.log') }}" class="nav-link">Logs Report</a></li>
+                <li><a href="{{ route('report.batchlist') }}" class="nav-link">BatchList</a></li>
+                <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList</a></li>
+              </ul>
+            </li>
+            @endif
 
           </ul>
         </aside>

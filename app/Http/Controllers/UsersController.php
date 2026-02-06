@@ -30,9 +30,10 @@ class UsersController extends Controller{
             'password' => bcrypt($request->password),
             'type' => $request->type,
             'branch' => $request->branch,
+            'menu' => "[]",
         ]);
 
-        return to_route('users.index');
+        return to_route('users.index')->with('success', 'User created successfully');
     }
     
     

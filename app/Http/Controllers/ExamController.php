@@ -545,7 +545,7 @@ class ExamController extends Controller
     }
     public function MovePervious()
     {
-        $sub = Exam::select('name')->groupBy('name')->orderByRaw('max(id) desc')->limit(5);
+        $sub = Exam::select('name')->groupBy('name')->orderByRaw('max(id) desc')->limit(3);
         $exams = Exam::leftJoinSub($sub, 't', fn($j) => $j->on('exam.name', '=', 't.name'))->whereNull('t.name')->select('exam.*')->get();
 
         foreach ($exams as $exam) {
