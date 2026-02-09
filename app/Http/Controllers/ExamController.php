@@ -60,7 +60,7 @@ class ExamController extends Controller
                     foreach ($request->file($subject . "_files") as $key => $file) {
                         $filename = $data['name'] . "-" . $q_no . '.' . $file->getClientOriginalExtension();
                         $file->move('questions', $filename);
-                        $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/".$filename];
+                        $questions[] = ['subject' => strtoupper($subject), 'image' => "questions/" . $filename];
                         $q_no++;
                     }
                 }
@@ -112,12 +112,12 @@ class ExamController extends Controller
     public function TestCategory(Request $request)
     {
         $category = Options::where('type', 'testcategory')->first()->value;
-        if($request->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             array_push($category, $request->category);
             $update = Options::where('type', 'testcategory')->update(['value' => $category]);
             return redirect()->back()->with('success', 'Category Added Successfully');
         }
-        if($request->isMethod("DELETE")) {
+        if ($request->isMethod("DELETE")) {
             $category = array_diff($category, [$request->category]);
             $update = Options::where('type', 'testcategory')->update(['value' => $category]);
             return redirect()->back()->with('success', 'Category Deleted Successfully');
@@ -138,7 +138,7 @@ class ExamController extends Controller
     {
         $student_id = $request->student_id ?? 0;
 
-        $exam_answers =  ExamAnswer::where('testname',$request->testname)->where('student_id', $student_id)->get()->keyBy('q_no');
+        $exam_answers =  ExamAnswer::where('testname', $request->testname)->where('student_id', $student_id)->get()->keyBy('q_no');
 
         for ($i = 1; $i <= $request->total_question; $i++) {
             $status = $request->status[$i] ?? null;
@@ -323,7 +323,7 @@ class ExamController extends Controller
             $csvData[] = $row;
         }
 
-        $filename = "OnlineResponse_".$examname.".csv";
+        $filename = "OnlineResponse_" . $examname . ".csv";
         return response()->stream(function () use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $line) {
@@ -380,14 +380,14 @@ class ExamController extends Controller
 
         $file = $request->file('offline');
         $originalName = $file->getClientOriginalName();
-        $filename = now()->format('Y-m-d H-i-s').'-'.$originalName;
+        $filename = now()->format('Y-m-d H-i-s') . '-' . $originalName;
         $file->move('answer_key', $filename);
 
         DB::table('key_log')->insert([
             'file_name' => $originalName,
             'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
-            'path' => 'answer_key/'.$filename,
+            'path' => 'answer_key/' . $filename,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
             'no_rows' => count($answers),
             'type' => 'offline_key',
@@ -438,28 +438,28 @@ class ExamController extends Controller
                     ->chunk(20000, function ($rows) use ($answer) {
                         $bulkData = [];
                         foreach ($rows as $row) {
-                            $key = 'a'.$row->q_no;
+                            $key = 'a' . $row->q_no;
                             $ans = $answer[$key] ?? '';
                             $ansKey = array_filter(explode('|', $ans));
                             $answerKey = count($ansKey) ? $ans : 'DEL';
                             $mark = 0;
 
-                            if($answerKey === 'DEL') {
-                               $mark = null;
+                            if ($answerKey === 'DEL') {
+                                $mark = null;
                             }
 
                             if (count($ansKey) && $row->answer) {
                                 $mark = in_array($row->answer, $ansKey) ? 4 : -1;
                             }
 
-                         $bulkData[] = [ 'id' => $row->id,'answer_key' => $answerKey,'mark' => $mark];
+                            $bulkData[] = ['id' => $row->id, 'answer_key' => $answerKey, 'mark' => $mark];
                         }
 
                         $this->executeBatchUpdate($bulkData);
                     });
             }
 
-            $filename = now()->format('Y-m-d_H-i-s').'_'.$file->getClientOriginalName();
+            $filename = now()->format('Y-m-d_H-i-s') . '_' . $file->getClientOriginalName();
             $file->move('answer_key', $filename);
 
             DB::table('key_log')->insert([
@@ -467,7 +467,7 @@ class ExamController extends Controller
                 'upload_time' => $uploadTime,
                 'test_name'  => implode(',', array_unique($uniqueTests)),
                 'test_id'    => implode(',', array_keys($uniqueTests)),
-                'path'       => 'answer_key/'.$filename,
+                'path'       => 'answer_key/' . $filename,
                 'no_rows'    => count($answers),
                 'type'       => 'answer_key',
             ]);
@@ -514,6 +514,7 @@ class ExamController extends Controller
         if ($request->start_date && $request->end_date) {
             $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange_file")->groupBy('name')->get();
         }
+
         if ($request->delete && $request->batch) {
             $exam = Exam::where('name', $request->delete)->where('academic_year', $this->academic_year)->first();
             $markrange_file = $exam->markrange_file;
@@ -525,22 +526,23 @@ class ExamController extends Controller
             return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
         }
 
-        if ($request->isMethod('post')) {
+        if ($request->isMethod('POST')) {
             foreach ($request->publish as $name => $publish) {
-                $exam['publish'] = $publish ?? 'No';
-                $batch = Student::select('batch')->whereNotNull('batch')->where('batch', '!=', '')->distinct()->get()->pluck('batch');
-                foreach ($batch as $b) {
-                    if ($request->hasFile("batch.$name.$b")) {
-                        $file = $request->file("batch.$name.$b");
-                        $file->move('assets/markrange', $file->getClientOriginalName());
-                        $exam['markrange_file'][$b] = 'assets/markrange/'.$file->getClientOriginalName();
+                $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
+                $files = $exam->markrange_file ?? [];
+                if($request->hasFile("batch.$name")) {
+                    foreach($request->file("batch.$name") as $batch => $file) {
+                        $filename = "{$name}-{$batch}.pdf";
+                        $file->move('assets/markrange', $filename);
+                        $files[$batch] = "assets/markrange/$filename";
                     }
                 }
-                Exam::where('name', $name)->where('academic_year', $this->academic_year)->update($exam);
-                $this->MovePervious();
+                $exam->update(['publish' => $publish, 'markrange_file' => $files]);
             }
-            return redirect()->back()->with('success', "Exams Publish Updated Successfully.");
+            $this->MovePervious();
+            return back()->with('success', 'Exams Publish Updated Successfully.');
         }
+
         return view('exam.publish', compact('exams'));
     }
     public function MovePervious()
