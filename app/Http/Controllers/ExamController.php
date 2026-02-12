@@ -359,13 +359,9 @@ class ExamController extends Controller
         foreach ($answers as $answer) {
             $exam = Exam::where('academic_year', $this->academic_year)->where('testid', $answer['test_id'])->first();
 
-            if (!$exam) {
-                return back()->with('error', "Exam with ID {$answer['test_id']} not found.");
-            }
-
             $exists = ExamAnswer::where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->exists();
 
-            if ($exists) {
+            if($exists) {
                 continue;
             }
 
@@ -375,19 +371,19 @@ class ExamController extends Controller
                 $subject = $this->determineSubject($i, $exam->phy_start, $exam->phy_end, $exam->chem_start, $exam->chem_end, $exam->bot_start, $exam->bot_end, $exam->zoo_start, $exam->zoo_end);
                 $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
             }
-            $exam_answer = ExamAnswer::insert($record);
+            $exam_answer = DB::table('exam_answer')->insert($record);
         }
 
         $file = $request->file('offline');
         $originalName = $file->getClientOriginalName();
-        $filename = now()->format('Y-m-d H-i-s') . '-' . $originalName;
+        $filename = now()->format('Y-m-d H-i-s').'-'.$originalName;
         $file->move('answer_key', $filename);
 
         DB::table('key_log')->insert([
             'file_name' => $originalName,
             'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
-            'path' => 'answer_key/' . $filename,
+            'path' => 'answer_key/'.$filename,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
             'no_rows' => count($answers),
             'type' => 'offline_key',
@@ -423,32 +419,30 @@ class ExamController extends Controller
             $file = $request->file('answer_key');
             $answers = $import->parseCSV($file->getRealPath());
 
-            if (empty($answers) || empty($answers[0]['test_id'])) {
-                return back()->with('error', 'File is not in the correct format.');
-            }
-
+           if(empty($answers) || empty($answers[0]['test_id'])) return back()->with('error', 'File is not in the correct format.');
+    
             $uniqueTests = [];
             $uploadTime = now()->format('Y-m-d H:i:s');
 
-            foreach ($answers as $answer) {
+            foreach($answers as $answer) {
                 $testId = $answer['test_id'];
                 $uniqueTests[$testId] = $answer['test_name'] ?? '';
 
                 ExamAnswer::where('test_id', $testId)->where('academic_year', $this->academic_year)->orderBy('id')
                     ->chunk(20000, function ($rows) use ($answer) {
                         $bulkData = [];
-                        foreach ($rows as $row) {
-                            $key = 'a' . $row->q_no;
+                        foreach($rows as $row) {
+                            $key = 'a'.$row->q_no;
                             $ans = $answer[$key] ?? '';
                             $ansKey = array_filter(explode('|', $ans));
                             $answerKey = count($ansKey) ? $ans : 'DEL';
                             $mark = 0;
 
-                            if ($answerKey === 'DEL') {
+                            if($answerKey === 'DEL') {
                                 $mark = null;
                             }
 
-                            if (count($ansKey) && $row->answer) {
+                            if(count($ansKey) && $row->answer) {
                                 $mark = in_array($row->answer, $ansKey) ? 4 : -1;
                             }
 
@@ -482,14 +476,8 @@ class ExamController extends Controller
 
     private function executeBatchUpdate(array $bulkData): void
     {
-        $batchSize = 500;
-
-        foreach (array_chunk($bulkData, $batchSize) as $chunk) {
-            DB::table('exam_answer')->upsert(
-                $chunk,
-                ['id'],
-                ['answer_key', 'mark']
-            );
+        foreach(array_chunk($bulkData, 1000) as $chunk) {
+            DB::table('exam_answer')->upsert($chunk,['id'],['answer_key', 'mark']);
         }
     }
 
