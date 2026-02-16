@@ -45,11 +45,18 @@
                         <td>
                           <div class="custom-control custom-checkbox">
 
-                            <input type="checkbox" class="custom-control-input main-checkbox" id="main_{{ $key }}" data-target="row_{{ $key }}" @if(!isset($menu['submenu'])) name="menus[{{ $menu['title'] }}][self]" @checked(in_array($menu['title'], $authorized_titles)) @endif>
+                            @if(!isset($menu['submenu']))
+                            <input type="checkbox" class="custom-control-input main-checkbox" id="main_{{ $key }}" data-target="row_{{ $key }}"  name="menus[{{ $menu['title'] }}][self]" @checked(in_array($menu['title'], $authorized_titles))>
                             <label class="custom-control-label" for="main_{{ $key }}">
-                              @if(isset($menu['icon'])) <i data-feather="{{ $menu['icon'] }}" width="15"></i> @endif
+                             <i data-feather="{{ $menu['icon'] }}" width="15"></i>
                               {{ $menu['title'] }}
                             </label>
+                            @else
+                            <label>
+                             <i data-feather="{{ $menu['icon'] }}" width="15"></i>
+                              {{ $menu['title'] }}
+                            </label>
+                            @endif
                           </div>
                         </td>
 
