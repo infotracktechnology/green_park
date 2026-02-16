@@ -525,7 +525,7 @@ class ExamController extends Controller
                         $files[$batch] = "assets/markrange/$filename";
                     }
                 }
-                $exam->update(['publish' => $publish, 'markrange_file' => $files]);
+                $update = Exam::where('name', $name)->where('academic_year', $this->academic_year)->update(['publish' => $publish, 'markrange_file' => $files]);
             }
             $this->MovePervious();
             return back()->with('success', 'Exams Publish Updated Successfully.');

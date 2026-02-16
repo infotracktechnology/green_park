@@ -22,7 +22,7 @@ class ReportController extends Controller
 
         $test_name = $request->test_name ?? 0;
 
-        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')->where([['a.testname', $test_name], ['section', '!=', ''],['section', '!=', null]])->select('section')->distinct()->orderBy('section')->get();
+        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')->where([['a.testname', $test_name], ['section', '!=', ''],['section', '!=', null]])->when(auth()->user()->branch,fn($q)=>$q->where('student.campus',auth()->user()->branch))->select('section')->distinct()->orderBy('section')->get();
 
         if ($request->query('type') == 'overall') {
             $section = $request->section;
