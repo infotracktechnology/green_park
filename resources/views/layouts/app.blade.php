@@ -96,20 +96,20 @@
 
           <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
-            <li class="dropdown"> 
-              <a href="{{ route('admin.home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a> 
+            <li class="dropdown">
+              <a href="{{ route('admin.home') }}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
             </li>
-            
-             @if(auth()->user()->type === 'Admin') 
-             <li class="dropdown"> <a href="{{ route('academicyear.index') }}" class="nav-link"><i data-feather="calendar"></i><span>Academic Year</span></a> 
+
+            @if(auth()->user()->type === 'Admin')
+            <li class="dropdown"> <a href="{{ route('academicyear.index') }}" class="nav-link"><i data-feather="calendar"></i><span>Academic Year</span></a>
             </li>
-            <li class="dropdown"> 
-              <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a> 
+            <li class="dropdown">
+              <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
             </li>
-            <li class="dropdown"> 
-              <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a> 
-            </li> 
-            
+            <li class="dropdown">
+              <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a>
+            </li>
+
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="users"></i><span>Students</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('student.create') }}" class="nav-link">Add Student</a></li>
@@ -152,7 +152,7 @@
                 <li><a href="{{ route('parent_concern') }}" class="nav-link">Parent Concern</a></li>
               </ul>
             </li>
-            <li class="dropdown"> 
+            <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Examination</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('exam.index') }}" class="nav-link">Add Test</a></li>
@@ -169,7 +169,7 @@
                 <li><a href="{{ route('exam.perviousexamresult') }}" class="nav-link">Pervious Exam Results</a></li>
               </ul>
             </li>
-            <li class="dropdown"> 
+            <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
@@ -178,7 +178,7 @@
                 <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
                 <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
                 <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
-                <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li> 
+                <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li>
                 {{-- Reports --}}
                 <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
                 <li><a href="{{ route('report.hostelvacate') }}" class="nav-link">Hostel Vacate Report</a></li>
@@ -190,7 +190,7 @@
                 <li><a href="{{ route('report.hostelsectionlist') }}" class="nav-link">Phone/Sign List (Room)</a></li>
               </ul>
             </li>
-            <li class="dropdown"> 
+            <li class="dropdown">
               <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
             </li>
 
@@ -222,9 +222,27 @@
                 <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList</a></li>
               </ul>
             </li>
-            @endif
+            @else
 
+            {{-- Admin user menu --}}
+            @foreach(auth()->user()->menu as $menu)
+            @if(isset($menu['submenu']) && !empty($menu['submenu']))
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="{{ $menu['icon'] ?? 'circle' }}"></i><span>{{ $menu['title'] }}</span></a>
+              <ul class="dropdown-menu">
+                @foreach($menu['submenu'] as $submenu)
+                <li><a href="{{ Route::has($submenu['route']) ? route($submenu['route']) : '#' }}" class="nav-link">{{ $submenu['title'] }}</a></li>
+                @endforeach
+              </ul>
+            </li>
+            @else
+            <li class="dropdown"> <a href="{{ Route::has($menu['route']) ? route($menu['route']) : '#' }}" class="nav-link"><i data-feather="{{ $menu['icon'] ?? 'circle' }}"></i><span>{{ $menu['title'] }}</span></a>
+            </li>
+            @endif
+            @endforeach
+
+            @endif
           </ul>
+
         </aside>
       </div>
 
