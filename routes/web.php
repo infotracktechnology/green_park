@@ -152,6 +152,8 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         'workshift'    => \App\Http\Controllers\WorkshiftController::class,
     ]);
 
+    Route::match(['get', 'post'], 'users/menuassign/{user}', [UsersController::class, 'MenuAssign'])->name('users.menuassign');
+
     Route::post('attendance/store', [\App\Http\Controllers\HolidayController::class, 'attendance_store'])->name('attendance.store');
     Route::get('/attendance', [\App\Http\Controllers\HolidayController::class, 'attendance'])->name('attendance');
 

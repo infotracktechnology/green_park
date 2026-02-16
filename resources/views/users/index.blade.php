@@ -38,6 +38,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Menu Access</th>
                         <th>Edit</th>
                         <th>Delete</th>
                       </tr>
@@ -54,7 +55,9 @@
                         <td>{{$user->email}}</td>
                         <td>{{$user->type }}</td>
 
-                        <td><a href="{{route('users.edit', $user->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a></td>
+                      <td><a href="{{route('users.menuassign', $user->id)}}" class="btn btn-primary"><i class="fas fa-list"></i></a></td>
+
+                      <td><a href="{{route('users.edit', $user->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a></td>
 
                         <td>
                           <form action="{{route('users.destroy', $user->id)}}" onsubmit="return confirm('Are you sure?')" method="post">

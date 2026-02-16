@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -9,16 +10,21 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Options;
 use Session;
-class UsersController extends Controller{
 
-    public function index(Request $request){
-        $users = User::where([['id', '!=', auth()->user()->id],['type', '!=', 'admin']])->get();
-        return view('users.index',compact('users'));
+class UsersController extends Controller
+{
+
+    public function index(Request $request)
+    {
+        $users = User::where([['id', '!=', auth()->user()->id], ['type', '!=', 'admin']])->get();
+        return view('users.index', compact('users'));
     }
 
-    public function create(Request $request){
-       
+    public function create(Request $request)
+    {
+
         return view('users.create');
     }
 
@@ -30,37 +36,64 @@ class UsersController extends Controller{
             'password' => bcrypt($request->password),
             'type' => $request->type,
             'branch' => $request->branch,
-            'menu' => "[]",
+            'menu' => [],
         ]);
 
         return to_route('users.index')->with('success', 'User created successfully');
     }
-    
-    
+
+    public function MenuAssign(User $user, Request $request)
+    {
+
+        $menus = collect(Options::where('type', 'admin menu')->value('value') ?? []);
+
+        if ($request->isMethod('POST')) {
+            $input = $request->input('menus', []);
+            $final_menu = $menus->map(function ($item) use ($input) {
+                $title = $item['title'];
+                if (!isset($input[$title])) return null;
+                if (isset($item['submenu'])) {
+                    $item['submenu'] = collect($item['submenu'])->filter(fn($sub) => isset($input[$title]['submenu'][$sub['title']]))->values()->all();
+                    return count($item['submenu']) ? $item : null;
+                }
+                return isset($input[$title]['self']) ? $item : null;
+            })->filter()->values();
+            $user->update(['menu' => $final_menu->toArray()]);
+            return redirect()->back()->with('success', 'User Menu Permissions Updated');
+        }
+
+        $authorized_titles = collect($user->menu)->flatMap(function ($item) {
+            return collect([$item['title']])->merge(collect($item['submenu'] ?? [])->pluck('title'));
+        })->all();
+        return view('users.menu', compact('user', 'menus', 'authorized_titles'));
+    }
+
+
 
     public function edit(User $user)
     {
-      
+
         return view('users.edit', compact('user'));
     }
-    
+
     public function update(Request $request, User $user)
     {
         $user->username = $request->username;
         $user->email = $request->email;
         $user->branch = $request->branch;
-        if(isset($request->reset_password)){
-        $user->password = bcrypt($request->password);
+        if (isset($request->reset_password)) {
+            $user->password = bcrypt($request->password);
         }
         $user->type = $request->type;
         $user->save();
-    
+
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
-    
-    
 
-    public function destroy(User $user){
+
+
+    public function destroy(User $user)
+    {
         $user->delete();
         return to_route('users.index')->with('success', 'User deleted successfully');
     }
