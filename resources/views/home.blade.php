@@ -11,10 +11,10 @@
   .text-dark { color: var(--text-dark) !important; }
   .text-muted { color: var(--text-muted) !important; }
   
-  .bg-pastel-purple { background-color: #dcd6f7; color: #5b4e8e; }
-  .bg-pastel-yellow { background-color: #fcf6bd; color: #8a7e00; }
-  .bg-pastel-blue   { background-color: #d0f4de; color: #1e6b36; }
-  .bg-pastel-pink   { background-color: #ffdae9; color: #8c2f50; }
+  .bg-pastel-purple { background-color: #dcd6f7 !important; color: #5b4e8e; }
+  .bg-pastel-yellow { background-color: #fcf6bd !important; color: #8a7e00; }
+  .bg-pastel-blue   { background-color: #d0f4de !important; color: #1e6b36; }
+  .bg-pastel-pink   { background-color: #ffdae9 !important; color: #8c2f50; }
   
   .card {
       border: none;
