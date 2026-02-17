@@ -84,7 +84,14 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
-        $results = DB::select("SELECT exam_date,b.name,b.testid,sum(mark)mark,(count(q_no)*4)total FROM `exam_answer` a join exam b on a.test_id=b.testid where student_id=$student_id and b.publish='Yes' order by b.updated_at desc limit 5");
+        $student = Student::where('student_id', $student_id)->first();
+        $sid = $student->student_id;
+        $batch = $student->batch;
+
+        $results = Exam::from("exam as b")->join('exam_answer as a', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch) {
+            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark,'markrange' => isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null];
+        });
+        
         $testgroup = ExamSubjectReport::where([['category', '!=', ''], ['stuid', $student_id]])->pluck('category')->unique();
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);

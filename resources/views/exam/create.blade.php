@@ -125,13 +125,16 @@
 
 
                   <div class="form-group col-lg-2">
-                    <label>Test ID</label>
+                    <label>Exam ID</label>
                     <input type="number" name="testid" class="form-control form-control-sm numberk" required>
                   </div>
 
                   <div class="form-group col-lg-3">
-                    <label>Test Name</label>
-                    <input type="text" name="name" id="name" class="form-control form-control-sm" required>
+                    <label>Exam Name (Unique*)</label>
+                    <input type="text" name="name" id="name" class="form-control form-control-sm @error('name') is-invalid @enderror" required>
+                    @error('name')
+                    <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
                   </div>
 
                   <div class="form-group col-lg-2">

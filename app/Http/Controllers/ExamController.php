@@ -45,8 +45,13 @@ class ExamController extends Controller
     }
 
 
+
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => ['required', 'unique:exam,name'],
+        ]);
+
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files', 'maths_files']);
         foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
@@ -525,7 +530,7 @@ class ExamController extends Controller
                         $files[$batch] = "assets/markrange/$filename";
                     }
                 }
-                $exam->update(['publish' => $publish, 'markrange_file' => $files]);
+                $update = Exam::where('name', $name)->where('academic_year', $this->academic_year)->update(['publish' => $publish, 'markrange_file' => $files]);
             }
             $this->MovePervious();
             return back()->with('success', 'Exams Publish Updated Successfully.');

@@ -48,23 +48,13 @@
           </ul>
         </div>
         <ul class="navbar-nav navbar-right">
-          <li class="dropdown dropdown-list-toggle">
+           @if(auth()->user()->type !== 'Admin')
+           <li>
+            <a href="javascript:void(0);" class="nav-link nav-link-lg">{{ auth()->user()->branch_details?->name }}</a>
+          </li>
+           @endif
+          <li>
             <a href="{{ route('admin.setting') }}" class="nav-link nav-link-lg"><i data-feather="settings"></i></a>
-            {{-- <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
-              <div class="dropdown-header">Notifications</div>
-              <div class="dropdown-list-content dropdown-list-icons">
-                <a href="#" class="dropdown-item dropdown-item-unread">
-                  <span class="dropdown-item-icon bg-primary text-white"><i class="fas fa-code"></i></span>
-                  <span class="dropdown-item-desc">
-                    Template update is available now!
-                    <span class="time">2 Min Ago</span>
-                  </span>
-                </a>
-              </div>
-              <div class="dropdown-footer text-center">
-                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
-              </div>
-            </div> --}}
           </li>
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
@@ -150,6 +140,7 @@
                 <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
                 <li><a href="{{ route('achievement.index') }}" class="nav-link">NEET Achievement</a></li>
                 <li><a href="{{ route('parent_concern') }}" class="nav-link">Parent Concern</a></li>
+                <li><a href="{{ route('mocktest.index') }}" class="nav-link">Mock Test <small> (shechedule)</small></a></li>
               </ul>
             </li>
             <li class="dropdown">
@@ -163,6 +154,7 @@
                 <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
                 <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
                 <li><a href="{{ route('exam.publish')}}" class="nav-link">Exam Publish</a></li>
+              
                 <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
                 <li><a href="{{ route('report.exam_analyisis') }}" class="nav-link">Analyisis Report</a></li>
                 <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li>
