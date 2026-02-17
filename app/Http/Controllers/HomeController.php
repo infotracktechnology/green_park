@@ -25,7 +25,7 @@ class HomeController extends Controller
         $branchId = auth()->user()->branch;
         $today = date('Y-m-d');
 
-        $data = Branch::from('branch as a')->join('student as b', 'a.id', '=', 'b.campus')->where('b.academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
+        $data = Branch::when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
 
         $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
 
