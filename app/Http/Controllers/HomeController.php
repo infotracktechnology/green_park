@@ -25,8 +25,9 @@ class HomeController extends Controller
         $branchId = auth()->user()->branch;
         $today = date('Y-m-d');
 
-        $data = Branch::when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
-        $students = Student::when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
+        $data = Branch::from('branch as a')->join('student as b', 'a.id', '=', 'b.campus')->where('b.academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
+
+        $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
 
         $boys = $students->where('gender', 'MALE')->count();
         $girls = $students->where('gender', 'FEMALE')->count();
@@ -47,6 +48,11 @@ class HomeController extends Controller
             'branch' => $item->name,
             'count'  => Chairmanvideo::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count()
         ]);
+
+        if($request->has('academic_year')) {
+         AcademicYear::query()->update(['active' => DB::raw("academic_year = '{$request->academic_year}'")]);
+         return redirect()->route('home')->with('success', 'Academic year changed successfully.');
+        }
 
         return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
     }

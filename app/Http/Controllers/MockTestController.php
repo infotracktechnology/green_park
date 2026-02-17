@@ -76,10 +76,11 @@ class MockTestController extends Controller
     {
         $student = Student::where('student_id', auth('student')->user()->student_id)->first();
         $mocktests = MockTest::ForStudent($student);
+        $exam = null;
         if ($request->isMethod('POST')) {
             dd($request->all());
         }
 
-        return view('student.mocktest', compact('mocktests'));
+        return view('student.mocktest', compact('mocktests', 'exam'));
     }
 }
