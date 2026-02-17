@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
   <style>
     thead th{
       background-color: #2b66a2 !important;
@@ -101,24 +102,6 @@
             </a>
           </li>
 
-          {{-- <li class="dropdown dropdown-list-toggle">
-            <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i></a>
-            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
-              <div class="dropdown-header">Notifications</div>
-              <div class="dropdown-list-content dropdown-list-icons">
-                <a href="#" class="dropdown-item dropdown-item-unread">
-                  <span class="dropdown-item-icon bg-primary text-white"><i class="fas fa-code"></i></span>
-                  <span class="dropdown-item-desc">
-                    Template update is available now! 
-                    <span class="time">2 Min Ago</span>
-                  </span>
-                </a>
-              </div>
-              <div class="dropdown-footer text-center">
-                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
-              </div>
-            </div>
-          </li> --}}
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
               <img alt="image" src="{{ auth()->user()->photo }}" class="user-img-radious-style">
@@ -198,6 +181,7 @@
   <script src="{{asset('js/app.min.js')}}"></script>
   <script src="{{asset('js/scripts.js')}}"></script>
   <script src="{{asset('js/custom.js')}}"></script>
+  <script src="{{asset('bundles/select2/dist/js/select2.full.min.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/easytimer.js/dist/easytimer.min.js"></script>
   <script>
     window.addEventListener("pageshow", function (event) {

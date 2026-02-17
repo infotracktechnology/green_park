@@ -33,7 +33,8 @@ use App\Http\Controllers\{
     ReceiptCancellationController,
     SegmentController,
     ConcessionController,
-    ReferencevideoController
+    ReferencevideoController,
+    MockTestController
 };
 
 use App\Models\{Student, Exam};
@@ -149,6 +150,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         'timetable'    => \App\Http\Controllers\TimetableController::class,
         'studentactivity' => StudentActivityController::class,
         'users'        => UsersController::class,
+        'mocktest'     => MockTestController::class,    
         'workshift'    => \App\Http\Controllers\WorkshiftController::class,
     ]);
 
@@ -212,6 +214,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('/examination/sectionwisetopper', [ReportController::class, 'SectionWiseTopper'])->name('sectionwisetopper');
         Route::post('/examination/subjectwisemarks', [ReportController::class, 'SubjectWiseMarks'])->name('subjectwisemarks');
         Route::post('/examination/overallmarkanalysis', [ReportController::class, 'OverallMarkAnalysis'])->name('overallmarkanalysis');
+
         Route::get('/hostel/roomallocation', [ReportController::class, 'RoomAllocation'])->name('roomallocation');
         Route::get('/hostel/vacate', [ReportController::class, 'HostelVacate'])->name('hostelvacate');
         Route::get('/hostel/inoutregister', [ReportController::class, 'InOutRegister'])->name('inoutregister');
@@ -283,7 +286,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     });
 
     Route::resource('document', StudentDocumentController::class)->only(['index', 'store', 'destroy']);
-    Route::get('mock', [\App\Http\Controllers\StudentMockTestController::class, 'index'])->name('student.mock');
+    Route::match(['get', 'post'],'mocktest', [MockTestController::class, 'MockTest'])->name('student.mock');
     Route::get('timetable', [\App\Http\Controllers\TimetableController::class, 'timetable'])->name('student.timetable');
 });
 

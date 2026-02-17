@@ -141,7 +141,7 @@ class StudentController extends Controller
     {
         $sid = auth()->user()->student_id;
         $batch = auth()->user()->batch;
-        $exams = Exam::from("exam as b")->join('exam_answer as a', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch) {
+        $exams = Exam::from("exam as b")->join('exam_answer as a', 'a.testname', '=', 'b.name')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch) {
             return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark,'markrange' => isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null];
         });
 

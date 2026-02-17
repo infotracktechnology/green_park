@@ -45,8 +45,13 @@ class ExamController extends Controller
     }
 
 
+
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => ['required', 'unique:exam,name'],
+        ]);
+
         $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files', 'maths_files']);
         foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
