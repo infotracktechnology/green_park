@@ -77,6 +77,9 @@ class MockTestController extends Controller
         $student = Student::where('student_id', auth('student')->user()->student_id)->first();
         $mocktests = MockTest::ForStudent($student);
         $exam = null;
+        if ($request->has('exam_name')) {
+            $exam = Exam::where('name', $request->exam_name)->first();
+        }
         if ($request->isMethod('POST')) {
             dd($request->all());
         }

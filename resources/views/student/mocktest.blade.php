@@ -60,17 +60,17 @@
       <h4>Mock Test (OMR Sheet)</h4>
     </div>
     <div class="card-body">
-         @if(session()->has('success'))
-          <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
-          @endif
-          
+      @if(session()->has('success'))
+      <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
+      @endif
+
       <form action="{{ route('student.mock') }}" method="GET">
         <div class="row">
           <div class="form-group col-lg-3">
             <select class="select2" id="exam_name" name="exam_name" required>
               <option value="">-- Select Exam Name --</option>
               @foreach ($mocktests as $row)
-              <option value="{{$row->exam_name}}">{{$row->exam_name}}</option>
+              <option value="{{$row->exam_name}}" @selected($row->exam_name==request('exam_name'))>{{$row->exam_name}}</option>
               @endforeach
             </select>
           </div>
@@ -85,14 +85,33 @@
       <form action="{{ route('student.mock') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="table-responsive">
+            <input type="hidden" name="testname" value="{{ $exam->name }}">
+            <input type="hidden" name="test_id" value="{{ $exam->testid }}">
           <table class="omr-table">
             <thead>
               <tr>
-                @for($i = 0; $i < 4; $i++) <th class="q-num">Q.</th>
+                @for($i = 0; $i < 4; $i++) 
+                  <th class="q-num">Q.</th>
                   <th>1 &nbsp; 2 &nbsp; 3 &nbsp; 4</th>
-                  @endfor
+                @endfor
               </tr>
             </thead>
+            <tbody>
+              <?php $tq = $exam->total_questions/4; ?>
+              @for($row = 1; $row <= $tq; $row++) 
+              <tr>
+                @for($col = 0; $col < 4; $col++)
+                <?php $q = $row + ($col * $tq); ?>
+                <td>{{ $q }}</td>
+                <td>
+                  @for($opt = 1; $opt <= 4; $opt++) 
+                  <input type="radio" class="omr-radio" name="answers[{{ $q }}]" value="{{ $opt }}">
+                  @endfor
+                </td>
+                @endfor
+                </tr>
+                @endfor
+            </tbody>
           </table>
         </div>
 
