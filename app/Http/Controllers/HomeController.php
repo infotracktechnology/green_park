@@ -51,7 +51,7 @@ class HomeController extends Controller
 
         if($request->has('academic_year')) {
          AcademicYear::query()->update(['active' => DB::raw("academic_year = '{$request->academic_year}'")]);
-         return redirect()->route('home')->with('success', 'Academic year changed successfully.');
+         return redirect()->route('admin.home')->with('success', 'Academic year changed successfully.');
         }
 
         return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));

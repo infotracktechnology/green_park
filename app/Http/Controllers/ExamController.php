@@ -287,7 +287,7 @@ class ExamController extends Controller
     public function OnlineResponseDownload(Request $request)
     {
         $examname = $request->examname;
-        $reportData = DB::table('exam_answer as ea')->join('exam as e', 'e.testid', '=', 'ea.test_id')->join('student as s', 's.student_id', '=', 'ea.student_id')->select('s.coaching_type', 's.user_name as username', 's.student_name', 's.section', 'ea.student_id', 'ea.test_id', 'e.name as exam_name', DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'), 'ea.q_no', 'ea.answer')->where('e.name', $examname)->where('ea.mode', '!=', 'OMR')->get()->groupBy('student_id');
+        $reportData = DB::table('exam_answer as ea')->join('exam as e', 'e.name', '=', 'ea.testname')->join('student as s', 's.student_id', '=', 'ea.student_id')->select('s.coaching_type', 's.user_name as username', 's.student_name', 's.section', 'ea.student_id', 'ea.test_id', 'e.name as exam_name', DB::raw('DATE_FORMAT(e.start_at, "%Y-%m-%d") as exam_date'), 'ea.q_no', 'ea.answer')->where('e.name', $examname)->where('ea.mode', '!=', 'OMR')->get()->groupBy('student_id');
 
         $headers = [
             'Coaching Type',
@@ -357,14 +357,14 @@ class ExamController extends Controller
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
 
-        if (empty($answers) || !isset($answers[0]['test_id'], $answers[0]['student_id'])) {
+        if (empty($answers) || !isset($answers[0]['exam_name'], $answers[0]['student_id'])) {
             return back()->with('error', 'File is not in the template format.');
         }
 
         foreach ($answers as $answer) {
-            $exam = Exam::where('academic_year', $this->academic_year)->where('testid', $answer['test_id'])->first();
+            $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answer['exam_name'])->first();
 
-            $exists = ExamAnswer::where('test_id', $answer['test_id'])->where('student_id', $answer['student_id'])->exists();
+            $exists = ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->exists();
 
             if($exists) {
                 continue;
