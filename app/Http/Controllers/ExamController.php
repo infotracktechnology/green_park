@@ -237,6 +237,10 @@ class ExamController extends Controller
         return response()->json(['message' => 'Log cleared successfully']);
     }
 
+    public function OfflineExam(Request $request){
+        $testcategory = Options::where('type', 'testcategory')->first()->value;
+        return view('exam.offlineexam', compact('testcategory'));
+    }
 
     public function enable(Request $request)
     {
@@ -260,6 +264,8 @@ class ExamController extends Controller
 
         return view('exam.enable', compact('tests', 'students', 'testId'));
     }
+
+
 
     public function enableExam(Request $request)
     {
@@ -357,35 +363,37 @@ class ExamController extends Controller
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
 
-        if (empty($answers) || !isset($answers[0]['exam_name'], $answers[0]['student_id'])) {
+        if (empty($answers) || !isset($answers[0]['exam_name'],$answers[0]['student_id'],$answers[0]['qorder'])) {
             return back()->with('error', 'File is not in the template format.');
         }
 
         foreach ($answers as $answer) {
             $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answer['exam_name'])->first();
-
             $exists = ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->exists();
 
-            if($exists) {
-                continue;
-            }
-
+            if($exists) continue;
+            
             $record = [];
-
-            for ($i = 1; $i <= $exam->total_questions; $i++) {
-                $subject = $this->determineSubject($i, $exam->phy_start, $exam->phy_end, $exam->chem_start, $exam->chem_end, $exam->bot_start, $exam->bot_end, $exam->zoo_start, $exam->zoo_end);
-                $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => $subject, 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
-            }
-            $exam_answer = DB::table('exam_answer')->insert($record);
+            $qno = 1;
+            $total_questions = 0;
+            foreach(explode(',', $answer['qorder']) as $col) {
+               $subjectkey = strtolower($col);
+               $subtotal = (int) ($exam->{"{$subjectkey}_questions"} ?? 0);
+               $total_questions = $total_questions+$subtotal;
+               for($i=$qno; $i<=$total_questions; $i++) {
+               $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => strtoupper($col), 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
+               $qno++;
+               }
+             }
+             $exam_answer = DB::table('exam_answer')->insert($record);
         }
-
+            
         $file = $request->file('offline');
-        $originalName = $file->getClientOriginalName();
-        $filename = now()->format('Y-m-d H-i-s').'-'.$originalName;
+        $filename = $file->getClientOriginalName();
         $file->move('answer_key', $filename);
 
         DB::table('key_log')->insert([
-            'file_name' => $originalName,
+            'file_name' => $filename,
             'upload_time' => now(),
             'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
             'path' => 'answer_key/'.$filename,
@@ -395,17 +403,6 @@ class ExamController extends Controller
         ]);
 
         return back()->with('success', 'Offline file uploaded successfully.');
-    }
-
-    public function determineSubject($question, $phyStart, $phyEnd, $chemStart, $chemEnd, $botStart, $botEnd, $zooStart, $zooEnd)
-    {
-        return match (true) {
-            $phyStart && $question >= $phyStart && $question <= $phyEnd => 'PHYSICS',
-            $chemStart && $question >= $chemStart && $question <= $chemEnd => 'CHEMISTRY',
-            $botStart && $question >= $botStart && $question <= $botEnd => 'BOTANY',
-            $zooStart && $question >= $zooStart && $question <= $zooEnd => 'ZOOLOGY',
-            default => NULL,
-        };
     }
 
     public function answerKey()

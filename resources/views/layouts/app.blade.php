@@ -146,7 +146,9 @@
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Examination</span></a>
               <ul class="dropdown-menu">
-                <li><a href="{{ route('exam.index') }}" class="nav-link">Add Test</a></li>
+                <li><a href="{{ route('exam.index') }}" class="nav-link">View Exams</a></li>
+                <li><a href="{{ route('exam.create') }}" class="nav-link">Add Online Exam</a></li>
+                <li><a href="{{ route('exam.offlineexam') }}" class="nav-link">Add Offline Exam</a></li>
                 <li><a href="{{ route('exam.testcategory') }}" class="nav-link">Test Category <small>(add / delete)</small></a></li>
 
                 <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>

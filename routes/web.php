@@ -115,6 +115,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::controller(ExamController::class)->group(function () {
         Route::get('examination/instruction/{test_id}', 'instruction')->name('exam.instruction');
         Route::match(['get', 'post','delete'], 'examination/testcategory', 'TestCategory')->name('exam.testcategory');
+        Route::get('examination/offlineexam', 'OfflineExam')->name('exam.offlineexam');
         Route::get('examination/enable', 'enable')->name('exam.enable');
         Route::post('examination/enable', 'enableExam')->name('exam.enableExam');
         Route::get('examination/onlineresponse', 'OnlineResponse')->name('exam.onlineresponse');
