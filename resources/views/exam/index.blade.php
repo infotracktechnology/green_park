@@ -28,10 +28,6 @@
                 <div class="col-md-2 col-sm-12 mb-3">
                   <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addShechedule">Add Shechedule</button>
                 </div>
-                <div class="col-md-2 col-sm-12 mb-3">
-                  <a href="{{route('exam.create')}}" class="btn btn-primary btn-block">Add Test</a>
-                </div>
-
               </div>
               <div class="col-12">
                 <form action="{{ route('exam.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
