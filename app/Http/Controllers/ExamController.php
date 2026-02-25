@@ -546,7 +546,7 @@ class ExamController extends Controller
                 $sr = substr($s, 0, 1);
                 return "sum(if(subject='$s' and mark=4,1,0)) as `{$sr}r`,sum(if(subject='$s' and mark=-1,1,0)) as `{$sr}w`,sum(if(subject='$s' and mark=0,1,0)) as `{$sr}l`,sum(if(subject='$s',mark,0)) as `{$sr}tot`";
             })->implode(',');
-            $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->where('testname', $exam->name)->selectRaw("s.student_id as stuid,s.student_name as sname,s.batch,test_id as testid,s.section as sec,sum(mark) totmark,$expr")->groupBy('stuid')->get()->map(function ($answer) use ($exam) {
+            $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->where('testname', $exam->name)->selectRaw("s.student_id as stuid,s.student_name as sname,s.batch,test_id as testid,s.section as sec,(count(mark)*4)totmark,sum(mark)nettot,$expr")->groupBy('stuid')->get()->map(function ($answer) use ($exam) {
                 return array_merge($answer->toArray(), ['category' => $exam->testcategory, 'subject' => $exam->name, 'exdate' => date('d-m-Y', strtotime($exam->exam_date))]);
             })->toArray();
             foreach (array_chunk($answers, 500) as $row) {
