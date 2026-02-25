@@ -22,7 +22,7 @@
                     <h6 class="col-deep-purple">Add Online Exam</h6>
                   </div>
 
-
+                  <input type="hidden" name="examtype" value="ONLINE">
                   <div class="form-group col-lg-3">
                     <label for="branch">Select Academic Year:</label>
                     <select name="academic_year" id="academic_year" class="form-control form-control-sm">
