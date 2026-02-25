@@ -19,6 +19,10 @@
           <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
           @endif
 
+           @if(session()->has('error'))
+          <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
+          @endif
+
           <div class="card card-primary">
             <div class="card-body">
               <div class="row">

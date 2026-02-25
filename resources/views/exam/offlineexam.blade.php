@@ -175,7 +175,7 @@
                     </div>
                     <div class="col-lg-2 botany-inputs" style="display: none;">
                       <label for="botanyQuestions">Botany Questions</label>
-                      <input type="number" min="1" max="180" name="botony_questions" id="botanyQuestions" class="form-control form-control-sm" disabled>
+                      <input type="number" min="1" max="180" name="botany_questions" id="botanyQuestions" class="form-control form-control-sm" disabled>
                     </div>
                     
                   </div>
