@@ -15,10 +15,13 @@
                   </div>
                   <div class="card-body">
                     <table class="table table-bordered table-striped">
-                      <tr>
-                        <th>Title</th>
-                        <th>Attachment</th> 
-                      </tr>
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Attachment</th>
+                        </tr>
+                      </thead>
+                      <tbody>
                       @foreach ($examportions as $examportion)
                       <tr>
                         <td>{{ $examportion->title }}</td>
@@ -31,6 +34,7 @@
                         </td>
                       </tr>
                       @endforeach
+                      </tbody>
                     </table>
                   </div>
                 </div>

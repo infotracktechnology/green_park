@@ -82,11 +82,12 @@
       </form>
 
       @if($exam)
-      <form action="{{ route('student.mock') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('student.mock') }}" onsubmit="return confirm('Are you sure you want to submit this?')" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="table-responsive">
             <input type="hidden" name="testname" value="{{ $exam->name }}">
             <input type="hidden" name="test_id" value="{{ $exam->testid }}">
+            <input type="hidden" name="student_id" value="{{ $student->student_id }}">
           <table class="omr-table">
             <thead>
               <tr>
@@ -97,12 +98,26 @@
               </tr>
             </thead>
             <tbody>
-              <?php $tq = $exam->total_questions/4; ?>
+              <?php 
+                $tq = $exam->total_questions/4;
+                $Subjects =[];
+                $qno = 1;
+                foreach(explode(',', $exam->subject_name) as $col) {
+                  $subjectkey = strtolower($col);
+                  $subtotal = (int) ($exam->{"{$subjectkey}_questions"} ?? 0);
+                  for($i = 1; $i <= $subtotal; $i++){
+                    $Subjects[$qno] = strtoupper($col);
+                    $qno++;
+                  }
+                }
+              ?>
               @for($row = 1; $row <= $tq; $row++) 
               <tr>
                 @for($col = 0; $col < 4; $col++)
                 <?php $q = $row + ($col * $tq); ?>
-                <td>{{ $q }}</td>
+                <td>{{ $q }}
+                  <input type="hidden" name="subject[{{ $q }}]" value="{{ $Subjects[$q] }}">
+                </td>
                 <td>
                   @for($opt = 1; $opt <= 4; $opt++) 
                   <input type="radio" class="omr-radio" name="answers[{{ $q }}]" value="{{ $opt }}">

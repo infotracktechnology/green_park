@@ -371,17 +371,17 @@ class ExamController extends Controller
             $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answer['exam_name'])->first();
             $exists = ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->exists();
 
-            if($exists) continue;
+            if($exists) {
+              ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->delete();
+            }
             
             $record = [];
             $qno = 1;
-            $total_questions = 0;
             foreach(explode(',', $answer['qorder']) as $col) {
                $subjectkey = strtolower($col);
                $subtotal = (int) ($exam->{"{$subjectkey}_questions"} ?? 0);
-               $total_questions = $total_questions+$subtotal;
-               for($i=$qno; $i<=$total_questions; $i++) {
-               $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => strtoupper($col), 'q_no' => $i, 'answer' => $answer["q$i"] ?? null, 'mode' => 'OMR'];
+               for($i=1; $i<=$subtotal; $i++) {
+               $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => strtoupper($col), 'q_no' => $qno, 'answer' => $answer["q$qno"] ?? null, 'mode' => 'OMR'];
                $qno++;
                }
              }
