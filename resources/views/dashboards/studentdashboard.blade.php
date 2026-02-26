@@ -51,7 +51,10 @@
           <div class="card-statistic-3">
             <div class="card-icon card-icon-large"><i class="fa fa-building"></i></div>
             <div class="card-content">
-              <h2 class="card-title">Branch : {{ auth()->user()->branch ? auth()->user()->branch->name : 'No Branch Assigned' }}</h2>
+              <h2 class="card-title">Branch : {{ auth()->user()->branch?->name }}</h2>
+               <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Course:</strong> {{ auth()->user()->course }}</span></p>
+              <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Section:</strong> {{ auth()->user()->section }}</span>
+              </p>
             </div>
           </div>
         </div>
