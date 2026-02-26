@@ -81,9 +81,19 @@ class MockTestController extends Controller
             $exam = Exam::where('name', $request->exam_name)->first();
         }
         if ($request->isMethod('POST')) {
-            dd($request->all());
+            $examanswer = ExamAnswer::where('testname', $request->testname)->where('student_id', $request->student_id)->first();
+            if ($examanswer) {
+                ExamAnswer::where('testname', $request->testname)->where('student_id', $request->student_id)->delete();
+            }
+            
+            $answers = [];
+            foreach ($request->answers as $q => $answer) {
+                $answers[] = ['q_no' => $q, 'answer' => $answer, 'student_id' => $request->student_id, 'testname' => $request->testname, 'test_id' => $request->test_id, 'academic_year' => $this->academic_year, 'subject' => $request->subject[$q]];
+            }
+            ExamAnswer::insert($answers);
+            return redirect()->route('studentdashboard')->with('success', 'Mock Test Answer Saved Successfully');
         }
 
-        return view('student.mocktest', compact('mocktests', 'exam'));
+        return view('student.mocktest', compact('mocktests', 'exam', 'student'));
     }
 }
