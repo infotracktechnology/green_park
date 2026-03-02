@@ -146,7 +146,7 @@ class StudentController extends Controller
             if($type === "OFFLINE"){
                 $markrange = isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null;
             }else{
-                $markrange = isset($test->markrange_file[0]) ? $test->markrange_file[0] : null;
+                $markrange = isset($test->markrange_file['online']) ? $test->markrange_file['online'] : null;
             }
             return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark,'markrange' => $markrange];
         });

@@ -87,9 +87,15 @@ Route::group(['prefix' => 'v2'], function () {
         $student = Student::where('student_id', $student_id)->first();
         $sid = $student->student_id;
         $batch = $student->batch;
+        $type = $student->coaching_type;
 
-        $results = Exam::from("exam as b")->join('exam_answer as a', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch) {
-            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark,'markrange' => isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null];
+        $results = Exam::from("exam as b")->join('exam_answer as a', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch, $type) {
+            if($type === "OFFLINE"){
+                $markrange = isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null;
+            }else{
+                $markrange = isset($test->markrange_file['online']) ? $test->markrange_file['online'] : null;
+            }
+            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark,'markrange' => $markrange];
         });
         
         $testgroup = ExamSubjectReport::where([['category', '!=', ''], ['stuid', $student_id]])->pluck('category')->unique();
