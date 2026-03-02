@@ -155,7 +155,8 @@
                 <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response(csv file)</a></li>
                 <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
                 <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
-                <li><a href="{{ route('exam.publish')}}" class="nav-link">Exam Publish</a></li>
+                <li><a href="{{ route('exam.offlinepublish')}}" class="nav-link">Offline Exam Publish</a></li>
+                <li><a href="{{ route('exam.onlinepublish')}}" class="nav-link">Online Exam Publish</a></li>
               
                 <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
                 <li><a href="{{ route('report.exam_analyisis') }}" class="nav-link">Analyisis Report</a></li>

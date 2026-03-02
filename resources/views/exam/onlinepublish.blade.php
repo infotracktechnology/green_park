@@ -31,10 +31,10 @@
 
           <div class="card card-primary">
             <div class="card-header">
-              <h4>Examinations Publish</h4>
+              <h4>Online Examinations Publish</h4>
             </div>
             <div class="card-body">
-              <form method="get" id="myForm" action="{{ route('exam.publish') }}" enctype="multipart/form-data">
+              <form method="get" id="myForm" action="{{ route('exam.onlinepublish') }}" enctype="multipart/form-data">
                 <div class="row">
                   <div class="form-group col-lg-2">
                     <label>Start Date</label>
@@ -53,7 +53,7 @@
                 </div>
               </form>
 
-              <form method="post" id="myForm" action="{{ route('exam.publish') }}" enctype="multipart/form-data">
+              <form method="post" id="myForm" action="{{ route('exam.onlinepublish') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                   <div class="col-lg-12">
@@ -65,9 +65,7 @@
                             <th>Test Name</th>
                             <th>Test Category</th>
                             <th>Total Questions</th>
-                            @foreach($batch as $row)
-                            <th>Mark Range(BATCH {{ $row }})</th>
-                            @endforeach
+                            <th>Mark Range</th>
                             <th>Publish</th>
                           </tr>
                         </thead>
@@ -79,16 +77,16 @@
                             <td>{{ $exam->testcategory }}</td>
                             <td>{{ $exam->total_questions }}</td>
 
-                           @foreach($batch as $row)
+                         
                             <td>
-                              @if(isset($exam->markrange_file[$row]))
-                              <a href="{{ env('APP_URL').$exam->markrange_file[$row] }}" download>{{ basename($exam->markrange_file[$row]) }}</a><br>
-                              <a class="btn btn-danger text-white" href="{{ route('exam.publish',['delete'=>$exam->name,'batch'=>$row])}}"><i class="fas fa-trash"></i></a>
+                              @if(isset($exam->markrange_file['online']))
+                              <a href="{{ env('APP_URL').$exam->markrange_file['online'] }}" download>{{ basename($exam->markrange_file['online']) }}</a><br>
+                              <a class="btn btn-danger text-white" href="{{ route('exam.onlinepublish',['delete'=>$exam->name,'batch'=>'online'])}}"><i class="fas fa-trash"></i></a>
                               @else
-                              <input type="file" name="batch[{{ $exam->name }}][{{ $row }}]" accept="application/pdf" class="form-control form-control-sm">
+                              <input type="file" name="batch[{{ $exam->name }}][online]" accept="application/pdf" class="form-control form-control-sm">
+                              @endif
                             </td>
-                            @endif
-                            @endforeach
+                            
 
                             <td>
                               <select name="publish[{{ $exam->name }}]" class="form-control form-control-sm" required>
