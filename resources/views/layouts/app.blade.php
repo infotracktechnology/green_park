@@ -174,7 +174,7 @@
                 <li><a href="{{ route('report.exam_analyisis') }}" class="nav-link">Analyisis Report</a></li>
                 <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li>
                 <li><a href="{{ route('exam.perviousexamresult') }}" class="nav-link">Pervious Exam Results</a></li>
-                <li><a href="{{ route('mocktest.index') }}" class="nav-link">MOCK TEST (SCHEDULE)</a></li>
+                <li><a href="{{ route('mocktest.index') }}" class="nav-link">Mock Test (Schedule)</a></li>
                 <li><a href="{{ route('exam.testcategory') }}" class="nav-link">Test Category(add / delete)</a></li>
               </ul>
             </li>
