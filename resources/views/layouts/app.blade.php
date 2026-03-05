@@ -48,11 +48,11 @@
           </ul>
         </div>
         <ul class="navbar-nav navbar-right">
-           @if(auth()->user()->type !== 'Admin')
-           <li>
+          @if(auth()->user()->type !== 'Admin')
+          <li>
             <a href="javascript:void(0);" class="nav-link nav-link-lg">{{ auth()->user()->branch_details?->name }}</a>
           </li>
-           @endif
+          @endif
           <li>
             <a href="{{ route('admin.setting') }}" class="nav-link nav-link-lg"><i data-feather="settings"></i></a>
           </li>
@@ -145,25 +145,40 @@
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Examination</span></a>
               <ul class="dropdown-menu">
-                <li><a href="{{ route('exam.index') }}" class="nav-link">View Exams</a></li>
-                <li><a href="{{ route('exam.create') }}" class="nav-link">Add Online Exam</a></li>
-                <li><a href="{{ route('exam.offlineexam') }}" class="nav-link">Add Offline Exam</a></li>
-                <li><a href="{{ route('exam.testcategory') }}" class="nav-link">Test Category <small>(add / delete)</small></a></li>
 
-                <li><a href="{{ route('mocktest.index') }}" class="nav-link">Mock Test <small> (shechedule)</small></a></li>
-                <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
-                <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response(csv file)</a></li>
-                <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">Offline/OMR Upload</a></li>
-                <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer key Upload</a></li>
-                <li><a href="{{ route('exam.offlinepublish')}}" class="nav-link">Offline Exam Publish</a></li>
-                <li><a href="{{ route('exam.onlinepublish')}}" class="nav-link">Online Exam Publish</a></li>
-              
-                <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
+                <li class="dropdown">
+                  <a href="#" class="menu-toggle nav-link has-dropdown">CBT Based Exam</a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{{ route('exam.create') }}" class="nav-link">Add CBT Exam</a></li>
+                    <li><a href="{{ route('exam.index') }}" class="nav-link">View Exams</a></li>
+                    <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response</a></li>
+                    <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">OMR Response Upload</a></li>
+                    <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer Key Valuation</a></li>
+                    <li><a href="{{ route('exam.onlinepublish')}}" class="nav-link">Exam Result Publish</a></li>
+                    <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
+                  </ul>
+                </li>
+
+                <li class="dropdown">
+                  <a href="#" class="menu-toggle nav-link has-dropdown">OMR Based Exam</a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{{ route('exam.offlineexam') }}" class="nav-link">Add OMR Based Exam</a></li>
+                    <li><a href="{{ route('exam.index') }}" class="nav-link">View Exams</a></li>
+                   <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">OMR Response Upload</a></li>
+                    <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer Key Valuation</a></li>
+                    <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
+                    <li><a href="{{ route('exam.offlinepublish')}}" class="nav-link">Exam Result Publish</a></li>
+                  </ul>
+                </li>
+
                 <li><a href="{{ route('report.exam_analyisis') }}" class="nav-link">Analyisis Report</a></li>
                 <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li>
                 <li><a href="{{ route('exam.perviousexamresult') }}" class="nav-link">Pervious Exam Results</a></li>
+                <li><a href="{{ route('mocktest.index') }}" class="nav-link">MOCK TEST (SCHEDULE)</a></li>
+                <li><a href="{{ route('exam.testcategory') }}" class="nav-link">Test Category(add / delete)</a></li>
               </ul>
             </li>
+
             <li class="dropdown">
               <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="home"></i><span>Hostel</span></a>
               <ul class="dropdown-menu">
