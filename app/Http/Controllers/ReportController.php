@@ -461,7 +461,7 @@ class ReportController extends Controller
             $students = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('room_no', $request->room)->get();
             $branchname = $students->first()->branch->name ?? '';
             $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'hostel'));
-            return $pdf->download("$hostel-$request->room-$request->view.pdf");
+            return $pdf->download("$hostels-$request->room-$request->view.pdf");
         }
 
         return view('report.hostelroomlist', compact('hostels', 'room'));
@@ -477,7 +477,7 @@ class ReportController extends Controller
             $students = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('section', $request->section)->get();
             $branchname = $students->first()->branch->name ?? '';
             $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'hostel'));
-            return $pdf->download("$hostel-$request->section-$request->view.pdf");
+            return $pdf->download("$hostels-$request->section-$request->view.pdf");
         }
 
         return view('report.hostelsectionlist', compact('hostels', 'section'));
