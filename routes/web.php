@@ -113,6 +113,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
 
     Route::resource('exam', ExamController::class);
     Route::controller(ExamController::class)->group(function () {
+        Route::get('examination/view/{examtype}', 'ViewExams')->name('exam.viewexams');
         Route::get('examination/instruction/{test_id}', 'instruction')->name('exam.instruction');
         Route::match(['get', 'post','delete'], 'examination/testcategory', 'TestCategory')->name('exam.testcategory');
         Route::get('examination/offlineexam', 'OfflineExam')->name('exam.offlineexam');

@@ -29,10 +29,31 @@
                 <div class="col-md-8 col-sm-12 mb-3">
                   <h6 class="col-deep-purple">Examinations</h6>
                 </div>
+                @if($examtype == 'ONLINE')
                 <div class="col-md-2 col-sm-12 mb-3">
                   <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addShechedule">Add Shechedule</button>
                 </div>
+                @endif
               </div>
+
+              @if($examtype == 'ONLINE')
+              <form action="{{ route('exam.viewexams', $examtype) }}" method="get">
+                <div class="row">
+                  <div class="form-group col-lg-3">
+                    <select name="coaching_type" class="select2" required>
+                      <option value="">Select Coaching Type</option>
+                      @foreach ($coachingtype as $row)
+                      <option value="{{$row}}" @selected(request('coaching_type')==$row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                  </div>
+                </div>
+              </form>
+              @endif
+
               <div class="col-12">
                 <form action="{{ route('exam.destroy','bulk') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
                 @csrf
@@ -111,7 +132,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="{{ route('exam.index') }}" method="get" enctype="multipart/form-data">
+        <form action="{{ route('exam.viewexams', $examtype) }}" method="get" enctype="multipart/form-data">
           <div class="row">
             <div class="form-group col-12">
               <label for="branch">Test</label>
@@ -144,8 +165,8 @@
     </div>
   </div>
 </div>
-
 @endsection
+
 
 @section('js')
 <script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>

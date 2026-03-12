@@ -17,12 +17,12 @@ use App\Http\Controllers\ImportController;
 class ExamController extends Controller
 {
 
-    public function index(Request $request)
+    public function ViewExams(Request $request, $examtype)
     {
         $tests = Exam::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
                 $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-            })->latest()->get();
+            })->where('examtype', $examtype)->when($request->coaching_type,fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))->latest()->get();
 
         if ($request->has('test_id')) {
             $test = Exam::find($request->test_id);
@@ -35,7 +35,7 @@ class ExamController extends Controller
             return to_route('exam.index')->with('success', 'Test Scheduled Successfully');
         }
 
-        return view('exam.index', compact('tests'));
+        return view('exam.index', compact('tests','examtype'));
     }
 
     public function create()
@@ -78,6 +78,8 @@ class ExamController extends Controller
         }
         return to_route('exam.index')->with('success', 'Test Created Successfully');
     }
+
+   
 
     public function edit(Request $request, Exam $exam)
     {

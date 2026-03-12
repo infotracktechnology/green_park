@@ -150,7 +150,7 @@
                   <a href="#" class="menu-toggle nav-link has-dropdown">CBT Based Exam</a>
                   <ul class="dropdown-menu">
                     <li><a href="{{ route('exam.create') }}" class="nav-link">Add CBT Exam</a></li>
-                    <li><a href="{{ route('exam.index') }}" class="nav-link">View Exams</a></li>
+                    <li><a href="{{ route('exam.viewexams','ONLINE') }}" class="nav-link">View Exams</a></li>
                     <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response</a></li>
                     <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">OMR Response Upload</a></li>
                     <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer Key Valuation</a></li>
@@ -163,7 +163,7 @@
                   <a href="#" class="menu-toggle nav-link has-dropdown">OMR Based Exam</a>
                   <ul class="dropdown-menu">
                     <li><a href="{{ route('exam.offlineexam') }}" class="nav-link">Add OMR Based Exam</a></li>
-                    <li><a href="{{ route('exam.index') }}" class="nav-link">View Exams</a></li>
+                    <li><a href="{{ route('exam.viewexams','OFFLINE') }}" class="nav-link">View Exams</a></li>
                    <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">OMR Response Upload</a></li>
                     <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer Key Valuation</a></li>
                     <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
