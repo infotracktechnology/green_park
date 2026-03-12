@@ -64,6 +64,18 @@
       <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
       @endif
 
+      @if(session('download_pdf'))
+      <div class="alert alert-info d-flex justify-content-between align-items-center">
+          <div>
+              MockTest PDF is ready for download.
+          </div>
+          <a href="{{ route('student.mocktestpdf', session('download_pdf')) }}" class="btn btn-success">
+              <i class="fas fa-download"></i> Download Response PDF
+          </a>
+      </div>
+      {{-- 2. Only show the Forms if NOT currently in 'download_pdf' state --}}
+      @else
+  
       <form action="{{ route('student.mock') }}" method="GET">
         <div class="row">
           <div class="form-group col-lg-3">
@@ -134,6 +146,7 @@
           <button type="submit" class="btn btn-primary">Final Submit</button>
         </div>
       </form>
+      @endif
       @endif
     </div>
   </div>

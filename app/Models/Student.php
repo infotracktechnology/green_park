@@ -176,4 +176,32 @@ class Student extends Authenticatable
                     ->whereRaw("date(start_at) = ?", [date('Y-m-d')]);
             })->first();
     }
+
+
+     public  function GetMockTest()
+    {
+        return MockTest::query()
+            ->where(function ($query) {
+                $query->where('usertype', 'INDIVIDUAL')
+                    ->where('students', $this->student_id)
+                    ->whereRaw("date(start_at) = ?", [date('Y-m-d')]);
+            })
+            ->orWhere(function ($query) {
+                $query->where('academic_year', $this->academic_year)
+                    ->where('course', $this->course)
+                    ->where('branch', 'like', "%{$this->campus}%")
+                    ->where('coaching_type', 'like', "%{$this->coaching_type}%")
+                    ->when($this->coaching_type === 'OFFLINE', function ($q) {
+                        if (in_array($this->course, ['NEET', 'JEE'])) {
+                            if (in_array($this->campus, [1, 4, 5])) {
+                                $q->where('category', 'like', "%{$this->hostel_dayscholar}%");
+                            }
+                            $q->where('batch', 'like', "%{$this->batch}%");
+                        }
+                        $q->where('section', 'like', "%{$this->section}%");
+                    })
+                    ->whereIn('gender', [$this->gender, 'All'])
+                    ->whereRaw("date(start_at) = ?", [date('Y-m-d')]);
+            })->first();
+    }
 }

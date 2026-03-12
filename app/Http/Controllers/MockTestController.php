@@ -8,6 +8,7 @@ use App\Models\MockTest;
 use App\Models\ExamAnswer;
 use App\Models\Exam;
 use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MockTestController extends Controller
 {
@@ -85,15 +86,32 @@ class MockTestController extends Controller
             if ($examanswer) {
                 ExamAnswer::where('testname', $request->testname)->where('student_id', $request->student_id)->delete();
             }
-            
+
             $answers = [];
-            foreach ($request->answers as $q => $answer) {
+            for ($q = 1; $q <= 180; $q++) {
+                $answer = $request->answers[$q] ?? 0;
                 $answers[] = ['q_no' => $q, 'answer' => $answer, 'student_id' => $request->student_id, 'testname' => $request->testname, 'test_id' => $request->test_id, 'academic_year' => $this->academic_year, 'subject' => $request->subject[$q]];
             }
             ExamAnswer::insert($answers);
-            return redirect()->route('studentdashboard')->with('success', 'Mock Test Answer Saved Successfully');
+            session()->put('download_pdf', $request->testname);
+            return redirect()->back()->with('success', 'Mock Test Answer Saved Successfully');
         }
 
         return view('student.mocktest', compact('mocktests', 'exam', 'student'));
+    }
+    public function downloadMockTestPdf($testname)
+    {
+        $student = Student::where('student_id', auth('student')->user()->student_id)->first();
+        $exam = Exam::where('name', $testname)->first();
+        $answersData = ExamAnswer::where('testname', $testname)->where('student_id', $student->student_id)->get()->keyBy('q_no');
+
+        $answers = [];
+        for ($i = 1; $i <= 180; $i++) {
+            $answers[$i] = $answersData[$i]->answer;
+        }
+
+        $pdf = PDF::loadView('pdf.student_mocktest', compact('student', 'exam', 'answers', 'testname'));
+
+        return $pdf->download($testname.'-'.$student->student_id.'.pdf');
     }
 }
