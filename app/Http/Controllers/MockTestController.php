@@ -9,7 +9,7 @@ use App\Models\ExamAnswer;
 use App\Models\Exam;
 use App\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Carbon\Carbon;
 class MockTestController extends Controller
 {
     public function index(Request $request)
@@ -78,8 +78,11 @@ class MockTestController extends Controller
         $student = Student::where('student_id', auth('student')->user()->student_id)->first();
         $mocktests = MockTest::ForStudent($student);
         $exam = null;
+        $timer=null;
         if ($request->has('exam_name')) {
             $exam = Exam::where('name', $request->exam_name)->first();
+            $mockexam = MockTest::where('exam_name', $request->exam_name)->first();
+            $timer = Carbon::parse($mockexam->end_at)->diffInSeconds(now());
         }
         if ($request->isMethod('POST')) {
             $examanswer = ExamAnswer::where('testname', $request->testname)->where('student_id', $request->student_id)->first();
@@ -97,7 +100,7 @@ class MockTestController extends Controller
             return redirect()->back()->with('success', 'Mock Test Answer Saved Successfully');
         }
 
-        return view('student.mocktest', compact('mocktests', 'exam', 'student'));
+        return view('student.mocktest', compact('mocktests', 'exam', 'student', 'timer'));
     }
     public function downloadMockTestPdf($testname)
     {

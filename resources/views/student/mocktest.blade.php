@@ -29,88 +29,97 @@
       width: 30px;
   }
   
-  .omr-radio {
+  /* Changed from omr-radio to omr-checkbox styles */
+  .omr-checkbox {
       appearance: none;
       width: 15px;
       height: 15px;
       border: 1px solid #adb5bd;
-      border-radius: 50%;
+      border-radius: 3px; /* 3px makes it look like a standard checkbox */
       margin: 0 3px;
       cursor: pointer;
       vertical-align: middle;
       transition: all 0.2s ease;
   }
   
-  .omr-radio:checked {
+  .omr-checkbox:checked {
       background-color: #000;
       border-color: #000;
       box-shadow: inset 0 0 0 2px #fff;
   }
   
-  .omr-radio:hover {
+  .omr-checkbox:hover {
       border-color: #333;
       background-color: #e9ecef;
   }
-  
 </style>
 
 <div class="main-content">
   <div class="card card-primary">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between">
       <h4>Mock Test (OMR Sheet)</h4>
     </div>
-    <div class="card-body">
-      @if(session()->has('success'))
-      <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
-      @endif
+      {{-- Timer Display --}}
 
-      @if(session('download_pdf'))
-      <div class="alert alert-info d-flex justify-content-between align-items-center">
+      <div class="card-body">
+        @if(session()->has('success'))
+        <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
+        @endif
+
+        @if(session('download_pdf'))
+        <div class="alert alert-info d-flex justify-content-between align-items-center">
           <div>
-              MockTest PDF is ready for download.
+            MockTest PDF is ready for download.
           </div>
           <a href="{{ route('student.mocktestpdf', session('download_pdf')) }}" class="btn btn-success">
-              <i class="fas fa-download"></i> Download Response PDF
+            <i class="fas fa-download"></i> Download Response PDF
           </a>
-      </div>
-      {{-- 2. Only show the Forms if NOT currently in 'download_pdf' state --}}
-      @else
-  
-      <form action="{{ route('student.mock') }}" method="GET">
-        <div class="row">
-          <div class="form-group col-lg-3">
-            <select class="select2" id="exam_name" name="exam_name" required>
-              <option value="">-- Select Exam Name --</option>
-              @foreach ($mocktests as $row)
-              <option value="{{$row->exam_name}}" @selected($row->exam_name==request('exam_name'))>{{$row->exam_name}}</option>
-              @endforeach
-            </select>
-          </div>
-
-          <div class="form-group col-lg-2">
-            <button type="submit" class="btn btn-primary btn-block">Get Questions</button>
-          </div>
         </div>
-      </form>
+        @else
 
-      @if($exam)
-      <form action="{{ route('student.mock') }}" onsubmit="return confirm('Are you sure you want to submit this?')" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="table-responsive">
+        <form action="{{ route('student.mock') }}" method="GET">
+          <div class="row">
+            <div class="form-group col-lg-3">
+              <select class="select2" id="exam_name" name="exam_name" required>
+                <option value="">-- Select Exam Name --</option>
+                @foreach ($mocktests as $row)
+                <option value="{{$row->exam_name}}" @selected($row->exam_name==request('exam_name'))>{{$row->exam_name}}</option>
+                @endforeach
+              </select>
+            </div>
+
+            <div class="form-group col-lg-2">
+              <button type="submit" class="btn btn-primary btn-block">START TEST</button>
+            </div>
+
+          @if($exam && $timer)
+          <div class="form-group col-lg-2">
+            <div class="badge badge-danger font-weight-bold" style="font-size: 1.2rem;">
+              Time Remaining: <span id="timerDisplay">Loading...</span>
+            </div>
+          </div>
+          @endif
+          </div>
+
+        </form>
+
+        @if($exam)
+        <form id="omrForm" action="{{ route('student.mock') }}" method="POST" enctype="multipart/form-data">
+          @csrf
+          <div class="table-responsive">
             <input type="hidden" name="testname" value="{{ $exam->name }}">
             <input type="hidden" name="test_id" value="{{ $exam->testid }}">
             <input type="hidden" name="student_id" value="{{ $student->student_id }}">
-          <table class="omr-table">
-            <thead>
-              <tr>
-                @for($i = 0; $i < 4; $i++) 
-                  <th class="q-num">Q.</th>
-                  <th>1 &nbsp; 2 &nbsp; 3 &nbsp; 4</th>
-                @endfor
-              </tr>
-            </thead>
-            <tbody>
-              <?php 
+            <table class="omr-table">
+              <thead>
+                <tr>
+                  @for($i = 0; $i < 4; $i++) <th class="q-num">Q.No</th>
+                    <th>RESPONSE <br> 1 &nbsp; 2 &nbsp; 3 &nbsp; 4</th>
+                    @endfor
+                </tr>
+              </thead>
+              <tbody>
+                <?php 
                 $tq = $exam->total_questions/4;
                 $Subjects =[];
                 $qno = 1;
@@ -123,34 +132,64 @@
                   }
                 }
               ?>
-              @for($row = 1; $row <= $tq; $row++) 
-              <tr>
-                @for($col = 0; $col < 4; $col++)
-                <?php $q = $row + ($col * $tq); ?>
-                <td>{{ $q }}
-                  <input type="hidden" name="subject[{{ $q }}]" value="{{ $Subjects[$q] }}">
-                </td>
-                <td>
-                  @for($opt = 1; $opt <= 4; $opt++) 
-                  <input type="radio" class="omr-radio" name="answers[{{ $q }}]" value="{{ $opt }}">
-                  @endfor
-                </td>
-                @endfor
-                </tr>
-                @endfor
-            </tbody>
-          </table>
-        </div>
+                @for($row = 1; $row <= $tq; $row++) <tr>
+                  @for($col = 0; $col < 4; $col++) <?php $q = $row + ($col * $tq); ?> <td>{{ $q }}
+                    <input type="hidden" name="subject[{{ $q }}]" value="{{ $Subjects[$q] ?? '' }}">
+                    </td>
+                    <td>
+                      @for($opt = 1; $opt <= 4; $opt++) <input type="checkbox" class="omr-checkbox" name="answers[{{ $q }}]" value="{{ $opt }}">
+                        @endfor
+                    </td>
+                    @endfor
+                    </tr>
+                    @endfor
+              </tbody>
+            </table>
+          </div>
 
-        <div class="text-center mt-4">
-          <button type="submit" class="btn btn-primary">Final Submit</button>
-        </div>
-      </form>
-      @endif
-      @endif
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Final Submit</button>
+          </div>
+        </form>
+        @endif
+
+        @endif
+      </div>
     </div>
   </div>
-</div>
-@endsection
-@section('js')
-@endsection
+  @endsection
+
+  @section('js')
+  <script>
+    $(document).ready(function() {
+        $('.omr-checkbox').on('change', function() {
+            if($(this).is(':checked')) {
+                var name = $(this).attr('name');
+                $('input[name="' + name + '"]').not(this).prop('checked', false);
+            }
+        });
+    
+      var distance = {{ $timer ?? 0 }};
+    
+        @if($exam && $timer)  
+            var timerInterval = setInterval(function() {
+                if (distance == 0) {
+                    clearInterval(timerInterval);
+                    $('#timerDisplay').text("00h 00m 00s");
+                    $('#omrForm').removeAttr('onsubmit');
+                    //alert("Time is up! Your answers are being submitted.");
+                    $('#omrForm').submit();
+                } else {
+                    distance--;
+                    var hours = Math.floor(distance / 3600);
+                    var minutes = Math.floor((distance % 3600) / 60);
+                    var seconds = distance % 60;
+                    $('#timerDisplay').text(
+                        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+                    );
+                }
+            }, 1000);
+        @endif
+    });
+  </script>
+  @endsection
