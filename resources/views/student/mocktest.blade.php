@@ -28,29 +28,23 @@
       font-weight: bold;
       width: 30px;
   }
-  
-  /* Changed from omr-radio to omr-checkbox styles */
-  .omr-checkbox {
+
+  .omr-radio {
       appearance: none;
-      width: 15px;
-      height: 15px;
+      width: 19px;
+      height: 19px;
       border: 1px solid #adb5bd;
-      border-radius: 3px; /* 3px makes it look like a standard checkbox */
+      border-radius: 50%;
       margin: 0 3px;
       cursor: pointer;
       vertical-align: middle;
       transition: all 0.2s ease;
   }
   
-  .omr-checkbox:checked {
+  .omr-radio:checked {
       background-color: #000;
       border-color: #000;
       box-shadow: inset 0 0 0 2px #fff;
-  }
-  
-  .omr-checkbox:hover {
-      border-color: #333;
-      background-color: #e9ecef;
   }
 </style>
 
@@ -104,7 +98,7 @@
         </form>
 
         @if($exam)
-        <form id="omrForm" action="{{ route('student.mock') }}" method="POST" enctype="multipart/form-data">
+        <form id="omrForm" action="{{ route('student.mock') }}" onsubmit="return confirm('Are you sure you want to submit?')" method="POST" enctype="multipart/form-data">
           @csrf
           <div class="table-responsive">
             <input type="hidden" name="testname" value="{{ $exam->name }}">
@@ -113,14 +107,15 @@
             <table class="omr-table">
               <thead>
                 <tr>
-                  @for($i = 0; $i < 4; $i++) <th class="q-num">Q.No</th>
+                  @for($i = 0; $i < 5; $i++) 
+                    <th class="q-num">Q.No</th>
                     <th>RESPONSE <br> 1 &nbsp; 2 &nbsp; 3 &nbsp; 4</th>
-                    @endfor
+                  @endfor
                 </tr>
               </thead>
               <tbody>
                 <?php 
-                $tq = $exam->total_questions/4;
+                $tq = $exam->total_questions/5;
                 $Subjects =[];
                 $qno = 1;
                 foreach(explode(',', $exam->subject_name) as $col) {
@@ -131,18 +126,23 @@
                     $qno++;
                   }
                 }
-              ?>
-                @for($row = 1; $row <= $tq; $row++) <tr>
-                  @for($col = 0; $col < 4; $col++) <?php $q = $row + ($col * $tq); ?> <td>{{ $q }}
-                    <input type="hidden" name="subject[{{ $q }}]" value="{{ $Subjects[$q] ?? '' }}">
+                ?>
+                @for($row = 1; $row <= $tq; $row++) 
+                  <tr>
+                  @for($col = 0; $col < 5; $col++) 
+                    <?php $q = $row + ($col * $tq); ?> 
+                    <td>{{ $q }}
+                      <input type="hidden" name="subject[{{ $q }}]" value="{{ $Subjects[$q] ?? '' }}">
                     </td>
                     <td>
-                      @for($opt = 1; $opt <= 4; $opt++) <input type="checkbox" class="omr-checkbox" name="answers[{{ $q }}]" value="{{ $opt }}">
-                        @endfor
+                      @for($opt = 1; $opt <= 4; $opt++) 
+                        {{-- Changed to input type="radio" --}}
+                        <input type="radio" class="omr-radio" name="answers[{{ $q }}]" value="{{ $opt }}">
+                      @endfor
                     </td>
-                    @endfor
-                    </tr>
-                    @endfor
+                  @endfor
+                  </tr>
+                @endfor
               </tbody>
             </table>
           </div>
@@ -157,39 +157,42 @@
       </div>
     </div>
   </div>
-  @endsection
+@endsection
 
-  @section('js')
-  <script>
-    $(document).ready(function() {
-        $('.omr-checkbox').on('change', function() {
-            if($(this).is(':checked')) {
-                var name = $(this).attr('name');
-                $('input[name="' + name + '"]').not(this).prop('checked', false);
-            }
-        });
-    
+@section('js')
+<script>
+  $(document).ready(function() {
+      $('.omr-radio').on('click', function() {
+          var name = $(this).attr('name');
+          if ($(this).data('waschecked') == true) {
+              $(this).prop('checked', false);
+              $(this).data('waschecked', false);
+          } else {
+              $(this).data('waschecked', true);
+          }
+          $('input[name="' + name + '"]').not(this).data('waschecked', false);
+      });
+  
       var distance = {{ $timer ?? 0 }};
-    
-        @if($exam && $timer)  
-            var timerInterval = setInterval(function() {
-                if (distance == 0) {
-                    clearInterval(timerInterval);
-                    $('#timerDisplay').text("00h 00m 00s");
-                    $('#omrForm').removeAttr('onsubmit');
-                    //alert("Time is up! Your answers are being submitted.");
-                    $('#omrForm').submit();
-                } else {
-                    distance--;
-                    var hours = Math.floor(distance / 3600);
-                    var minutes = Math.floor((distance % 3600) / 60);
-                    var seconds = distance % 60;
-                    $('#timerDisplay').text(
-                        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-                    );
-                }
-            }, 1000);
-        @endif
-    });
-  </script>
-  @endsection
+  
+      @if($exam && $timer)  
+          var timerInterval = setInterval(function() {
+              if (distance <= 0) {
+                  clearInterval(timerInterval);
+                  $('#timerDisplay').text("00h 00m 00s");
+                  $('#omrForm').removeAttr('onsubmit');
+                  $('#omrForm').submit();
+              } else {
+                  distance--;
+                  var hours = Math.floor(distance / 3600);
+                  var minutes = Math.floor((distance % 3600) / 60);
+                  var seconds = distance % 60;
+                  $('#timerDisplay').text(
+                      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+                  );
+              }
+          }, 1000);
+      @endif
+  });
+</script>
+@endsection

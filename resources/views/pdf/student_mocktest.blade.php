@@ -108,7 +108,7 @@
     <!-- OMR Grid (4 Columns, 45 Rows Each = 180 Total) -->
     <table class="layout-table">
         <tr>
-            @for ($col = 0; $col < 4; $col++)
+            @for ($col = 0; $col < 5; $col++)
                 <!-- Data Column -->
                 <td>
                     <table class="omr-table">
@@ -119,9 +119,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for ($row = 1; $row <= 45; $row++)
+                            @for ($row = 1; $row <= 36; $row++)
                                 @php
-                                    $qNum = $row + ($col * 45);
+                                    $qNum = $row + ($col * 36);
                                 @endphp
                                 <tr>
                                     <td>{{ $qNum }}.</td>
