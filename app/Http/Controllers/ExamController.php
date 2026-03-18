@@ -13,6 +13,7 @@ use App\Models\Options;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ImportController;
+use App\Models\MockTest;
 
 class ExamController extends Controller
 {
@@ -246,25 +247,24 @@ class ExamController extends Controller
 
     public function enable(Request $request)
     {
-        $tests = Exam::where('end_at', '>', Carbon::now())->get();
+        $tests = Exam::where('end_at', '>', Carbon::now())->selectRaw('name as testname')->distinct()->get();
+        // $tests = $tests->merge(MockTest::where('end_at', '>', Carbon::now())->selectRaw('name as testname')->distinct()->get());
         $students = collect();
-        $testId = $request->input('test_id');
+        $test = $request->input('test');
 
-        if ($testId) {
+        if ($test) {
             $students = DB::table('student')
                 ->join('exam_answer', 'student.id', '=', 'exam_answer.student_id')
-                ->where('exam_answer.test_id', $testId)
+                ->where('exam_answer.testname', $test)
                 ->distinct()
                 ->select('student.id', 'student.user_name')
                 ->get();
-
-
             if ($request->ajax()) {
                 return response()->json($students);
             }
         }
 
-        return view('exam.enable', compact('tests', 'students', 'testId'));
+        return view('exam.enable', compact('tests', 'students', 'test'));
     }
 
 
@@ -272,11 +272,9 @@ class ExamController extends Controller
     public function enableExam(Request $request)
     {
         $studentId = $request->student_id;
-        $testId = $request->test_id;
-
-        ExamAnswer::where('student_id', $studentId)->where('test_id', $testId)->delete();
-
-        return redirect()->back()->with('success', 'Exam enabled successfully!');
+        $test = $request->test;
+        ExamAnswer::where('student_id', $studentId)->where('testname', $test)->delete();
+        return redirect()->back()->with('success', 'Exam enabled successfully! Check the student dashboard.');
     }
 
     public function OnlineResponse(Request $request)

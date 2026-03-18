@@ -80,10 +80,16 @@ class MockTestController extends Controller
         $exam = null;
         $timer=null;
         if ($request->has('exam_name')) {
+             $existinganswer = ExamAnswer::where('testname', $request->exam_name)->where('student_id', auth('student')->user()->student_id)->first();
+            if ($existinganswer) {
+                return redirect()->back()->with('error', 'You have already attempted this exam and cannot attempt it again.');
+            }
+            
             $exam = Exam::where('name', $request->exam_name)->first();
             $mockexam = MockTest::where('exam_name', $request->exam_name)->first();
             $timer = Carbon::parse($mockexam->end_at)->diffInSeconds(now());
         }
+
         if ($request->isMethod('POST')) {
             $examanswer = ExamAnswer::where('testname', $request->testname)->where('student_id', $request->student_id)->first();
             if ($examanswer) {

@@ -26,11 +26,11 @@
 
                            <!-- Test ID Dropdown -->
                            <div class="form-group col-lg-3">
-                              <label>Test ID</label>
-                              <select name="test_id" id="test_id" class="select2" required>
+                              <label>Test</label>
+                              <select name="test" id="test" class="select2" required>
                                  <option value="">Select Test</option>
                                  @foreach ($tests as $test)
-                                    <option value="{{ $test->testid }}" @selected($test->testid == $testId)>{{ $test->name }}</option>
+                                    <option value="{{ $test->testname }}" @selected($test->testname == $test)>{{ $test->testname }}</option>
                                  @endforeach
                               </select>
                            </div>
