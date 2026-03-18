@@ -172,7 +172,7 @@ class ExamController extends Controller
             }
         }
 
-        return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : redirect()->back()->with('success', 'Exam submitted successfully');
+        return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.viewexams','ONLINE')->with('success', 'Exam submitted successfully');
     }
 
 
