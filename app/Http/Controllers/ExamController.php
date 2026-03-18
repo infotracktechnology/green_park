@@ -75,9 +75,9 @@ class ExamController extends Controller
             $data['questions'] = $questions;
             Exam::create($data);
         } catch (\Exception $e) {
-            return to_route('exam.index')->with('error', $e->getMessage());
+            return  redirect()->back()->with('error', $e->getMessage());
         }
-        return to_route('exam.index')->with('success', 'Test Created Successfully');
+        return redirect()->back()->with('success', 'Exam Created Successfully! Check Preview.');
     }
 
    
@@ -115,7 +115,7 @@ class ExamController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $exam->update($data);
-        return to_route('exam.index')->with('success', 'Exam updated successfully');
+        return redirect()->back()->with('success', 'Exam updated successfully! Check Preview.');
     }
     public function TestCategory(Request $request)
     {
@@ -172,7 +172,7 @@ class ExamController extends Controller
             }
         }
 
-        return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.index');
+        return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : redirect()->back()->with('success', 'Exam submitted successfully');
     }
 
 
