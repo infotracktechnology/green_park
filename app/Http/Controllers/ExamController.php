@@ -33,7 +33,7 @@ class ExamController extends Controller
                 'status' => 'scheduled',
                 'duration' => Carbon::parse($request->end_at)->diffInSeconds($request->start_at),
             ]);
-            return to_route('exam.index')->with('success', 'Test Scheduled Successfully');
+            return redirect()->back()->with('success', 'Test Scheduled Successfully');
         }
 
         return view('exam.index', compact('tests','examtype'));
