@@ -113,9 +113,9 @@
                                 Chemistry ({{ $exam->chemistry_questions }})
                             </button>
                             @endif
-                            @if(isset($exam->bot_start) && $exam->bot_start < $exam->total_questions && $exam->botony_questions > 0)
+                            @if(isset($exam->bot_start) && $exam->bot_start < $exam->total_questions && $exam->botany_questions > 0)
                             <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->bot_start }})">
-                                Botany ({{ $exam->botony_questions }})
+                                Botany ({{ $exam->botany_questions }})
                             </button>
                             @endif
                             @if(isset($exam->zoo_start) && $exam->zoo_start < $exam->total_questions && $exam->zoology_questions > 0)
