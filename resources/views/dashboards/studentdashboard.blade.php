@@ -6,62 +6,76 @@
 <meta http-equiv="refresh" content="60">
 @endsection
 
-@section('css')
-@endsection
-
 @section('main')
+@php
+    $user = auth()->user();
+    $exam = $user->GetExam();
+    $isOffline = $user->coaching_type == 'OFFLINE';
+
+    $isNeetJeeOffline = in_array($user->course, ['NEET', 'JEE']) && $user->coaching_type != 'OFFLINE';
+    $isObCourse = in_array($user->course, ['XI-OB', 'XII-OB']);
+    $showUploads = $isNeetJeeOffline || $isObCourse;
+    $needsPan = empty($user->neet_confirmationpan);
+    $needsPhoto = empty($user->neet_photo);
+@endphp
+
 <div class="main-content">
   <div class="section-body">
     <div class="row">
 
+      <!-- Alerts Section -->
       <div class="col-lg-12">
-        <?php
-        $exam = auth()->user()->GetExam();
-        ?>
-
         @if($exam && $exam->end_at >= now())
-        <div class="alert alert-warning">⚠️ If the Exam Link Doesn't Work, Please Click <a class="font-weight-bold" href="{{ route('student.instruction',base64_encode($exam->id)) }}">here</a></div>
+          <div class="alert alert-warning">
+            <b>⚠️ If the Exam Link Doesn't Work, Please Click <a class="font-weight-bold" href="{{ route('student.instruction', base64_encode($exam->id)) }}">here</a></b>
+          </div>
         @endif
-        
-        @if(session('success'))
-        <div class="alert alert-success"><b>{{ session('success') }}</b></div>
+
+        @if(session('success')) 
+        <div class="alert alert-success">
+          <b>{{ session('success') }}</b>
+        </div> 
         @endif
-        @if(session('error'))
-        <div class="alert alert-danger"><b>{{ session('error') }}</b></div>
+
+        @if(session('error')) 
+        <div class="alert alert-danger">
+          <b>{{ session('error') }}</b>
+        </div> 
         @endif
       </div>
 
-
-
+      <!-- Student Profile Card -->
       <div class="col-xl-4 col-lg-6">
         <div class="card l-bg-green">
           <div class="card-statistic-3">
             <div class="card-icon card-icon-large"><i class="fa fa-user"></i></div>
             <div class="card-content">
-              <h4 class="card-title">{{ auth()->user()->student_name }}</h4>
-              <span>{{ auth()->user()->dob }}</span>
+              <h4 class="card-title">{{ $user->student_name }}</h4>
+              <span>{{ $user->dob }}</span>
               <p class="mb-0 text-sm">
-                <span class="text-nowrap"><strong>Coaching Type:</strong> {{ auth()->user()->coaching_type }}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-xl-4 col-lg-6">
-        <div class="card l-bg-purple">
-          <div class="card-statistic-3">
-            <div class="card-icon card-icon-large"><i class="fa fa-building"></i></div>
-            <div class="card-content">
-              <h2 class="card-title">Branch : {{ auth()->user()->branch?->name }}</h2>
-               <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Course:</strong> {{ auth()->user()->course }}</span></p>
-              <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Section:</strong> {{ auth()->user()->section }}</span>
+                <span class="text-nowrap"><strong>Coaching Type:</strong> {{ $user->coaching_type }}</span>
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      @if(auth()->user()->coaching_type == "OFFLINE")
+      <!-- Branch & Course Card -->
+      <div class="col-xl-4 col-lg-6">
+        <div class="card l-bg-purple">
+          <div class="card-statistic-3">
+            <div class="card-icon card-icon-large"><i class="fa fa-building"></i></div>
+            <div class="card-content">
+              <h2 class="card-title">Branch : {{ $user->branch?->name }}</h2>
+              <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Course:</strong> {{ $user->course }}</span></p>
+              <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Section:</strong> {{ $user->section }}</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Card (Offline Only) -->
+      @if($isOffline)
       <div class="col-xl-4 col-lg-6">
         <div class="card l-bg-orange">
           <div class="card-statistic-3">
@@ -69,23 +83,53 @@
             <div class="card-content">
               <h5 class="card-title">Attendance (Current Month)</h5>
               <span style="font-size: 17px;"><strong>Working Days:</strong> {{ $totalDaysInMonth }}</span>
-
-              <p class="mb-0 text-sm">
-                <span class="text-nowrap">
-
-                  <span style="font-size: 17px;"> <strong>Present Days :</strong> {{ $presentDaysInMonth }}</span> <span style="font-size: 24px;float: right"> ({{ number_format($percentage, 2) }}%)
-                  </span>
+              <p class="mb-0 text-sm text-nowrap">
+                <span style="font-size: 17px;"><strong>Present Days :</strong> {{ $presentDaysInMonth }}</span> 
+                <span style="font-size: 24px; float: right;">({{ number_format($percentage, 2) }}%)</span>
               </p>
             </div>
           </div>
         </div>
       </div>
       @endif
-    </div>
 
+      <!-- NEET Document Uploads -->
+      @if($showUploads)
+        
+        @if($needsPan)
+        <div class="col-xl-3 col-md-6">
+          <a href="{{ route('student.neetdocument') }}" class="text-decoration-none">
+            <div class="card bg-pink">
+              <div class="card-statistic-3">
+                <div class="card-icon card-icon-large"><i class="fas fa-file-pdf"></i></div>
+                <div class="card-content text-white">
+                  <h5 class="card-title">Upload NEET Confirmation PAN</h5>
+                  <p class="mb-0 text-sm text-nowrap"><i class="fas fa-upload"></i> PDF/Image (Max 2MB)</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        @endif
+
+        @if($needsPhoto)
+        <div class="col-xl-3 col-md-6">
+          <a href="{{ route('student.neetdocument') }}" class="text-decoration-none">
+            <div class="card bg-pink">
+              <div class="card-statistic-3">
+                <div class="card-icon card-icon-large"><i class="fas fa-camera-retro"></i></div>
+                <div class="card-content text-white">
+                  <h5 class="card-title">Upload NEET Photo</h5>
+                  <p class="mb-0 text-sm text-nowrap"><i class="fas fa-upload"></i> Image Only (Max 2MB)</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        @endif
+      @endif
+
+    </div>
   </div>
 </div>
-
-@endsection
-@section('js')
 @endsection

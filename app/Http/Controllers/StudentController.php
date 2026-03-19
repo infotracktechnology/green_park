@@ -203,4 +203,27 @@ class StudentController extends Controller
 
         return view('student.attendance', compact('attendance', 'total_present', 'total_days', 'percentage'));
     }
+
+    public function NeetDocument(Request $request)
+    {
+        $student = auth()->user();
+        if($request->isMethod('post')){
+            if($request->hasFile('neet_confirmationpan')) {
+                $file = $request->file('neet_confirmationpan');
+                $filename = "confirmationpan-".$student->student_id.".".$file->getClientOriginalExtension();
+                $file->move('assets/profilepic', $filename);
+                $student->neet_confirmationpan = $filename;
+                $student->save();
+            }
+            if($request->hasFile('neet_photo')) {
+                $file = $request->file('neet_photo');
+                $filename = $student->student_id."."."jpg";
+                $file->move('assets/profilepic', $filename);
+                $student->neet_photo = $filename;
+                $student->save();
+            }
+            return redirect()->back()->with('success', 'Document uploaded successfully.');
+        }
+        return view('student.neetdocument', compact('student'));
+    }
 }

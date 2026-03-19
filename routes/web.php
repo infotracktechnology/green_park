@@ -291,6 +291,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::resource('document', StudentDocumentController::class)->only(['index', 'store', 'destroy']);
     Route::match(['get', 'post'],'mocktest', [MockTestController::class, 'MockTest'])->name('student.mock');
     Route::get('mocktestpdf/{testname}', [MockTestController::class, 'downloadMockTestPdf'])->name('student.mocktestpdf');
+    Route::match(['get', 'post'],'neetdocument', [StudentController::class, 'NeetDocument'])->name('student.neetdocument');
     Route::get('timetable', [\App\Http\Controllers\TimetableController::class, 'timetable'])->name('student.timetable');
 });
 
