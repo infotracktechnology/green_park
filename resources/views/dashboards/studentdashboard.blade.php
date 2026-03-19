@@ -18,8 +18,9 @@
         <?php
         $exam = auth()->user()->GetExam();
         ?>
+
         @if($exam && $exam->end_at >= now())
-        <div class="alert alert-danger">⚠️ If the Exam Link Doesn't Work, Please logout and login again or refresh the page.</div>
+        <div class="alert alert-warning">⚠️ If the Exam Link Doesn't Work, Please Click <a class="font-weight-bold" href="{{ route('student.instruction',base64_encode($exam->id)) }}">here</a></div>
         @endif
         
         @if(session('success'))
