@@ -88,9 +88,9 @@ Route::group(['prefix' => 'v2'], function () {
         $sid = $student->student_id;
         $batch = $student->batch;
         $type = $student->coaching_type;
-
+        $course = $student->course;
         $results = Exam::from("exam as b")->join('exam_answer as a', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch, $type) {
-            if($type === "OFFLINE"){
+            if($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")){
                 $markrange = isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null;
             }else{
                 $markrange = isset($test->markrange_file['online']) ? $test->markrange_file['online'] : null;
