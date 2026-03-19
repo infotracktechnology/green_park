@@ -14,10 +14,8 @@
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
   <link rel='shortcut icon' type='image/x-icon' href='{{asset('img/favicon.png')}}' />
-
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
   <link rel="stylesheet" href="{{asset('bundles/select2/dist/css/select2.min.css')}}" />
   <style>
     thead th{
@@ -62,15 +60,7 @@
     [x-cloak] {
       display: none !important;
     }
-    
-    /* --- NEW CSS TO FIX TEXT WRAPPING (e.g. COIMBATORE) --- */
-    .force-wrap {
-      overflow-wrap: break-word !important;
-      word-wrap: break-word !important;
-      word-break: break-all !important;
-      hyphens: auto;
-    }
-    
+      
     /* Timer Banner Styling */
     .timer-banner {
       background-color: #343a40; /* Dark background */
@@ -310,5 +300,4 @@
   </script>
   @yield('js')
 </body>
-
 </html>
