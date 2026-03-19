@@ -16,6 +16,9 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="table-responsive">
+                  <?php
+                  $hasMarkRange = collect($exams)->contains(fn($exam) => !empty($exam['markrange']));
+                  ?>
                   <table class="table">
                     <thead>
                       <tr>
@@ -24,7 +27,11 @@
                         <th>Subject</th>
                         <th>Student Mark</th>
                         <th>Overall First Mark</th>
+                        
+                        @if($hasMarkRange)
                         <th>Marks Range</th>
+                        @endif
+
                         <th>Download Choosen Answer</th>
                       </tr>
                     </thead>
@@ -36,11 +43,15 @@
                         <td>{{ $test['name'] }}</td>
                         <td><a href="{{ route('student.mark_subject', $test['test_id']) }}">{{ $test['mark']  }} / {{ $test['total'] }}</a></td>
                         <td> {{ $test['first_mark'] }} </td>
+
+                        @if($hasMarkRange)
                         <td>
                           @if($test['markrange'])
                           <a href="{{ env('APP_URL').$test['markrange'] }}" class="btn btn-primary">Markrange</a>
                           @endif
                         </td>
+                        @endif
+
                         <td><a href="{{ route('student.mark_download', $test['test_id']) }}" class="btn btn-primary">Download</a></td>
                       </tr>
                       @endforeach

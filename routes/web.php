@@ -121,9 +121,9 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('examination/enable', 'enableExam')->name('exam.enableExam');
         Route::get('examination/onlineresponse', 'OnlineResponse')->name('exam.onlineresponse');
         Route::post('examination/onlineresponse/download', 'OnlineResponseDownload')->name('exam.onlineresponse.download');
-        Route::get('examination/offline', 'offline')->name('exam.offline.index');
+        Route::get('examination/offline/{type}', 'offline')->name('exam.offline.index');
         Route::post('examination/offline', 'offlineUpload')->name('exam.offline.upload');
-        Route::get('examination/answerkey', 'answerKey')->name('exam.answerkey');
+        Route::get('examination/answerkey/{type}', 'answerKey')->name('exam.answerkey');
         Route::post('examination/answerkey', 'uploadAnswerKey')->name('exam.answerkey.upload');
         Route::get('examination/report/dump', 'Dump_Report')->name('exam.report.dump');
         Route::delete('examination/answerkey/delete/{id}/{test_id}', 'deleteAnswerKey')->name('answerkey.delete');

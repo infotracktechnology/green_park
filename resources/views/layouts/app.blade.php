@@ -152,8 +152,8 @@
                     <li><a href="{{ route('exam.create') }}" class="nav-link">Add CBT Exam</a></li>
                     <li><a href="{{ route('exam.viewexams','ONLINE') }}" class="nav-link">View Exams</a></li>
                     <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response</a></li>
-                    <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">OMR Response Upload</a></li>
-                    <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer Key Valuation</a></li>
+                    <li><a href="{{ route('exam.offline.index','ONLINE')}}" class="nav-link">OMR Response Upload</a></li>
+                    <li><a href="{{ route('exam.answerkey','ONLINE')}}" class="nav-link">Answer Key Valuation</a></li>
                     <li><a href="{{ route('exam.onlinepublish')}}" class="nav-link">Exam Result Publish</a></li>
                     <li><a href="{{ route('exam.enable') }}" class="nav-link">Enable Test</a></li>
                   </ul>
@@ -164,8 +164,8 @@
                   <ul class="dropdown-menu">
                     <li><a href="{{ route('exam.offlineexam') }}" class="nav-link">Add OMR Based Exam</a></li>
                     <li><a href="{{ route('exam.viewexams','OFFLINE') }}" class="nav-link">View Exams</a></li>
-                   <li><a href="{{ route('exam.offline.upload')}}" class="nav-link">OMR Response Upload</a></li>
-                    <li><a href="{{ route('exam.answerkey')}}" class="nav-link">Answer Key Valuation</a></li>
+                   <li><a href="{{ route('exam.offline.index','OFFLINE')}}" class="nav-link">OMR Response Upload</a></li>
+                    <li><a href="{{ route('exam.answerkey','OFFLINE')}}" class="nav-link">Answer Key Valuation</a></li>
                     <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
                     <li><a href="{{ route('exam.offlinepublish')}}" class="nav-link">Exam Result Publish</a></li>
                   </ul>

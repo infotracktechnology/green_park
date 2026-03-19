@@ -349,9 +349,9 @@ class ExamController extends Controller
 
 
 
-    public function offline()
+    public function offline($examtype)
     {
-        $offline_logs = DB::table('key_log')->where('type', 'offline_key')->latest()->take(10)->get();
+        $offline_logs = DB::table('key_log')->where('type', 'offline_key')->where('examtype', $examtype)->latest()->take(10)->get();
         return view('exam.offline', compact('offline_logs'));
     }
 
@@ -362,6 +362,7 @@ class ExamController extends Controller
         ]);
 
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
+        $examtype = '';
 
         if (empty($answers) || !isset($answers[0]['exam_name'],$answers[0]['student_id'],$answers[0]['qorder'])) {
             return back()->with('error', 'File is not in the template format.');
@@ -369,6 +370,7 @@ class ExamController extends Controller
 
         foreach ($answers as $answer) {
             $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answer['exam_name'])->first();
+            $examtype = $exam->examtype;
             $exists = ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->exists();
 
             if($exists) {
@@ -395,7 +397,8 @@ class ExamController extends Controller
         DB::table('key_log')->insert([
             'file_name' => $filename,
             'upload_time' => now(),
-            'test_name' => implode(',', array_unique(array_column($answers, 'exam name'))),
+            'examtype' => $examtype,
+            'test_name' => implode(',', array_unique(array_column($answers, 'exam_name'))),
             'path' => 'answer_key/'.$filename,
             'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
             'no_rows' => count($answers),
@@ -405,9 +408,9 @@ class ExamController extends Controller
         return back()->with('success', 'Offline file uploaded successfully.');
     }
 
-    public function answerKey()
+    public function answerKey($examtype)
     {
-        $answerkey_logs = DB::table('key_log')->where('type', 'answer_key')->latest()->take(10)->get();
+        $answerkey_logs = DB::table('key_log')->where('type', 'answer_key')->where('examtype', $examtype)->latest()->take(10)->get();
         return view('exam.answerkey', compact('answerkey_logs'));
     }
 
@@ -425,7 +428,8 @@ class ExamController extends Controller
     
             $uniqueTests = [];
             $uploadTime = now()->format('Y-m-d H:i:s');
-
+            $exam = Exam::where('name', $answers[0]['test_name'])->where('academic_year', $this->academic_year)->first();
+            $examtype = $exam->examtype;
             foreach($answers as $answer) {
                 $testId = $answer['test_id'];
                 $uniqueTests[$testId] = $answer['test_name'] ?? '';
@@ -461,6 +465,7 @@ class ExamController extends Controller
             DB::table('key_log')->insert([
                 'file_name'  => $file->getClientOriginalName(),
                 'upload_time' => $uploadTime,
+                'examtype'   => $examtype,
                 'test_name'  => implode(',', array_unique($uniqueTests)),
                 'test_id'    => implode(',', array_keys($uniqueTests)),
                 'path'       => 'answer_key/' . $filename,

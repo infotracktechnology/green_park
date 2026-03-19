@@ -15,6 +15,20 @@
   th {
       background-color: #eeece1;
   }
+  .toggle-markrange {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+  }
+  .toggle-markrange input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+  }
 </style>
 @endsection
 
@@ -34,7 +48,7 @@
               <h4>Online Examinations Publish</h4>
             </div>
             <div class="card-body">
-              <form method="get" id="myForm" action="{{ route('exam.onlinepublish') }}" enctype="multipart/form-data">
+              <form method="get" id="filterForm" action="{{ route('exam.onlinepublish') }}" enctype="multipart/form-data">
                 <div class="row">
                   <div class="form-group col-lg-2">
                     <label>Start Date</label>
@@ -53,7 +67,12 @@
                 </div>
               </form>
 
-              <form method="post" id="myForm" action="{{ route('exam.onlinepublish') }}" enctype="multipart/form-data">
+              <label class="toggle-markrange">
+                <input type="checkbox" id="toggleMarkRange">
+                Show Mark Range File Column?
+              </label>
+
+              <form method="post" id="publishForm" action="{{ route('exam.onlinepublish') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                   <div class="col-lg-12">
@@ -65,7 +84,7 @@
                             <th>Test Name</th>
                             <th>Test Category</th>
                             <th>Total Questions</th>
-                            <th>Mark Range</th>
+                            <th class="markrange-col" style="display:none;">Mark Range</th>
                             <th>Publish</th>
                           </tr>
                         </thead>
@@ -77,8 +96,7 @@
                             <td>{{ $exam->testcategory }}</td>
                             <td>{{ $exam->total_questions }}</td>
 
-                         
-                            <td>
+                            <td class="markrange-col" style="display:none;">
                               @if(isset($exam->markrange_file['online']))
                               <a href="{{ env('APP_URL').$exam->markrange_file['online'] }}" download>{{ basename($exam->markrange_file['online']) }}</a><br>
                               <a class="btn btn-danger text-white" href="{{ route('exam.onlinepublish',['delete'=>$exam->name,'batch'=>'online'])}}"><i class="fas fa-trash"></i></a>
@@ -86,7 +104,6 @@
                               <input type="file" name="batch[{{ $exam->name }}][online]" accept="application/pdf" class="form-control form-control-sm">
                               @endif
                             </td>
-                            
 
                             <td>
                               <select name="publish[{{ $exam->name }}]" class="form-control form-control-sm" required>
@@ -97,6 +114,7 @@
                             </td>
                           </tr>
                           @endforeach
+                        </tbody>
                       </table>
                     </div>
 
@@ -116,12 +134,26 @@
 @endsection
 @section('js')
 <script>
-  $(document).on('change', `input[type="file"]`, function(){
-    const file = this.files[0];
-    if (file && (file.type !== "application/pdf" || file.size >= 2 * 1024 * 1024)) {
-      alert("Only PDF files with size less than 2MB are allowed.");
-      this.value = "";
-    }
+  $(document).ready(function(){
+
+    // Toggle Mark Range column visibility
+    $('#toggleMarkRange').on('change', function(){
+      if($(this).is(':checked')){
+        $('.markrange-col').show();
+      } else {
+        $('.markrange-col').hide();
+      }
+    });
+
+    // File validation
+    $(document).on('change', 'input[type="file"]', function(){
+      const file = this.files[0];
+      if (file && (file.type !== "application/pdf" || file.size >= 2 * 1024 * 1024)) {
+        alert("Only PDF files with size less than 2MB are allowed.");
+        this.value = "";
+      }
+    });
+
   });
 </script>
 @endsection

@@ -115,6 +115,7 @@
                     </div>
                 </div>
 
+                @if(auth()->user()->course =='NEET' || auth()->user()->course =='JEE')
                 <!-- Academic Details -->
                 <div>
                     <h5 class="section-header">Academic Details</h5>
@@ -146,6 +147,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
