@@ -93,41 +93,8 @@
       </div>
       @endif
 
-      <!-- NEET Document Uploads -->
-      @if($showUploads)
-        
-        @if($needsPan)
-        <div class="col-xl-3 col-md-6">
-          <a href="{{ route('student.neetdocument') }}" class="text-decoration-none">
-            <div class="card bg-pink">
-              <div class="card-statistic-3">
-                <div class="card-icon card-icon-large"><i class="fas fa-file-pdf"></i></div>
-                <div class="card-content text-white">
-                  <h5 class="card-title">Upload NEET Confirmation PAN</h5>
-                  <p class="mb-0 text-sm text-nowrap"><i class="fas fa-upload"></i> PDF/Image (Max 2MB)</p>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-        @endif
-
-        @if($needsPhoto)
-        <div class="col-xl-3 col-md-6">
-          <a href="{{ route('student.neetdocument') }}" class="text-decoration-none">
-            <div class="card bg-pink">
-              <div class="card-statistic-3">
-                <div class="card-icon card-icon-large"><i class="fas fa-camera-retro"></i></div>
-                <div class="card-content text-white">
-                  <h5 class="card-title">Upload NEET Photo</h5>
-                  <p class="mb-0 text-sm text-nowrap"><i class="fas fa-upload"></i> Image Only (Max 2MB)</p>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-        @endif
-      @endif
+     
+     
 
     </div>
   </div>
