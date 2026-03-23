@@ -391,7 +391,7 @@ class ExamController extends Controller
         }
             
         $file = $request->file('offline');
-        $filename = $file->getClientOriginalName();
+        $filename = time().'.'.$file->getClientOriginalExtension();
         $file->move('answer_key', $filename);
 
         DB::table('key_log')->insert([
