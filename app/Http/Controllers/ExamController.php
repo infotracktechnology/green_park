@@ -328,7 +328,7 @@ class ExamController extends Controller
             ];
 
             for ($i = 1; $i <= $maxQuestions; $i++) {
-                $row[] = $answers->firstWhere('q_no', $i)->answer ?? '';
+                $row[] = $answers->firstWhere('q_no', $i)->answer ?? 0;
             }
 
             $csvData[] = $row;

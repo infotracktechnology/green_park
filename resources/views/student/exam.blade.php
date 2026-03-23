@@ -35,16 +35,16 @@
   .info-table td {
     height: 20px !important;
   }
-
-.question-panel{
+  
+  .question-panel{
   overflow-x:hidden;
   height:auto;
-}
-.question-panel img{
+  }
+  .question-panel img{
   max-width:100%;
   height:auto;
   display:block;
-}
+  }
 </style>
 @endsection
 
@@ -160,20 +160,20 @@
               <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
                 <div class="question-panel">
                   <p>Question {{ $key }}</p>
-                <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image">
+                  <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image">
                 </div>
 
-                 <input type="hidden" name="subject[{{ $key }}]" value="{{ $question['subject'] }}">
-                  <table class="table table-borderless mb0">
-                    <tbody>
-                      <tr>
-                        <td> <input type="radio" name="question[{{ $key }}]" value="1"> 1 ) </td>
-                        <td> <input type="radio" name="question[{{ $key }}]" value="2"> 2 ) </td>
-                        <td> <input type="radio" name="question[{{ $key }}]" value="3"> 3 ) </td>
-                        <td> <input type="radio" name="question[{{ $key }}]" value="4"> 4 ) </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <input type="hidden" name="subject[{{ $key }}]" value="{{ $question['subject'] }}">
+                <table class="table table-borderless mb0">
+                  <tbody>
+                    <tr>
+                      <td> <input type="radio" name="question[{{ $key }}]" value="1"> 1 ) </td>
+                      <td> <input type="radio" name="question[{{ $key }}]" value="2"> 2 ) </td>
+                      <td> <input type="radio" name="question[{{ $key }}]" value="3"> 3 ) </td>
+                      <td> <input type="radio" name="question[{{ $key }}]" value="4"> 4 ) </td>
+                    </tr>
+                  </tbody>
+                </table>
 
                 <input type="hidden" name="status[{{ $key }}]" id="status-{{ $key }}" value="not-attempted">
                 <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}"> {{ $key == $exam->total_questions ? 'Save & Submit' : 'Save & Next' }} </button>
@@ -271,7 +271,7 @@
               );
           } else {
               clearInterval(interval);
-              timefinish();
+              form.submit();
           }
       }, 1000);
   }
@@ -419,9 +419,9 @@
       NextQuestion(activeQuestion);
   });
   
-  function timefinish() {
-      form.submit();
-  }
+  // function timefinish() {
+  //     form.submit();
+  // }
   
   function NextQuestion(index) {
       updateCounts();
@@ -468,7 +468,7 @@
           if (status === 'que-save' || status === 'que-save-mark') {
               $(`#question-${qno} input[type="radio"][value="${ans}"]`).prop('checked', true);
           }
-
+  
           $(`#status-${qno}`).val(status);
           
           $(`.pagination li[data-seq="${qno}"] a`).removeClass('not-attempted not-answered que-mark que-save que-save-mark')
