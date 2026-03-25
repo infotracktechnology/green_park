@@ -146,23 +146,49 @@ class ExamController extends Controller
     public function submit(Request $request)
     {
         $student_id = $request->student_id ?? 0;
+
         DB::transaction(function () use ($request, $student_id) {
+        $existingQuestions = ExamAnswer::where('testname', $request->testname)->where('student_id', $student_id)->pluck('q_no')->toArray();
+
+        $insertData = [];
+        
             for ($i = 1; $i <= $request->total_question; $i++) {
+                if (in_array($i, $existingQuestions)) {
+                    continue;
+                }
+
                 $status = $request->status[$i] ?? 'not-visited';
                 $subject = $request->subject[$i] ?? null;
                 $answer = $request->question[$i] ?? 0;
-                $data = ['testname' => $request->testname, 'subject' => $subject, 'answer' => ($status == 'que-save' || $status == 'que-save-mark') ? $answer : 0, 'status' => $status, 'academic_year' => $this->academic_year, 'student_id' => $student_id, 'q_no' => $i, 'test_id' => $request->test_id];
 
-                ExamAnswer::updateOrCreate(
-                    ['testname' => $request->testname, 'student_id' => $student_id, 'q_no' => $i,],
-                    $data
-                );
+                $insertData[] = [
+                    'testname'      => $request->testname,
+                    'student_id'    => $student_id,
+                    'q_no'          => $i,
+                    'subject'       => $subject,
+                    'answer'        => ($status == 'que-save' || $status == 'que-save-mark') ? $answer : 0,
+                    'status'        => $status,
+                    'academic_year' => $this->academic_year,
+                    'test_id'       => $request->test_id,
+                ];
             }
 
-            DB::table('student_log')->insert(['module' => 'Exam', 'student_id' => $student_id, 'action' => "Submitted Exam '{$request->testname}' (Total Questions Processed: {$request->total_question})", 'created_at' => now(), 'updated_at' => now()]);
+
+            if (!empty($insertData)) {
+                ExamAnswer::insert($insertData);
+            }
+
+            DB::table('student_log')->insert([
+                'module' => 'Exam',
+                'student_id' => $student_id,
+                'action' => "Submitted Exam '{$request->testname}' (Total Questions Processed {$request->total_question})",
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
         });
 
-        return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully') : to_route('exam.viewexams', 'ONLINE')->with('success', 'Exam submitted successfully');
+        return $student_id ? redirect()->route('studentdashboard')->with('success', 'Exam submitted successfully')
+            : to_route('exam.viewexams', 'ONLINE')->with('success', 'Exam submitted successfully');
     }
 
     function destroy(Request $request, $id = null)
