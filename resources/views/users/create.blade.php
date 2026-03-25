@@ -19,7 +19,7 @@
                     <label>Role</label>
                     <select name="type" class="form-control form-control-sm" required>
                       <option value="">Select Role</option>
-                      {{-- <option value="Admin">Admin</option> --}}
+                      <option value="Admin">Admin</option>
                       <option value="Branch Admin">Branch Admin</option>
                       <option value="Accountant">Accountant</option>
                     </select>

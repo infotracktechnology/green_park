@@ -97,8 +97,8 @@
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>OMR Valuation Report</th>
-                        <th>Overall Report</th>
+                        <th>OMR Print</th>
+                        <th>Checking Print</th>
                       </tr>
                     </thead>
                     <tbody>

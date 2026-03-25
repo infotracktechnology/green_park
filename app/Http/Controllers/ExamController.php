@@ -212,7 +212,7 @@ class ExamController extends Controller
 
         ExamAnswer::updateOrCreate(['testname' => $request->testname, 'student_id' => $student_id, 'q_no' => $request->q_no], $data);
 
-        DB::table('student_log')->insert(['module' => 'Exam', 'student_id' => $student_id, 'action' => "Saved answer for Question {$request->q_no} with status '{$request->status}' in Exam '{$request->testname}'", 'created_at' => now(), 'updated_at' => now(),]);
+        DB::table('student_log')->insert(['module' => 'Exam', 'student_id' => $student_id, 'action' => "Saved answer for Question {$request->q_no} and {$request->answer} with status '{$request->status}' in Exam'{$request->testname}'", 'created_at' => now(), 'updated_at' => now(),]);
 
         return response()->json(['message' => 'Answer saved successfully']);
     }
@@ -224,6 +224,8 @@ class ExamController extends Controller
             'test_id' => $request->input('test_id'),
             'q_no' => $request->input('q_no'),
             'action' => 'clear',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return response()->json(['message' => 'Log cleared successfully']);

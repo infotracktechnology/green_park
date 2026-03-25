@@ -27,7 +27,7 @@ class ReportController extends Controller
         if ($request->query('type') == 'overall') {
             $section = $request->section;
 
-            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section',$section)->where('testname', $test_name)->orderBy('test_id')->orderBy('student_name')->get();
+            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section],['coaching_type','OFFLINE']])->orderBy('student_name')->get();
 
             $subjects = $answers->pluck('subject')->unique()->values()->toArray();
             $results = $answers->groupBy('student_id')->map(function ($logs) use ($subjects) {
@@ -39,18 +39,13 @@ class ReportController extends Controller
                 return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total')];
             })->values();
             return view('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
-            // $pdf = Pdf::loadView('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
-            // return $pdf->download("OVERALLPRINT-$test_name - $section.pdf");
         }
 
         if ($request->query('type') == 'omr') {
             $section = $request->section;
-            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where('a.section', $section)->where('testname', $test_name)->orderBy('test_id')->orderBy('student_name')->get();
+            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section],['coaching_type','OFFLINE']])->orderBy('test_id')->orderBy('student_name')->get();
             return view('report.omr_print', compact('answers', 'test_name'));
-            //$pdf = PDF::loadView('report.omr_print', compact('answers', 'test_name'));
-            //return $pdf->download("OMRPRINT-$test_name-$section.pdf");
         }
-
 
         return view('report.section_exam', compact('sections', 'test_name', 'category', 'exams'));
     }

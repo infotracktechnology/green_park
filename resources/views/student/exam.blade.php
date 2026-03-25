@@ -343,18 +343,18 @@
       });
   }
   
-  function openQuestion(index) {
-      $('.question').hide();
-      $(`#question-${index}`).show();
-      $('.pagination li').removeClass('active');
-      $(`.pagination li[data-seq="${index}"]`).addClass('active');
-      const a = $(`.pagination li[data-seq="${index}"] a`);
-      if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
-          $(a).addClass("not-answered").removeClass("not-attempted");
-      }
-      $(`#status-${index}`).val('not-answered');
-      activeQuestion = index;
-      updateCounts();
+   function openQuestion(index) {
+    $('.question').hide();
+    $(`#question-${index}`).show();
+    $('.pagination li').removeClass('active');
+    $(`.pagination li[data-seq="${index}"]`).addClass('active');
+    const a = $(`.pagination li[data-seq="${index}"] a`);
+    if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
+        $(a).addClass("not-answered").removeClass("not-attempted");
+        $(`#status-${index}`).val('not-answered'); 
+    }
+    activeQuestion = index;
+    updateCounts();
   }
   
   function updateCounts() {
@@ -405,6 +405,10 @@
           return;
       }
       var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+      if(answer == 0){
+        alert('Please select an answer first.');
+        return;
+      }
       setStatus(index, 'que-save',answer);
       $(`.pagination li[data-seq="${index}"] a`)
           .removeClass('not-answered que-mark que-save-mark')
@@ -420,6 +424,10 @@
           return;
       }
       var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+      if(answer == 0){
+        alert('Please select an answer first.');
+        return;
+      }
       setStatus(index, 'que-save-mark',answer);
       $(`.pagination li[data-seq="${index}"] a`)
           .removeClass('not-answered que-mark que-save')
@@ -437,17 +445,13 @@
   });
   
   $('.btn-reset').click(function () {
-      const index = $(this).data('index');
-      if ($(`#question-${index} input[type="radio"]`).is(':checked')) {
-          clearLog(testid, index);
-      }
-  
-      $(`#question-${index} input[type="radio"]`).prop('checked', false);
-      $(`#status-${index}`).val('not-answered');
-  
-      $(`.pagination li[data-seq="${index}"] a`).removeClass('que-save que-mark que-save-mark')
-          .addClass('not-answered');
-      updateCounts();
+    const index = $(this).data('index');
+    $(`#question-${index} input[type="radio"]`).prop('checked', false);
+    $(`#status-${index}`).val('not-answered');
+    $(`.pagination li[data-seq="${index}"] a`).removeClass('que-save que-mark que-save-mark').addClass('not-answered');
+    updateCounts();
+    setStatus(index, 'not-answered', 0);
+    clearLog(testid, index);
   });
   
   $('.pagination a').click(function (e) {
@@ -484,9 +488,11 @@
       $('.exam-summery').show();
   });
   
-  $('#btnYesSubmitConfirm').click(function () {
-      isSubmitting = true;
-      form.submit();
+   $('#btnYesSubmitConfirm').click(function () {
+    $(this).prop('disabled', true);
+    $(this).text('Submitting...');
+    isSubmitting = true;
+    form.submit();
   });
   
   $('#btnNoSubmitConfirm').click(function () {
