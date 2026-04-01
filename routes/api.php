@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -245,6 +245,12 @@ Route::group(['prefix' => 'v2'], function () {
     Route::get('hostel/inoutregister/{student_id}/', function ($student_id) {
         $student = InOutRegister::where('student_id', $student_id)->latest()->get();
         return response()->json($student);
+    });
+
+    Route::get('/mocktest/{student_id}', function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
+        $mocktests = MockTest::ForStudent($student);
+        return response()->json($mocktests);
     });
 
 });

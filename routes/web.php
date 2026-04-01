@@ -306,6 +306,13 @@ Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_na
     return back()->with('error', 'Invalid username or password.');
 });
 
+Route::get('/student/mocktest/login/{user_name}/{password}/{testname}', function ($user_name, $password, $testname) {
+    if (Auth::guard('student')->attempt(compact('user_name', 'password'))) {
+        return redirect()->route('student.mock', ['exam_name' => $testname]);
+    }
+    return back()->with('error', 'Invalid username or password.');
+});
+
 Route::get('/test/{id}', function ($student_id) {
     $student = Student::find($student_id);
     if (!$student) {
