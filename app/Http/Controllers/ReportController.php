@@ -126,6 +126,7 @@ class ReportController extends Controller
                 $studentDetails = [
                     'online' => Student::whereIn('student_id', $totalOnlineIds)->get(),
                     'writing' => Student::whereIn('student_id', $writingStudentIds)->get(),
+                    'not_finished' => Student::whereIn('student_id', $writingStudentIds)->get(),
                     'finished' => Student::whereIn('student_id', $finishedStudentIds)->get(),
                     'absent' => Student::whereIn('student_id', $absentStudentIds)->get(),
                 ];
