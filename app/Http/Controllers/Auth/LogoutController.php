@@ -10,43 +10,24 @@ use illuminate\Database\Eloquent\Model;
 
 class LogoutController extends Controller
 {
-    /**
-     * Handle the logout request and fully destroy the session.
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function logout(Request $request)
     {
         if (Auth::guard('student')->check()) {
-            // Update the active column to 0
             $student = Auth::guard('student')->user();
             $student->active = 0;
             if ($student instanceof \Illuminate\Database\Eloquent\Model) {
                 $student->save();
             }
-
             Auth::guard('student')->logout();
         } elseif (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
         }
 
-        // Destroy all session data
         $request->session()->flush();
-
-        // Regenerate the session ID to prevent session fixation attacks
         $request->session()->regenerate();
-
-        // Optionally, invalidate the "remember me" token if using "remember me"
-        if (Auth::viaRemember()) {
-            Auth::user()->tokens->each(function ($token) {
-                $token->delete();
-            });
-        }
-
-        // Set headers to prevent the browser from caching the page
-        $response = redirect()->route('login');
         
-        // Add headers to prevent caching
+        $response = redirect()->route('login');
         $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');

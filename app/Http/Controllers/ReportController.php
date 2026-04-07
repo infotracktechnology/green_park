@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance,HostelCourier};
+use App\Models\{Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -22,12 +22,12 @@ class ReportController extends Controller
 
         $test_name = $request->test_name ?? 0;
 
-        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')->where([['a.testname', $test_name], ['section', '!=', ''],['section', '!=', null]])->when(auth()->user()->branch,fn($q)=>$q->where('student.campus',auth()->user()->branch))->select('section')->distinct()->orderBy('section')->get();
+        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')->where([['a.testname', $test_name], ['section', '!=', ''], ['section', '!=', null]])->when(auth()->user()->branch, fn($q) => $q->where('student.campus', auth()->user()->branch))->select('section')->distinct()->orderBy('section')->get();
 
         if ($request->query('type') == 'overall') {
             $section = $request->section;
 
-            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section],['coaching_type','OFFLINE']])->orderBy('student_name')->get();
+            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section], ['coaching_type', 'OFFLINE']])->orderBy('student_name')->get();
 
             $subjects = $answers->pluck('subject')->unique()->values()->toArray();
             $results = $answers->groupBy('student_id')->map(function ($logs) use ($subjects) {
@@ -43,7 +43,7 @@ class ReportController extends Controller
 
         if ($request->query('type') == 'omr') {
             $section = $request->section;
-            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section],['coaching_type','OFFLINE']])->orderBy('test_id')->orderBy('student_name')->get();
+            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section], ['coaching_type', 'OFFLINE']])->orderBy('test_id')->orderBy('student_name')->get();
             return view('report.omr_print', compact('answers', 'test_name'));
         }
 
@@ -66,6 +66,134 @@ class ReportController extends Controller
             });
         }
         return view('report.logreport', compact('students', 'announcements', 'exams'));
+    }
+
+    public function ExaminationLogReport(Request $request)
+    {
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $exams = [];
+        $stats = null;
+        $students = [];
+        $studentDetails = [];
+
+        if ($request->has('testcategory')) {
+            $exams = Exam::where('testcategory', $request->testcategory)
+                ->where("academic_year", $this->academic_year)
+                ->groupBy('name')->get();
+        }
+
+        $test_name = $request->examname;
+
+        if ($test_name) {
+            $exam = Exam::where('name', $test_name)->where('academic_year', $this->academic_year)->first();
+
+            if ($exam) {
+                $eligibleQuery = Student::where('academic_year', $this->academic_year);
+
+                if ($exam->course) $eligibleQuery->where('course', $exam->course);
+                if ($exam->branch) $eligibleQuery->whereIn('campus', explode(',', $exam->branch));
+                if ($exam->coaching_type) $eligibleQuery->whereIn('coaching_type', explode(',', $exam->coaching_type));
+                if ($exam->batch) $eligibleQuery->whereIn('batch', explode(',', $exam->batch));
+                if ($exam->category) $eligibleQuery->whereIn('hostel_dayscholar', explode(',', $exam->category));
+                if ($exam->gender && $exam->gender != 'All') $eligibleQuery->where('gender', $exam->gender);
+
+                $eligibleStudentIds = $eligibleQuery->pluck('student_id')->toArray();
+
+                $totalOnlineIds = ExamAnswer::whereIn('student_id', $eligibleStudentIds)->where('testname', $test_name)->groupBy('student_id')->pluck('student_id')->toArray();
+
+                $startedStudentIds = ExamAnswer::where('testname', $test_name)
+                    ->whereIn('student_id', $totalOnlineIds)
+                    ->groupBy('student_id')->havingRaw('count(*) < ?', [$exam->total_questions])->pluck('student_id')->toArray();
+
+                $finishedStudentIds = ExamAnswer::where('testname', $test_name)
+                    ->whereIn('student_id', $totalOnlineIds)
+                    ->groupBy('student_id')
+                    ->havingRaw('count(*) = ?', [$exam->total_questions])
+                    ->pluck('student_id')->toArray();
+                
+                $writingStudentIds = array_diff($startedStudentIds, $finishedStudentIds);
+                $absentStudentIds = array_diff($eligibleStudentIds, $totalOnlineIds);
+
+                $stats = [
+                    'total_eligible' => count($eligibleStudentIds),
+                    'total_online' => count($totalOnlineIds),
+                    'total_writing' => count($writingStudentIds),
+                    'total_finished' => count($finishedStudentIds),
+                    'total_not_finished' => count($writingStudentIds),
+                    'total_absent' => count($absentStudentIds)
+                ];
+
+                $studentDetails = [
+                    'online' => Student::whereIn('student_id', $totalOnlineIds)->get(),
+                    'writing' => Student::whereIn('student_id', $writingStudentIds)->get(),
+                    'finished' => Student::whereIn('student_id', $finishedStudentIds)->get(),
+                    'absent' => Student::whereIn('student_id', $absentStudentIds)->get(),
+                ];
+            }
+        }
+
+        return view('report.examination_log_report', compact('category', 'exams', 'stats', 'students', 'test_name', 'studentDetails'));
+    }
+
+    public function StudentResponseDownload(Request $request)
+    {
+        $examname = $request->examname;
+        $student_id = $request->student_id;
+
+        $exam = Exam::where('name', $examname)->where('academic_year', $this->academic_year)->first();
+        if (!$exam) return back()->with('error', 'Exam not found.');
+
+        $student = Student::where('student_id', $student_id)->first();
+        if (!$student) return back()->with('error', 'Student not found.');
+
+        $answers = ExamAnswer::where('testname', $examname)->where('student_id', $student_id)->get();
+
+        $headers = [
+            'Coaching Type',
+            'Username',
+            'Student Name',
+            'Section',
+            'Student ID',
+            'Test ID',
+            'Exam Name',
+            'Exam Date',
+        ];
+
+        $maxQuestions = $exam->total_questions;
+
+        for ($i = 1; $i <= $maxQuestions; $i++) {
+            $headers[] = "A{$i}";
+        }
+
+        $row = [
+            $student->coaching_type,
+            $student->user_name,
+            $student->student_name,
+            $student->section,
+            $student->student_id,
+            $exam->id,
+            $exam->name,
+            $exam->exam_date,
+        ];
+
+        $answersByKey = $answers->keyBy('q_no');
+        for ($i = 1; $i <= $maxQuestions; $i++) {
+            $row[] = $answersByKey->get($i)->answer ?? 0;
+        }
+
+        $csvData = [$headers, $row];
+        $filename = "Response_" . $student_id . "_" . $examname . ".csv";
+
+        return response()->stream(function () use ($csvData) {
+            $file = fopen('php://output', 'w');
+            foreach ($csvData as $line) {
+                fputcsv($file, $line);
+            }
+            fclose($file);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ]);
     }
 
     public function AttendanceReport(Request $request)
@@ -450,7 +578,7 @@ class ReportController extends Controller
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-    
+
         if ($request->view) {
             $hostels = Hostel::find($request->hostel)?->name;
             $students = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('room_no', $request->room)->get();

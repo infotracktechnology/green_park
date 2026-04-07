@@ -151,6 +151,7 @@
                   <ul class="dropdown-menu">
                     <li><a href="{{ route('exam.create') }}" class="nav-link">Add CBT Exam</a></li>
                     <li><a href="{{ route('exam.viewexams','ONLINE') }}" class="nav-link">View Exams</a></li>
+                    <li><a href="{{ route('report.examination_log') }}" class="nav-link">Log Report</a></li>
                     <li><a href="{{ route('exam.onlineresponse') }}" class="nav-link">Online Response</a></li>
                     <li><a href="{{ route('exam.offline.index','ONLINE')}}" class="nav-link">OMR Response Upload</a></li>
                     <li><a href="{{ route('exam.answerkey','ONLINE')}}" class="nav-link">Answer Key Valuation</a></li>
