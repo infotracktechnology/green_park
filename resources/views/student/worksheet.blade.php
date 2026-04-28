@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'worksheet')
+@section('title', 'Worksheet')
 
 @section('main')
 <div class="main-content">

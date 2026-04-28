@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
   @yield('meta')
   <title>@yield('title')</title>
-  
+
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{{ asset('css/app.min.css') }}">
   <!-- Template CSS -->
@@ -14,13 +15,13 @@
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
   <link rel='shortcut icon' type='image/x-icon' href='{{ asset('img/favicon.png') }}' />
-  
+
   <!-- Select2 -->
   <link rel="stylesheet" href="{{ asset('bundles/select2/dist/css/select2.min.css') }}" />
-  
+
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  
+
   <style>
     /* Table & General Styles */
     thead th {
@@ -48,7 +49,7 @@
       display: none !important;
     }
   </style>
-  
+
   @yield('css')
 </head>
 
@@ -138,13 +139,13 @@
               </a>
             </li>
             @foreach (auth()->user()->menu ?? [] as $menu)
-              @if($menu['route'] != '')
-              <li class="dropdown {{ request()->routeIs($menu['route']) ? 'active' : '' }}">
-                <a href="{{ route($menu['route']) }}" class="nav-link">
-                  <i class="{{ $menu['icon'] }}" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
-                </a>
-              </li>
-              @endif
+            @if($menu['route'] != '')
+            <li class="dropdown {{ request()->routeIs($menu['route']) ? 'active' : '' }}">
+              <a href="{{ route($menu['route']) }}" class="nav-link">
+                <i class="{{ $menu['icon'] }}" style="font-size: 20px; color: #2196f3;"></i><span>{{ $menu['title'] }}</span>
+              </a>
+            </li>
+            @endif
             @endforeach
             @endif
           </ul>
@@ -190,7 +191,45 @@
       }
       initClock();
     });
+    
+    $(document).on('click', 'a', function(e) {
+        let href = $(this).attr('href');
+        if (!href || href === '#' || href.startsWith('javascript:')) return;
+    
+        let isPdf = href.toLowerCase().endsWith('.pdf') || href.toLowerCase().includes('.pdf');
+        let isVideo = href.includes('/video/') || $(this).text().toLowerCase().includes('watch');
+        let isAttachment = $(this).text().toLowerCase().includes('attachment') || $(this).closest('.notice-board-item-date').length > 0;
+        let isDownload = $(this).hasClass('btn-primary') && $(this).text().toLowerCase().includes('download');
+    
+        if (isPdf || isVideo || isAttachment || isDownload) {
+            let modules = $('title').text().trim() || 'Communication';
+            let titleText = '';
+    
+            let $row = $(this).closest('tr');
+            if ($row.length > 0) {
+                let $tds = $row.find('td');
+                if ($tds.eq(0).text().trim().length < 4 && !isNaN($tds.eq(0).text().trim())) {
+                    titleText = $tds.eq(1).text().trim() + ($tds.eq(2).length ? '-' + $tds.eq(2).text().trim() : '');
+                } else {
+                    titleText = $tds.eq(0).text().trim();
+                }
+            } else if ($(this).closest('.notice-board-item').length > 0) {
+                titleText = $(this).closest('.notice-board-item').find('.notice-board-item-title').text().replace('Title :', '').trim();
+            }
+            
+            if (!titleText) titleText = $(this).text().trim() || href.split('/').pop();
+            
+            let action = 'Seen'+titleText;
+    
+            $.post('{{ route("student.logActivity") }}', {
+                _token: '{{ csrf_token() }}',
+                module: modules,
+                action: action
+            });
+        }
+    });
   </script>
   @yield('js')
 </body>
+
 </html>

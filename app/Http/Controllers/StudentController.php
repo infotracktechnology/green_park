@@ -226,4 +226,16 @@ class StudentController extends Controller
         }
         return view('student.neetdocument', compact('student'));
     }
+
+    public function logActivity(Request $request)
+    {
+        DB::table('student_log')->insert([
+            'module' => $request->module,
+            'student_id' => auth()->user()->student_id,
+            'action' => $request->action,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return response()->json(['success' => true]);
+    }
 }

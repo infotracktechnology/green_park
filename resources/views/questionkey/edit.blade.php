@@ -1,5 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Question key')
+@section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+@endsection
 @section('main')
 <div class="main-content">
   <section class="section">
@@ -140,6 +144,26 @@
                 </div>
 
                 <div class="form-group col-lg-12">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" name="is_schedule" class="custom-control-input" id="is_schedule" value="1" @checked($questionkey->is_schedule)>
+                    <label class="custom-control-label" for="is_schedule">Is Schedule</label>
+                  </div>
+                </div>
+
+                <div class="col-lg-12 row" id="schedule_fields" style="{{ $questionkey->is_schedule ? '' : 'display: none;' }}">
+                  <div class="form-group col-lg-3">
+                      <label>Start Datetime</label>
+                      <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" value="{{ $questionkey->start_at }}" {{ $questionkey->is_schedule ? 'required' : '' }}>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                      <label>End Datetime</label>
+                      <input type="text" id="end_at" name="end_at" class="datetime-picker form-control form-control-sm" value="{{ $questionkey->end_at }}" {{ $questionkey->is_schedule ? 'required' : '' }}>
+                      <div id="end_at_error" class="text-danger"></div>
+                  </div>
+                </div>
+
+                <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
 
@@ -157,7 +181,44 @@
 @endsection
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
+  flatpickr(".datetime-picker", {
+      enableTime: true,
+      allowInput: true,
+      dateFormat: "Y-m-d H:i",
+      plugins: [
+          new confirmDatePlugin({
+              confirmText: "OK",
+              showAlways: false,
+              theme: "light"
+          })
+      ]
+  });
+
+  $('#is_schedule').change(function() {
+      if ($(this).is(':checked')) {
+          $('#schedule_fields').show();
+          $('#start_at').attr('required', true);
+          $('#end_at').attr('required', true);
+      } else {
+          $('#schedule_fields').hide();
+          $('#start_at').attr('required', false);
+          $('#end_at').attr('required', false);
+      }
+  });
+  
+  $('#end_at').change(function() {
+      $('#end_at_error').text('');
+      const startTime = new Date($('#start_at').val());
+      const endTime = new Date($(this).val());
+      if (startTime >= endTime) {
+          $('#end_at_error').text('End time must be greater than start time.');
+          $(this).val('');
+      }
+  });
+
   document.getElementById('fileInput').addEventListener('change', function() {
       let fileName = this.files[0] ? this.files[0].name : "{{ basename($questionkey->file_path) }}";
       document.getElementById('fileName').innerText = fileName;

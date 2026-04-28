@@ -35,6 +35,8 @@ class ClassVideoController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+
         ClassVideo::create($data);
         return redirect()->route('classvideo.index')->with('success', 'Video created successfully.');
     }
@@ -75,6 +77,8 @@ class ClassVideoController extends Controller
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
+
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
 
         $classvideo->update($data);
         return redirect()->route('classvideo.index')->with('success', 'Video updated successfully.');

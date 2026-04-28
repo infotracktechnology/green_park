@@ -14,6 +14,9 @@ class Announcement extends Model
 
      protected $casts = [
         'student_ids' => 'json',
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
+        'is_schedule' => 'boolean',
     ];
     function branch()
     {
@@ -32,8 +35,10 @@ class Announcement extends Model
 public static function ForStudent(Student $student)
 {
     return self::query()
-        ->where('usertype', 'INDIVIDUAL')
-        ->where('students', $student->student_id)
+        ->where(function($q) use ($student) {
+            $q->where('usertype', 'INDIVIDUAL')
+              ->where('students', $student->student_id);
+        })
         ->orWhere(function ($query) use ($student) {
             $query->where('academic_year', $student->academic_year)
                 ->where('course', $student->course)
@@ -48,6 +53,14 @@ public static function ForStudent(Student $student)
                     }
                     $q->where('section', 'like', "%{$student->section}%");
                 })->whereIn('gender', [$student->gender, 'All']);
+        })
+        ->where(function($q) {
+            $q->where('is_schedule', false)
+              ->orWhere(function($q2) {
+                  $q2->where('is_schedule', true)
+                     ->where('start_at', '<=', date('Y-m-d H:i:s'))
+                     ->where('end_at', '>=', date('Y-m-d H:i:s'));
+              });
         });
 }
 

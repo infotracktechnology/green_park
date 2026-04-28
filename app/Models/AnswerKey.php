@@ -9,6 +9,13 @@ class AnswerKey extends Model
     use HasFactory;
     protected $table = 'answer_key';
     protected $guarded = [];
+
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
+        'is_schedule' => 'boolean',
+    ];
+
     public function branchNames()
     {
         return Branch::whereIn('id', explode(',', $this->branch))->get()->implode('name', '/');
@@ -36,6 +43,15 @@ class AnswerKey extends Model
                         $q->where('section', 'like', "%{$student->section}%");
                     })
                     ->whereIn('gender', [$student->gender, 'All']);
-            })->latest()->get();
+            })
+            ->where(function($q) {
+                $q->where('is_schedule', false)
+                  ->orWhere(function($q2) {
+                      $q2->where('is_schedule', true)
+                         ->where('start_at', '<=', date('Y-m-d H:i:s'))
+                         ->where('end_at', '>=', date('Y-m-d H:i:s'));
+                  });
+            })
+            ->latest()->get();
     }
 }

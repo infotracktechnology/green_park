@@ -38,6 +38,8 @@ class AnnouncementController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+
         $data['student_ids'] = [];
         if ($request->has('attachment')) {
             $fileName = time() . '.' . $request->attachment->extension();
@@ -78,6 +80,8 @@ class AnnouncementController extends Controller
         foreach (['coaching_type', 'branch', 'batch', 'category'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
+
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
 
         $data['student_ids'] = [];
         if ($request->has('attachment')) {

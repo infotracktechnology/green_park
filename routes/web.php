@@ -85,7 +85,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::get('import/student', [ImportController::class, 'index'])->name('import.student');
     Route::post('import/upload/student', [ImportController::class, 'upload'])->name('import.student.upload');
     Route::get('export/student', [\App\Http\Controllers\ExportController::class, 'student_export'])->name('export.student');
-    Route::match(['get', 'post'],'import/studentupdate', [ImportController::class, 'StudentUpdate'])->name('import.studentupdate');
+    Route::match(['get', 'post'], 'import/studentupdate', [ImportController::class, 'StudentUpdate'])->name('import.studentupdate');
 
     Route::resource('announcement', AnnouncementController::class);
     Route::resource('examportion', ExamPortionController::class);
@@ -106,7 +106,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::post('classvideo/bulk-delete', [ClassVideoController::class, 'bulkDelete'])->name('classvideo.bulk-delete');
     Route::resource('discussionvideo', DiscussionVideoController::class);
     Route::post('discussionvideo/bulk-delete', [DiscussionVideoController::class, 'bulkDelete'])->name('discussionvideo.bulkDelete');
-    
+
     Route::resource('revisionvideo', RevisionVideoController::class)->except(['show']);
     Route::post('revisionvideo/bulk-delete', [RevisionVideoController::class, 'bulkDelete'])->name('revisionvideo.bulkDelete');
     Route::resource('referencevideo', ReferenceVideoController::class)->except(['show']);
@@ -115,7 +115,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::controller(ExamController::class)->group(function () {
         Route::get('examination/view/{examtype}', 'ViewExams')->name('exam.viewexams');
         Route::get('examination/instruction/{test_id}', 'instruction')->name('exam.instruction');
-        Route::match(['get', 'post','delete'], 'examination/testcategory', 'TestCategory')->name('exam.testcategory');
+        Route::match(['get', 'post', 'delete'], 'examination/testcategory', 'TestCategory')->name('exam.testcategory');
         Route::get('examination/offlineexam', 'OfflineExam')->name('exam.offlineexam');
         Route::get('examination/enable', 'enable')->name('exam.enable');
         Route::post('examination/enable', 'enableExam')->name('exam.enableExam');
@@ -153,7 +153,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         'timetable'    => \App\Http\Controllers\TimetableController::class,
         'studentactivity' => StudentActivityController::class,
         'users'        => UsersController::class,
-        'mocktest'     => MockTestController::class,    
+        'mocktest'     => MockTestController::class,
         'workshift'    => \App\Http\Controllers\WorkshiftController::class,
     ]);
 
@@ -196,9 +196,9 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     });
 
     Route::resource('segment', SegmentController::class);
-    Route::get('assignsegment',[SegmentController::class,'assign'])->name('assignsegment');
-    Route::put('assignsegment',[SegmentController::class,'assignSegment'])->name('assignsegment');
-    Route::match(['get', 'post'],'/fees/migration', [FinanceController::class,'FeesMigration'])->name('fees.migration');
+    Route::get('assignsegment', [SegmentController::class, 'assign'])->name('assignsegment');
+    Route::put('assignsegment', [SegmentController::class, 'assignSegment'])->name('assignsegment');
+    Route::match(['get', 'post'], '/fees/migration', [FinanceController::class, 'FeesMigration'])->name('fees.migration');
     Route::resource('concession', ConcessionController::class);
 
     Route::prefix('report')->as('report.')->group(function () {
@@ -245,6 +245,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::get('mark/subject/{test_id}', 'mark_subject')->name('student.mark_subject');
         Route::get('mark/download/{test_id}', 'mark_download')->name('student.mark_download');
         Route::get('attendance', 'attendance')->name('student.attendance');
+        Route::post('logActivity', 'logActivity')->name('student.logActivity');
     });
 
     Route::controller(AnnouncementController::class)->group(function () {
@@ -262,7 +263,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     });
 
     Route::get('answerkey', [AnswerkeyController::class, 'answerkey'])->name('student.answerkey');
-    
+
 
     Route::controller(QuestionKeyController::class)->group(function () {
         Route::get('questionkey', 'questionkey')->name('student.questionKey');
@@ -292,9 +293,9 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     });
 
     Route::resource('document', StudentDocumentController::class)->only(['index', 'store', 'destroy']);
-    Route::match(['get', 'post'],'mocktest', [MockTestController::class, 'MockTest'])->name('student.mock');
+    Route::match(['get', 'post'], 'mocktest', [MockTestController::class, 'MockTest'])->name('student.mock');
     Route::get('mocktestpdf/{testname}', [MockTestController::class, 'downloadMockTestPdf'])->name('student.mocktestpdf');
-    Route::match(['get', 'post'],'neetdocument', [StudentController::class, 'NeetDocument'])->name('student.neetdocument');
+    Route::match(['get', 'post'], 'neetdocument', [StudentController::class, 'NeetDocument'])->name('student.neetdocument');
     Route::get('timetable', [\App\Http\Controllers\TimetableController::class, 'timetable'])->name('student.timetable');
 });
 

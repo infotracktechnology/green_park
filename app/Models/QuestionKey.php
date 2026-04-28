@@ -16,6 +16,9 @@ class QuestionKey extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
+        'is_schedule' => 'boolean',
     ];
 
     public function branchNames()
@@ -45,6 +48,15 @@ class QuestionKey extends Model
                         $q->where('section', 'like', "%{$student->section}%");
                     })
                     ->whereIn('gender', [$student->gender, 'All']);
-            })->latest()->get();
+            })
+            ->where(function($q) {
+                $q->where('is_schedule', false)
+                  ->orWhere(function($q2) {
+                      $q2->where('is_schedule', true)
+                         ->where('start_at', '<=', date('Y-m-d H:i:s'))
+                         ->where('end_at', '>=', date('Y-m-d H:i:s'));
+                  });
+            })
+            ->latest()->get();
     }
 }

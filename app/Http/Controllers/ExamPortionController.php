@@ -36,6 +36,8 @@ class ExamPortionController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+
         if ($request->hasFile('attachment')) {
             $originalName = $request->file('attachment')->getClientOriginalName();
             $fileName = time().'_'.$originalName;
@@ -65,6 +67,8 @@ class ExamPortionController extends Controller
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
+
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
 
          if ($request->hasFile('attachment')) {
             $originalName = $request->file('attachment')->getClientOriginalName();
