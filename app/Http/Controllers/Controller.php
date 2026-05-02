@@ -11,15 +11,26 @@ use App\Models\AcademicYear;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    public $academic_year = [];
+    public $academic_year;
 
-    public function __construct(){
-        $this->academic_year = AcademicYear::where('active', 1)->first()->academic_year;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!session()->has('academic_year')) {
+                $active = AcademicYear::where('active', 1)->first();
+                if ($active) {
+                    session()->put('academic_year', $active->academic_year);
+                }
+            }
+            $this->academic_year = session('academic_year');
+            return $next($request);
+        });
     }
-    
-    private function financial_year(){
-    $financial_year_start = (int)date('m') < 4 ? (int)date('Y') - 1 : (int)date('Y');
-    $financial_year_end = (int)date('m') < 4 ? (int)date('Y') : (int)date('Y') + 1;
-    return $financial_year_start . '-' . $financial_year_end;
+
+    protected function financial_year()
+    {
+        $financial_year_start = (int)date('m') < 4 ? (int)date('Y') - 1 : (int)date('Y');
+        $financial_year_end = (int)date('m') < 4 ? (int)date('Y') : (int)date('Y') + 1;
+        return $financial_year_start . '-' . $financial_year_end;
     }
 }

@@ -23,9 +23,8 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         if ($request->has('academic_year')) {
-            AcademicYear::query()->update(['active' => 0]);
-            AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
-            return redirect()->route('admin.home')->with('success', 'Academic year changed successfully.');
+            session()->put('academic_year', $request->academic_year);
+            return redirect()->back()->with('success', 'Academic year changed successfully.');
         }
 
         $branchId = auth()->user()->branch;
@@ -33,25 +32,25 @@ class HomeController extends Controller
         $academic_years = AcademicYear::all();
         $active_year = $this->academic_year;
 
-        $data = Branch::with(['student' => function($query) {
+        $data = Branch::with(['student' => function ($query) {
             $query->where('academic_year', $this->academic_year);
-        }, 'attendance' => function($query) use ($today) {
+        }, 'attendance' => function ($query) use ($today) {
             $query->where('attendance_date', $today)
-                ->whereIn('student_id', function($q) {
+                ->whereIn('student_id', function ($q) {
                     $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
                 });
         }])->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
 
         $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
-    
+
         $boys = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'MALE')->count();
         $girls = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'FEMALE')->count();
         $total = $students->count();
-        
+
         $present = Attendance::when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))
             ->where('status', 'P')
             ->where('attendance_date', $today)
-            ->whereIn('student_id', function($q) {
+            ->whereIn('student_id', function ($q) {
                 $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
             })
             ->distinct('student_id')

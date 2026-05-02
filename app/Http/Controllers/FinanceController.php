@@ -513,12 +513,7 @@ class FinanceController extends Controller
     }
 
 
-    private function financial_year()
-    {
-        $financial_year_start = (int)date('m') < 4 ? (int)date('Y') - 1 : (int)date('Y');
-        $financial_year_end = (int)date('m') < 4 ? (int)date('Y') : (int)date('Y') + 1;
-        return $financial_year_start . '-' . $financial_year_end;
-    }
+
 
     public function FeesMigration(Request $request,ImportController $import)
     {

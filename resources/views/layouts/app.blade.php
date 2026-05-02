@@ -39,7 +39,7 @@
               <form class="form-inline mr-auto" action="{{ route('admin.home') }}" method="get">
                 <select name="academic_year" id="academic_year" onchange="this.form.submit();" class="form-control" required>
                   @foreach (\App\Models\AcademicYear::all() as $row)
-                  <option value="{{ $row->academic_year }}" @selected($row->active)>{{ $row->academic_year }}</option>
+                  <option value="{{ $row->academic_year }}" @selected($row->academic_year == session('academic_year'))>{{ $row->academic_year }}</option>
                   @endforeach
                 </select>
 
@@ -53,7 +53,7 @@
             <a href="javascript:void(0);" class="nav-link nav-link-lg">{{ auth()->user()->branch_details?->name }}</a>
           </li>
           @endif
-         
+
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
               <img alt="image" src="{{asset('img/avather.png')}}" class="user-img-radious-style">
@@ -114,7 +114,7 @@
                 <li><a href="{{ route('import.studentupdate') }}" class="nav-link">Student Bulk Update</a></li>
               </ul>
             </li>
-            
+
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('studentmenu.type') }}" class="nav-link">Type Assign</a></li>
@@ -171,7 +171,7 @@
                   <ul class="dropdown-menu">
                     <li><a href="{{ route('exam.offlineexam') }}" class="nav-link">Add OMR Based Exam</a></li>
                     <li><a href="{{ route('exam.viewexams','OFFLINE') }}" class="nav-link">View Exams</a></li>
-                   <li><a href="{{ route('exam.offline.index','OFFLINE')}}" class="nav-link">OMR Response Upload</a></li>
+                    <li><a href="{{ route('exam.offline.index','OFFLINE')}}" class="nav-link">OMR Response Upload</a></li>
                     <li><a href="{{ route('exam.answerkey','OFFLINE')}}" class="nav-link">Answer Key Valuation</a></li>
                     <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
                     <li><a href="{{ route('exam.offlinepublish')}}" class="nav-link">Exam Result Publish</a></li>

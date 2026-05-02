@@ -16,7 +16,7 @@ class FinanceReportController extends Controller
         $branchselect = Branch::when(auth()->user()->branch, function ($query) { $query->where('id', auth()->user()->branch); })->pluck('name', 'id');
         $reports = collect([]);
         if($request->filled('branch_id') && $request->filled('payment_mode')){
-            $reports = FeeCollection::where('financial_year', $this->financial_year)->where('collected_branch', $request->input('branch_id'))->where('payment_date', date('Y-m-d'))->where('is_cancelled', 0)->when($request->input('payment_mode') != 'all', function ($query) use ($request) { $query->where('payment_mode', $request->input('payment_mode')); })->get();
+            $reports = FeeCollection::where('financial_year', $this->financial_year())->where('collected_branch', $request->input('branch_id'))->where('payment_date', date('Y-m-d'))->where('is_cancelled', 0)->when($request->input('payment_mode') != 'all', function ($query) use ($request) { $query->where('payment_mode', $request->input('payment_mode')); })->get();
         }
         return view('finance.dfc',compact('branchselect','reports'));
     }
