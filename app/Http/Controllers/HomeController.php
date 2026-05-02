@@ -43,11 +43,11 @@ class HomeController extends Controller
         }])->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
 
         $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
-
-        $boys = $students->where('gender', 'MALE')->count();
-        $girls = $students->where('gender', 'FEMALE')->count();
+    
+        $boys = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'MALE')->count();
+        $girls = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'FEMALE')->count();
         $total = $students->count();
-
+        
         $present = Attendance::when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))
             ->where('status', 'P')
             ->where('attendance_date', $today)
