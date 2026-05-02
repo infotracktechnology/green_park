@@ -22,10 +22,25 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->has('academic_year')) {
+            AcademicYear::query()->update(['active' => 0]);
+            AcademicYear::where('academic_year', $request->academic_year)->update(['active' => 1]);
+            return redirect()->route('admin.home')->with('success', 'Academic year changed successfully.');
+        }
+
         $branchId = auth()->user()->branch;
         $today = date('Y-m-d');
+        $academic_years = AcademicYear::all();
+        $active_year = $this->academic_year;
 
-        $data = Branch::when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
+        $data = Branch::with(['student' => function($query) {
+            $query->where('academic_year', $this->academic_year);
+        }, 'attendance' => function($query) use ($today) {
+            $query->where('attendance_date', $today)
+                ->whereIn('student_id', function($q) {
+                    $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
+                });
+        }])->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
 
         $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
 
@@ -33,7 +48,14 @@ class HomeController extends Controller
         $girls = $students->where('gender', 'FEMALE')->count();
         $total = $students->count();
 
-        $present = Attendance::when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))->where('status', 'P')->where('attendance_date', $today)->distinct('student_id')->count();
+        $present = Attendance::when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))
+            ->where('status', 'P')
+            ->where('attendance_date', $today)
+            ->whereIn('student_id', function($q) {
+                $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
+            })
+            ->distinct('student_id')
+            ->count();
 
         $staffs = collect(Staff::select('department')->when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))->get())->groupBy('department');
 
@@ -49,12 +71,7 @@ class HomeController extends Controller
             'count'  => Chairmanvideo::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count()
         ]);
 
-        if($request->has('academic_year')) {
-         AcademicYear::query()->update(['active' => DB::raw("academic_year = '{$request->academic_year}'")]);
-         return redirect()->route('admin.home')->with('success', 'Academic year changed successfully.');
-        }
-
-        return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman'));
+        return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman', 'academic_years', 'active_year'));
     }
 
 
@@ -94,13 +111,7 @@ class HomeController extends Controller
 
     public function chat(Request $request)
     {
-        $users = DB::table('chat')->where('sender_id', '!=', auth()->user()->id)->orWhere('receiver_id', '=', auth()->user()->id)->groupBy('sender_id')->selectRaw("sender_id,receiver_id,count(chat_read=0 and receiver_id=" . auth()->user()->id . ") as unread")->get()->map(function ($user) {
-            return [
-                'id' => $user->sender_id,
-                'name' => Student::where('student_id', $user->sender_id)->first()->student_name ?? '',
-                'unread' => $user->unread,
-            ];
-        });
+        $users =  \App\Models\User::where('id', '!=', auth()->user()->id)->get();
 
         if ($request->has('submit')) {
             $parentconcern = DB::table('parent_concern')->where('id', $request->id)->update(['status' => $request->status]);
@@ -198,7 +209,9 @@ class HomeController extends Controller
     public function dashboardGender(Request $request)
     {
         $user = auth()->user();
-        $query = Student::with('branch')->select('student_id', 'student_name', 'section', 'coaching_type', 'gender', 'campus')->where('campus', $request->campus);
+        $query = Student::with('branch')->select('student_id', 'student_name', 'section', 'coaching_type', 'gender', 'campus')
+            ->where('academic_year', $this->academic_year)
+            ->where('campus', $request->campus);
 
         if ($request->has('section')) {
             if ($request->section == '-') {
@@ -238,9 +251,10 @@ class HomeController extends Controller
     {
         $start_date = $request->start_date ? Carbon::createFromFormat('Y-m-d H:i', $request->start_date)->format('Y-m-d H:i:s') : Carbon::now()->startOfDay()->format('Y-m-d H:i:s');
         $end_date = $request->end_date ? Carbon::createFromFormat('Y-m-d H:i', $request->end_date)->endOfDay()->format('Y-m-d H:i:s') : Carbon::now()->endOfDay()->format('Y-m-d H:i:s');
-        $query = Announcement::when(auth()->user()->branch, function ($query) {
-            $query->whereRaw('FIND_IN_SET(?, branch)', [auth()->user()->branch]);
-        });
+        $query = Announcement::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->whereRaw('FIND_IN_SET(?, branch)', [auth()->user()->branch]);
+            });
         $announcements = $query->get();
         return response()->json(['announcements' => $announcements]);
     }
