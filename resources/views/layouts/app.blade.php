@@ -53,9 +53,7 @@
             <a href="javascript:void(0);" class="nav-link nav-link-lg">{{ auth()->user()->branch_details?->name }}</a>
           </li>
           @endif
-          <li>
-            <a href="{{ route('admin.setting') }}" class="nav-link nav-link-lg"><i data-feather="settings"></i></a>
-          </li>
+         
           <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
               <img alt="image" src="{{asset('img/avather.png')}}" class="user-img-radious-style">
@@ -93,6 +91,11 @@
             @if(auth()->user()->type === 'Admin')
             <li class="dropdown"> <a href="{{ route('academicyear.index') }}" class="nav-link"><i data-feather="calendar"></i><span>Academic Year</span></a>
             </li>
+
+            <li class="dropdown">
+              <a href="{{ route('admin.setting') }}" class="nav-link"><i data-feather="settings"></i><span>Admin Setting</span></a>
+            </li>
+
             <li class="dropdown">
               <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
             </li>
