@@ -219,7 +219,7 @@
             
             if (!titleText) titleText = $(this).text().trim() || href.split('/').pop();
             
-            let action = 'Seen'+titleText;
+            let action = 'Seen '+titleText;
     
             $.post('{{ route("student.logActivity") }}', {
                 _token: '{{ csrf_token() }}',

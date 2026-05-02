@@ -99,6 +99,7 @@
             <li class="dropdown">
               <a href="{{ route('branch.index') }}" class="nav-link"><i data-feather="grid"></i><span>Branches</span></a>
             </li>
+
             <li class="dropdown">
               <a href="{{ route('users.index') }}" class="nav-link"><i data-feather="user"></i><span>Users</span></a>
             </li>
@@ -113,12 +114,14 @@
                 <li><a href="{{ route('import.studentupdate') }}" class="nav-link">Student Bulk Update</a></li>
               </ul>
             </li>
+            
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="clipboard"></i><span>Student Menu</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('studentmenu.type') }}" class="nav-link">Type Assign</a></li>
                 <li><a href="{{ route('studentmenu.student') }}" class="nav-link">Student Assign</a></li>
               </ul>
             </li>
+
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="user-check"></i><span>Staff Profile</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('staff.index') }}" class="nav-link"> Staff</a></li>
