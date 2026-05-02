@@ -44,23 +44,6 @@
 
 @section('main')
 <div class="main-content">
-  <div class="row mb-4">
-    <div class="col-md-12 d-flex justify-content-between align-items-center">
-      <h1 class="h3 mb-0 text-dark fw-bold">Dashboard</h1>
-      <div class="d-flex align-items-center">
-        <form action="{{ route('admin.home') }}" method="GET" class="d-flex align-items-center">
-          <label class="mb-0 mr-2 text-muted fw-bold">Academic Year:</label>
-          <select name="academic_year" class="form-control form-control-sm border-0 shadow-sm rounded-pill px-3" onchange="this.form.submit()" style="width: 150px; background: #fff;">
-            @foreach($academic_years as $year)
-              <option value="{{ $year->academic_year }}" {{ $active_year == $year->academic_year ? 'selected' : '' }}>
-                {{ $year->academic_year }}
-              </option>
-            @endforeach
-          </select>
-        </form>
-      </div>
-    </div>
-  </div>
 
   <!-- Top Stats Row (Derived from your data for the UI look) -->
   <div class="row mb-4">
