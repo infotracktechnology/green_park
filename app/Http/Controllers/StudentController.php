@@ -14,6 +14,8 @@ use App\Models\Announcement;
 use App\Models\Attendance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Options;
+use App\Models\StudentLog;
+
 
 class StudentController extends Controller
 {
@@ -229,7 +231,7 @@ class StudentController extends Controller
 
     public function logActivity(Request $request)
     {
-        DB::table('student_log')->insert([
+        $log = StudentLog::insert([
             'module' => $request->module,
             'student_id' => auth()->user()->student_id,
             'action' => $request->action,
@@ -237,5 +239,16 @@ class StudentController extends Controller
             'updated_at' => now(),
         ]);
         return response()->json(['success' => true]);
+    }
+
+    
+    public function GetLogActivity(Request $request)
+    {
+        $logs = StudentLog::where('student_log.module', $request->module)
+            ->where('student_log.action', 'like', "%{$request->action}%")
+            ->join('student', 'student.student_id', '=', 'student_log.student_id')
+            ->select('student_name', 'student.student_id', 'section', 'student_log.created_at','action')
+            ->get();
+        return response()->json(['success' => true, 'logs' => $logs]);
     }
 }
