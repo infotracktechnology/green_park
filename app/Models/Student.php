@@ -79,7 +79,7 @@ class Student extends Authenticatable
 
     private static function generateId($course)
     {
-        $lastId = self::where('course', $course)->max('student_id');
+        $lastId = self::withTrashed()->where('course', $course)->max('student_id');
         $y = date('y')+1;
         if ($lastId) {
             return $lastId+1;
