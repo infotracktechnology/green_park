@@ -12,7 +12,7 @@
     <div class="section-body">
       <div class="row">
         <div class="col-md-12 col-sm-12">
-            
+
           @if(session()->has('success'))
           <div class="alert alert-success alert-dismissible fade show" role="alert">
             <b>{{ session('success') }}</b>
@@ -41,7 +41,7 @@
 
                   <div class="form-group col-lg-2">
                     <label for="academic_year">Academic Year</label>
-                    <select name="academic_year" id="academic_year" class=" form-control form-control-sm" required>
+                    <select name="academic_year" id="academic_year" class="select2" required>
                       @foreach ($academicyear as $row)
                       <option value="{{ $row->academic_year }}" @selected(request('academic_year')==$row->academic_year)>{{ $row->academic_year }}</option>
                       @endforeach
@@ -68,7 +68,7 @@
 
                   <div class="form-group col-lg-3">
                     <label for="branch">Branch</label>
-                    <select name="branch_id" id="branch_id" class="form-control form-control-sm" required>
+                    <select name="branch_id" id="branch_id" class="select2" required>
                       <option value="">Select Branch</option>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}" @selected(request('branch_id')==$branch->id)>{{ $branch->name }}</option>
@@ -78,7 +78,7 @@
 
                   <div class="form-group col-lg-2">
                     <label for="section">Section</label>
-                    <select name="section" id="section" class="form-control form-control-sm" required>
+                    <select name="section" id="section" class="select2" required>
                       <option value="">Select Section</option>
                       @foreach ($sections as $section)
                       <option value="{{ $section->section }}" @selected(request('section')==$section->section)>{{ $section->section }}</option>
@@ -142,7 +142,7 @@
                             <td>{{ $row->coaching_type }}</td>
                             <td>{{ $row->section }}</td>
                             @foreach(explode(',', request('attendance_timing')) as $time)
-                    <?php 
+                            <?php 
                     $disabled = $attendance->where('timing', $time)->where('student_id', $row->student_id)->count();
                     $attendance_entry = $attendance->where('timing', $time)->where('student_id', $row->student_id)->first();
                     $checked = $attendance_entry ? $attendance_entry->status : 'P';
@@ -205,9 +205,9 @@
      ]
       });
   
-const branch = $('#branch_id');
+  const branch = $('#branch_id');
   
-branch.change(function() {
+  branch.change(function() {
       $('#section').html('<option value="">Select Section</option>');
       if(branch.val() != "") {
      getSection();
