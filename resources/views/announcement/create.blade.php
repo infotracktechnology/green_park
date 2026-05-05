@@ -143,7 +143,7 @@
 
                   <div class="form-group col-lg-12">
                     <label for="content">Content</label>
-                    <textarea name="content" id="content" class="summernote-simple"></textarea>
+                    <textarea name="content" id="content"></textarea>
                   </div>
                   
 

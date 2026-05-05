@@ -10,6 +10,7 @@ use App\Models\Branch;
 use App\Models\Student;
 use App\Providers\FcmServiceProvider;
 use App\Http\Controllers\HomeController;
+use App\Jobs\SendAnnouncementNotification;
 
 class AnnouncementController extends Controller
 {
@@ -30,7 +31,7 @@ class AnnouncementController extends Controller
         return view('announcement.create');
     }
 
-    public function store(Request $request, FcmServiceProvider $fcm)
+    public function store(Request $request)
     {
         $data = $request->all();
 
@@ -49,12 +50,10 @@ class AnnouncementController extends Controller
 
         $announcement = Announcement::create($data);
 
-        $students = $announcement->StudentList()->map(function ($student) {
-            return $student->device_token;
-        })->toArray();
-
-        if (count($students) > 0) {
-            $fcm->sendMulticast($students,"There is an announcement from GPCC",$request->title,env('APP_LOGO'));
+        if ($announcement->is_schedule && $announcement->start_at && $announcement->start_at->isFuture()) {
+            SendAnnouncementNotification::dispatch($announcement)->delay($announcement->start_at);
+        } else {
+            SendAnnouncementNotification::dispatch($announcement);
         }
 
         return to_route('announcement.index')->with('success', 'Announcement created successfully.');
