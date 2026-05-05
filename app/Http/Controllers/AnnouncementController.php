@@ -109,7 +109,6 @@ class AnnouncementController extends Controller
     {
         $student = Student::where('student_id', auth()->user()->student_id)->first();
         $announcements = Announcement::ForStudent($student)->latest()->get();
-        dd($announcements);
-        //return view('student.notification', compact('announcements'));
+        return view('student.notification', compact('announcements'));
     }
 }
