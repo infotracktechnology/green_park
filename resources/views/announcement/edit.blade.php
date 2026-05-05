@@ -163,7 +163,7 @@
 
                             <div class="form-group col-lg-12">
                                 <label for="content">Content</label>
-                                <textarea name="content" id="content">{{  $announcement->content }}</textarea>
+                                <textarea name="content" class="form-control form-control-sm" id="content">{{  $announcement->content }}</textarea>
                             </div>
 
                             <div class="form-group col-lg-12">
