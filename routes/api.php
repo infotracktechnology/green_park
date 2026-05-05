@@ -236,12 +236,6 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($sickroomentry);
     });
 
-    Route::get('/hostelattendance/{student_id}', function ($student_id) {
-        $monthwise = HostelAttendance::where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
-        $daywise = HostelAttendance::where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
-        return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
-    });
-
     Route::get('hostel/inoutregister/{student_id}/', function ($student_id) {
         $student = InOutRegister::where('student_id', $student_id)->latest()->get();
         return response()->json($student);

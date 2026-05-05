@@ -260,6 +260,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::resource('document', StudentDocumentController::class)->only(['index', 'store', 'destroy']);
     Route::match(['get', 'post'], 'mocktest', [MockTestController::class, 'MockTest'])->name('student.mock');
     Route::get('mocktestpdf/{testname}', [MockTestController::class, 'downloadMockTestPdf'])->name('student.mocktestpdf');
+    Route::get('sickroom', [SickRoomEntryController::class, 'sickroom'])->name('student.sickroom');
 });
 
 // ------------------------------------------------------

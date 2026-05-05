@@ -7,6 +7,13 @@ use App\Models\{SickRoomEntry, Hostel, HostelRoom,Student};
 
 class SickRoomEntryController extends Controller
 {
+    public function sickroom(Request $request)
+    {
+        $student = auth('student')->user();
+        $entries = SickRoomEntry::where('student_id', $student->student_id)->latest()->get();
+        return view('student.sickroom', compact('entries'));
+    }
+
     public function index(Request $request)
     {
         $entries = SickRoomEntry::with(['hostel', 'student'])->latest()->get();

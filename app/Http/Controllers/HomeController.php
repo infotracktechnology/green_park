@@ -260,7 +260,7 @@ class HomeController extends Controller
 
     public function Setting(Request $request)
     {
-        $setting = Setting::all();
+        $setting = Setting::where('academic_year', $this->academic_year)->get();
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
 
         if ($request->isMethod('POST')) {
