@@ -33,9 +33,10 @@ class Student extends Authenticatable
         return $this->belongsTo(Attendance::class, 'student_id', 'id');
     }
 
-    protected function photo():Attribute {
+    protected function photo(): Attribute
+    {
         return Attribute::make(
-            get:fn()=> file_exists(base_path("assets/profilepic/{$this->student_id}.jpg")) ? asset("profilepic/{$this->student_id}.jpg") : asset('img/avather.png'),
+            get: fn() => file_exists(base_path("assets/profilepic/{$this->student_id}.jpg")) ? asset("profilepic/{$this->student_id}.jpg") : asset('img/avather.png'),
         );
     }
 
@@ -45,14 +46,12 @@ class Student extends Authenticatable
         static::creating(function ($model) {
             $model->student_id = self::generateId($model->course);
             $model->password = self::generatePassword(7);
-            //$model->password = bcrypt($model->password_1);
             $model->user_name = self::generateName($model->course, $model->student_id);
         });
         static::addGlobalScope('order', function (Builder $builder) {
             $builder->orderBy('student_name');
         });
     }
-
 
 
     public function feespaidhistory()
@@ -80,12 +79,12 @@ class Student extends Authenticatable
     private static function generateId($course)
     {
         $lastId = self::withTrashed()->where('course', $course)->max('student_id');
-        $y = date('y')+1;
+        $y = date('y') + 1;
         if ($lastId) {
-            return $lastId+1;
+            return $lastId + 1;
         } else {
             $setting = Setting::firstWhere('key', 'like', "%$course Admission No%");
-            $lastId =  $setting->value ?? $y.'00001';
+            $lastId =  $setting->value ?? $y . '00001';
             return $lastId;
         }
     }
@@ -93,9 +92,9 @@ class Student extends Authenticatable
     private static function generateName($course, $student_id)
     {
         if ($course == "XI-OB" || $course == "XII-OB") {
-            return 'S'.$student_id;
+            return 'S' . $student_id;
         } else {
-            return 'L'.$student_id;
+            return 'L' . $student_id;
         }
     }
 
@@ -178,7 +177,7 @@ class Student extends Authenticatable
     }
 
 
-     public  function GetMockTest()
+    public  function GetMockTest()
     {
         return MockTest::query()
             ->where(function ($query) {

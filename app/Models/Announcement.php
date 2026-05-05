@@ -16,7 +16,6 @@ class Announcement extends Model
         'student_ids' => 'json',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
-        'is_schedule' => 'boolean',
     ];
     function branch()
     {
@@ -35,29 +34,31 @@ class Announcement extends Model
 public static function ForStudent(Student $student)
 {
     return self::query()
-        ->where(function($q) use ($student) {
-            $q->where('usertype', 'INDIVIDUAL')
-              ->where('students', $student->student_id);
-        })
-        ->orWhere(function ($query) use ($student) {
-            $query->where('academic_year', $student->academic_year)
-                ->where('course', $student->course)
-                ->where('branch', 'like', "%{$student->campus}%")
-                ->where('coaching_type', 'like', "%{$student->coaching_type}%")
-                ->when($student->coaching_type === 'OFFLINE', function ($q) use ($student) {
-                    if (in_array($student->course, ['NEET', 'JEE'])) {
-                        if (in_array($student->campus, [1, 4, 5])) {
-                            $q->where('category', 'like', "%{$student->hostel_dayscholar}%");
+        ->where(function($mainQuery) use ($student) {
+            $mainQuery->where(function($q) use ($student) {
+                $q->where('usertype', 'INDIVIDUAL')
+                  ->where('students', $student->student_id);
+            })
+            ->orWhere(function ($query) use ($student) {
+                $query->where('academic_year', $student->academic_year)
+                    ->where('course', $student->course)
+                    ->where('branch', 'like', "%{$student->campus}%")
+                    ->where('coaching_type', 'like', "%{$student->coaching_type}%")
+                    ->when($student->coaching_type === 'OFFLINE', function ($q) use ($student) {
+                        if (in_array($student->course, ['NEET', 'JEE'])) {
+                            if (in_array($student->campus, [1, 4, 5])) {
+                                $q->where('category', 'like', "%{$student->hostel_dayscholar}%");
+                            }
+                            $q->where('batch', 'like', "%{$student->batch}%");
                         }
-                        $q->where('batch', 'like', "%{$student->batch}%");
-                    }
-                    $q->where('section', 'like', "%{$student->section}%");
-                })->whereIn('gender', [$student->gender, 'All']);
+                        $q->where('section', 'like', "%{$student->section}%");
+                    })->whereIn('gender', [$student->gender, 'All']);
+            });
         })
         ->where(function($q) {
-            $q->where('is_schedule', false)
+            $q->where('is_schedule', 0)
               ->orWhere(function($q2) {
-                  $q2->where('is_schedule', true)
+                  $q2->where('is_schedule', 1)
                      ->where('start_at', '<=', date('Y-m-d H:i:s'))
                      ->where('end_at', '>=', date('Y-m-d H:i:s'));
               });
