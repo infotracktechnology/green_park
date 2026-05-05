@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -193,8 +193,8 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/attendance/{student_id}', function ($student_id) {
-        $monthwise = DB::table('attendance')->where('student_id', $student_id)->whereMonth('attendance_date', date('m'))->get();
-        $daywise = DB::table('attendance')->where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
+        $monthwise = Attendance::where('student_id', $student_id)->get();
+        $daywise = Attendance::where('student_id', $student_id)->where('attendance_date', date('Y-m-d'))->get();
         return response()->json(['monthwise' => $monthwise, 'daywise' => $daywise]);
     });
 
