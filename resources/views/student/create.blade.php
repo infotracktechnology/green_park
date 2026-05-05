@@ -41,7 +41,7 @@
 
                   <div class="form-group col-lg-3">
                     <label for="branch_id">Campus</label>
-                    <select name="campus" id="branch" class="form-control form-control-sm" required>
+                    <select name="campus" class="form-control form-control-sm" required>
                       <option value="" disabled selected>Select Campus</option>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -51,7 +51,7 @@
 
                   <div class="form-group col-lg-3">
                     <label>Coaching Type</label>
-                    <select name="coaching_type" id="coaching_type" class="form-control form-control-sm" required>
+                    <select name="coaching_type"  class="form-control form-control-sm" required>
                       <option value="">Select Coaching Type</option>
                       @foreach ($coachingtype as $row)
                       <option value="{{$row}}">{{$row}}</option>
