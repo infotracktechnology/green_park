@@ -12,26 +12,19 @@
     }
     .notice-board-item {
         background-color: #f9f9f9;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s;
     }
     .notice-board-item:hover {
-        transform: translateY(-5px);
-    }
-    .notice-board-id {
-        font-size: 1.2rem;
-        color: #007bff;
-    }
-    .notice-board-item-date {
-        color: #6c757d;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     .notice-board-item-title {
         font-weight: bold;
         font-size: 1.1rem;
-        margin-bottom: 5px;
+        cursor: pointer;
     }
     .notice-board-item-content {
-        margin-top: 10px;
         color: #333;
     }
     .card-header h4 {
@@ -40,6 +33,15 @@
     }
     .card-header h4 i {
         margin-right: 10px;
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    .rotate-90 {
+        transform: rotate(90deg);
+    }
+    .transition-all {
+        transition: all 0.2s ease-in-out;
     }
 </style>
 @endsection
@@ -56,33 +58,37 @@
                   <div class="card-body">
                     <div class="notice-board">
                         @forelse($announcements as $announcement)
-                            <div class="notice-board-item border p-3 mb-3 rounded">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="notice-board-id">
-                                        <i class="fas fa-id-badge"></i> <strong>#</strong> {{ $announcement->id }}
+                            <div class="notice-board-item border mb-3 rounded" x-data="{ open: false, logged: false }">
+                                <div class="p-3 cursor-pointer d-flex justify-content-between align-items-center" 
+                                     @click="open = !open; if(open && !logged) { logAnnouncementView('{{ addslashes($announcement->title) }}'); logged = true; }">
+                                    <div class="notice-board-item-title mb-0 d-flex align-items-center">
+                                        <i class="fas fa-chevron-right mr-3 transition-all" :class="open ? 'rotate-90' : ''"></i>
+                                        <span class="col-deep-purple">{{ $announcement->title }}</span>
                                     </div>
                                     <div class="badge badge-info">
                                         {{ $announcement->created_at->format('d M Y') }}
                                     </div>
                                 </div>
-                                <div class="notice-board-item-title mt-2">
-                                    <strong>Title :</strong><span class="col-deep-purple">{{ $announcement->title }}</span>
-                                </div>
-                                <div class="notice-board-item-content">
-                                    <i class="fas fa-align-left"></i> <strong>Content :</strong> {!! $announcement->content !!}
-                                </div>
-                                <div class="notice-board-item-date mt-2">
+                                
+                                <div x-show="open" x-cloak x-transition class="p-3 border-top bg-white rounded-bottom">
+                                    <div class="notice-board-item-content">
+                                        <i class="fas fa-align-left text-primary"></i> <strong>Content :</strong> 
+                                        <div class="mt-2 ml-4">{!! $announcement->content !!}</div>
+                                    </div>
                                     @if($announcement->attachment)
-                                        <a href="{{ env('APP_URL') }}/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer">
-                                            <i class="fas fa-paperclip"></i> Attachment
-                                        </a>
+                                        <div class="notice-board-item-date mt-3 ml-4">
+                                            <a href="{{ env('APP_URL') }}/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-paperclip"></i> View Attachment
+                                            </a>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
                         @empty
-                            <div class="notice-board-item border p-3 mb-3 rounded text-center">
-                                <div class="notice-board-item-date text-muted">
-                                    <i class="fas fa-exclamation-circle"></i> No announcement found
+                            <div class="notice-board-item border p-4 mb-3 rounded text-center">
+                                <div class="text-muted">
+                                    <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                                    <p>No announcements found</p>
                                 </div>
                             </div>
                         @endforelse
@@ -93,4 +99,16 @@
             </div>
         </div>
       </div>
+@endsection
+
+@section('js')
+<script>
+    function logAnnouncementView(title) {
+        $.post('{{ route("student.logActivity") }}', {
+            _token: '{{ csrf_token() }}',
+            module: 'Announcement',
+            action: 'Seen ' + title
+        });
+    }
+</script>
 @endsection
