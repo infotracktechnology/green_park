@@ -58,7 +58,8 @@
                                             @endphp
                                             
                                             @if(in_array('Image', $categories) && !empty($achievement->images))
-                                                <img src="{{ asset(is_array($achievement->images) ? $achievement->images[0] : json_decode($achievement->images)[0]) }}" alt="Achievement Image">
+                                                <img src="{{ env('APP_URL').$achievement->images[0] }}" alt="Achievement Image">
+
                                             @elseif(in_array('Video', $categories) && $achievement->video)
                                                 <i class="fas fa-play-circle"></i>
                                             @elseif(in_array('pdf', $categories) && $achievement->pdf)
@@ -75,12 +76,12 @@
                                             </div>
                                             <div class="mt-3">
                                                 @if(in_array('Video', $categories) && $achievement->video)
-                                                    <a href="{{ asset($achievement->video) }}" target="_blank" class="btn btn-sm btn-outline-primary mb-2 mr-1">
+                                                    <a href="{{ env('APP_URL').$achievement->video }}" target="_blank" class="btn btn-sm btn-outline-primary mb-2 mr-1">
                                                         <i class="fas fa-video"></i> Watch Video
                                                     </a>
                                                 @endif
                                                 @if(in_array('pdf', $categories) && $achievement->pdf)
-                                                    <a href="{{ asset($achievement->pdf) }}" target="_blank" class="btn btn-sm btn-outline-danger mb-2 mr-1">
+                                                    <a href="{{ env('APP_URL').$achievement->pdf }}" target="_blank" class="btn btn-sm btn-outline-danger mb-2 mr-1">
                                                         <i class="fas fa-file-pdf"></i> View PDF
                                                     </a>
                                                 @endif
@@ -94,7 +95,7 @@
                                                         $imgs = $achievement->images;
                                                     @endphp
                                                     @foreach($imgs as $img)
-                                                        <a href="{{ asset($img) }}" target="_blank" class="btn btn-sm btn-outline-success mb-2 mr-1">
+                                                        <a href="{{ env('APP_URL').$img }}" target="_blank" class="btn btn-sm btn-outline-success mb-2 mr-1">
                                                             <i class="fas fa-image"></i> View Image {{ $loop->iteration }}
                                                         </a>
                                                     @endforeach
