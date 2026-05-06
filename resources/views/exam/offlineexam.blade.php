@@ -13,7 +13,7 @@
           @endif
 
            @if(session('error'))
-          <div class="alert alert-success alert-dismissible show fade">{{ session('error') }}</div>
+          <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
           @endif
 
           <div class="card card-primary">
