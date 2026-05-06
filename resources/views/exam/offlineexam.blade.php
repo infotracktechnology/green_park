@@ -12,6 +12,10 @@
           <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
           @endif
 
+           @if(session('error'))
+          <div class="alert alert-success alert-dismissible show fade">{{ session('error') }}</div>
+          @endif
+
           <div class="card card-primary">
             <form method="post" id="myForm" action="{{ route('exam.store') }}" enctype="multipart/form-data">
               @csrf
