@@ -36,11 +36,12 @@ class ImportController extends Controller
         try {
             $data = array_map(function ($row) use ($request) {
                 $row['academic_year'] = $request->academic_year;
-                $row['campus'] = $request->branch;
+                //$row['campus'] = $request->branch;
                 return $row;
             }, $data);
 
             foreach ($data as $row) {
+                if(empty($row['campus']) || !isset($row['campus'])) continue;
                 Student::create($row);
             }
             DB::commit();

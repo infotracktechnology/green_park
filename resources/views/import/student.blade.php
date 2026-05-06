@@ -38,7 +38,7 @@
                   </div>
 
 
-                  <div class="form-group col-lg-3">
+                  {{-- <div class="form-group col-lg-3">
                     <label for="branch">Select Branch</label>
                     <select name="branch" id="branch" class="form-control form-control-sm" required>
                       <option value="" disabled selected>-- Choose Branch --</option>
@@ -46,7 +46,7 @@
                       <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                       @endforeach
                     </select>
-                  </div>
+                  </div> --}}
 
                   <div class="form-group col-lg-3">
                     <label for="csv_file">Upload CSV File (Max: 5MB):</label>
