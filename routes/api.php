@@ -243,8 +243,12 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/mocktest/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $mocktests = MockTest::ForStudent($student);
-        return response()->json($mocktests);
+        return response()->json($student->GetMockTest());
+    });
+
+    Route::get('/onlineexam/{student_id}', function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
+        return response()->json($student->GetExams());
     });
 
 });
