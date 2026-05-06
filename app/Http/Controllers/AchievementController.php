@@ -22,6 +22,12 @@ class AchievementController extends Controller
         return view('achievement.index', compact('achievements'));
     }
 
+    public function achievement()
+    {
+        $achievements = Achievement::ForStudent(auth()->user());
+        return view('student.achievement', compact('achievements'));
+    }
+
     public function create()
     {
         return view('achievement.create');

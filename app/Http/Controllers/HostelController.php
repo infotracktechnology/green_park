@@ -211,7 +211,7 @@ class HostelController extends Controller
 
     public function attendanceEntry(Request $request)
     {
-        $hostel = $request->branch_id ? Hostel::where('branch_id', $request->branch_id)->get() : collect();
+        $hostels = $request->branch_id ? Hostel::where('branch_id', $request->branch_id)->get() : collect();
         
         $section = $request->hostel_id ? Student::where('hostel_id', $request->hostel_id)->distinct()->pluck('section') : collect();
 
@@ -223,7 +223,7 @@ class HostelController extends Controller
             return response()->json(['success' => 'Attendance deleted successfully!']);
         }
 
-        return view('hostel.hostelattendance', compact('hostel', 'section', 'students', 'attendance'));
+        return view('hostel.hostelattendance', compact('hostels', 'section', 'students', 'attendance'));
     }
 
 

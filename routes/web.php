@@ -247,6 +247,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::get('worksheet', [WorksheetController::class, 'worksheet'])->name('student.worksheet');
     Route::get('classvideo', [ClassVideoController::class, 'classvideo'])->name('student.classvideo');
     Route::get('revisionvideo', [RevisionVideoController::class, 'revisionvideo'])->name('student.revisionvideo');
+    Route::get('achievement', [AchievementController::class, 'achievement'])->name('student.achievement');
     Route::get('timetable', [TimetableController::class, 'timetable'])->name('student.timetable');
 
     // Student Exam Interface

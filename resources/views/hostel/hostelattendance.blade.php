@@ -52,7 +52,7 @@
                     <label for="section">Hostel</label>
                     <select name="hostel_id" id="hostel_id" class="select2" required>
                       <option value="">Select Hostel</option>
-                      @foreach ($hostel as $row)
+                      @foreach ($hostels as $row)
                       <option value="{{ $row->id }}" @selected(request('hostel_id')==$row->id)>{{ $row->name }}</option>
                       @endforeach
                     </select>
