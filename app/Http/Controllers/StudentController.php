@@ -16,7 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Options;
 use App\Models\StudentLog;
 use Illuminate\Support\Facades\File;
-
+use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
@@ -79,7 +79,7 @@ class StudentController extends Controller
     public function RestoreStudent(Request $request)
     {
         $students = Student::onlyTrashed()->get();
-        if($request->isMethod('post')){
+        if ($request->isMethod('post')) {
             $restore = Student::withTrashed()->find($request->id)->update(['deleted_at' => null, 'remarks' => null]);
             return redirect()->back()->with('success', 'Student Reactivated successfully.');
         }
@@ -146,13 +146,13 @@ class StudentController extends Controller
         $batch = auth()->user()->batch;
         $type = auth()->user()->coaching_type;
         $course = auth()->user()->course;
-        $exams = Exam::from("exam as b")->join('exam_answer as a', 'a.testname', '=', 'b.name')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(b.total_questions*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch, $type,$course) {
-            if($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")){
+        $exams = Exam::from("exam as b")->join('exam_answer as a', 'a.testname', '=', 'b.name')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(b.total_questions*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch, $type, $course) {
+            if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
                 $markrange = isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null;
-            }else{
+            } else {
                 $markrange = isset($test->markrange_file['online']) ? $test->markrange_file['online'] : null;
             }
-            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark,'markrange' => $markrange];
+            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total, 'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark, 'markrange' => $markrange];
         });
 
         $category = ExamSubjectReport::where([['stuid', $sid], ['category', '!=', '']])->pluck('category')->unique();
@@ -210,17 +210,17 @@ class StudentController extends Controller
     public function NeetDocument(Request $request)
     {
         $student = auth()->user();
-        if($request->isMethod('post')){
-            if($request->hasFile('neet_confirmationpan')) {
+        if ($request->isMethod('post')) {
+            if ($request->hasFile('neet_confirmationpan')) {
                 $file = $request->file('neet_confirmationpan');
-                $filename = "confirmationpan-".$student->student_id.".".$file->getClientOriginalExtension();
+                $filename = "confirmationpan-" . $student->student_id . "." . $file->getClientOriginalExtension();
                 $file->move('assets/profilepic', $filename);
                 $student->neet_confirmationpan = $filename;
                 $student->save();
             }
-            if($request->hasFile('neet_photo')) {
+            if ($request->hasFile('neet_photo')) {
                 $file = $request->file('neet_photo');
-                $filename = $student->student_id."."."jpg";
+                $filename = $student->student_id . "." . "jpg";
                 $file->move('assets/profilepic', $filename);
                 $student->neet_photo = $filename;
                 $student->save();
@@ -242,13 +242,13 @@ class StudentController extends Controller
         return response()->json(['success' => true]);
     }
 
-    
+
     public function GetLogActivity(Request $request)
     {
         $logs = StudentLog::where('student_log.module', $request->module)
             ->where('student_log.action', 'like', "%{$request->action}%")
             ->join('student', 'student.student_id', '=', 'student_log.student_id')
-            ->select('student_name', 'student.student_id', 'section', 'student_log.created_at','action')
+            ->select('student_name', 'student.student_id', 'section', 'student_log.created_at', 'action')
             ->get();
         return response()->json(['success' => true, 'logs' => $logs]);
     }
@@ -256,10 +256,10 @@ class StudentController extends Controller
     public function StudentDownload(Request $request)
     {
         $student = auth()->user();
-        $files = File::glob("uploads/Student Download/$student->student_id.*");
-        $files = array_map(function($file) {
-            return str_replace('public/', '', $file);
-        }, $files);
+        $allFiles = File::allFiles("uploads/Student Download/");
+        $files = collect($allFiles)->filter(function ($file) use ($student) {
+            return str_starts_with($file->getFilename(), $student->student_id);
+        });
         return view('student.studentdownload', compact('files'));
     }
 }

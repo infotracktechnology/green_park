@@ -195,7 +195,7 @@ class HostelController extends Controller
         }
 
 
-        $hostel = $branchId ? Hostel::where('branch_id', $branchId)->get() : collect();
+        $hostels = $branchId ? Hostel::where('branch_id', $branchId)->get() : collect();
 
         $room = $hostelId ? HostelRoom::where('hostel_id', $hostelId)->distinct()->pluck('room_no') : collect();
 
@@ -205,7 +205,7 @@ class HostelController extends Controller
 
         $carts = HostelRoom::where('hostel_id', $hostelId)->where('room_no', $roomNo)->whereNotIn('cart_no',fn($q) => $q->select('cots_no')->from('student')->where('hostel_id', $hostelId)->where('room_no', $roomNo))->get()->pluck('cart_no');
 
-        return view('hostel.reallocation', compact('hostel', 'room', 'availableStudents', 'allocatedStudents', 'carts'));
+        return view('hostel.reallocation', compact('hostels', 'room', 'availableStudents', 'allocatedStudents', 'carts'));
     }
 
 

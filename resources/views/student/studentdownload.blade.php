@@ -29,8 +29,10 @@
               <tbody>
                 @foreach($files as $file)
                 <tr>
-                  <td>{{ basename($file) }}</td>
-                  <a href="{{ env('APP_URL')."uploads/Student Download/".$file }}" class="btn btn-primary btn-sm" download>Download</a>
+                  <td>{{ $file->getFilename() }}</td>
+                  <td>
+                  <a href="{{ env('APP_URL')."uploads/Student Download/".$file->getFilename() }}" class="btn btn-primary" download>Download</a>
+                  </td>
                 </tr>
                 @endforeach
               </tbody>

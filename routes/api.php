@@ -53,7 +53,7 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::find($id);
         if ($announcement) {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            $announcement->attachment = "public/" . $announcement->attachment;
+            $announcement->attachment = $announcement->attachment ? "public/".$announcement->attachment : null;
         }
         return response()->json($announcement);
     });
@@ -254,10 +254,10 @@ Route::group(['prefix' => 'v2'], function () {
 
       Route::get('/studentdownload/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $files = File::glob("uploads/Student Download/$student->student_id.*");
-        $files = array_map(function($file) {
-            return str_replace('public/', '', $file);
-        }, $files);
+        $allFiles = File::allFiles("uploads/Student Download/");
+        $files = collect($allFiles)->filter(function ($file) use ($student) {
+            return str_starts_with($file->getFilename(), $student->student_id);
+        });
         return response()->json($files);
     });
 
