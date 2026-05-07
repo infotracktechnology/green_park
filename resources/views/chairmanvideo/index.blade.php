@@ -63,7 +63,7 @@
                         <th>Branch </th>
                         <th>Coaching Type</th>
                         <th>H/D</th>
-                        <th>Section</th>
+                        {{-- <th>Section</th> --}}
                         <th>Batch</th>
                         <th>Title</th>
                         <th>Edit</th>
@@ -80,7 +80,7 @@
                         <td>{{ $chairmanvideo->branchNames() }}</td>
                         <td>{{ $chairmanvideo->coaching_type}}</td>
                         <td>{{ $chairmanvideo->category}}</td>
-                        <td>{{ $chairmanvideo->section}}</td>
+                        {{-- <td>{{ $chairmanvideo->section}}</td> --}}
                         <td>{{ $chairmanvideo->batch}}</td>
                         <td>{{ $chairmanvideo->title}}</td>
 
