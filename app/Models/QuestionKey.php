@@ -55,8 +55,7 @@ class QuestionKey extends Model
                 $q->where('is_schedule', false)
                   ->orWhere(function($q2) {
                       $q2->where('is_schedule', true)
-                         ->where('start_at', '<=', date('Y-m-d H:i:s'))
-                         ->where('end_at', '>=', date('Y-m-d H:i:s'));
+                         ->where('start_at', '<=', date('Y-m-d H:i:s'));
                   });
             })
             ->latest()->get();

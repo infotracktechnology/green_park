@@ -59,8 +59,7 @@ public static function ForStudent(Student $student)
             $q->where('is_schedule', 0)
               ->orWhere(function($q2) {
                   $q2->where('is_schedule', 1)
-                     ->where('start_at', '<=', date('Y-m-d H:i:s'))
-                     ->where('end_at', '>=', date('Y-m-d H:i:s'));
+                     ->where('start_at', '<=', date('Y-m-d H:i:s'));
               });
         });
 }

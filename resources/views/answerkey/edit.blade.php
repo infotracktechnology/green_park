@@ -155,11 +155,7 @@
                         <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" value="{{ $answerkey->start_at }}" {{ $answerkey->is_schedule ? 'required' : '' }}>
                     </div>
 
-                    <div class="form-group col-lg-3">
-                        <label>End Datetime</label>
-                        <input type="text" id="end_at" name="end_at" class="datetime-picker form-control form-control-sm" value="{{ $answerkey->end_at }}" {{ $answerkey->is_schedule ? 'required' : '' }}>
-                        <div id="end_at_error" class="text-danger"></div>
-                    </div>
+                    
                   </div>
 
 
