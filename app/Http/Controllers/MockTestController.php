@@ -103,7 +103,7 @@ class MockTestController extends Controller
             }
             ExamAnswer::insert($answers);
             session()->put('download_pdf', $request->testname);
-            return to_route('student.mocktest');
+            return to_route('student.mock');
         }
 
         return view('student.mocktest', compact('mocktests', 'exam', 'student', 'timer'));
