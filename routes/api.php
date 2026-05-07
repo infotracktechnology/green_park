@@ -63,7 +63,6 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::ForStudent($student)->get()->filter(function ($row) use ($student_id) {
             return !in_array($student_id, $row->student_ids ?? []);
         })->count();
-
         return response()->json(['count' => $announcement]);
     });
 
