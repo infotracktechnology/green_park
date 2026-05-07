@@ -274,7 +274,7 @@ Route::post('/exam/submit', [ExamController::class, 'submit'])->name('exam.submi
 Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_name, $password, $test_id) {
     if ($student = Student::where('user_name', $user_name)->where('password', $password)->first()) {
         Auth::guard('student')->login($student);
-        return redirect()->route('student.instruction', ['test_id' => $test_id]);
+        return redirect()->route('student.instruction', ['test_id' => base64_encode($test_id)]);
     }
     return back()->with('error', 'Invalid username or password.');
 });
@@ -285,11 +285,4 @@ Route::get('/student/mocktest/login/{user_name}/{password}/{testname}', function
         return redirect()->route('student.mock', ['exam_name' => $testname]);
     }
     return back()->with('error', 'Invalid username or password.');
-});
-
-Route::get('/test/{id}', function ($student_id) {
-    $student = Student::find($student_id);
-    if (!$student) return response()->json(['error' => 'Student not found'], 404);
-    $exam = Exam::getOngoingExams($student->coaching_type, $student->campus);
-    return response()->json(['test_id' => base64_encode($exam->id ?? '')]);
 });

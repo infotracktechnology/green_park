@@ -30,6 +30,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/student_profile/{student_id}', function ($student_id, Student $attendanceService) {
         $student = Student::findOrFail($student_id);
+        $student->photo = file_exists(base_path("assets/profilepic/{$student->student_id}.jpg")) ? asset("profilepic/{$this->student_id}.jpg") : asset('img/avather.png');
         $attendanceStats = $attendanceService->calculateCurrentMonthStats($student->student_id);
         $student->total_attendance_days = $attendanceStats->total_days;
         $student->present_attendance_days = $attendanceStats->present_days;

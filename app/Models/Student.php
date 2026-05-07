@@ -22,6 +22,8 @@ class Student extends Authenticatable
         'menu' => 'json',
     ];
 
+    protected $appends = ['photo'];
+
     function branch()
     {
         return $this->belongsTo(Branch::class, 'campus', 'id');
