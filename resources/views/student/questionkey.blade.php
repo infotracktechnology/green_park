@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Question Key')
+@section('title', 'Question Paper')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
@@ -20,7 +20,7 @@
               
                 <div class="card answer-key-card">
                     <div class="card-header">
-                        <h4><i style="font-size: 30px;" class="fas fa-file-pdf"></i>  Question Key</h4>
+                        <h4><i style="font-size: 30px;" class="fas fa-file-pdf"></i>  Question Paper</h4>
                     </div>
                    
                     <div class="card-body">

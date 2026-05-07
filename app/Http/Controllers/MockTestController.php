@@ -103,7 +103,7 @@ class MockTestController extends Controller
             }
             ExamAnswer::insert($answers);
             session()->put('download_pdf', $request->testname);
-            return redirect()->back()->with('success', 'Mock Test Answer Saved Successfully');
+            return to_route('student.mocktest');
         }
 
         return view('student.mocktest', compact('mocktests', 'exam', 'student', 'timer'));
