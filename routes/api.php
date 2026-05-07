@@ -252,5 +252,14 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($student->GetExams());
     });
 
+      Route::get('/studentdownload/{student_id}', function (Request $request, $student_id) {
+        $student = Student::where('student_id', $student_id)->first();
+        $files = File::glob("uploads/Student Download/$student->student_id.*");
+        $files = array_map(function($file) {
+            return str_replace('public/', '', $file);
+        }, $files);
+        return view('student.studentdownload', compact('files'));
+    });
+
     Route::post('/logactivity',[StudentController::class,'logActivity']);
 });

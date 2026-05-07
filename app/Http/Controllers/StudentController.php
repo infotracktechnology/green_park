@@ -256,6 +256,10 @@ class StudentController extends Controller
     public function StudentDownload(Request $request)
     {
         $student = auth()->user();
-        $files = [];
+        $files = File::glob("uploads/Student Download/$student->student_id.*");
+        $files = array_map(function($file) {
+            return str_replace('public/', '', $file);
+        }, $files);
+        return view('student.studentdownload', compact('files'));
     }
 }
