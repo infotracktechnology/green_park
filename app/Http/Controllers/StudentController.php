@@ -15,6 +15,7 @@ use App\Models\Attendance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Options;
 use App\Models\StudentLog;
+use Illuminate\Support\Facades\File;
 
 
 class StudentController extends Controller
@@ -233,7 +234,7 @@ class StudentController extends Controller
     {
         $log = StudentLog::insert([
             'module' => $request->module,
-            'student_id' => auth()->user()->student_id,
+            'student_id' => $request->student_id,
             'action' => $request->action,
             'created_at' => now(),
             'updated_at' => now(),
@@ -250,5 +251,11 @@ class StudentController extends Controller
             ->select('student_name', 'student.student_id', 'section', 'student_log.created_at','action')
             ->get();
         return response()->json(['success' => true, 'logs' => $logs]);
+    }
+
+    public function StudentDownload(Request $request)
+    {
+        $student = auth()->user();
+        $files = [];
     }
 }

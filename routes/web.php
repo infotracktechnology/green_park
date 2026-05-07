@@ -271,14 +271,16 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
 Route::post('/exam/submit', [ExamController::class, 'submit'])->name('exam.submit');
 
 Route::get('/student/login/{user_name}/{password}/{test_id}', function ($user_name, $password, $test_id) {
-    if (Auth::guard('student')->attempt(compact('user_name', 'password'))) {
+    if ($student = Student::where('user_name', $user_name)->where('password', $password)->first()) {
+        Auth::guard('student')->login($student);
         return redirect()->route('student.instruction', ['test_id' => $test_id]);
     }
     return back()->with('error', 'Invalid username or password.');
 });
 
 Route::get('/student/mocktest/login/{user_name}/{password}/{testname}', function ($user_name, $password, $testname) {
-    if (Auth::guard('student')->attempt(compact('user_name', 'password'))) {
+    if ($student = Student::where('user_name', $user_name)->where('password', $password)->first()) {
+        Auth::guard('student')->login($student);
         return redirect()->route('student.mock', ['exam_name' => $testname]);
     }
     return back()->with('error', 'Invalid username or password.');

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance};
+use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -251,4 +252,5 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($student->GetExams());
     });
 
+    Route::post('/logactivity',[StudentController::class,'logActivity']);
 });

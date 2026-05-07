@@ -107,7 +107,8 @@
         $.post('{{ route("student.logActivity") }}', {
             _token: '{{ csrf_token() }}',
             module: 'Announcement',
-            action: 'Seen ' + title
+            action: 'Seen ' + title,
+            student_id : '{{ auth()->user()->student_id }}'
         });
     }
 </script>

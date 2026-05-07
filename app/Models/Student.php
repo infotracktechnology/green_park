@@ -44,7 +44,7 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
-            $model->student_id = self::generateId($model->course);
+            // $model->student_id = self::generateId($model->course);
             $model->password = self::generatePassword(7);
             $model->user_name = self::generateName($model->course, $model->student_id);
             $model->menu = Options::where('type', "{$model->course}{$model->branch->name}{$model->coaching_type} menu")

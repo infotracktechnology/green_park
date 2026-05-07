@@ -224,7 +224,8 @@
             $.post('{{ route("student.logActivity") }}', {
                 _token: '{{ csrf_token() }}',
                 module: modules,
-                action: action
+                action: action,
+                student_id : '{{ auth()->user()->student_id }}'
             });
         }
     });
