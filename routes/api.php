@@ -258,7 +258,7 @@ Route::group(['prefix' => 'v2'], function () {
         $files = array_map(function($file) {
             return str_replace('public/', '', $file);
         }, $files);
-        return view('student.studentdownload', compact('files'));
+        return response()->json($files);
     });
 
     Route::post('/logactivity',[StudentController::class,'logActivity']);
