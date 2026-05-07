@@ -60,6 +60,10 @@
         <div class="alert alert-success alert-dismissible show fade">{{ session('success') }}</div>
         @endif
 
+         @if(session()->has('error'))
+        <div class="alert alert-danger alert-dismissible show fade">{{ session('error') }}</div>
+        @endif
+
         @if(session('download_pdf'))
         <div class="alert alert-info d-flex justify-content-between align-items-center">
           <div>
