@@ -79,11 +79,10 @@ class HomeController extends Controller
 
         $parentconcerns = ParentConcern::where('status', '!=', 'Closed')->get();
 
-        if ($request->has('submit')) {
+        if ($request->isMethod('post')) {
             $parentconcern = ParentConcern::findOrFail($request->id);
-            $updateData = ['status' => $request->status];
 
-            if ($request->status === 'Closed') {
+            $updateData = ['status' => $request->status];
                 if ($request->hasFile('file')) {
                     if ($parentconcern->file && file_exists($parentconcern->file)) {
                         unlink($parentconcern->file);
@@ -91,11 +90,9 @@ class HomeController extends Controller
                     $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
                     $path = $request->file('file')->move('uploads/concern', $fileName);
                     $updateData['file'] = $path;
-                }
 
                 $updateData['remark'] = $request->remark;
             }
-
             $parentconcern->update($updateData);
 
             return redirect()->route('parent_concern')->with('success', 'Status updated successfully!');

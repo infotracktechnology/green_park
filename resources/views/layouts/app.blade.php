@@ -234,7 +234,7 @@
             </li>
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
               <ul class="dropdown-menu">
-                <li><a href="{{ route('report.log') }}" class="nav-link">Logs Report</a></li>
+                {{-- <li><a href="{{ route('report.log') }}" class="nav-link">Logs Report</a></li> --}}
                 <li><a href="{{ route('report.batchlist') }}" class="nav-link">BatchList</a></li>
                 <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList</a></li>
               </ul>
