@@ -248,7 +248,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/onlineexam/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        return response()->json($student->GetExams());
+        return response()->json($student->GetExam());
     });
 
       Route::get('/studentdownload/{student_id}', function (Request $request, $student_id) {
