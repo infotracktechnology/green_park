@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col-12">
 
-           @if(session()->has('success'))
+          @if(session()->has('success'))
           <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
           </div>
@@ -20,7 +20,7 @@
               @method('PUT')
               <h3>Personal Details</h3>
               <fieldset class="row">
-                
+
                 <div class="form-group col-lg-3">
                   <label>Admission Date</label>
                   <input type="date" name="admission_date" value="{{date('Y-m-d', strtotime($Student->admission_date))}}" class="form-control form-control-sm">
@@ -40,7 +40,7 @@
 
                 <div class="form-group col-lg-3">
                   <label>Course</label>
-                  <select name="course" id="course" class="form-control form-control-sm" onchange="handleType(this);" required>
+                  <select name="course" id="course" class="form-control form-control-sm" required>
                     <option value="">Select Course</option>
                     @foreach ($course as $row)
                     <option value="{{$row}}" @selected($row==$Student->course)>{{$row}}</option>
@@ -65,7 +65,7 @@
 
                 <div class="form-group col-lg-3">
                   <label>Coaching Type</label>
-                  <select name="coaching_type" id="coaching_type" class="form-control form-control-sm type" onchange="hostel(this.value)">
+                  <select name="coaching_type" class="form-control form-control-sm type">
                     <option value="">Select Coaching Type</option>
                     @foreach ($coachingtype as $row)
                     <option value="{{$row}}" @selected($row==$Student->coaching_type)>{{$row}}</option>
@@ -111,7 +111,7 @@
 
                 <div class="form-group col-lg-3">
                   <label>Date of Birth</label>
-                  <input type="date" name="dob" value="{{date('Y-m-d', strtotime($Student->dob))}}" class="form-control form-control-sm" id="dobInput" onchange="calculateAge()">
+                  <input type="date" name="dob" value="{{date('Y-m-d', strtotime($Student->dob))}}" class="form-control form-control-sm" id="dobInput">
                 </div>
 
                 <div class="form-group col-lg-3">
@@ -181,7 +181,7 @@
 
                 <div class="form-group col-lg-3">
                   <label>Nationality</label>
-                 <input type="text" name="nationality" value="{{ $Student->nationality }}" class="form-control form-control-sm">
+                  <input type="text" name="nationality" value="{{ $Student->nationality }}" class="form-control form-control-sm">
                 </div>
 
 
@@ -220,7 +220,15 @@
 
                 <div class="form-group col-lg-3">
                   <label>Institution Bill Type</label>
-                  <input type="text" name="institution_bill_type" value="{{$Student->institution_bill_type}}" class="form-control form-control-sm">
+                  <select name="institution_bill_type" id="bill_type" class="form-control form-control-sm">
+                    <option value="">Select Bill Type </option>
+                    <option value="GPCC,NKL" @selected($Student->institution_bill_type == 'GPCC,NKL')>GPCC,NKL</option>
+                    <option value="GPCI,NKL" @selected($Student->institution_bill_type == 'GPCI,NKL')>GPCI,NKL</option>
+                    <option value="GPCI,KARUR" @selected($Student->institution_bill_type == 'GPCI,KARUR')>GPCI,KARUR</option>
+                    <option value="GPCI,ERODE" @selected($Student->institution_bill_type == 'GPCI,ERODE')>GPCI,ERODE</option>
+                    <option value="GPCA,COIMBATORE" @selected($Student->institution_bill_type == 'GPCA,COIMBATORE')>GPCA,COIMBATORE</option>
+                    <option value="GPA,CHENNAI" @selected($Student->institution_bill_type == 'GPA,CHENNAI')>GPA,CHENNAI</option>
+                  </select>
                 </div>
 
 
@@ -250,7 +258,7 @@
 
                 <div class="form-group col-lg-3">
                   <label>State</label>
-                  <select name="state" id="state" onchange="City(this.value);" class="form-control form-control-sm">
+                  <select name="state" id="state" class="form-control form-control-sm">
                     <option value="">Select State</option>
                     @foreach ($states as $state)
                     <option value="{{$state->State}}" @if($Student->state == $state->State) selected @endif>{{$state->State}}</option>
@@ -260,7 +268,7 @@
 
                 <div class="form-group col-lg-3">
                   <label>District</label>
-                  <select name="district" id="city" onchange="Pincode(this.value);" class="form-control form-control-sm">
+                  <select name="district" id="city" class="form-control form-control-sm">
                     <option value="">Select City</option>
                     @foreach ($districts as $city)
                     <option value="{{ $city->District }}" @if($Student->district == $city->District) selected @endif>{{ $city->District }}</option>
@@ -382,14 +390,10 @@
                   <input type="text" name="district_name_school_X_std" value="{{$Student->district_name_school_X_std}}" class="form-control form-control-sm">
                 </div>
 
-                <div class="form-group col-lg-3">
-                  <label>Total Marks Obtained in X std</label>
-                  <input type="number" name="total_marks_X_std" value="{{$Student->total_marks_X_std}}" class="form-control form-control-sm">
-                </div>
 
                 <div class="form-group col-lg-3">
                   <label>Board of Study (XII std)</label>
-                  <select name="board_of_study_XII_std" class="form-control form-control-sm">
+                  <select name="board_of_study_XII_std" id="board_of_study_XII_std" class="form-control form-control-sm">
                     <option value="">Select Board</option>
                     <option value="STATEBOARD" {{ $Student->board_of_study_XII_std == 'STATEBOARD' ? 'selected' : '' }}>STATEBOARD</option>
                     <option value="CBSE" {{ $Student->board_of_study_XII_std == 'CBSE' ? 'selected' : '' }}>CBSE</option>
@@ -409,10 +413,6 @@
                   <input type="text" name="district_name_school_XII_std" value="{{$Student->district_name_school_XII_std}}" class="form-control form-control-sm">
                 </div>
 
-                <div class="form-group col-lg-3">
-                  <label>Total Marks Obtained in XII std</label>
-                  <input type="number" name="total_marks_XII_std" value="{{$Student->total_marks_XII_std}}" class="form-control form-control-sm">
-                </div>
 
                 <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
@@ -423,88 +423,57 @@
 
               <h3>Mark Details</h3>
               <fieldset class="row">
-
-
-
-                <div class="form-group col-lg-4">
-                  <label>Subject 1</label>
-                  <input type="text" name="S1" value="{{ $Student->S1 ?? 'English' }}" class="form-control form-control-sm" readonly>
-                </div>
-
-
-
-
-                <div class="form-group col-lg-4">
-                  <label>Maximum Marks of S1</label>
-                  <input type="number" name="S1_max_marks" value="{{$Student->S1_max_marks}}" max="100" class="form-control form-control-sm">
-                </div>
-
-                <div class="form-group col-lg-4">
-                  <label>Marks Obtained in S1</label>
-                  <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$Student->S1_obtained_mark}}" class="form-control form-control-sm" oninput="calculateTotal()">
-                </div>
-
-
-
-                <div class="form-group col-lg-4">
-                  <label>Subject 2</label>
-                  <input type="text" name="S2" value="{{ $Student->S2 ?? 'Physics' }}" class="form-control form-control-sm" readonly>
-                </div>
-
-                <div class="form-group col-lg-4">
-                  <label>Maximum Marks of S2</label>
-                  <input type="number" name="S2_max_marks" value="{{$Student->S2_max_marks}}" max="100" class="form-control form-control-sm">
-                </div>
-
-                <div class="form-group col-lg-4">
-                  <label>Marks Obtained in S2</label>
-                  <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$Student->S2_obtained_mark}}" class="form-control form-control-sm" oninput="calculateTotal()">
-                </div>
-
-                <div class="form-group col-lg-4">
-                  <label>Subject 3</label>
-                  <input type="text" name="S3" value="{{ $Student->S3 ?? 'Chemistry' }}" class="form-control form-control-sm" readonly>
-                </div>
-
-
-                <div class="form-group col-lg-4">
-                  <label>Maximum Marks of S3</label>
-                  <input type="number" name="S3_max_marks" value="{{$Student->S3_max_marks}}" max="100" class="form-control form-control-sm">
-                </div>
-
-                <div class="form-group col-lg-4">
-                  <label>Marks Obtained in S3</label>
-                  <input type="number" id="S3_obtained_mark" name="S3_obtained_mark" value="{{$Student->S3_obtained_mark}}" class="form-control form-control-sm" oninput="calculateTotal()">
-                </div>
-
-
-
-                <div class="form-group col-lg-4">
-                  <label>Subject 4</label>
-                  <input type="text" name="S4" value="{{ $Student->S4
-                             ?? 'Biology' }}" class="form-control form-control-sm" readonly>
-                </div>
-
-                <div class="form-group col-lg-4">
-                  <label>Maximum Marks of S4</label>
-                  <input type="number" name="S4_max_marks" value="{{$Student->S4_max_marks}}" max="100" class="form-control form-control-sm">
-                </div>
-
-                <div class="form-group col-lg-4">
-                  <label>Marks Obtained in S4</label>
-                  <input type="number" id="S4_obtained_mark" name="S4_obtained_mark" value="{{$Student->S4_obtained_mark}}" class="form-control form-control-sm" oninput="calculateTotal()">
-                </div>
-
-
-                <div class="form-group col-lg-4">
-                  <label>Total Marks</label>
-                  <input type="number" id="total_marks" name="total_marks" value="{{$Student->total_marks}}" class="form-control form-control-sm" readonly>
+                <div class="col-lg-6 offset-lg-3">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr class="text-center">
+                        <th>SUBJECTS</th>
+                        <th id="xii_max_marks"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>MARKS OBTAINED </td>
+                        <td>
+                          <input type="number" id="total_marks_XII_std" name="total_marks_XII_std" value="{{$Student->total_marks_XII_std}}" class="form-control form-control-sm">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>PHYSICS</td>
+                        <td>
+                          <input type="hidden" name="S1" value="PHYSICS">
+                          <input type="hidden" name="S1_max_marks" value="100">
+                          <input type="number" id="S1_obtained_mark" name="S1_obtained_mark" value="{{$Student->S1_obtained_mark}}" class="form-control form-control-sm">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>CHEMISTRY</td>
+                        <td>
+                          <input type="hidden" name="S2" value="CHEMISTRY">
+                          <input type="hidden" name="S2_max_marks" value="100">
+                          <input type="number" id="S2_obtained_mark" name="S2_obtained_mark" value="{{$Student->S2_obtained_mark}}" class="form-control form-control-sm">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>BIOLOGY</td>
+                        <td>
+                          <input type="hidden" name="S3" value="BIOLOGY">
+                          <input type="hidden" name="S3_max_marks" value="100">
+                          <input type="number" id="S3_obtained_mark" name="S3_obtained_mark" value="{{$Student->S3_obtained_mark}}" class="form-control form-control-sm">
+                        </td>
+                      </tr>
+                      <tr class="font-weight-bold">
+                        <td class="text-right">TOTAL</td>
+                        <td>
+                          <input type="number" id="total_marks" name="total_marks" value="{{$Student->total_marks}}" class="form-control form-control-sm" readonly>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
                 <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
-
-
               </fieldset>
 
               <h3> Neet Details</h3>
@@ -522,6 +491,11 @@
                 <div class="form-group col-lg-3">
                   <label>NEET Score - 2025</label>
                   <input type="number" name="neet_score_2025" value="{{$Student->neet_score_2025}}" class="form-control form-control-sm">
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label>NEET Score - 2026</label>
+                  <input type="number" name="neet_score_2026" value="{{$Student->neet_score_2026}}" class="form-control form-control-sm">
                 </div>
 
                 <div class="form-group col-lg-3">
@@ -553,7 +527,7 @@
                 </div>
 
 
-                </fieldset>
+              </fieldset>
 
 
 
@@ -572,102 +546,93 @@
 <script src="{{asset('bundles/jquery-validation/dist/jquery.validate.min.js')}}"></script>
 <script src="{{asset('bundles/jquery-steps/jquery.steps.min.js')}}"></script>
 <script src="{{asset('js/page/form-wizard.js') }}"></script>
-
-
 <script>
-  // function hostel(type){
-  //     document.getElementById('hostel_dayscholar').value = '';
-  //     if(type == 'OFFLINE'){
-  //         document.getElementById('hostel_dayscholar').disabled = false;
-  //     }else{
-  //         document.getElementById('hostel_dayscholar').disabled = true;
-  //     }
-  // }
-  
-  // window.onload = function() {
-  //     var selectedCoachingType = document.getElementById('coaching_type').value;
-  //     var hostelSelect = document.getElementById('hostel_dayscholar');
-      
-  //     if (selectedCoachingType !== 'OFFLINE') {
-  //         hostelSelect.disabled = true;  
-  //     }
-  // };
-  
-  function  City(state) {
-    if(!state) return;
-    $.get("{{ route('staff.create') }}", {state: state}, function(data) {
-        var html = '<option value="">Select City</option>';
-        $.each(data, function(key, value) {
-            html += '<option value="' + value.District + '">' + value.District + '</option>';
-        });
-        $('#city').html(html);
+  // City and Pincode AJAX
+  $('#state').on('change', function () {
+    const state = $(this).val();
+    if (!state) return;
+    $.get("{{ route('staff.create') }}", { state: state }, function (data) {
+      let html = '<option value="">Select City</option>';
+      $.each(data, function (key, value) {
+        html += `<option value="${value.District}">${value.District}</option>`;
+      });
+      $('#city').html(html);
     });
-     }
-  
-  
-     function Pincode(city){
-  $.get("{{ route('student.create') }}", {city: city}, function(data) {
-          var html = '';
-          $('#pincode').val('');
-        $.each(data, function(key, value) {
-            html += '<option value="' + value.Pincode + '">' + value.Pincode + '</option>';
-        });
-        $('#pincode_list').html(html);
+  });
+    
+  $('#city').on('change', function () {
+    const city = $(this).val();
+    $.get("{{ route('student.create') }}", { city: city }, function (data) {
+      let html = '';
+      $('#pincode').val('');
+      $.each(data, function (key, value) {
+        html += `<option value="${value.Pincode}">${value.Pincode}</option>`;
+      });
+      $('#pincode_list').html(html);
     });
-     }
-  
-  
-  function calculateAge() {
-      const dobInput = document.getElementById('dobInput');
-      const ageInput = document.getElementById('ageInput');
-  
-      const dob = new Date(dobInput.value);
-      const today = new Date();
-  
-      if (!isNaN(dob.getTime())) { 
-          let age = today.getFullYear() - dob.getFullYear();
-          const monthDiff = today.getMonth() - dob.getMonth();
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-              age--;
-          }
-          ageInput.value = age; 
-      } else {
-          ageInput.value = ''; 
+  });
+    
+  // Age Calculation
+  $('#dobInput').on('change', function () {
+    const dob = new Date($(this).val());
+    const today = new Date();
+    if (!isNaN(dob.getTime())) {
+      let age = today.getFullYear() - dob.getFullYear();
+      const monthDiff = today.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
       }
-  }
-  
-  function calculateTotal() {
-      const s1 = parseInt(document.getElementById('S1_obtained_mark').value) || 0;
-      const s2 = parseInt(document.getElementById('S2_obtained_mark').value) || 0;
-      const s3 = parseInt(document.getElementById('S3_obtained_mark').value) || 0;
-      const s4 = parseInt(document.getElementById('S4_obtained_mark').value) || 0;
-  
-      const total = s1 + s2 + s3 + s4;
-      document.getElementById('total_marks').value = total;
-  }
-  
-  $(document).ready(function () {
-  const acNonAcSelect = $('#ac-nonac-select');
-  
+      $('#ageInput').val(age);
+    } else {
+      $('#ageInput').val('');
+    }
+  });
+    
+  // Total Marks Calculation
+  $('#S1_obtained_mark, #S2_obtained_mark, #S3_obtained_mark').on('input', function () {
+    const s1 = parseInt($('#S1_obtained_mark').val()) || 0;
+    const s2 = parseInt($('#S2_obtained_mark').val()) || 0;
+    const s3 = parseInt($('#S3_obtained_mark').val()) || 0;
+    $('#total_marks').val(s1 + s2 + s3);
+  });
+    
+  // Campus and AC/Non AC logic
   $('#campus-select').on('change', function () {
-      const selectedCampusName = $(this).find('option:selected').text().trim();
-  
-      if (selectedCampusName.startsWith('GPCC')) {
-          acNonAcSelect.prop('disabled', false); // Enable AC/Non AC field
-      } else {
-          acNonAcSelect.prop('disabled', true); // Disable AC/Non AC field
-          acNonAcSelect.val(''); // Reset value to null when campus is not GPCC
-      }
+    const selectedCampusName = $(this).find('option:selected').text().trim();
+    const acNonAcSelect = $('#ac-nonac-select');
+    if (selectedCampusName.startsWith('GPCC')) {
+      acNonAcSelect.prop('disabled', false);
+    } else {
+      acNonAcSelect.prop('disabled', true).val('');
+    }
   });
+    
+    
   
-  // Initialize AC/Non AC field state on page load
-  const initialCampusName = $('#campus-select').find('option:selected').text().trim();
-  if (!initialCampusName.startsWith('GPCC')) {
-      acNonAcSelect.prop('disabled', true);
-      acNonAcSelect.val(''); // Reset value to null when campus is not GPCC on page load
+  
+  
+  
+    
+     
+    
+  $('#coaching_type').on('change', function() {
+      const type = $(this).val();
+      $('#hostel_dayscholar').prop('disabled', type !== 'OFFLINE').val(type !== 'OFFLINE' ? '' : $('#hostel_dayscholar').val());
+      if (typeof hostel === 'function') hostel(type);
+  });
+    
+  $('.steps ul li').addClass('done').removeClass('disabled');
+  
+  
+    // Board Max Marks logic
+  function updateMaxMarks() {
+    var boardVal = $('#board_of_study_XII_std').val() || '';
+    var maxMarks = (boardVal.replace(/\s/g, '') == 'STATE BOARD') ? 600 : 500;
+    $('#xii_max_marks').text(boardVal ? boardVal + ' / ' + maxMarks : maxMarks);
   }
-  });
-  $('.steps ul li').addClass('done').removeClass('disabled');  
+  
+  $('#board_of_study_XII_std').on('change', updateMaxMarks);
+  updateMaxMarks();
 </script>
 
 @endsection

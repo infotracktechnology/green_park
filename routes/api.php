@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance,Document};
 use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
@@ -215,15 +215,28 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($parent_concern ?? []);
     });
 
+
+
+     Route::get('/document/{student_id}', function (Request $request, $student_id) {
+       $documents = Document::where('student_id', $student_id)->latest()->get();
+       $options = Options::where('type', 'Document Option')->first();
+       $options = $options->value ?? [];
+       return response()->json(['documents' => $documents, 'options' => $options]);
+    });
+
     Route::post('/document_upload', function (Request $request) {
-        $data = $request->all();
-        if ($request->has('attachment') && $request->attachment != null) {
-            $fileName = time() . '-' . $request->attachment->getClientOriginalName();
-            $request->attachment->move('documents', $fileName);
-            $data['file'] = 'documents/' . $fileName;
+       $studentId = $request->student_id;
+       if ($request->hasFile('document_file')) {
+            $file = $request->file('document_file');
+            $fileName = $studentId.'_'.$request->document_name.'.'.$file->getClientOriginalExtension();
+            $file->move('uploads/documents', $fileName);
+            Document::create([
+                'student_id' => $studentId,
+                'document_name' => $request->document_name,
+                'file' => 'uploads/documents/'.$fileName,
+            ]);
         }
-        $parent_concern = DB::table('documents')->insert($data);
-        return response()->json($parent_concern);
+        return response()->json(['message' => 'Document uploaded successfully.']);
     });
 
     Route::get('/device_token/{student_id}/{device_token}', function ($student_id, $device_token) {

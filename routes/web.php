@@ -52,7 +52,8 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('student', StudentController::class);
     Route::match(['get', 'post'], 'students/restore', [StudentController::class, 'RestoreStudent'])->name('students.restore');
     Route::post('getlogactivity', [StudentController::class, 'GetLogActivity'])->name('student.getlogactivity');
-
+    Route::match(['post', 'delete'], 'option/document', [StudentController::class, 'DocumentOption'])->name('option.document');
+    
     Route::controller(ImportController::class)->group(function () {
         Route::get('import/student', 'index')->name('import.student');
         Route::post('import/upload/student', 'upload')->name('import.student.upload');

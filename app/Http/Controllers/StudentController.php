@@ -262,4 +262,24 @@ class StudentController extends Controller
         });
         return view('student.studentdownload', compact('files'));
     }
+    public function DocumentOption(Request $request)
+    {
+        $options = Options::where('type', 'Document Option')->first();
+        $documents = $options->value ?? [];
+
+        if ($request->isMethod('POST')) {
+            $documents[] = $request->document_name;
+            Options::updateOrCreate(['type' => 'Document Option'], ['value' => array_values(array_unique($documents))]);
+            return redirect()->back()->with('success', 'Document option added successfully!');
+        }
+
+        if ($request->isMethod('DELETE')) {
+            if (($key = array_search($request->document_name, $documents)) !== false) {
+                unset($documents[$key]);
+            }
+            Options::where('type', 'Document Option')->update(['value' => array_values($documents)]);
+            return redirect()->back()->with('success', 'Document option deleted successfully!');
+        }
+    }
+    
 }

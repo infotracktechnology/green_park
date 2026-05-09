@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Document;
+use App\Models\Options;
 use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,49 +13,47 @@ class StudentDocumentController extends Controller
     public function index()
     {
         $documents = Document::where('student_id', auth()->user()->student_id)->latest()->get();
-        return view('student.documentupload', compact('documents'));
+        $options = Options::where('type', 'Document Option')->first();
+        $options = $options->value ?? [];
+        return view('student.documentupload', compact('documents', 'options'));
     }
-    
 
-    public function store(Request $request) {
 
-    $request->validate([
-        'file_name' => 'required|string|max:255',
-        'document_file' => 'required|file|mimes:pdf|max:2048',
-    ]);
+    public function store(Request $request)
+    {
 
-    $studentId = auth()->user()->student_id;
-
-    if ($request->hasFile('document_file')) {
-        $file = $request->file('document_file');
-        $originalName = $file->getClientOriginalName();
-        $fileName = $studentId.'_'.$originalName;
-        $file->move('documents', $fileName);
-        Document::create([
-            'student_id' => $studentId,
-            'file_name' => $request->file_name,
-            'file' => 'documents/'.$fileName,
+        $request->validate([
+            'file_name' => 'required|string|max:255',
+            'document_file' => 'required|file|max:2048',
         ]);
+
+        $studentId = auth()->user()->student_id;
+
+        if ($request->hasFile('document_file')) {
+            $file = $request->file('document_file');
+            $fileName = $studentId.'_'.$request->document_name.'.'.$file->getClientOriginalExtension();
+            $file->move('uploads/documents', $fileName);
+            Document::create([
+                'student_id' => $studentId,
+                'document_name' => $request->document_name,
+                'file' => 'uploads/documents/'.$fileName,
+            ]);
+        }
+
+        return redirect()->route('document.index')->with('success', 'Document uploaded successfully.');
     }
 
-    return redirect()->route('document.index')->with('success', 'Document uploaded successfully.');
-}
 
-    
-
-    
     public function destroy($id)
     {
         $document = Document::findOrFail($id);
-        $filePath = base_path('documents/'.basename($document->file));
+        $filePath = base_path('uploads/documents/' . basename($document->file));
         if (file_exists($filePath)) {
             unlink($filePath);
         }
-        
+
         $document->delete();
-    
+
         return redirect()->route('document.index')->with('success', 'Document deleted successfully.');
     }
-   
-
 }

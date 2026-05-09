@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\Chairmanvideo;
+use App\Providers\FcmServiceProvider;
 use Illuminate\Support\Facades\DB;
 
 class ChairmanVideoController extends Controller
@@ -28,7 +29,7 @@ class ChairmanVideoController extends Controller
 
         return view('chairmanvideo.create');
     }
-    public function store(Request $request)
+    public function store(Request $request,FcmServiceProvider $fcm)
     {
         $data = $request->all();
 
@@ -43,6 +44,13 @@ class ChairmanVideoController extends Controller
         }
 
         $chairmanvideo = Chairmanvideo::create($data);
+
+         $students = $chairmanvideo->StudentList()->map(function ($student) { return $student->device_token;})->filter()->unique()->toArray();
+
+        if (count($students) > 0) {
+            $fcm->sendMulticast($students,"There is an chairman video from GPCC",$chairmanvideo->title,env('APP_LOGO'));
+        }
+
         return redirect()->route('chairmanvideo.index')->with('success', 'Chairman video created successfully.');
     }
 

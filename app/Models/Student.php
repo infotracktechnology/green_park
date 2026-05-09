@@ -46,9 +46,9 @@ class Student extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
-            // $model->student_id = self::generateId($model->course);
+            $model->student_id = self::generateId($model->academic_year,$model->course);
             $model->password = self::generatePassword(7);
-            $model->user_name = self::generateName($model->course, $model->student_id);
+            $model->user_name = self::generateName($model->academic_year,$model->course, $model->student_id);
             $model->menu = Options::where('type', "{$model->course}{$model->branch->name}{$model->coaching_type} menu")
                 ->value('value') ?? [];
         });
@@ -80,26 +80,24 @@ class Student extends Authenticatable
         return $password;
     }
 
-    private static function generateId($course)
+    private static function generateId($academic_year,$course)
     {
-        $lastId = self::withTrashed()->where('course', $course)->max('student_id');
+        $lastId = self::withTrashed()->where('academic_year', $academic_year)->where('course', $course)->max('student_id');
         $y = date('y') + 1;
         if ($lastId) {
             return $lastId + 1;
         } else {
-            $setting = Setting::firstWhere('key', 'like', "%$course Admission No%");
+            $setting = Setting::Where('key', 'like', "%$course Admission No%")->where('academic_year', $academic_year)->first();
             $lastId =  $setting->value ?? $y . '00001';
             return $lastId;
         }
     }
 
-    private static function generateName($course, $student_id)
+    private static function generateName($academic_year,$course, $student_id)
     {
-        if ($course == "XI-OB" || $course == "XII-OB") {
-            return 'S' . $student_id;
-        } else {
-            return 'L' . $student_id;
-        }
+        $setting = Setting::Where('key', 'like', "%$course Admission Prefix%")->where('academic_year', $academic_year)->first();
+        $prefix = $setting->value ?? 'R';
+         return $prefix.$student_id;
     }
 
     public function calculateCurrentMonthStats(string $studentId): object

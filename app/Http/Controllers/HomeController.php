@@ -259,20 +259,13 @@ class HomeController extends Controller
     {
         $setting = Setting::where('academic_year', $this->academic_year)->get();
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $documents = Options::where('type', 'Document Option')->first()->value ?? [];
 
         if ($request->isMethod('POST')) {
             $row = Setting::find($request->id)->update(['value' => $request->value]);
             return redirect()->back()->with('success', 'Setting new value updated successfully!');
         }
 
-        if ($request->action && $request->action == 'delete') {
-            if (($key = array_search($request->value, $category)) !== false) {
-                unset($category[$key]);
-            }
-            Options::where('type', 'testcategory')->update(['value' => $category]);
-            return redirect()->back()->with('success', 'Test Category deleted successfully!');
-        }
-
-        return view('setting', compact('setting', 'category'));
+        return view('setting', compact('setting', 'category', 'documents'));
     }
 }

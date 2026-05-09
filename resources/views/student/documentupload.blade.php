@@ -52,13 +52,18 @@
                     @csrf
                     <div class="form-row">
                       <div class="form-group col-md-4">
-                        <label for="file_name">Document Type</label>
-                        <input type="text" name="file_name" class="form-control form-control-sm" required>
+                        <label for="file_name">Document List</label>
+                        <select name="document_name" class="form-control form-control-sm" required>
+                          <option value="">Select Document List</option>
+                          @foreach($options as $row)
+                          <option value="{{ $row }}">{{ $row }}</option>
+                          @endforeach
+                        </select>
                       </div>
 
                       <div class="form-group col-md-4">
-                        <label for="document_file">Upload File</label>
-                        <input type="file" name="document_file" class="form-control form-control-sm" accept="application/pdf" required>
+                        <label for="document_file">Upload File (Max Size: 2MB)</label>
+                        <input type="file" name="document_file" class="form-control form-control-sm" accept="application/pdf,image/*" required>
                       </div>
 
                       <div class="form-group col-lg-2 align-self-center">
@@ -76,7 +81,7 @@
                       <thead>
                         <tr>
                           <th>#</th>
-                          <th>Document Type</th>
+                          <th>Document</th>
                           <th>Download</th>
                           <th>Uploaded At</th>
                           <th>Action</th>
@@ -86,7 +91,7 @@
                         @forelse($documents as $doc)
                         <tr>
                           <td>{{ $loop->iteration }}</td>
-                          <td>{{ $doc->file_name }}</td>
+                          <td>{{ $doc->document_name }}</td>
                           <td>
                             <a href="{{ env('APP_URL').$doc->file }}" class="btn btn-primary text-white" download>
                               <i class="fas fa-download"></i>

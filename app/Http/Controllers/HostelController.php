@@ -147,7 +147,7 @@ class HostelController extends Controller
 
         $csvFile = $request->file('file');
         $csvData = $import->parseCSV($csvFile->getRealPath());
-        $hostel_name = array_column($csvData, 'hostel_name');
+        $hostel_name = array_column($csvData, 'hosname');
         $hostels = Hostel::where('branch_id', $request->branch)->whereIn('name', array_unique($hostel_name))->get()->keyBy('name');
 
         foreach ($csvData as $key => $row) {
@@ -157,7 +157,7 @@ class HostelController extends Controller
                 return redirect()->back()->with('error', "CSV file is missing student ID ($no) row in one or more rows.");
             }
 
-            $hostel = $hostels[$row['hostel_name']];
+            $hostel = $hostels[$row['hosname']];
 
             if(!$hostel){
                 return redirect()->back()->with('error', "CSV file is missing hostel name ($no) row in one or more rows.");

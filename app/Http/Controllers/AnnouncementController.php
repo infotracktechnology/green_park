@@ -31,7 +31,7 @@ class AnnouncementController extends Controller
         return view('announcement.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, FcmServiceProvider $fcm)
     {
         $data = $request->all();
 
@@ -50,10 +50,10 @@ class AnnouncementController extends Controller
 
         $announcement = Announcement::create($data);
 
-        if ($announcement->is_schedule && $announcement->start_at && $announcement->start_at->isFuture()) {
-            SendAnnouncementNotification::dispatch($announcement)->delay($announcement->start_at);
-        } else {
-            SendAnnouncementNotification::dispatch($announcement);
+         $students = $announcement->StudentList()->map(function ($student) { return $student->device_token;})->filter()->unique()->toArray();
+
+        if (count($students) > 0) {
+            $fcm->sendMulticast($students,"There is an announcement from GPCC",$announcement->title,env('APP_LOGO'));
         }
 
         return to_route('announcement.index')->with('success', 'Announcement created successfully.');
