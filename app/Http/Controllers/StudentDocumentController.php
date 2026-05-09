@@ -22,11 +22,6 @@ class StudentDocumentController extends Controller
     public function store(Request $request)
     {
 
-        $request->validate([
-            'file_name' => 'required|string|max:255',
-            'document_file' => 'required|file|max:2048',
-        ]);
-
         $studentId = auth()->user()->student_id;
 
         if ($request->hasFile('document_file')) {
