@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance,Document};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance,Document,Options};
 use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
