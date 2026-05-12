@@ -27,7 +27,7 @@
 
                   <div class="form-group col-lg-3" style="display: none" id="branch_div">
                     <label for="branch">Branch</label>
-                    <select name="branch" id="branch" class="select2 form-control">
+                    <select name="branch[]" id="branch" class="select2 form-control" multiple>
                       <option value="">Select Branch</option>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}">{{ $branch->name }}</option>

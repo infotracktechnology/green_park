@@ -61,6 +61,11 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
               <div class="dropdown-title">Hi, {{ auth()->user()->username }}</div>
+              @if(auth()->user()->type === 'Branch Admin')
+              <a href="{{ route('users.branchswitch', auth()->id()) }}" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>
+                Branch Switch
+              </a>
+              @endif
               <div class="dropdown-divider"></div>
               <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout">
                 <i class="fas fa-sign-out-alt"></i>Logout

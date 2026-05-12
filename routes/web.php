@@ -184,6 +184,8 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     ]);
 
     Route::match(['get', 'post'], 'users/menuassign/{user}', [UsersController::class, 'MenuAssign'])->name('users.menuassign');
+    Route::match(['get', 'post'], 'users/branchswitch/{user}', [UsersController::class, 'BranchSwitch'])->name('users.branchswitch');
+
     Route::post('attendance/store', [HolidayController::class, 'attendance_store'])->name('attendance.store');
     Route::get('/attendance', [HolidayController::class, 'attendance'])->name('attendance');
     Route::match(['get', 'post'], '/shiftwork/assign', [WorkshiftController::class, 'assign'])->name('workshift.assign');

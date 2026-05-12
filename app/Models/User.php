@@ -19,6 +19,7 @@ class User extends Authenticatable
         'password',
         'type',
         'branch',
+        'branch_ids',
         'menu',
         'created_by',
         'updated_by',
@@ -38,6 +39,11 @@ class User extends Authenticatable
     public function branch_details()
     {
         return $this->belongsTo(Branch::class, 'branch', 'id');
+    }
+
+     public function branchNames()
+    {
+        return Branch::whereIn('id', explode(',', $this->branch_ids))->get()->implode('name', '/');
     }
 
     public static function boot()

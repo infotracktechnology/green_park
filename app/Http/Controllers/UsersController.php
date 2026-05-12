@@ -33,9 +33,10 @@ class UsersController extends Controller
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
+            'branch_ids' => implode(',', $request->branch ?? []),
             'password' => bcrypt($request->password),
             'type' => $request->type,
-            'branch' => $request->branch,
+            'branch' => $request->branch[0] ?? 1,
             'menu' => [],
         ]);
 
@@ -80,7 +81,8 @@ class UsersController extends Controller
     {
         $user->username = $request->username;
         $user->email = $request->email;
-        $user->branch = $request->branch;
+        $user->branch_ids = implode(',', $request->branch ?? []);
+        $user->branch = $request->branch[0] ?? 1;
         if (isset($request->reset_password)) {
             $user->password = bcrypt($request->password);
         }
@@ -88,6 +90,19 @@ class UsersController extends Controller
         $user->save();
 
         return redirect()->route('users.index')->with('success', 'User updated successfully');
+    }
+
+    public function BranchSwitch(User $user, Request $request) 
+    {
+        if ($request->isMethod('POST')) {
+            $user->branch = $request->branch;
+            $user->save();
+            return redirect()->route('admin.home')->with('success', 'Branch switched successfully');
+        }
+
+        $branchIds = explode(',', $user->branch_ids);
+        $branches_list = Branch::whereIn('id', $branchIds)->get();
+        return view('users.branch_switch', compact('user', 'branches_list'));
     }
 
 

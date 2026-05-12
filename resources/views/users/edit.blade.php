@@ -27,10 +27,10 @@
 
                   <div class="form-group col-lg-3" id="branch_div">
                     <label for="branch">Branch</label>
-                    <select name="branch"  class="select2 form-control">
+                    <select name="branch[]"  class="select2 form-control" multiple>
                       <option value="">Select Branch</option>
                       @foreach ($branches as $branch)
-                      <option value="{{ $branch->id }}" @selected($branch->id == $user->branch)>{{ $branch->name }}</option>
+                      <option value="{{ $branch->id }}" @selected(in_array($branch->id, explode(',',$user->branch_ids)))>{{ $branch->name }}</option>
                       @endforeach
                     </select>
                   </div>

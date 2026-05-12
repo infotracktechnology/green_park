@@ -50,7 +50,9 @@
                       <tr>
 
                         <td>{{$key+1}}</td>
-                        <td>{{$user->branch_details?->name}}</td>
+                        <td>
+                          {{ $user->branchNames() }}
+                        </td>
                         <td>{{$user->username}}</td>
                         <td>{{$user->email}}</td>
                         <td>{{$user->type }}</td>
