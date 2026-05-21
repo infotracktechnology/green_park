@@ -170,6 +170,7 @@ class ExamController extends Controller
                     'status'        => $status,
                     'academic_year' => $this->academic_year,
                     'test_id'       => $request->test_id,
+                    'mode'          => 'ONLINE',
                 ];
             }
 
@@ -238,7 +239,7 @@ class ExamController extends Controller
     {
         $student_id = Auth::user()->student_id;
 
-        $data = ['test_id' => $request->test_id, 'student_id' => $student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year, 'testname' => $request->testname];
+        $data = ['test_id' => $request->test_id, 'student_id' => $student_id, 'subject' => $request->subject, 'q_no' => $request->q_no, 'answer' => $request->answer, 'status' => $request->status, 'academic_year' => $this->academic_year, 'testname' => $request->testname,'mode' => 'ONLINE'];
 
         ExamAnswer::updateOrCreate(['testname' => $request->testname, 'student_id' => $student_id, 'q_no' => $request->q_no], $data);
 
