@@ -451,7 +451,7 @@
     $(`.pagination li[data-seq="${index}"] a`).removeClass('que-save que-mark que-save-mark').addClass('not-answered');
     updateCounts();
     setStatus(index, 'not-answered', 0);
-    clearLog(testid, index);
+    //clearLog(testid, index);
   });
   
   $('.pagination a').click(function (e) {
