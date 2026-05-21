@@ -380,22 +380,6 @@
       $('.countAnsweredAndMarked').text(answeredAndMarked);
   }
   
-  function clearLog(testid, qno) {
-      $.ajax({
-          url: "{{ route('exam.clearlog') }}",
-          headers: {
-              'X-CSRF-TOKEN': '{{ csrf_token() }}'
-          },
-          method: 'POST',
-          data: {
-              test_id: testid,
-              q_no: qno,
-          },
-          success: function (data) {
-              console.log(data);
-          },
-      });
-  }
   
   $('.btn-save').click(function () {
       const index = $(this).data('index');
@@ -451,7 +435,6 @@
     $(`.pagination li[data-seq="${index}"] a`).removeClass('que-save que-mark que-save-mark').addClass('not-answered');
     updateCounts();
     setStatus(index, 'not-answered', 0);
-    //clearLog(testid, index);
   });
   
   $('.pagination a').click(function (e) {
