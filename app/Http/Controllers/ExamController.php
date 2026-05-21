@@ -209,10 +209,11 @@ class ExamController extends Controller
     function student_instruction(Request $request, $test_id)
     {
         $exam = Exam::findOrFail(base64_decode($test_id));
-        $exam_answer = ExamAnswer::where('test_id', base64_decode($test_id))->where('student_id', auth()->user()->student_id)->selectRaw('count(q_no) as total_question')->first();
-        if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
-            return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
-        }
+        // $exam_answer = ExamAnswer::where('test_id', $exam->id)->where('student_id', auth()->user()->student_id)->selectRaw('count(q_no) as total_question')->first();
+
+        // if ($exam_answer && $exam_answer->total_question >= $exam->total_questions) {
+        //     return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
+        // }
 
         return view('student.instruction', compact('test_id'));
     }
