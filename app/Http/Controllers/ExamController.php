@@ -223,9 +223,9 @@ class ExamController extends Controller
         $answers = $answers->keyBy('q_no');
         $second = now()->diffInSeconds(Carbon::parse($exam->end_at), false);
 
-        if($answers->count() >= $exam->total_questions) {
-            return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
-        }
+        // if($answers->count() >= $exam->total_questions) {
+        //     return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
+        // }
         
         if ($second < 0) {
             return redirect()->route('studentdashboard')->with('error', 'Exam Time is up!');
