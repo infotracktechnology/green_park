@@ -519,14 +519,7 @@
       }
   });
 
-  $('.logout').on('click', function (e) {
-      e.preventDefault();
-      if(!isSubmitting){
-        isSubmitting = true;
-        form.submit();
-      }
-  });
-  
+
   startTimer();
   openQuestion(max_qno);
   updateCounts();
