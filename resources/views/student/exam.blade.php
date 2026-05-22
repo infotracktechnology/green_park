@@ -45,7 +45,24 @@
     height:auto;
     display:block;
   }
+
+   .omr-radio {
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border: 1px solid #adb5bd;
+      border-radius: 50%;
+      margin: 0 3px;
+      cursor: pointer;
+      vertical-align: middle;
+      transition: all 0.2s ease;
+  }
   
+  .omr-radio:checked {
+      background-color: #007bff;
+      border-color: #007bff;
+      box-shadow: inset 0 0 0 2px #fff;
+  }
   /* Task 1: Utility to ensure gap for buttons if flex-gap isn't supported */
   .action-buttons button {
       margin-bottom: 8px;
@@ -194,7 +211,7 @@
                ?>
               <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
                 <div class="question-panel">
-                  <p>Question {{ $key }}</p>
+                  <p style="font-weight: bold;font-size: 20px;">Question {{ $key }}</p>
                   <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image">
                 </div>
 
@@ -202,10 +219,10 @@
                 <table class="table table-borderless mb0">
                   <tbody>
                     <tr>
-                      <td> <input type="radio" name="question[{{ $key }}]" value="1"> 1 ) </td>
-                      <td> <input type="radio" name="question[{{ $key }}]" value="2"> 2 ) </td>
-                      <td> <input type="radio" name="question[{{ $key }}]" value="3"> 3 ) </td>
-                      <td> <input type="radio" name="question[{{ $key }}]" value="4"> 4 ) </td>
+                      <td> <input type="radio" class="omr-radio" name="question[{{ $key }}]" value="1"> 1 ) </td>
+                      <td> <input type="radio" class="omr-radio" name="question[{{ $key }}]" value="2"> 2 ) </td>
+                      <td> <input type="radio" class="omr-radio" name="question[{{ $key }}]" value="3"> 3 ) </td>
+                      <td> <input type="radio" class="omr-radio" name="question[{{ $key }}]" value="4"> 4 ) </td>
                     </tr>
                   </tbody>
                 </table>
@@ -339,6 +356,23 @@
           },
           success: function (data) {
               //console.log(data);
+          },
+      });
+  }
+
+  function clearLog(testid, qno) {
+      $.ajax({
+          url: "{{ route('exam.clearlog') }}",
+          headers: {
+              'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          },
+          method: 'POST',
+          data: {
+              test_id: testid,
+              q_no: qno,
+          },
+          success: function (data) {
+              console.log(data);
           },
       });
   }
@@ -495,12 +529,12 @@
       }
   });
   
-  document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden" && !isSubmitting) {
-          isSubmitting = true;
-          form.submit();
-      }
-  });
+  // document.addEventListener("visibilitychange", () => {
+  //     if (document.visibilityState === "hidden" && !isSubmitting) {
+  //         isSubmitting = true;
+  //         form.submit();
+  //     }
+  // });
 
 
   startTimer();
