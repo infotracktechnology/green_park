@@ -408,14 +408,6 @@ function updateCounts() {
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const totals = { answered: 0, notAnswered: 0, marked: 0, answeredAndMarked: 0 };
-  const subjectStats = {};
-
-  const subjectMap = {};
-
-  $('[name^="subject["]').each(function () {
-    const match = this.name.match(/subject\[([^\]]+)\]/);
-    if (match) subjectMap[match[1]] = $(this).val();
-  });
 
   $(".pagination a").each(function () {
     const $el = $(this);
@@ -424,8 +416,46 @@ function updateCounts() {
 
     const key = classMap[matchedClass];
     totals[key]++;
+  });
 
-    const qno = $el.data("seq");
+  const totalVisited = Object.values(totals).reduce((sum, val) => sum + val, 0);
+  const notVisited = questions.length - totalVisited;
+
+  // Restrict overall legend counts updating to the legend table to avoid overriding summary table values prematurely
+  $(".table.test-questions .countNotVisited").text(notVisited);
+  for (const key of statKeys) {
+    $(`.table.test-questions .count${capitalize(key)}`).text(totals[key]);
+  }
+}
+
+function calculateSubjectWiseStats() {
+  const classMap = {
+    "not-answered": "notAnswered",
+    "que-save": "answered",
+    "que-mark": "marked",
+    "que-save-mark": "answeredAndMarked",
+  };
+
+  const statKeys = ["answered", "notAnswered", "marked", "answeredAndMarked"];
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+  const subjectStats = {};
+  const subjectMap = {};
+
+  // Build subject mapping based on question name fields
+  $('[name^="subject["]').each(function () {
+    const match = this.name.match(/subject\[([^\]]+)\]/);
+    if (match) subjectMap[match[1]] = $(this).val();
+  });
+
+  // Calculate stats for each subject
+  $(".pagination a").each(function () {
+    const $el = $(this);
+    const matchedClass = Object.keys(classMap).find((cls) => $el.hasClass(cls));
+    if (!matchedClass) return;
+
+    const key = classMap[matchedClass];
+    const qno = $el.data("index");
     const subject = subjectMap[qno];
 
     if (subject) {
@@ -439,12 +469,13 @@ function updateCounts() {
     }
   });
 
+  // Render calculated stats to the Exam Summary table
   for (const [sub, stats] of Object.entries(subjectStats)) {
     const row = $(`tr[data-subject="${sub}"]`);
     let visited = 0;
 
     for (const key of statKeys) {
-      const val = stats[key];
+      const val = stats[key] || 0;
       row.find(`.count${capitalize(key)}`).text(val);
       visited += val;
     }
@@ -453,13 +484,15 @@ function updateCounts() {
     row.find(".countNotVisited").text(totalQ - visited);
   }
 
-  const totalVisited = Object.values(totals).reduce((sum, val) => sum + val, 0);
-  const notVisited = questions.length - totalVisited;
-
-  $(".countNotVisited").text(notVisited);
-  for (const key of statKeys) {
-    $(`.count${capitalize(key)}`).text(totals[key]);
-  }
+  // Handle remaining subjects with zero interactions
+  $('.exam-summery tbody tr').each(function() {
+    const sub = $(this).data('subject');
+    if (sub && !subjectStats[sub]) {
+      const totalQ = parseInt($(this).find("td").eq(1).text()) || 0;
+      $(this).find('.countAnswered, .countNotAnswered, .countMarked, .countAnsweredAndMarked').text(0);
+      $(this).find('.countNotVisited').text(totalQ);
+    }
+  });
 }
 
 
@@ -549,6 +582,7 @@ function updateCounts() {
   }
 
   $(".btn-submit-answer").click(function () {
+      calculateSubjectWiseStats();
       $('.exam-paper').hide();
       $('.exam-summery').show();
   });
@@ -587,8 +621,7 @@ function updateCounts() {
 
   startTimer();
   openQuestion(max_qno);
-  updateCounts();
-
+  
   $(document).ready(function () {
       Object.keys(answers).forEach(qno => {
           const answer = answers[qno];
