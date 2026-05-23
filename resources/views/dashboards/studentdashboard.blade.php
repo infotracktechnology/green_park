@@ -158,7 +158,7 @@ $isExamActive = $exam && $exam->start_at <= now() && $exam->end_at >= now();
                 </div>
               </div>
 
-              <a href="{{ route('student.instruction', base64_encode($exam->id)) }}" class="btn btn-primary px-5 mt-2" style="font-size: 20px; font-weight: bold; border-radius: 50px; text-transform: uppercase;">
+              <a href="{{ route('student.exam', base64_encode($exam->id)) }}" class="btn btn-primary px-5 mt-2" style="font-size: 20px; font-weight: bold; border-radius: 50px; text-transform: uppercase;">
                 Enter Exam <i class="fas fa-arrow-circle-right ml-2"></i>
               </a>
             </div>

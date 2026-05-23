@@ -165,7 +165,7 @@
     {{-- FOOTER --}}
     <div class="receipt-footer">
         This is a computer-generated receipt. No signature required.<br>
-        © {{ date('Y') }} Spectra Academy. All Rights Reserved.
+        © {{ date('Y') }} Green Park Coaching Centre
 
         <p>Printed on: {{ now()->format('d-m-Y h:i A') }}</p>
     </div>

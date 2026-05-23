@@ -117,7 +117,7 @@
 
             @if($isExamActive)
             <li class="dropdown active">
-              <a href="{{ route('student.instruction', base64_encode($exam->id)) }}" class="nav-link">
+              <a href="{{ route('student.exam', base64_encode($exam->id)) }}" class="nav-link">
                 <i class="fas fa-file-alt" style="font-size: 20px; color: #2196f3;"></i><span>Online Exam</span>
               </a>
             </li>
