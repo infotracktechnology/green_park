@@ -45,7 +45,7 @@
     height:auto;
     display:block;
   }
-
+  
    .omr-radio {
       appearance: none;
       width: 15px;
@@ -273,6 +273,7 @@
           <table class="table table-bordered">
             <thead>
               <tr>
+                <th>Subject</th>
                 <th>No of Questions</th>
                 <th>Answered</th>
                 <th>Not Answered</th>
@@ -282,14 +283,17 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>{{ $exam->total_questions }}</td>
+              @foreach (explode(',', $exam->subject_name) as $index => $subject)
+              <tr data-subject="{{ $subject }}">
+                <td>{{ $subject }}</td>
+                <td>{{ $exam->{$subject.'_questions'} ?? 0 }}</td>
                 <td class="countAnswered">0</td>
                 <td class="countNotAnswered">0</td>
                 <td class="countMarked">0</td>
                 <td class="countAnsweredAndMarked">0</td>
                 <td class="countNotVisited">0</td>
               </tr>
+              @endforeach
             </tbody>
           </table>
           <hr>
@@ -318,7 +322,7 @@
   max_qno = max_qno > 0 ? max_qno : 1;
   const answers = @json($answers);
   let isSubmitting = false;
-  
+
   function startTimer() {
       const interval = setInterval(function () {
           if (timer > 0) {
@@ -336,7 +340,7 @@
           }
       }, 1000);
   }
-  
+
   function setStatus(qno, status, ans) {
       document.getElementById('status-'+qno).value = status;
       var subject = $(`[name="subject[${qno}]`).val();
@@ -376,7 +380,7 @@
           },
       });
   }
-  
+
    function openQuestion(index) {
     $('.question').hide();
     $(`#question-${index}`).show();
@@ -385,36 +389,80 @@
     const a = $(`.pagination li[data-seq="${index}"] a`);
     if (!$(a).hasClass("que-save") && !$(a).hasClass("que-save-mark") && !$(a).hasClass("que-mark")) {
         $(a).addClass("not-answered").removeClass("not-attempted");
-        $(`#status-${index}`).val('not-answered'); 
+        $(`#status-${index}`).val('not-answered');
     }
     activeQuestion = index;
     updateCounts();
   }
+
   
-  function updateCounts() {
-      let notVisited = 0;
-      let notAnswered = 0;
-      let answered = 0;
-      let marked = 0;
-      let answeredAndMarked = 0;
-  
-      $('.pagination a').each(function () {
-          if ($(this).hasClass('not-answered')) notAnswered++;
-          if ($(this).hasClass('que-save')) answered++;
-          if ($(this).hasClass('que-mark')) marked++;
-          if ($(this).hasClass('que-save-mark')) answeredAndMarked++;
-      });
-  
-      notVisited = questions.length - (notAnswered + answered + marked + answeredAndMarked);
-  
-      $('.countNotVisited').text(notVisited);
-      $('.countNotAnswered').text(notAnswered);
-      $('.countAnswered').text(answered);
-      $('.countMarked').text(marked);
-      $('.countAnsweredAndMarked').text(answeredAndMarked);
+function updateCounts() {
+  const classMap = {
+    "not-answered": "notAnswered",
+    "que-save": "answered",
+    "que-mark": "marked",
+    "que-save-mark": "answeredAndMarked",
+  };
+
+  const statKeys = ["answered", "notAnswered", "marked", "answeredAndMarked"];
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+  const totals = { answered: 0, notAnswered: 0, marked: 0, answeredAndMarked: 0 };
+  const subjectStats = {};
+
+  const subjectMap = {};
+
+  $('[name^="subject["]').each(function () {
+    const match = this.name.match(/subject\[([^\]]+)\]/);
+    if (match) subjectMap[match[1]] = $(this).val();
+  });
+
+  $(".pagination a").each(function () {
+    const $el = $(this);
+    const matchedClass = Object.keys(classMap).find((cls) => $el.hasClass(cls));
+    if (!matchedClass) return;
+
+    const key = classMap[matchedClass];
+    totals[key]++;
+
+    const qno = $el.data("seq");
+    const subject = subjectMap[qno];
+
+    if (subject) {
+      subjectStats[subject] = subjectStats[subject] || {
+        answered: 0,
+        notAnswered: 0,
+        marked: 0,
+        answeredAndMarked: 0,
+      };
+      subjectStats[subject][key]++;
+    }
+  });
+
+  for (const [sub, stats] of Object.entries(subjectStats)) {
+    const row = $(`tr[data-subject="${sub}"]`);
+    let visited = 0;
+
+    for (const key of statKeys) {
+      const val = stats[key];
+      row.find(`.count${capitalize(key)}`).text(val);
+      visited += val;
+    }
+
+    const totalQ = parseInt(row.find("td").eq(1).text()) || 0;
+    row.find(".countNotVisited").text(totalQ - visited);
   }
-  
-  
+
+  const totalVisited = Object.values(totals).reduce((sum, val) => sum + val, 0);
+  const notVisited = questions.length - totalVisited;
+
+  $(".countNotVisited").text(notVisited);
+  for (const key of statKeys) {
+    $(`.count${capitalize(key)}`).text(totals[key]);
+  }
+}
+
+
   $('.btn-save').click(function () {
       const index = $(this).data('index');
       const radio = $(`#question-${index} input[type="radio"]`);
@@ -433,7 +481,7 @@
           .addClass('que-save');
       NextQuestion(index);
   });
-  
+
   $('.btn-save-mark-answer').click(function () {
       const index = $(this).data('index');
       const radio = $(`#question-${index} input[type="radio"]`);
@@ -452,7 +500,7 @@
           .addClass('que-save-mark');
       NextQuestion(index);
   });
-  
+
   $('.btn-mark').click(function () {
       const index = $(this).data('index');
       setStatus(index, 'que-mark', 0);
@@ -461,7 +509,7 @@
           .addClass('que-mark');
       NextQuestion(index);
   });
-  
+
   $('.btn-reset').click(function () {
     const index = $(this).data('index');
     $(`#question-${index} input[type="radio"]`).prop('checked', false);
@@ -470,20 +518,20 @@
     updateCounts();
     setStatus(index, 'not-answered', 0);
   });
-  
+
   $('.pagination a').click(function (e) {
       const index = $(this).data('index');
       openQuestion(index);
   });
-  
+
   $('#btnPrevQue').click(function () {
       PreviousQuestion(activeQuestion);
   });
-  
+
   $('#btnNextQue').click(function () {
       NextQuestion(activeQuestion);
   });
-  
+
   function NextQuestion(index) {
       updateCounts();
       if (index < questions.length) {
@@ -491,7 +539,7 @@
       }
       return;
   }
-  
+
   function PreviousQuestion(index) {
       updateCounts();
       if (index > 1) {
@@ -499,28 +547,28 @@
       }
       return;
   }
-  
+
   $(".btn-submit-answer").click(function () {
       $('.exam-paper').hide();
       $('.exam-summery').show();
   });
-  
+
    $('#btnYesSubmitConfirm').click(function () {
     $(this).prop('disabled', true);
     $(this).text('Submitting...');
     isSubmitting = true;
     form.submit();
   });
-  
+
   $('#btnNoSubmitConfirm').click(function () {
       if (timer === 0) {
-          isSubmitting = true; 
+          isSubmitting = true;
           form.submit();
       }
       $('.exam-paper').show();
       $('.exam-summery').hide();
   });
-  
+
   window.addEventListener('beforeunload', function (e) {
       if (!isSubmitting) {
           var confirmationMessage = 'If you leave this page, your exam will be automatically submitted. Are you sure?';
@@ -528,7 +576,7 @@
           return confirmationMessage;
       }
   });
-  
+
   // document.addEventListener("visibilitychange", () => {
   //     if (document.visibilityState === "hidden" && !isSubmitting) {
   //         isSubmitting = true;
@@ -540,7 +588,7 @@
   startTimer();
   openQuestion(max_qno);
   updateCounts();
-  
+
   $(document).ready(function () {
       Object.keys(answers).forEach(qno => {
           const answer = answers[qno];
@@ -549,14 +597,15 @@
           if (status === 'que-save' || status === 'que-save-mark') {
               $(`#question-${qno} input[type="radio"][value="${ans}"]`).prop('checked', true);
           }
-  
+
           $(`#status-${qno}`).val(status);
-          
+
           $(`.pagination li[data-seq="${qno}"] a`).removeClass('not-attempted not-answered que-mark que-save que-save-mark')
           .addClass(status);
-          
+
       });
       updateCounts();
   });
 </script>
+
 @endsection
