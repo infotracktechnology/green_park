@@ -75,7 +75,7 @@
 <div class="main-content">
   <section class="section">
     <div class="section-body">
-      <form method="post" id="examForm" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
+      <form method="post" id="examForm" onsubmit="return confirm('Are you sure you want to submit?')" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="test_id" value="{{ $exam->testid }}">
         <input type="hidden" name="testname" value="{{ $exam->name }}">
@@ -211,7 +211,7 @@
                ?>
               <div id="question-{{ $key }}" class="question" style="display: {{ $key === 1 ? 'block' : 'none' }};">
                 <div class="question-panel">
-                  <p style="font-weight: bold;font-size: 20px;">Question {{ $key }}</p>
+                  <p style="color: #000;font-size: 20px;">Question {{ $key }}</p>
                   <img src="{{ env('APP_URL').$question['image'] }}" alt="Question Image">
                 </div>
 
