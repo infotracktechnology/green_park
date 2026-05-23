@@ -295,7 +295,7 @@
           <hr>
           <div class="col-md-12 text-center">
             <h4> Are you sure you want to submit for final marking?<br>No changes will be allowed after submission.</h4>
-            <button type="button" class="btn btn-success btn-lg mx-auto m-2" id="btnYesSubmitConfirm">Yes, Submit Exam</button>
+            <button type="button" class="btn btn-primary btn-lg mx-auto m-2" id="btnYesSubmitConfirm">Yes, Submit Exam</button>
             <button type="button" class="btn btn-danger btn-lg mx-auto m-2" id="btnNoSubmitConfirm">No, Go Back</button>
           </div>
         </div>
