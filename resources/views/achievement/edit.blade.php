@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Edit NEET Achievement')
+@section('title', 'Edit MBBS/BDS Counselling')
 @section('main')
 <div class="main-content">
   <section class="section">
@@ -12,7 +12,7 @@
             <div class="card card-primary">
               <div class="card-header">
 
-                <h6 class="col-deep-purple">Edit NEET Achievement</h6>
+                <h6 class="col-deep-purple">Edit MBBS/BDS Counselling</h6>
               </div>
               <div class="card-body row">
 

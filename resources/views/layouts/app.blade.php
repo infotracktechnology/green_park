@@ -149,7 +149,7 @@
                 <li><a href="{{route('discussionvideo.index')}}" class="nav-link"> Discussion Video</a></li>
                 <li><a href="{{ route('download.index') }}" class="nav-link">Downloads</a></li>
                 <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
-                <li><a href="{{ route('achievement.index') }}" class="nav-link">NEET Achievement</a></li>
+                <li><a href="{{ route('achievement.index') }}" class="nav-link">MBBS/BDS Counselling</a></li>
                 <li><a href="{{ route('parent_concern') }}" class="nav-link">Parent Concern</a></li>
               </ul>
             </li>

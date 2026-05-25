@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'NEET Achievements')
+@section('title', 'MBBS/BDS Counselling')
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
@@ -22,7 +22,7 @@
 
               <div class="row">
                 <div class="col-md-9 col-sm-12 mb-3">
-                  <h6 class="col-deep-purple">NEET Achievements</h6>
+                  <h6 class="col-deep-purple">MBBS/BDS Counselling</h6>
                 </div>
                 <div class="col-md-2 col-sm-6 mb-3">
                   <a href="{{route('achievement.create')}}" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Add </a>
