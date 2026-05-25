@@ -64,21 +64,20 @@
 @section('js')
 <script>
  $('#test').on('change', function() {
-    var testId = $(this).val();
+    var testname = $(this).val();
 
-    if (testId) {
+    if (testname) {
         $.ajax({
             url: "{{ route('exam.enable') }}",  
             type: "GET",
             data: { 
-                test_id: testId,
+                test: testname,
                 _token: "{{ csrf_token() }}"  
             },
             success: function(data) {
                 var studentSelect = $('#student_id');
                 studentSelect.empty();  
                 studentSelect.append('<option value="">Select Student</option>');
-
                
                 $.each(data, function(key, student) {
                     studentSelect.append('<option value="' + student.id + '">' + student.user_name + '</option>');
