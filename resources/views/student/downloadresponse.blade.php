@@ -40,6 +40,7 @@
                     <thead>
                       <tr>
                         <th>#</th>
+                        <th>EXAM ID</th>
                         <th>EXAM DATE</th>
                         <th>EXAM NAME</th>
                         <th>NO OF QUESTIONS</th>
@@ -51,6 +52,7 @@
                       @foreach($exams as $key => $row)
                       <tr>
                         <td>{{ $key + 1 }}</td>
+                        <td>{{ $row->testid }}</td>
                         <td>{{ $row->exam_date }}</td>
                         <td>{{ $row->name }}</td>
                         <td>{{ $row->total_questions }}</td>
