@@ -68,6 +68,12 @@
       margin-bottom: 8px;
       margin-right: 6px;
   }
+
+  .btn-orange {
+      background-color: #ff9800 !important;
+      border-color: #ff9800 !important;
+      color: #fff !important;
+  }
 </style>
 @endsection
 
@@ -174,27 +180,28 @@
               </table>
             </div>
 
-            <div class="mt-2">
+            <div class="subjects-btn mt-2">
+
               @if($exam->physics_questions > 0)
-              <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->phy_start }})">
+              <button type="button" id="btnPHYSICS" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->phy_start }})">
                 Physics ({{ $exam->physics_questions }})
               </button>
               @endif
 
               @if($exam->chemistry_questions > 0)
-              <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->chem_start }})">
+              <button type="button" id="btnCHEMISTRY" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->chem_start }})">
                 Chemistry ({{ $exam->chemistry_questions }})
               </button>
               @endif
 
               @if($exam->botany_questions > 0)
-              <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->bot_start }})">
+              <button type="button" id="btnBOTANY" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->bot_start }})">
                 Botany ({{ $exam->botany_questions }})
               </button>
               @endif
 
               @if($exam->zoology_questions > 0)
-              <button type="button" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->zoo_start }})">
+              <button type="button" id="btnZOOLOGY" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->zoo_start }})">
                 Zoology ({{ $exam->zoology_questions }})
               </button>
               @endif
@@ -395,6 +402,11 @@
     }
     activeQuestion = index;
     updateCounts();
+    const subject = $(`input[name="subject[${index}]"]`).val();
+    if (subject) {
+        $('.subjects-btn button').removeClass('btn-orange').addClass('btn-primary');
+        $(`#btn${subject}`).removeClass('btn-primary').addClass('btn-orange');
+    }
   }
 
   

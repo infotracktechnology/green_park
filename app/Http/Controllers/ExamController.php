@@ -279,10 +279,10 @@ class ExamController extends Controller
 
         if ($test) {
             $students = DB::table('student')
-                ->join('exam_answer', 'student.id', '=', 'exam_answer.student_id')
+                ->join('exam_answer', 'student.student_id', '=', 'exam_answer.student_id')
                 ->where('exam_answer.testname', $test)
                 ->distinct()
-                ->select('student.id', 'student.user_name')
+                ->select('student.student_id', 'student.student_name')
                 ->get();
             if ($request->ajax()) {
                 return response()->json($students);

@@ -78,9 +78,9 @@
                 var studentSelect = $('#student_id');
                 studentSelect.empty();  
                 studentSelect.append('<option value="">Select Student</option>');
-               
+                
                 $.each(data, function(key, student) {
-                    studentSelect.append('<option value="' + student.id + '">' + student.user_name + '</option>');
+                    studentSelect.append(`<option value="${student.student_id}">${student.student_id} - ${student.student_name}</option>`);
                 });
             },
             error: function(xhr, status, error) {
