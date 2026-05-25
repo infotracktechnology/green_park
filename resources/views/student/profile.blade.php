@@ -23,6 +23,7 @@
         height: 120px;
         object-fit: cover;
         border: 4px solid #fff;
+        border-radius: 15px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .label-text {
@@ -56,7 +57,7 @@
             <div class="card bg-pastel-card">
                 <div class="bg-pastel-purple" style="height: 80px;"></div>
                 <div class="card-body text-center mt-n5">
-                    <img src="{{ asset('profilepic/'.auth()->user()->student_id.'.jpg') }}"  onerror="this.style.display='none'" class="rounded-circle profile-img mb-3">
+                    <img src="{{ asset('profilepic/'.auth()->user()->student_id.'.jpg') }}"  onerror="this.style.display='none'" class="profile-img mb-3">
                     
                     <h4 class="fw-bold text-dark mb-1">{{ auth()->user()->student_name }}</h4>
                     <p class="text-muted mb-3">{{ auth()->user()->student_id ?? 'Student' }}</p>
