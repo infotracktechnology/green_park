@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'NEET Achievements')
+@section('title', 'MBBS/BDS Counselling')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
@@ -45,7 +45,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4><i class="fas fa-trophy mr-2 text-warning"></i> NEET Achievements</h4>
+                            <h4><i class="fas fa-trophy mr-2 text-warning"></i> MBBS/BDS Counselling</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
