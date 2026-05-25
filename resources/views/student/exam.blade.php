@@ -345,6 +345,7 @@
           } else {
               clearInterval(interval);
               isSubmitting = true;
+              form.removeAttr('onsubmit');
               form.submit();
           }
       }, 1000);
