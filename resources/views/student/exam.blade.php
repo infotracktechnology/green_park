@@ -255,7 +255,7 @@
                   << Back </button>
                     <button type="button" class="btn btn-outline-secondary" id="btnNextQue">Next >></button>
               </div>
-              <button type="button" class="btn btn-success btn-submit-answer">Submit Exam</button>
+              <button type="button" class="btn bg-blue btn-submit-answer">Submit Exam</button>
             </div>
 
           </div>
