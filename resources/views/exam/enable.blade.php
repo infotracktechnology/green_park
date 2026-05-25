@@ -72,7 +72,7 @@
    });
 </script>
 <script>
- $('#test_id').on('change', function() {
+ $('#test').on('change', function() {
     var testId = $(this).val();
 
     if (testId) {
