@@ -284,7 +284,7 @@
             </thead>
             <tbody>
               @foreach (explode(',', $exam->subject_name) as $index => $subject)
-              <?php $subjectkey = strtolower($col); ?>
+              <?php $subjectkey = strtolower($subject); ?>
               <tr data-subject="{{ strtoupper($subject) }}">
                 <td>{{ $subject }}</td>
                 <td>{{ $exam->{"{$subjectkey}_questions"} ?? 0 }}</td>
