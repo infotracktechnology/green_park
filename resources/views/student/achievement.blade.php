@@ -45,7 +45,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4><i class="fas fa-trophy mr-2 text-warning"></i> MBBS/BDS Counselling</h4>
+                            <h4><i class="fas fa-stethoscope mr-2 text-warning"></i> MBBS/BDS Counselling</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
