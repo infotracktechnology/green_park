@@ -199,12 +199,12 @@
 
                   <div class="row m-2">
                     <div class="col-lg-1 form-check">
-                      <input type="checkbox" id="mathsCheckbox" name="subject_name[]" value="Mathematics" class="form-check-input">
-                      <label for="mathsCheckbox" class="form-check-label">Mathematics</label>
+                      <input type="checkbox" id="biologyCheckbox" name="subject_name[]" value="Biology" class="form-check-input">
+                      <label for="biologyCheckbox" class="form-check-label">Biology</label>
                     </div>
-                    <div class="col-lg-2 maths-inputs" style="display: none;">
-                      <label for="mathsQuestions">Maths Questions</label>
-                      <input type="number" min="1" max="180" name="maths_questions" id="mathsQuestions" class="form-control form-control-sm" disabled>
+                    <div class="col-lg-2 biology-inputs" style="display: none;">
+                      <label for="biologyQuestions">Biology Questions</label>
+                      <input type="number" min="1" max="180" name="biology_questions" id="biologyQuestions" class="form-control form-control-sm" disabled>
                     </div>
                     
                   </div>
@@ -239,7 +239,7 @@
     { key: 'chemistry' },
     { key: 'botany' },
     { key: 'zoology' },
-    { key: 'maths' }
+    { key: 'biology' }
   ];
 
   const $total = $('#total_questions');

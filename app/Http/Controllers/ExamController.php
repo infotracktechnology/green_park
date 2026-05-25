@@ -54,7 +54,7 @@ class ExamController extends Controller
             'name' => ['required', 'unique:exam,name'],
         ]);
 
-        $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files', 'maths_files']);
+        $data = $request->except(['physics_files', 'chemistry_files', 'botany_files', 'zoology_files', 'biology_files']);
         foreach (['coaching_type', 'branch', 'category', 'batch', 'subject_name'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
@@ -62,7 +62,7 @@ class ExamController extends Controller
         try {
             $questions = [];
             $q_no = 1;
-            foreach (['physics', 'chemistry', 'botany', 'zoology', 'maths'] as $subject) {
+            foreach (['physics', 'chemistry', 'botany', 'zoology', 'biology'] as $subject) {
                 if ($request->hasFile($subject . "_files")) {
                     foreach ($request->file($subject . "_files") as $key => $file) {
                         $filename = $data['name'] . "-" . $q_no . '.' . $file->getClientOriginalExtension();

@@ -250,24 +250,24 @@
 
                   <div class="row m-2">
                     <div class="col-lg-1 form-check">
-                      <input type="checkbox" id="mathsCheckbox" name="subject_name[]" value="Mathematics" class="form-check-input">
-                      <label for="mathsCheckbox" class="form-check-label">Mathematics</label>
+                      <input type="checkbox" id="biologyCheckbox" name="subject_name[]" value="Biology" class="form-check-input">
+                      <label for="biologyCheckbox" class="form-check-label">Biology</label>
                     </div>
-                    <div class="col-lg-2 maths-inputs" style="display: none;">
-                      <label for="mathsQuestions">Maths Questions</label>
-                      <input type="number" min="1" max="180" name="maths_questions" id="mathsQuestions" class="form-control form-control-sm" disabled>
+                    <div class="col-lg-2 biology-inputs" style="display: none;">
+                      <label for="BiologyQuestions">Biology Questions</label>
+                      <input type="number" min="1" max="180" name="biology_questions" id="biologyQuestions" class="form-control form-control-sm" disabled>
                     </div>
-                    <div class="col-lg-2 maths-inputs" style="display: none;">
-                      <label for="mathsStart">Maths Start No</label>
-                      <input type="number" min="1" name="math_start" id="mathsStart" class="form-control form-control-sm" disabled>
+                    <div class="col-lg-2 biology-inputs" style="display: none;">
+                      <label for="biologyStart">Biology Start No</label>
+                      <input type="number" min="1" name="bio_start" id="biologyStart" class="form-control form-control-sm" disabled>
                     </div>
-                    <div class="col-lg-2 maths-inputs" style="display: none;">
-                      <label>Maths End No</label>
-                      <input type="number" min="1" name="math_end" class="form-control form-control-sm" disabled>
+                    <div class="col-lg-2 biology-inputs" style="display: none;">
+                      <label>Biology End No</label>
+                      <input type="number" min="1" name="bio_end" class="form-control form-control-sm" disabled>
                     </div>
-                    <div class="col-lg-3 maths-inputs" style="display: none;">
-                      <label for="mathsFile">Maths Files</label>
-                      <input type="file" name="maths_files[]" id="mathsFile" class="form-control form-control-sm" accept="image/*" multiple disabled onchange="validateFileCount('mathsQuestions','mathsFile')">
+                    <div class="col-lg-3 biology-inputs" style="display: none;">
+                      <label for="biologyFile">Biology Files</label>
+                      <input type="file" name="biology_files[]" id="biologyFile" class="form-control form-control-sm" accept="image/*" multiple disabled onchange="validateFileCount('biologyQuestions','biologyFile')">
                     </div>
                   </div>
 
@@ -303,7 +303,7 @@
     { key: 'chemistry' },
     { key: 'botany' },
     { key: 'zoology' },
-    { key: 'maths' }
+    { key: 'biology' }
   ];
 
   const $total = $('#total_questions');

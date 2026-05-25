@@ -206,6 +206,12 @@
               </button>
               @endif
 
+              @if($exam->biology_questions > 0)
+              <button type="button" id="btnBIOLOGY" class="btn btn-primary m-1" onclick="openQuestion({{ $exam->bio_start }})">
+                Biology ({{ $exam->biology_questions }})
+              </button>
+              @endif
+
             </div>
 
           </div>
