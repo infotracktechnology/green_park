@@ -78,7 +78,7 @@ class ExamController extends Controller
         } catch (\Exception $e) {
             return  redirect()->back()->with('error', $e->getMessage());
         }
-        return redirect()->back()->with('success', 'Exam Created Successfully! Check Preview.');
+        return to_route('exam.viewexams',$data['examtype'])->with('success', 'Exam Created Successfully! Check Preview.');
     }
 
 
@@ -116,7 +116,7 @@ class ExamController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $exam->update($data);
-        return redirect()->back()->with('success', 'Exam updated successfully! Check Preview.');
+        return to_route('exam.viewexams', $exam->examtype)->with('success', 'Exam updated successfully! Check Preview.');
     }
     public function TestCategory(Request $request)
     {
