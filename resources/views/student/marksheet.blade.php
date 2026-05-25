@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="form-group col-lg-4">
-                      <select name="exam" class="form-control form-control-sm" required>
+                      <select name="exam" class="select2" required>
                         <option value="">Select Exam</option>
                         @foreach ($category as $row)
                         <option value="{{ $row }}" @selected(request('exam')==$row)>{{ $row }}</option>

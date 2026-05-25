@@ -116,7 +116,7 @@ class MockTestController extends Controller
 
         $answers = [];
         for ($i = 1; $i <= 180; $i++) {
-            $answers[$i] = $answersData[$i]->answer;
+            $answers[$i] = $answersData[$i]->answer ?? 0;
         }
 
         $pdf = PDF::loadView('pdf.student_mocktest', compact('student', 'exam', 'answers', 'testname'));

@@ -18,7 +18,7 @@
                 <form action="{{ route('student.downloadresponse') }}" enctype="multipart/form-data">
                   <div class="row">
                     <div class="form-group col-lg-4">
-                      <select name="category" class="form-control form-control-sm" required>
+                      <select name="category" class="select2" required>
                         <option value="">Select Category</option>
                         @foreach ($category as $row)
                         <option value="{{ $row }}" @selected(request('category')==$row)>{{ $row }}</option>
@@ -63,6 +63,10 @@
                     </tbody>
                   </table>
                 </div>
+              </div>
+              @else
+              <div class="col-md-12">
+                <div class="alert alert-danger">No Record Found</div>
               </div>
               @endif
             </div>
