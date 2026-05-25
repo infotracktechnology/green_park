@@ -284,9 +284,10 @@
             </thead>
             <tbody>
               @foreach (explode(',', $exam->subject_name) as $index => $subject)
+              <?php $subjectkey = strtolower($col); ?>
               <tr data-subject="{{ strtoupper($subject) }}">
                 <td>{{ $subject }}</td>
-                <td>{{ $exam->{"{$subject}_questions"} ?? 0 }}</td>
+                <td>{{ $exam->{"{$subjectkey}_questions"} ?? 0 }}</td>
                 <td class="countAnswered">0</td>
                 <td class="countNotAnswered">0</td>
                 <td class="countMarked">0</td>
