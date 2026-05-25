@@ -231,10 +231,11 @@
 
 
                 <div class="d-flex flex-wrap action-buttons mt-3">
-                  <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}"> {{ $key == $exam->total_questions ? 'Save & Submit' : 'Save & Next' }} </button>
+                  <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
                   <button type="button" class="btn btn-warning btn-save-mark-answer text-white" data-index="{{ $key }}">Save &amp; Mark For Review</button>
                   <button type="button" class="btn-mark btn btn-primary" data-index="{{ $key }}">Mark for Review & Next</button>
-                  <button type="button" class="btn-reset btn btn-light" data-index="{{ $key }}">Clear</button>
+                  <button type="button" class="btn-save btn btn-success" data-index="{{ $key }}"> {{ $key == $exam->total_questions ? 'Save & Submit' : 'Save & Next' }} </button>
+
                 </div>
               </div>
               @endforeach
