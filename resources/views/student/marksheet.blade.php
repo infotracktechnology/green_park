@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col-md-12 col-lg-12">
 
-        <div class="card">
+        <div class="card card-primary">
           <div class="card-header">
             <h4>Mark Details</h4>
           </div>
