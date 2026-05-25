@@ -48,8 +48,8 @@
   
    .omr-radio {
       appearance: none;
-      width: 15px;
-      height: 15px;
+      width: 18px;
+      height: 18px;
       border: 1px solid #adb5bd;
       border-radius: 50%;
       margin: 0 3px;
@@ -443,7 +443,7 @@ function calculateSubjectWiseStats() {
   const subjectMap = {};
 
   // Build subject mapping based on question name fields
-  $('[name^="subject["]').each(function () {
+  $('input[name^="subject["]').each(function () {
     const match = this.name.match(/subject\[([^\]]+)\]/);
     if (match) subjectMap[match[1]] = $(this).val();
   });
@@ -473,7 +473,7 @@ function calculateSubjectWiseStats() {
   for (const [sub, stats] of Object.entries(subjectStats)) {
     const row = $(`tr[data-subject="${sub}"]`);
     let visited = 0;
-
+    console.log(stats,row,sub);
     for (const key of statKeys) {
       const val = stats[key] || 0;
       row.find(`.count${capitalize(key)}`).text(val);
