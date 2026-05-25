@@ -110,7 +110,7 @@
                                 @empty
                                 <div class="col-12 text-center py-5">
                                     <i class="fas fa-award fa-4x text-muted mb-3"></i>
-                                    <h5>No achievements found yet.</h5>
+                                    <h5>MBBS/BDS Counselling news no found yet.</h5>
                                     <p class="text-muted">Stay tuned for updates!</p>
                                 </div>
                                 @endforelse
