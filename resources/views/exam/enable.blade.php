@@ -62,15 +62,6 @@
 @endsection
 
 @section('js')
-
-<script>
-   $(document).ready(function() {
-       $('.select2').select2({
-           placeholder: "Select an option",
-           allowClear: true
-       });
-   });
-</script>
 <script>
  $('#test').on('change', function() {
     var testId = $(this).val();
