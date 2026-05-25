@@ -661,4 +661,18 @@ class ExamController extends Controller
 
         return view('exam.previousexamupload');
     }
+
+    public function DownloadResponse(Request $request)
+    {
+        $student = auth()->user();
+        $category = Options::where('type', 'testcategory')->first()->value ?? [];
+        $exams = collect();
+
+        if ($request->category) {
+        $exams = Exam::from('exam as e')->join('exam_answer as ea', 'ea.testname', '=', 'e.name')->select('e.*')->where('e.testcategory', $request->category)->where('ea.student_id', $student->student_id)->whereNull('e.publish')->groupBy('e.name')->get(); 
+        dd($exams);
+        }
+
+        return view('exam.downloadresponse', compact('category', 'exams'));
+    }
 }

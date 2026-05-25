@@ -260,6 +260,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::get('exam/{test_id}', 'student_exam')->name('student.exam');
         Route::post('exam/clearlog', 'clearlog')->name('exam.clearlog');
         Route::post('exam/save', 'Save')->name('exam.save');
+        Route::get('downloadresponse', 'DownloadResponse')->name('student.downloadresponse');
     });
 
     Route::resource('document', StudentDocumentController::class)->only(['index', 'store', 'destroy']);
