@@ -289,7 +289,7 @@
     
     window.addEventListener('pageshow', e => e.persisted && location.reload());
     
-    const backbutton = `<div class="row m-b-10"><div class="col-md-2 offset-md-10"><a href="{{ url()->previous() }}" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back</a></div></div>`;
+    const backbutton = `<div class="row m-b-10"><div class="col-md-2 offset-md-10"><a href="javascript:history.back()" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back</a></div></div>`;
     $('.section-body').prepend(backbutton);
     
     $('form[method="post"]:not(.no-loader)').on('submit', function() {

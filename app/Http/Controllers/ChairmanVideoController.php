@@ -40,7 +40,7 @@ class ChairmanVideoController extends Controller
         if ($request->hasFile('attachment')) {
             $fileName = time() . '.' . $request->attachment->extension();
             $request->attachment->move(public_path('chairman/video'), $fileName);
-            $chairmanvideos->attachment = 'chairman/video/' . $fileName;
+            $data['attachment'] = 'chairman/video/'.$fileName;
         }
 
         $chairmanvideo = Chairmanvideo::create($data);
