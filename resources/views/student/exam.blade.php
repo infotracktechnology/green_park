@@ -591,7 +591,9 @@ function calculateSubjectWiseStats() {
       if (index < questions.length) {
           openQuestion(index + 1);
       }
-      return;
+      else {
+        openQuestion(1);
+      }
   }
 
   function PreviousQuestion(index) {
@@ -603,9 +605,11 @@ function calculateSubjectWiseStats() {
   }
 
   $(".btn-submit-answer").click(function () {
+    if(confirm('Are you sure you want to submit?')) {
       calculateSubjectWiseStats();
       $('.exam-paper').hide();
       $('.exam-summery').show();
+    }
   });
 
    $('#btnYesSubmitConfirm').click(function () {
