@@ -42,7 +42,7 @@ class ImportController extends Controller
 
             foreach ($data as $row) {
                 if(empty($row['campus']) || !isset($row['campus'])) continue;
-                Student::create($row);
+                DB::table('student')->insert($row);
             }
             DB::commit();
             return back()->with('success', 'Students Data has been processed successfully.');
