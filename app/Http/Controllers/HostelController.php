@@ -118,10 +118,10 @@ class HostelController extends Controller
     }
 
 
-    public function destroy(Request $request, Hostel $hostel)
+    public function destroy(Request $request, Hostel $hostels)
     {
-        $hostel->delete();
-        $hostel->rooms()->delete();
+        $hostels->delete();
+        $hostels->rooms()->delete();
         session()->flash('success', 'Hostel deleted successfully');
         return to_route('hostel.index');
     }

@@ -69,7 +69,7 @@
                           </a>
                         </td>
                         <td>
-                          <form action="{{ route('hostel.destroy', $hostel->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this hostel?')">
+                          <form action="{{ route('hostel.destroy', $hostel->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this hostel?')" class="no-loader">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">
