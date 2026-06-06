@@ -50,7 +50,7 @@
                                 @foreach ($rooms as $room)
                                 <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $hostel->name }}</td>
+                                <td>{{ $hostels->name }}</td>
                                 <td>{{ $room->floor }}</td>
                                 <td>{{ $room->room_no }}</td>
                                 <td>{{ $room->no_of_cots }}</td>
@@ -59,7 +59,7 @@
                                         <form action="{{ route('room.delete') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this hostel?')">
                                             @csrf
                                            <input type="hidden" name="room_no" value="{{ $room->room_no }}">
-                                           <input type="hidden" name="hostel_id" value="{{ $hostel->id }}">
+                                           <input type="hidden" name="hostel_id" value="{{ $hostels->id }}">
                                             <button type="submit" class="btn btn-danger">
                                                <i class="fas fa-trash"></i>
                                             </button>

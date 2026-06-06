@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col-12">
           <div class="card card-primary" x-data="hostelForm()">
-            <form method="post" id="myForm" action="{{ route('hostel.update', $hostel->id) }}" enctype="multipart/form-data">
+            <form method="post" id="myForm" action="{{ route('hostel.update', $hostels->id) }}" enctype="multipart/form-data">
               @method('PUT')
               @csrf
               <div class="card-body">
@@ -20,21 +20,21 @@
                     <select name="branch_id" id="branch" class="form-control form-control-sm" required>
                       <option value="" disabled selected>-- Choose Branch --</option>
                       @foreach ($branches as $branch)
-                      <option value="{{ $branch->id }}" @selected($branch->id == $hostel->branch_id)>{{ $branch->name }}</option>
+                      <option value="{{ $branch->id }}" @selected($branch->id == $hostels->branch_id)>{{ $branch->name }}</option>
                       @endforeach
                     </select>
                   </div>
 
                   <div class="form-group col-lg-3">
                     <label>Name</label>
-                    <input type="text" name="name" value="{{ $hostel->name }}" class="form-control form-control-sm" required>
+                    <input type="text" name="name" value="{{ $hostels->name }}" class="form-control form-control-sm" required>
                   </div>
                   <div class="form-group col-lg-3">
                     <label>Type</label>
                     <select name="type" id="type" class="form-control form-control-sm" required>
                       <option value="">Select</option>
-                      <option value="BOYS" @selected($hostel->type == 'BOYS')>BOYS</option>
-                      <option value="GIRLS" @selected($hostel->type == 'GIRLS')>GIRLS</option>
+                      <option value="BOYS" @selected($hostels->type == 'BOYS')>BOYS</option>
+                      <option value="GIRLS" @selected($hostels->type == 'GIRLS')>GIRLS</option>
                     </select>
                   </div>
                   {{-- <div class="form-group col-lg-3">
@@ -42,7 +42,7 @@
                                  <select name="warden_name" id="staff" class="form-control form-control-sm" required>
                                      <option value="" disabled selected>-- Choose Warden --</option>
                                      @foreach ($staffs as $staff)
-                                         <option value="{{ $staff->name }}" @selected($staff->name == $hostel->warden_name)>{{ $staff->name }}</option>
+                                         <option value="{{ $staff->name }}" @selected($staff->name == $hostels->warden_name)>{{ $staff->name }}</option>
                   @endforeach
                   </select>
                 </div> --}}
@@ -51,8 +51,8 @@
                   <label>Room Type</label>
                   <select name="room_type" class="form-control form-control-sm">
                     <option value="">Select</option>
-                    <option value="AC" @selected($hostel->room_type == 'AC')>AC</option>
-                    <option value="Non AC" @selected($hostel->room_type == 'Non AC')>Non AC</option>
+                    <option value="AC" @selected($hostels->room_type == 'AC')>AC</option>
+                    <option value="Non AC" @selected($hostels->room_type == 'Non AC')>Non AC</option>
                   </select>
                 </div>
 

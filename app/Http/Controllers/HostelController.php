@@ -75,11 +75,11 @@ class HostelController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $hostel = Hostel::with('rooms')->findOrFail($id);
+        $hostels = Hostel::with('rooms')->findOrFail($id);
 
         $staffs = Staff::all();
         $rooms = HostelRoom::where('hostel_id', $id)->groupBy('room_no')->orderBy('id')->get()->toArray();
-        return view('hostel.edit', compact('hostel',  'staffs', 'rooms'));
+        return view('hostel.edit', compact('hostels',  'staffs', 'rooms'));
     }
 
     public function update(Request $request, $id)
@@ -126,10 +126,10 @@ class HostelController extends Controller
         return to_route('hostel.index');
     }
 
-    public function show(Request $request, Hostel $hostel)
+    public function show(Request $request, Hostel $hostels)
     {
-        $rooms = HostelRoom::where('hostel_id', $hostel->id)->selectRaw('room_no,floor,no_of_cots,group_concat(cart_no order by id) as cart_no')->groupBy('room_no')->orderBy('id')->get();
-        return view('hostel.show', compact('hostel', 'rooms'));
+        $rooms = HostelRoom::where('hostel_id', $hostels->id)->selectRaw('room_no,floor,no_of_cots,group_concat(cart_no order by id) as cart_no')->groupBy('room_no')->orderBy('id')->get();
+        return view('hostel.show', compact('hostels', 'rooms'));
     }
 
     public function deleteRoom(Request $request)
