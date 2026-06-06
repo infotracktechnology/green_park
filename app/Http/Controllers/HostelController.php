@@ -118,16 +118,18 @@ class HostelController extends Controller
     }
 
 
-    public function destroy(Request $request, Hostel $hostels)
+    public function destroy(Request $request,$id)
     {
+        $hostels = Hostel::findOrFail($id);
         $hostels->delete();
         $hostels->rooms()->delete();
         session()->flash('success', 'Hostel deleted successfully');
         return to_route('hostel.index');
     }
 
-    public function show(Request $request, Hostel $hostels)
+    public function show(Request $request,$id)
     {
+        $hostels = Hostel::with('rooms')->findOrFail($id);
         $rooms = HostelRoom::where('hostel_id', $hostels->id)->selectRaw('room_no,floor,no_of_cots,group_concat(cart_no order by id) as cart_no')->groupBy('room_no')->orderBy('id')->get();
         return view('hostel.show', compact('hostels', 'rooms'));
     }
