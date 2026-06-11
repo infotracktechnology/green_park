@@ -90,6 +90,7 @@
                     <tr>
                       <th><input type="checkbox" id="checkAll" /></th>
                       <th>Coaching Type</th>
+                      <th>Date</th>
                       <th>Subject</th>
                       <th>Period</th>
                       <th>Chapter</th>
@@ -106,6 +107,7 @@
                     <tr>
                       <td><input type="checkbox" class='ids' name="ids[]" value="{{$classvideo->id}}" /></td>
                       <td>{{ $classvideo->coaching_type }}</td>
+                      <td>{{ $classvideo->date }}</td>
                       <td>{{ $classvideo->subject }}</td>
                       <td>{{ $classvideo->period }}</td>
                       <td>{{ $classvideo->chapter }}</td>

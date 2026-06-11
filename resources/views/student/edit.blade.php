@@ -48,20 +48,15 @@
                   </select>
                 </div>
 
-
                 <div class="form-group col-lg-3">
                   <label for="student_name">Student Name</label>
                   <input type="text" name="student_name" id="student_name" value="{{ old('student_name', $Student->student_name) }}" class="form-control form-control-sm alphabetsOnly">
-
                 </div>
-
 
                 <div class="form-group col-lg-3">
                   <label>Password</label>
                   <input type="text" name="password" value="{{$Student->password}}" class="form-control form-control-sm">
                 </div>
-
-
 
                 <div class="form-group col-lg-3">
                   <label>Coaching Type</label>
@@ -98,6 +93,11 @@
                 </div>
 
                 <div class="form-group col-lg-3">
+                  <label>Batch</label>
+                  <input type="text" name="batch" value="{{$Student->batch}}" class="form-control form-control-sm">
+                </div>
+
+                <div class="form-group col-lg-3">
                   <label>Gender</label>
                   <select name="gender" class="form-control form-control-sm">
                     <option value="">Select Gender</option>
@@ -106,8 +106,6 @@
                     <option value="Other" @if($Student->gender == 'Other') selected @endif>Other</option>
                   </select>
                 </div>
-
-
 
                 <div class="form-group col-lg-3">
                   <label>Date of Birth</label>
@@ -118,55 +116,7 @@
                   <label>Age</label>
                   <input type="text" name="age" value="{{ $Student->age }}" class="form-control form-control-sm" id="ageInput" readonly>
                 </div>
-
-
-                <div class="form-group col-lg-3">
-                  <label for="father_name">Father Name</label>
-                  <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $Student->father_name) }}" class="form-control form-control-sm">
-
-                </div>
-
-                <div class="form-group col-lg-3">
-                  <label for="father_ph_no">Father Mobile No</label>
-                  <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $Student->father_ph_no) }}" class="form-control form-control-sm">
-
-                </div>
-
-                <div class="form-group col-lg-3">
-                  <label for="mother_name">Mother Name</label>
-                  <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $Student->mother_name) }}" class="form-control form-control-sm">
-
-                </div>
-
-                <div class="form-group col-lg-3">
-                  <label for="mother_ph_no">Mother Mobile No</label>
-                  <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $Student->mother_ph_no) }}" class="form-control form-control-sm">
-
-                </div>
-
-
-
-
-
-                <div class="form-group col-lg-3">
-                  <label>Blood Group</label>
-                  <select name="blood_group" class="form-control form-control-sm">
-                    <option value="">Select Blood Group</option>
-                    <option value="A+" @if($Student->blood_group == 'A+') selected @endif>A+</option>
-                    <option value="A-" @if($Student->blood_group == 'A-') selected @endif>A-</option>
-                    <option value="B+" @if($Student->blood_group == 'B+') selected @endif>B+</option>
-                    <option value="B-" @if($Student->blood_group == 'B-') selected @endif>B-</option>
-                    <option value="AB+" @if($Student->blood_group == 'AB+') selected @endif>AB+</option>
-                    <option value="AB-" @if($Student->blood_group == 'AB-') selected @endif>AB-</option>
-                    <option value="O+" @if($Student->blood_group == 'O+') selected @endif>O+</option>
-                    <option value="O-" @if($Student->blood_group == 'O-') selected @endif>O-</option>
-                  </select>
-                </div>
-
-
-
-
-
+                 
                 <div class="form-group col-lg-3">
                   <label for="aadhar_card_no">Aadhar Card No</label>
                   <input type="number" name="aadhar_card_no" id="aadhar_card_no" value="{{ old('aadhar_card_no', $Student->aadhar_card_no) }}" class="form-control form-control-sm">
@@ -175,22 +125,15 @@
                   </div>
                 </div>
 
-
-
-
-
                 <div class="form-group col-lg-3">
                   <label>Nationality</label>
                   <input type="text" name="nationality" value="{{ $Student->nationality }}" class="form-control form-control-sm">
                 </div>
 
-
-
                 <div class="form-group col-lg-3">
                   <label>Religion</label>
                   <input type="text" name="religion" value="{{ $Student->religion }}" class="form-control form-control-sm">
                 </div>
-
 
                 <div class="form-group col-lg-3">
                   <label>Community</label>
@@ -212,26 +155,39 @@
                 </div>
 
                 <div class="form-group col-lg-3">
-                  <label for="student_whatsapp_no">Student WhatsApp No</label>
-                  <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $Student->student_whatsapp_no) }}" class="form-control form-control-sm digits">
-
+                  <label>Blood Group</label>
+                  <select name="blood_group" class="form-control form-control-sm">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+" @if($Student->blood_group == 'A+') selected @endif>A+</option>
+                    <option value="A-" @if($Student->blood_group == 'A-') selected @endif>A-</option>
+                    <option value="B+" @if($Student->blood_group == 'B+') selected @endif>B+</option>
+                    <option value="B-" @if($Student->blood_group == 'B-') selected @endif>B-</option>
+                    <option value="AB+" @if($Student->blood_group == 'AB+') selected @endif>AB+</option>
+                    <option value="AB-" @if($Student->blood_group == 'AB-') selected @endif>AB-</option>
+                    <option value="O+" @if($Student->blood_group == 'O+') selected @endif>O+</option>
+                    <option value="O-" @if($Student->blood_group == 'O-') selected @endif>O-</option>
+                  </select>
                 </div>
 
+                <div class="form-group col-lg-3">
+                  <label for="student_whatsapp_no">Student WhatsApp No</label>
+                  <input type="number" name="student_whatsapp_no" id="student_whatsapp_no" value="{{ old('student_whatsapp_no', $Student->student_whatsapp_no) }}" class="form-control form-control-sm digits">
+                </div>
 
                 <div class="form-group col-lg-3">
                   <label>Institution Bill Type</label>
                   <select name="institution_bill_type" id="bill_type" class="form-control form-control-sm">
                     <option value="">Select Bill Type </option>
+                    <option value="GPI,NKL" @selected($Student->institution_bill_type == 'GPI,NKL')>GPI,NKL</option>
                     <option value="GPCC,NKL" @selected($Student->institution_bill_type == 'GPCC,NKL')>GPCC,NKL</option>
                     <option value="GPCI,NKL" @selected($Student->institution_bill_type == 'GPCI,NKL')>GPCI,NKL</option>
+                    <option value="GPCA,NKL" @selected($Student->institution_bill_type == 'GPCA,NKL')>GPCA,NKL</option>
                     <option value="GPCI,KARUR" @selected($Student->institution_bill_type == 'GPCI,KARUR')>GPCI,KARUR</option>
                     <option value="GPCI,ERODE" @selected($Student->institution_bill_type == 'GPCI,ERODE')>GPCI,ERODE</option>
                     <option value="GPCA,COIMBATORE" @selected($Student->institution_bill_type == 'GPCA,COIMBATORE')>GPCA,COIMBATORE</option>
                     <option value="GPA,CHENNAI" @selected($Student->institution_bill_type == 'GPA,CHENNAI')>GPA,CHENNAI</option>
                   </select>
                 </div>
-
-
 
                 <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
@@ -276,7 +232,6 @@
                   </select>
                 </div>
 
-
                 <datalist id="pincode_list">
                   @foreach ($pincodes as $pin)
                   <option value="{{$pin->Pincode}}">{{$pin->Pincode}}</option>
@@ -288,24 +243,25 @@
                   <input type="text" id="pincode" list="pincode_list" name="pincode" value="{{$Student->pincode}}" class="form-control form-control-sm">
                 </div>
 
-                <div class="form-group col-lg-3">
-                  <label for="parent_whatsapp_no">Parent WhatsApp No</label>
-                  <input type="number" name="parent_whatsapp_no" id="parent_whatsapp_no" value="{{ old('parent_whatsapp_no', $Student->parent_whatsapp_no) }}" class="form-control form-control-sm digits">
-
-                </div>
-
-                <div class="form-group col-lg-3">
-                  <label>Email ID</label>
-                  <input type="email" name="email" value="{{$Student->email}}" class="form-control form-control-sm">
-                </div>
-
                 <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
 
               </fieldset>
+
               <h3>Parent Details</h3>
               <fieldset class="row">
+
+                <div class="form-group col-lg-3">
+                  <label for="father_name">Father Name</label>
+                  <input type="text" name="father_name" id="father_name" value="{{ old('father_name', $Student->father_name) }}" class="form-control form-control-sm">
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label for="father_ph_no">Father Mobile No</label>
+                  <input type="number" name="father_ph_no" id="father_ph_no" value="{{ old('father_ph_no', $Student->father_ph_no) }}" class="form-control form-control-sm">
+                </div>
+
                 <div class="form-group col-lg-3">
                   <label>Father Qualification</label>
                   <input type="text" name="father_qualification" value="{{$Student->father_qualification}}" class="form-control form-control-sm">
@@ -329,6 +285,16 @@
                 <div class="form-group col-lg-3">
                   <label>Father's Place of Work</label>
                   <input type="text" name="fathers_place_of_work" value="{{$Student->fathers_place_of_work}}" class="form-control form-control-sm">
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label for="mother_name">Mother Name</label>
+                  <input type="text" name="mother_name" id="mother_name" value="{{ old('mother_name', $Student->mother_name) }}" class="form-control form-control-sm">
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label for="mother_ph_no">Mother Mobile No</label>
+                  <input type="number" name="mother_ph_no" id="mother_ph_no" value="{{ old('mother_ph_no', $Student->mother_ph_no) }}" class="form-control form-control-sm">
                 </div>
 
                 <div class="form-group col-lg-3">
@@ -356,10 +322,19 @@
                   <input type="text" name="mother_place_of_work" value="{{$Student->mother_place_of_work}}" class="form-control form-control-sm">
                 </div>
 
+                <div class="form-group col-lg-3">
+                  <label for="parent_whatsapp_no">Parent WhatsApp No</label>
+                  <input type="number" name="parent_whatsapp_no" id="parent_whatsapp_no" value="{{ old('parent_whatsapp_no', $Student->parent_whatsapp_no) }}" class="form-control form-control-sm digits">
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label>Email ID</label>
+                  <input type="email" name="email" value="{{$Student->email}}" class="form-control form-control-sm">
+                </div>
+
                 <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
-
 
               </fieldset>
 
@@ -378,8 +353,6 @@
                   </select>
                 </div>
 
-
-
                 <div class="form-group col-lg-3">
                   <label>Name of School (X std)</label>
                   <input type="text" name="school_name_X_std" value="{{$Student->school_name_X_std}}" class="form-control form-control-sm">
@@ -390,6 +363,10 @@
                   <input type="text" name="district_name_school_X_std" value="{{$Student->district_name_school_X_std}}" class="form-control form-control-sm">
                 </div>
 
+                <div class="form-group col-lg-3">
+                  <label>Year of Passing (X std)</label>
+                  <input type="text" name="year_of_passing_X_std" value="{{$Student->year_of_passing_X_std}}" class="form-control form-control-sm">
+                </div>
 
                 <div class="form-group col-lg-3">
                   <label>Board of Study (XII std)</label>
@@ -402,7 +379,6 @@
                   </select>
                 </div>
 
-
                 <div class="form-group col-lg-3">
                   <label>Name of School (XII std)</label>
                   <input type="text" name="school_name_XII_std" value="{{$Student->school_name_XII_std}}" class="form-control form-control-sm">
@@ -413,6 +389,10 @@
                   <input type="text" name="district_name_school_XII_std" value="{{$Student->district_name_school_XII_std}}" class="form-control form-control-sm">
                 </div>
 
+                <div class="form-group col-lg-3">
+                  <label>Year of Passing (XII std)</label>
+                  <input type="text" name="year_of_passing_XII_std" value="{{$Student->year_of_passing_XII_std}}" class="form-control form-control-sm">
+                </div>
 
                 <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
@@ -504,7 +484,7 @@
                     <option value="" disabled selected>Select an option</option>
                     <option value="repeater" {{ $Student->repeater_re_repeater == 'repeater' ? 'selected' : '' }}>Repeater</option>
                     <option value="re-repeater" {{ $Student->repeater_re_repeater == 're-repeater' ? 'selected' : '' }}>Re-repeater</option>
-                    <option value="Regular" {{ $Student->repeater_re_repeater == 'Regular' ? 'selected' : '' }}>Regular</option>
+
 
                   </select>
                 </div>
@@ -512,14 +492,19 @@
 
                 <div class="form-group col-lg-3">
                   <label>Previous Course Studied for NEET</label>
-                  <select name="previous_course_studied_neet" class="form-control form-control-sm">
+                  <select name="previous_course_studied_neet" id="previous_course_studied_neet" class="form-control form-control-sm">
                     <option value="">Select Course</option>
                     <option value="Integrated" {{ $Student->previous_course_studied_neet == 'Integrated' ? 'selected' : '' }}>Integrated</option>
                     <option value="Crash course" {{ $Student->previous_course_studied_neet == 'Crash course' ? 'selected' : '' }}>Crash course</option>
                     <option value="Long term" {{ $Student->previous_course_studied_neet == 'Long term' ? 'selected' : '' }}>Long term</option>
+                    <option value="other" {{ $Student->previous_course_studied_neet == 'other' ? 'selected' : '' }}>Other</option>
                   </select>
                 </div>
 
+                <div class="form-group col-lg-3" id="other_course_div" style="display:none;">
+                  <label>Specify </label>
+                  <input type="text"name="other_initution" id="other_initution" class="form-control form-control-sm" value="{{ $Student->other_initution ?? '' }}">
+                 </div>
 
                 <div class="form-group col-lg-3">
                   <label>Name of the Institution Studied</label>
@@ -528,8 +513,6 @@
 
 
               </fieldset>
-
-
 
             </form>
           </div>
@@ -607,32 +590,39 @@
     }
   });
     
-    
-  
-  
-  
-  
-    
-     
-    
+  // coaching type 
   $('#coaching_type').on('change', function() {
       const type = $(this).val();
       $('#hostel_dayscholar').prop('disabled', type !== 'OFFLINE').val(type !== 'OFFLINE' ? '' : $('#hostel_dayscholar').val());
       if (typeof hostel === 'function') hostel(type);
   });
-    
   $('.steps ul li').addClass('done').removeClass('disabled');
   
   
     // Board Max Marks logic
   function updateMaxMarks() {
     var boardVal = $('#board_of_study_XII_std').val() || '';
-    var maxMarks = (boardVal.replace(/\s/g, '') == 'STATE BOARD') ? 600 : 500;
+    var maxMarks = (boardVal.replace(/\s/g, '') == 'STATEBOARD') ? 600 : 500;
     $('#xii_max_marks').text(boardVal ? boardVal + ' / ' + maxMarks : maxMarks);
   }
   
   $('#board_of_study_XII_std').on('change', updateMaxMarks);
   updateMaxMarks();
+
+  // Previous Course Studied for NEET logic
+  function toggleOtherCourse() {
+    if ($('#previous_course_studied_neet').val() == 'other') {
+        $('#other_course_div').show();
+    } else {
+        $('#other_course_div').hide();
+        $('input[name="other_course"]').val('');
+    }
+}
+$('#previous_course_studied_neet').on('change', function () {
+    toggleOtherCourse();
+});
+
+toggleOtherCourse();
 </script>
 
 @endsection
