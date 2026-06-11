@@ -40,7 +40,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/chairmanvideo/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $chairmanvideo = Chairmanvideo::ForStudent($student);
+        $chairmanvideo = Chairmanvideo::ForStudent($student)->first();
         return response()->json($chairmanvideo);
     });
 
