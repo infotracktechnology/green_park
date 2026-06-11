@@ -84,7 +84,7 @@
                           <th>Document</th>
                           <th>Download</th>
                           <th>Uploaded At</th>
-                          <th>Action</th>
+                          {{-- <th>Action</th> --}}
                         </tr>
                       </thead>
                       <tbody>
@@ -98,7 +98,7 @@
                             </a>
                           </td>
                           <td>{{ $doc->created_at->format('d-m-Y H:i') }}</td>
-                          <td>
+                          {{-- <td>
                             <form action="{{ route('document.destroy', $doc->id) }}" method="POST" onsubmit="return confirm('Are you sure to delete this document?');">
                               @csrf
                               @method('DELETE')
@@ -106,7 +106,7 @@
                                 <i class="fas fa-trash"></i>
                               </button>
                             </form>
-                          </td>
+                          </td> --}}
                         </tr>
                         @empty
                         <tr>
