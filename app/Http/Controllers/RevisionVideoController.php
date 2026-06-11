@@ -50,7 +50,14 @@ class RevisionVideoController extends Controller
                 return back()->with('error', 'Subject and Video ID fields are required.');
             }
             
-            $revisionvideos[] = array_merge($data, ['subject' => $record['subject'], 'video_id' => $record['video_id'], 'period' => $record['period'] ?? '0', 'chapter' => $record['chapter'] ?? 'Unknown','day'=> $record['day'] ?? '','date' => $record['date'] ?? '']);
+            $revisionvideos[] = array_merge($data, [
+                'subject' => $record['subject'],
+                'video_id' => $record['video_id'],
+                'period' => $record['period'] ?? '0',
+                'chapter' => $record['chapter'] ?? 'Unknown',
+                'day' => $record['day'] ?? '',
+                'date' => $this->parseDate($record['date'] ?? '')
+            ]);
         }
 
         RevisionVideo::insert($revisionvideos);
@@ -107,5 +114,32 @@ class RevisionVideoController extends Controller
         RevisionVideo::whereIn('id', $ids)->delete();
 
         return response()->json(['message' => RevisionVideo::whereIn('id', $ids)], 200);
+    }
+
+    private function parseDate($dateStr)
+    {
+        if (empty($dateStr)) {
+            return null;
+        }
+        $dateStr = trim($dateStr);
+        
+        $formats = ['Y-m-d', 'd-m-Y', 'd/m/Y', 'Y/m/d', 'm/d/Y', 'j-n-Y', 'j/n/Y'];
+        foreach ($formats as $format) {
+            try {
+                return Carbon::createFromFormat($format, $dateStr)->format('Y-m-d');
+            } catch (\Exception $e) {
+                // try next
+            }
+        }
+
+        try {
+            return Carbon::parse($dateStr)->format('Y-m-d');
+        } catch (\Exception $e) {
+            try {
+                return Carbon::parse(str_replace('/', '-', $dateStr))->format('Y-m-d');
+            } catch (\Exception $e2) {
+                return null;
+            }
+        }
     }
 }

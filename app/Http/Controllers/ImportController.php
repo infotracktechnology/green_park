@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Carbon\Carbon;
 
 class ImportController extends Controller
 {
@@ -37,6 +38,9 @@ class ImportController extends Controller
             $data = array_map(function ($row) use ($request) {
                 $row['academic_year'] = $request->academic_year;
                 //$row['campus'] = $request->branch;
+                if (isset($row['admission_date']) && !empty($row['admission_date'])) {
+                    $row['admission_date'] = $this->parseDate($row['admission_date']);
+                }
                 return $row;
             }, $data);
 
@@ -64,6 +68,9 @@ class ImportController extends Controller
             try {
                 foreach ($data as $row) {
                     if (empty($row['student_id']) || !isset($row['student_id'])) continue;
+                    if (isset($row['admission_date']) && !empty($row['admission_date'])) {
+                        $row['admission_date'] = $this->parseDate($row['admission_date']);
+                    }
                     Student::where('student_id', $row['student_id'])->update($row);
                 }
                 DB::commit();
@@ -102,5 +109,32 @@ class ImportController extends Controller
         }
 
         return $csvData;
+    }
+
+    public function parseDate($dateStr)
+    {
+        if (empty($dateStr)) {
+            return null;
+        }
+        $dateStr = trim($dateStr);
+
+        $formats = ['Y-m-d', 'd-m-Y', 'd/m/Y', 'Y/m/d', 'm/d/Y', 'j-n-Y', 'j/n/Y'];
+        foreach ($formats as $format) {
+            try {
+                return Carbon::createFromFormat($format, $dateStr)->format('Y-m-d');
+            } catch (\Exception $e) {
+                // try next
+            }
+        }
+
+        try {
+            return Carbon::parse($dateStr)->format('Y-m-d');
+        } catch (\Exception $e) {
+            try {
+                return Carbon::parse(str_replace('/', '-', $dateStr))->format('Y-m-d');
+            } catch (\Exception $e2) {
+                return null;
+            }
+        }
     }
 }
