@@ -67,6 +67,7 @@
                         <th>Video Id</th>
                         <th>Start At</th>
                         <th>End At</th>
+                        <th>Seen Log</th>
                         <th>Edit</th>
                         <th>Delete</th>
                       </tr>
@@ -86,6 +87,9 @@
                         <td>{{ $discussionvideo->video_id }}</td>
                         <td>{{ $discussionvideo->start_at }}</td>
                         <td>{{ $discussionvideo->end_at }}</td>
+                        <td>
+                          <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$discussionvideo->title}}" data-module="Discussion Videos"> <i class="fas fa-eye"></i></button>
+                        </td>
                         <td>
                           <a href="{{ route('discussionvideo.edit', $discussionvideo->id) }}" class="btn btn-primary">
                             <i class="fas fa-edit"></i>
@@ -113,12 +117,82 @@
         </div>
   </section>
 </div>
+
+<!-- Log Modal -->
+<div class="modal fade" id="seenlog" tabindex="-1" role="dialog" aria-labelledby="seenlogLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="seenlogLabel">Seen Log - <span id="logTitle"></span></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm" id="logTable" style="width: 100%;">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Section</th>
+                <th>Action</th>
+                <th>Seen At</th>
+              </tr>
+            </thead>
+            <tbody id="logBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('js')
 <script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script>
 <script src="{{ asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('bundles/datatables/export-tables/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('bundles/datatables/export-tables/buttons.flash.min.js') }}"></script>
+<script src="{{ asset('bundles/datatables/export-tables/jszip.min.js') }}"></script>
 <script>
+  const logTable = $('#logTable').DataTable({
+    paging: false,
+    dom: 'Bfrtip',
+    searching: false,
+    buttons: [
+     'excelHtml5'
+    ]
+  });
+
+  $(document).on('click', '.logbtn', function() {
+    var action = $(this).data('action');
+    var modules = $(this).data('module');
+    $('#logTitle').text(action);
+    logTable.clear().draw();
+    $('#logBody').html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
+    $.post("{{ route('student.getlogactivity') }}", {
+      action: action,
+      module: modules,
+      _token: "{{ csrf_token() }}"
+    },
+    function(data, status) {
+      logTable.clear();
+      if(data.success && data.logs.length > 0) {
+        data.logs.forEach(log => {
+          logTable.row.add([
+            log.student_name || '',
+            log.student_id || '',
+            log.section || '',
+            log.action || '',
+            log.created_at ? new Date(log.created_at).toLocaleString() : ''
+          ]);
+        });
+      }
+      logTable.draw();
+    });
+  });
   $(document).ready(function() {
       $('#myTable').DataTable();
   

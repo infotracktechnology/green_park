@@ -19,7 +19,7 @@ class LoginController extends Controller
          }
         elseif($student = Student::where('user_name', $request->username)->where('password', $request->password)->first()) {
             Auth::guard('student')->login($student);
-            $student->update(['active' => 1]);   
+            $student->update(['active' => 1, 'last_login' => now(),'device' => 'Web']);   
             return redirect()->route('studentdashboard')->with('success', 'Welcome back!');
         }
     

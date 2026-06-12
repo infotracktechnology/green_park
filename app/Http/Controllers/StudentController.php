@@ -232,13 +232,20 @@ class StudentController extends Controller
 
     public function logActivity(Request $request)
     {
-        $log = StudentLog::insert([
-            'module' => $request->module,
-            'student_id' => $request->student_id,
-            'action' => $request->action,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $exists = StudentLog::where('module', $request->module)
+            ->where('student_id', $request->student_id)
+            ->where('action', $request->action)
+            ->exists();
+
+        if (!$exists) {
+            StudentLog::insert([
+                'module' => $request->module,
+                'student_id' => $request->student_id,
+                'action' => $request->action,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
         return response()->json(['success' => true]);
     }
 

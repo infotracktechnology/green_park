@@ -147,6 +147,9 @@
 @section('js')
 <script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
+<script src="{{asset('bundles/datatables/export-tables/dataTables.buttons.min.js')}}"></script>
+<script src="{{asset('bundles/datatables/export-tables/buttons.flash.min.js')}}"></script>
+<script src="{{asset('bundles/datatables/export-tables/jszip.min.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script>
   const table = $('#myTable').DataTable({
@@ -164,10 +167,11 @@
     ]
   });
   
-  $(".logbtn").click(function() {
+  $(document).on('click', '.logbtn', function() {
     var action = $(this).data('action');
     var modules = $(this).data('module');
     $('#logTitle').text(action);
+    logTable.clear().draw();
     $('#logBody').html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
    $.post("{{ route('student.getlogactivity') }}", {
       action: action,
@@ -175,21 +179,19 @@
       _token: "{{ csrf_token() }}"
     },
     function(data, status) {
-      let html = '';
+      logTable.clear();
       if(data.success && data.logs.length > 0) {
         data.logs.forEach(log => {
-          html += `<tr>
-            <td>${log.student_name}</td>
-            <td>${log.student_id}</td>
-            <td>${log.section}</td>
-            <td>${log.action}</td>
-            <td>${new Date(log.created_at).toLocaleString()}</td>
-          </tr>`;
+          logTable.row.add([
+            log.student_name || '',
+            log.student_id || '',
+            log.section || '',
+            log.action || '',
+            log.created_at ? new Date(log.created_at).toLocaleString() : ''
+          ]);
         });
-      } else {
-        html = '<tr><td colspan="5" class="text-center">No logs found</td></tr>';
       }
-      $('#logBody').html(html);
+      logTable.draw();
     });
   });
   

@@ -22,6 +22,8 @@ Route::group(['prefix' => 'v2'], function () {
         $student = Student::where('user_name', $request->username)->where('password', $request->password)->first();
         if ($student) {
             $student->active = 1;
+            $student->last_login = now();
+            $student->device = $request->device;
             $student->save();
             return response()->json(['message' => 'Login successful', 'student_id' => $student->id], 200);
         }
