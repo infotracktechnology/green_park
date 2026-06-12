@@ -208,7 +208,15 @@
             let $row = $(this).closest('tr');
             if ($row.length > 0) {
                 let $tds = $row.find('td');
-                if ($tds.eq(0).text().trim().length < 4 && !isNaN($tds.eq(0).text().trim())) {
+                let pageTitle = modules.toLowerCase();
+                
+                if (pageTitle.includes('class video') && $tds.length > 4) {
+                    titleText = $tds.eq(3).text().trim();
+                } else if (pageTitle.includes('revision video') && $tds.length > 5) {
+                    titleText = $tds.eq(4).text().trim();
+                } else if (pageTitle.includes('discussion video') && $tds.length > 3) {
+                    titleText = $tds.eq(2).text().trim();
+                } else if ($tds.eq(0).text().trim().length <= 4 && !isNaN($tds.eq(0).text().trim())) {
                     titleText = $tds.eq(1).text().trim() + ($tds.eq(2).length ? '-' + $tds.eq(2).text().trim() : '');
                 } else {
                     titleText = $tds.eq(0).text().trim();
