@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Announcement')
+@section('title', 'Announcements')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
