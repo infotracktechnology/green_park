@@ -133,7 +133,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          @foreach($students as $i => $row)
+                          @foreach($students ->where('coaching_type', 'OFFLINE') as $i => $row)
                           <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $row->academic_year }}</td>
