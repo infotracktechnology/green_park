@@ -151,7 +151,7 @@ class HolidayController extends Controller
         $attendanceData = [];
         foreach ($request->status as $key => $status) {
             foreach ($status as $time => $value) {
-                $attendance_id = $request->attendance_id[$key][$time];
+                $attendance_id = $request->attendance_id[$key][$time] ?? null;
                 if (isset($attendance_id) && $attendance_id != '') {
                     $attendanceData[] = ['id' => $attendance_id, 'status' => $value ?? 'A'];
                 } else {
