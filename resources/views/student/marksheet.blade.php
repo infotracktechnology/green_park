@@ -91,10 +91,11 @@
                     <?php
                     $first = $subjectexam->first();
                      $subjects = [
-                      'PHYSICS'   => ['tot' => 'ptot', 'r' => 'pr', 'w' => 'pw', 'l' => 'pl'],
-                      'CHEMISTRY' => ['tot' => 'ctot', 'r' => 'cr', 'w' => 'cw', 'l' => 'cl'],
-                      'BOTANY'    => ['tot' => 'btot', 'r' => 'br', 'w' => 'bw', 'l' => 'bl'],
-                      'ZOOLOGY'   => ['tot' => 'ztot', 'r' => 'zr', 'w' => 'zw', 'l' => 'zl'],
+                      'PHYSICS'   => ['tot' => 'phy_tot', 'r' => 'phy_r', 'w' => 'phy_w', 'l' => 'phy_l'],
+                      'CHEMISTRY' => ['tot' => 'che_tot', 'r' => 'che_r', 'w' => 'che_w', 'l' => 'che_l'],
+                      'BOTANY'    => ['tot' => 'bot_tot', 'r' => 'bot_r', 'w' => 'bot_w', 'l' => 'bot_l'],
+                      'ZOOLOGY'   => ['tot' => 'zoo_tot', 'r' => 'zoo_r', 'w' => 'zoo_w', 'l' => 'zoo_l'],
+                      'BIOLOGY'   => ['tot' => 'bio_tot', 'r' => 'bio_r', 'w' => 'bio_w', 'l' => 'bio_l'],
                      ];
                     ?>
                     <thead>

@@ -1,2 +1,2 @@
-stuid,omr,sname,sex,fph1,mph1,campus,ctype,sec,stype,testid,totmark,pr,pw,pl,ptot,cr,cw,cl,ctot,br,bw,bl,btot,zr,zw,zl,ztot,nettot,r,w,l,tot,category,subject,exdate,batch,qtype,quesord,,,,
-2061697,OMR,HARISHRAM S,MALE,9942762996,9788997009,SSVM,OFFLINE,MB4,GP,616,180,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,4,0,160,WEEKEND,WEEKEND PHYSICS-19.12.25,19.12.25,E,A,P,,,,
+stuid,omr,sname,sex,fph1,mph1,campus,ctype,sec,stype,testid,totmark,phy_r,phy_w,phy_l,phy_tot,che_r,che_w,che_l,che_tot,bot_r,bot_w,bot_l,bot_tot,zoo_r,zoo_w,zoo_l,zoo_tot,bio_r,bio_w,bio_l,bio_tot,nettot,r,w,l,tot,category,subject,exdate,batch,qtype,quesord
+2061697,OMR,HARISHRAM S,MALE,9942762996,9788997009,SSVM,OFFLINE,MB4,GP,616,180,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,4,0,160,WEEKEND,WEEKEND PHYSICS-19.12.25,19.12.25,E,A,P
