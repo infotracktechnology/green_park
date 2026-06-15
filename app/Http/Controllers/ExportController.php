@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
-use App\models\branch;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 
 class ExportController extends Controller

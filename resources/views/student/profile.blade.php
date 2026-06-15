@@ -57,7 +57,7 @@
             <div class="card bg-pastel-card">
                 <div class="bg-pastel-purple" style="height: 80px;"></div>
                 <div class="card-body text-center mt-n5">
-                    <img src="{{ asset('profilepic/'.auth()->user()->student_id.'.jpg') }}"  onerror="this.style.display='none'" class="profile-img mb-3">
+                    <img src="{{ asset('profilepic/'.auth()->user()->student_id.'.jpg') }}"  onerror="this.null;this.src='{{ asset('img/avather.png') }}';" class="profile-img mb-3">
                     
                     <h4 class="fw-bold text-dark mb-1">{{ auth()->user()->student_name }}</h4>
                     <p class="text-muted mb-3">{{ auth()->user()->student_id ?? 'Student' }}</p>

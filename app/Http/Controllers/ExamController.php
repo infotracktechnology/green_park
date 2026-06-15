@@ -385,7 +385,7 @@ class ExamController extends Controller
         $request->validate([
             'offline' => 'required|mimes:csv,txt|max:4096',
         ]);
-        try{
+
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
         $examtype = '';
 
@@ -393,7 +393,7 @@ class ExamController extends Controller
             return back()->with('error', 'File is not in the template format.');
         }
 
-        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answers[0]['exam_name'])->first();
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answer[0]['exam_name'])->first();
         if(empty($exam)) return back()->with('error', 'No such Exam exists.');
 
         foreach ($answers as $answer) {
@@ -433,10 +433,6 @@ class ExamController extends Controller
         ]);
 
         return back()->with('success', 'Offline file uploaded successfully.');
-        }
-        catch(\Exception $e){
-            return back()->with('error', 'Error: '.$e->getMessage());
-        }
     }
 
     public function answerKey($examtype)

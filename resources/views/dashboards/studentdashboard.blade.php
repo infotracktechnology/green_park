@@ -226,6 +226,9 @@ $isExamActive = $exam && $exam->start_at <= now() && $exam->end_at >= now();
                   <span style="font-size: 16px;"><strong>Present Days :</strong> {{ $presentDaysInMonth }}</span>
                   <span style="font-size: 22px; float: right; font-weight: bold;">{{ number_format($percentage, 2) }}%</span>
                 </p>
+                <p class="mb-0 text-sm text-nowrap mt-0">
+                  <span style="font-size: 16px;"><strong>Absent Days :</strong> {{ $absentDaysInMonth }}</span>
+                </p>
               </div>
             </div>
           </div>

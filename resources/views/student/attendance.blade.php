@@ -79,6 +79,7 @@
                                         <tr>
                                             <th>Month</th>
                                             <th>Present Days</th>
+                                            <th>Absent Days</th>
                                             <th>Percentage (%)</th>
                                         </tr>
                                     </thead>
@@ -88,6 +89,9 @@
                                                 <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $data->month)->format('F Y') }}</td>
                                                 <td>
                                                     {{ fmod($data->present_days, 1) == 0 ? (int) $data->present_days : number_format($data->present_days, 1) }}
+                                                </td>
+                                                <td>
+                                                    {{ fmod($data->absent_days, 1) == 0 ? (int) $data->absent_days : number_format($data->absent_days, 1) }}
                                                 </td>
                                                 <td>
                                                     @php
