@@ -205,8 +205,8 @@ class ReportController extends Controller
             $attendances = $attendances->map(function ($attendance, $section) use ($request) {
                 $present = $attendance->where('status', 'P')->unique('student_id')->count();
                 $absent = $attendance->where('status', 'A')->unique('student_id')->count();
-                $boys = Student::where('section', $section)->where('campus', $request->branch_id)->where('gender', 'Male')->count();
-                $girls = Student::where('section', $section)->where('campus', $request->branch_id)->where('gender', 'Female')->count();
+                $boys = Student::where('section', $section)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Male')->count();
+                $girls = Student::where('section', $section)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Female')->count();
                 return [
                     'section' => $section,
                     'boys' => $boys,

@@ -134,10 +134,11 @@ class StudentController extends Controller
 
         $totalDaysInMonth = $stats->total_days ?? 0;
         $presentDaysInMonth = $stats->present_days ?? 0;
+        $absentDaysInMonth = $totalDaysInMonth - $presentDaysInMonth;
 
         $percentage = $totalDaysInMonth > 0 ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2) : 0;
 
-        return view('dashboards.studentdashboard', compact('totalDaysInMonth', 'presentDaysInMonth', 'percentage'));
+        return view('dashboards.studentdashboard', compact('totalDaysInMonth', 'presentDaysInMonth', 'percentage', 'absentDaysInMonth'));
     }
 
     function marksheet(Request $request)
@@ -198,13 +199,14 @@ class StudentController extends Controller
     public function attendance()
     {
         $student_id = Auth::user()->student_id;
-        $attendance = DB::table('attendance')->selectRaw("student_id,DATE_FORMAT(attendance_date, '%Y-%m') AS month,GROUP_CONCAT(timing) AS timings,GROUP_CONCAT(status) AS statuses,COUNT(DISTINCT attendance_date) AS total_days,SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days")->where('student_id', $student_id)->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")->get();
+        $attendance = DB::table('attendance')->selectRaw("student_id,DATE_FORMAT(attendance_date, '%Y-%m') AS month,GROUP_CONCAT(timing) AS timings,GROUP_CONCAT(status) AS statuses,COUNT(DISTINCT attendance_date) AS total_days,SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days,SUM(CASE WHEN status = 'A' THEN 0.5 ELSE 0 END) AS absent_days")->where('student_id', $student_id)->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")->get();
 
         $total_present = $attendance->sum('present_days');
         $total_days = $attendance->sum('total_days');
+        $absent_days = $attendance->sum('absent_days');
         $percentage = $total_days > 0 ? round(($total_present / $total_days) * 100, 2) : 0;
 
-        return view('student.attendance', compact('attendance', 'total_present', 'total_days', 'percentage'));
+        return view('student.attendance', compact('attendance', 'total_present', 'total_days', 'percentage', 'absent_days'));
     }
 
     public function NeetDocument(Request $request)
