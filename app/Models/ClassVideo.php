@@ -53,9 +53,8 @@ public static function ForStudent(Student $student)
                   ->whereIn('gender', [$student->gender, 'All'])
                   ->where('start_at', '<=', date('Y-m-d H:i:s'))
                   ->where('end_at', '>=', date('Y-m-d H:i:s'));
-        })->get();
+        })->orderByDesc('date')
+        ->get();
 }
-
-
 }
 
