@@ -12,7 +12,7 @@ Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('auth.login');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('preventCache');
 Route::get('/notify', [HomeController::class, 'notify']);
-Route::get('video/{id}', [ChairmanVideoController::class, 'video'])->name('video');
+//Route::get('video/{id}', [ChairmanVideoController::class, 'video'])->name('video');
 
 // ------------------------------------------------------
 // 2. Admin Routes (Authenticated)
@@ -267,6 +267,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::match(['get', 'post'], 'mocktest', [MockTestController::class, 'MockTest'])->name('student.mock');
     Route::get('mocktestpdf/{testname}', [MockTestController::class, 'downloadMockTestPdf'])->name('student.mocktestpdf');
     Route::get('sickroom', [SickRoomEntryController::class, 'sickroom'])->name('student.sickroom');
+    Route::get('video/{id}', [ChairmanVideoController::class, 'video'])->name('video');
 });
 
 // ------------------------------------------------------
