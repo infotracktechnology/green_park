@@ -51,6 +51,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     // Student Management
     Route::resource('student', StudentController::class);
     Route::match(['get', 'post'], 'students/restore', [StudentController::class, 'RestoreStudent'])->name('students.restore');
+    Route::post('students/permanentdelete', [StudentController::class, 'permanentdelete'])->name('students.permanentdelete');
     Route::post('getlogactivity', [StudentController::class, 'GetLogActivity'])->name('student.getlogactivity');
     Route::match(['post', 'delete'], 'option/document', [StudentController::class, 'DocumentOption'])->name('option.document');
     

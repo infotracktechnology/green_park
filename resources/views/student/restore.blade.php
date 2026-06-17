@@ -55,6 +55,7 @@
                         <th>Inactive Date & Time</th>
                         <th>Reason/Remarks</th>
                         <th>Reactive</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
 
@@ -77,7 +78,14 @@
                             <input type="hidden" value="{{ $student->id }}" name="id" />
                             <button type="submit" class="btn btn-danger"><i class="fas fa-sync"></i></button>
                           </form>
-                        </td>                        
+                        </td>
+                        <td>
+                          <form action="{{route('students.permanentdelete')}}" class="no-loader" method="post" onsubmit="return confirm('Are you sure you want to permanently delete this student?')">
+                            @csrf
+                            <input type="hidden" value="{{ $student->id }}" name="id" />
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+                          </form>
+                        </td>
                       </tr>
                       @endforeach
                     </tbody>
