@@ -277,4 +277,13 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::post('/logactivity',[StudentController::class,'logActivity']);
+
+    Route::get('/video/{student_id}/{id}', function (Request $request, $student_id, $id) {
+        try{
+            $id = base64_decode($id);
+            return view('layouts.video', compact('id'));
+        }catch(\Exception $e){
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    });
 });

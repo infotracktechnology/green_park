@@ -2,6 +2,8 @@
 
 @section('title', 'Edit Chairman Video')
 @section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
 @endsection
 
 @section('main')
@@ -128,22 +130,19 @@
                     <label for="title">Title</label>
                     <input type="text" name="title" id="title" class="form-control form-control-sm" value="{{ $chairmanvideo->title }}" required>
                   </div>
-                  <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-3">
                     <label for="video_id">Video ID</label>
                     <input type="number" name="video_id" id="video_id" class="form-control form-control-sm" value="{{ $chairmanvideo->video_id }}" required>
                   </div>
-
-                  {{-- <div class="form-group col-lg-4">
-                                <label for="attachment">Attachment</label>
-                                <input type="file" name="attachment" id="attachment" class="form-control form-control-sm">
-                                <div class="mt-2">
-                                @if(isset($chairmanvideo->attachment))
-                                    <a href="/public/{{ $chairmanvideo->attachment }}" target="_blank" rel="noopener noreferrer">
-                  <i class="fas fa-paperclip"></i> Attachment
-                  </a>
-                  @endif
-                </div>
-              </div> --}}
+                  <div class="form-group col-lg-3">
+                    <label for="start_at">Start Date/Time</label>
+                    <input type="text" name="start_at" id="start_at" class="datetime-picker form-control form-control-sm" value="{{ $chairmanvideo->start_at ? date('Y-m-d H:i', strtotime($chairmanvideo->start_at)) : '' }}">
+                  </div>
+                  <div class="form-group col-lg-3">
+                    <label for="end_at">End Date/Time</label>
+                    <input type="text" name="end_at" id="end_at" class="datetime-picker form-control form-control-sm" value="{{ $chairmanvideo->end_at ? date('Y-m-d H:i', strtotime($chairmanvideo->end_at)) : '' }}">
+                    <div id="end_at_error" class="text-danger"></div>
+                  </div>
 
               <div class="form-group col-lg-12">
                 <button type="submit" class="btn btn-primary">Update</button>
@@ -157,4 +156,37 @@
 </div>
 </section>
 </div>
+@endsection
+
+@section('js')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
+<script>
+  flatpickr(".datetime-picker", {
+      enableTime: true,
+      allowInput: true,
+      dateFormat: "Y-m-d H:i",
+      plugins: [
+          new confirmDatePlugin({
+              confirmText: "OK",
+              showAlways: false,
+              theme: "light"
+          })
+      ]
+  });
+  
+  $('#end_at').change(function() {
+      $('#end_at_error').text('');
+      const startTimeVal = $('#start_at').val();
+      const endTimeVal = $(this).val();
+      if (startTimeVal && endTimeVal) {
+          const startTime = new Date(startTimeVal);
+          const endTime = new Date(endTimeVal);
+          if (startTime >= endTime) {
+              $('#end_at_error').text('End time must be greater than start time.');
+              $(this).val('');
+          }
+      }
+  });
+</script>
 @endsection
