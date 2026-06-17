@@ -1,72 +1,91 @@
 @extends('layouts.dashboard')
-@section('title', 'Chairman Video')
+
+@section('title', 'Chairman Videos')
+
 @section('css')
-<link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
-<link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
 @endsection
+
 @section('main')
 <div class="main-content">
-    <div class="section-body">
-        <div class="row">
-            <div class="col-md-6 col-lg-12 col-xl-8"> 
-    @if(isset($chairmanvideo->video_id))
-    @php
-        $videoId = $chairmanvideo->video_id ?? null;
-        $title = $chairmanvideo->title ?? null;
-    @endphp
-    @if($videoId)
-        <div class="card">
-            <div class="card-header">
-                <h4><i style="font-size: 25px;" class="fas fa-video"></i> Chairman Video - {{ $title }}</h4>
-            </div>
-
+  <div class="section-body">
+    <div class="row">
+      @if($chairmanvideos->isEmpty())
+        <div class="col-12 text-center mt-5">
+          <div class="card p-5">
             <div class="card-body">
-                <div class="embed-responsive embed-responsive-16by9" id="chairmanVideoContainer">
-                    <iframe src="https://player.vimeo.com/video/{{ $videoId }}" 
-                            frameborder="0" 
-                            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; gyroscope; accelerometer" 
-                            style="position:absolute;top:0;left:0;width:100%;height:100%;" 
-                            title="video_20240822_142621"></iframe>
-                </div>
-            </div>         
-            <div class="card-footer text-right">
-                @if(isset($chairmanvideo->attachment))
-                    <a href="/public/{{ $chairmanvideo->attachment }}" target="_blank" rel="noopener noreferrer">
-                        <i class="fas fa-paperclip"></i> Attachment
-                    </a>
-                @endif
+              <i style="font-size: 60px;" class="fas fa-video-slash text-muted mb-4"></i>
+              <h4>No Videos Available</h4>
+              <p class="text-muted">There are no chairman videos assigned to you at this time.</p>
             </div>
+          </div>
         </div>
-    @endif
-@endif
+      @else
+        @foreach($chairmanvideos as $date => $videos)
+        <div class="col-lg-12">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h4><i class="fas fa-calendar"></i> {{ $date }}</h4>
             </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>S.No</th>
+                      <th>Title</th>
+                      <th>Start Date & Time</th>
+                      <th>Expiry Date & Time</th>
+                      <th>Attachment</th>
+                      <th>Video</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach ($videos as $video)
+                    <tr>
+                      <td>{{ $loop->iteration }}</td>
+                      <td>{{ $video->title }}</td>
+                      <td>{{ $video->start_at ? \Carbon\Carbon::parse($video->start_at)->format('d/m/Y H:i') : 'Immediate' }}</td>
+                      <td>{{ $video->end_at ? \Carbon\Carbon::parse($video->end_at)->format('d/m/Y H:i') : 'No Expiry' }}</td>
+                      <td>
+                        @if($video->attachment)
+                          <a href="/public/{{ $video->attachment }}" target="_blank"><i class="fas fa-paperclip"></i> View</a>
+                        @else
+                          -
+                        @endif
+                      </td>
+                      <td>
+                        <a href="{{ route('video', base64_encode($video->video_id)) }}" 
+                           target="_blank" 
+                           class="watch-link" 
+                           data-title="{{ $video->title }}">Watch</a>
+                      </td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
+        @endforeach
+      @endif
     </div>
+  </div>
 </div>
-
 @endsection
 
 @section('js')
-<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const iframe = document.querySelector('#chairmanVideoContainer iframe');
-        if (!iframe || !window.Vimeo) return;
-        const title = `{{ $title ?? '' }}`;
-        const player = new Vimeo.Player(iframe);
-        let hasLogged = false;
-        
-        player.on('play', function() {
-            if (hasLogged) return;
-            hasLogged = true;
-            
-            $.post('{{ route("student.logActivity") }}', {
-                _token: '{{ csrf_token() }}',
-                module: 'Chairman Video',
-                action: 'Seen '+title,
-                student_id: '{{ auth()->user()->student_id }}'
-            });
-        });
-    });
+  $(document).ready(function() {
+      $('.watch-link').click(function() {
+          const title = $(this).data('title');
+          $.post('{{ route("student.logActivity") }}', {
+              _token: '{{ csrf_token() }}',
+              module: 'Chairman Video',
+              action: 'Seen ' + title,
+              student_id: '{{ auth()->user()->student_id }}'
+          });
+      });
+  });
 </script>
 @endsection

@@ -37,6 +37,9 @@ class ChairmanVideoController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $data['start_at'] = $request->filled('start_at') ? $request->start_at : null;
+        $data['end_at'] = $request->filled('end_at') ? $request->end_at : null;
+
         if ($request->hasFile('attachment')) {
             $fileName = time() . '.' . $request->attachment->extension();
             $request->attachment->move(public_path('chairman/video'), $fileName);
@@ -72,6 +75,9 @@ class ChairmanVideoController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $data['start_at'] = $request->filled('start_at') ? $request->start_at : null;
+        $data['end_at'] = $request->filled('end_at') ? $request->end_at : null;
+
         if ($request->hasFile('attachment')) {
             if ($chairmanvideo->attachment && file_exists(public_path($chairmanvideo->attachment))) {
                 unlink(public_path($chairmanvideo->attachment));
@@ -95,8 +101,11 @@ class ChairmanVideoController extends Controller
     public function chairmanvideo(Request $request)
     {
         $student = Student::where('student_id', auth()->user()->student_id)->first();
-        $chairmanvideo = Chairmanvideo::ForStudent($student)->latest()->first();
-        return view('student.chairmanvideo', compact('chairmanvideo'));
+        $chairmanvideos = Chairmanvideo::ForStudent($student)->latest()->get();
+        $chairmanvideos = $chairmanvideos->groupBy(function($video) {
+            return $video->created_at ? $video->created_at->format('d-m-Y') : 'N/A';
+        });
+        return view('student.chairmanvideo', compact('chairmanvideos'));
     }
 
     public function video(Request $request, $id)

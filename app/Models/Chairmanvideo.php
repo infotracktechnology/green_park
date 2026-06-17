@@ -23,23 +23,31 @@ class Chairmanvideo extends Model
 
 public static function ForStudent(Student $student)
 {
+    $now = now();
     return self::query()
-        ->where('usertype', 'INDIVIDUAL')
-        ->where('students', $student->student_id)
-        ->orWhere(function ($query) use ($student) {
-            $query->where('academic_year', $student->academic_year)
-                ->where('course', $student->course)
-                ->where('branch', 'like', "%{$student->campus}%")
-                ->where('coaching_type', 'like', "%{$student->coaching_type}%")
-                ->when($student->coaching_type === 'OFFLINE', function ($q) use ($student) {
-                    if (in_array($student->course, ['NEET', 'JEE'])) {
-                        if (in_array($student->campus, [1, 4, 5])) {
-                            $q->where('category', 'like', "%{$student->hostel_dayscholar}%");
+        ->where(function ($query) use ($student) {
+            $query->where(function ($q) use ($student) {
+                $q->where('usertype', 'INDIVIDUAL')
+                  ->where('students', $student->student_id) 
+                  ->where('start_at', '<=', date('Y-m-d H:i:s'))
+                  ->where('end_at', '>=', date('Y-m-d H:i:s'));
+            })
+            ->orWhere(function ($q) use ($student) {
+                $q->where('academic_year', $student->academic_year)
+                    ->where('course', $student->course)
+                    ->where('branch', 'like', "%{$student->campus}%")
+                    ->where('coaching_type', 'like', "%{$student->coaching_type}%")
+                    ->when($student->coaching_type === 'OFFLINE', function ($sq) use ($student) {
+                        if (in_array($student->course, ['NEET', 'JEE'])) {
+                            if (in_array($student->campus, [1, 4, 5])) {
+                                $sq->where('category', 'like', "%{$student->hostel_dayscholar}%");
+                            }
+                            $sq->where('batch', 'like', "%{$student->batch}%");
                         }
-                        $q->where('batch', 'like', "%{$student->batch}%");
-                    }
-                    $q->where('section', 'like', "%{$student->section}%");
-                })->whereIn('gender', [$student->gender, 'All']);
+                        $sq->where('section', 'like', "%{$student->section}%");
+                    })->whereIn('gender', [$student->gender, 'All'])->where('start_at', '<=', date('Y-m-d H:i:s'))
+                  ->where('end_at', '>=', date('Y-m-d H:i:s'));
+            });
         });
 }
 

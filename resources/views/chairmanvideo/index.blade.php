@@ -66,6 +66,8 @@
                         {{-- <th>Section</th> --}}
                         <th>Batch</th>
                         <th>Title</th>
+                        <th>Start At</th>
+                        <th>End At</th>
                         <th>Seen Log</th>
                         <th>Edit</th>
                       </tr>
@@ -84,6 +86,8 @@
                         {{-- <td>{{ $chairmanvideo->section}}</td> --}}
                         <td>{{ $chairmanvideo->batch}}</td>
                         <td>{{ $chairmanvideo->title}}</td>
+                        <td>{{ $chairmanvideo->start_at ? date('d M Y H:i', strtotime($chairmanvideo->start_at)) : '-' }}</td>
+                        <td>{{ $chairmanvideo->end_at ? date('d M Y H:i', strtotime($chairmanvideo->end_at)) : '-' }}</td>
                         <td>
                           <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$chairmanvideo->title}}" data-module="Chairman Video"> <i class="fas fa-eye"></i></button>
                         </td>
