@@ -78,7 +78,7 @@ class StudentController extends Controller
 
     public function RestoreStudent(Request $request)
     {
-        $students = Student::onlyTrashed()->get();
+        $students = Student::onlyTrashed()->where('academic_year', $this->academic_year)->get();
         if ($request->isMethod('post')) {
             $restore = Student::withTrashed()->find($request->id)->update(['deleted_at' => null, 'remarks' => null]);
             return redirect()->back()->with('success', 'Student Reactivated successfully.');
@@ -93,7 +93,14 @@ class StudentController extends Controller
         return redirect()->back()->with('success', 'Student Inactivated successfully.');
     }
 
-
+    public function permanentdelete(Request $request)
+    {
+      $student = Student::withTrashed()->findOrFail($request->id);
+      if($student){
+        $student->forceDelete();
+      } 
+        return redirect()->back()->with('success', 'Student permanently deleted successfully.');
+    }
     public function section()
     {
         $students = Student::all();
