@@ -60,7 +60,9 @@
                     <img src="{{ asset('profilepic/'.auth()->user()->student_id.'.jpg') }}"  onerror="this.null;this.src='{{ asset('img/avather.png') }}';" class="profile-img mb-3">
                     
                     <h4 class="fw-bold text-dark mb-1">{{ auth()->user()->student_name }}</h4>
-                    <p class="text-muted mb-3">{{ auth()->user()->student_id ?? 'Student' }}</p>
+                    <p class="text-muted mb-1">{{ auth()->user()->student_id ?? 'Student' }}</p>
+                    <p class="text-muted mb-1">Course:  {{ auth()->user()->course ?? 'Course' }}</p>
+                    <p class="text-muted mb-3">Section: {{ auth()->user()->section ?? 'Section' }}</p>
                     
                     <div class="d-flex justify-content-center gap-3 mb-4">
                         <span class="badge bg-light text-dark px-3 py-2 rounded-pill">{{ auth()->user()->gender }}</span>
