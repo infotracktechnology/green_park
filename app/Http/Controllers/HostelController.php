@@ -151,18 +151,18 @@ class HostelController extends Controller
         $csvData = $import->parseCSV($csvFile->getRealPath());
         $hostel_name = array_column($csvData, 'hosname');
         $hostels = Hostel::where('branch_id', $request->branch)->whereIn('name', array_unique($hostel_name))->get()->keyBy('name');
-
+        try {
         foreach ($csvData as $key => $row) {
             $no = $key + 1;
 
-            if (!isset($row['stuid'])) {
-                return redirect()->back()->with('error', "CSV file is missing student ID ($no) row in one or more rows.");
+            if (!isset($row['stuid']) || !isset($row['hosname']) || !isset($row['room_no']) || !isset($row['cot_no'])) {
+              return redirect()->back()->with('error', "CSV file is missing required fields in row ($no) & column (stuid, hosname, room_no, cot_no).");
             }
 
-            $hostel = $hostels[$row['hosname']];
+            $hostel = $hostels[$row['hosname']] ?? null;
 
             if(!$hostel){
-                return redirect()->back()->with('error', "CSV file is missing hostel name ($no) row in one or more rows.");
+              return redirect()->back()->with('error', "CSV file is missing hostel name ($no) row in one or more rows.");
             }
 
             $room  = HostelRoom::firstWhere(['hostel_id' => $hostel->id, 'room_no' => $row['room_no'], 'cart_no' => $row['cot_no']]);
@@ -175,6 +175,10 @@ class HostelController extends Controller
         }
 
         return redirect()->route('allocation.hostel')->with('success', 'Hostel Allocation Successfully Updated Check Hostel Room Wise Report.');
+        }
+        catch(\Exception $e){
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function RoomReallocation(Request $request)
