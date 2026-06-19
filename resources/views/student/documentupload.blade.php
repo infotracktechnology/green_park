@@ -84,7 +84,7 @@
                           <th>Document</th>
                           <th>Download</th>
                           <th>Uploaded At</th>
-                          {{-- <th>Action</th> --}}
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -107,6 +107,11 @@
                               </button>
                             </form>
                           </td> --}}
+                          <td>
+                              <a href="{{ asset($doc->file) }}" target="_blank" class="btn btn-primary text-white">
+                              <i class="fas fa-eye"></i>
+                              </a>
+                          </td>
                         </tr>
                         @empty
                         <tr>
