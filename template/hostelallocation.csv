@@ -1,2 +1,2 @@
-id,stuid,sec,sname,sex,campus,hosday,acnonac,floor,roomno,cotno,hosname
+id,stuid,sec,sname,sex,campus,hosday,acnonac,floor,room_no,cot_no,hosname
 1,2601198,RBH,DINESHKUMAR K,MALE,GP,HOSTEL,AC,SECOND,307,U-3,HOSTEL BLOCK - 1
