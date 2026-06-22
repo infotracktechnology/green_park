@@ -229,9 +229,9 @@ class ExamController extends Controller
             return redirect()->route('studentdashboard')->with('error', 'Exam Time is up!');
         }
 
-        if ($answers && $answers->count() >= $exam->total_questions) {
-            return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
-        }
+        // if ($answers && $answers->count() >= $exam->total_questions) {
+        //     return redirect()->route('studentdashboard')->with('error', 'You have already attempted this Exam!');
+        // }
         
         return view('student.exam', compact('exam', 'second', 'answers', 'maxQuestions'));
     }
