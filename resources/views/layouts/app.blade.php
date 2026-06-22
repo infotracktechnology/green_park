@@ -221,6 +221,7 @@
                 <li><a href="{{ route('holiday.index') }}" class="nav-link">Add Holiday</a></li>
                 <li><a href="{{ route('attendance') }}" class="nav-link">Attendance Entry</a></li>
                 <li><a href="{{ route('report.attendance') }}" class="nav-link">Daily Attendance Report</a></li>
+                <li><a href="{{ route('report.monthlyattendance') }}" class="nav-link">Monthly Attendance Report</a></li>
               </ul>
             </li>
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
