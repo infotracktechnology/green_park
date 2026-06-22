@@ -130,7 +130,31 @@ class HostelController extends Controller
     public function show(Request $request,$id)
     {
         $hostels = Hostel::with('rooms')->findOrFail($id);
-        $rooms = HostelRoom::where('hostel_id', $hostels->id)->selectRaw('room_no,floor,no_of_cots,group_concat(cart_no order by id) as cart_no')->groupBy('room_no')->orderBy('id')->get();
+        $rooms = HostelRoom::where('hostel_id', $hostels->id)
+        ->selectRaw("room_no,
+        floor,
+         SUM(CASE WHEN cot_type = 'U-' THEN 1 ELSE 0 END) as upper_cots,
+            SUM(CASE WHEN cot_type = 'L-' THEN 1 ELSE 0 END) as lower_cots,
+            COUNT(*) as no_of_cots,
+            group_concat(cart_no order by id) as cart_no")
+        ->groupBy('room_no')
+        ->orderBy('id')->get();
+
+        foreach ($rooms as $room) {
+            $cots = HostelRoom::where('hostel_id', $hostels->id)->where('room_no', $room->room_no)->get();
+
+            $occupiedCots = Student::where('hostel_id', $hostels->id)
+            ->where('room_no', $room->room_no)
+            ->when($request->academic_year, fn($q) => $q->where('academic_year', $request->academic_year))
+            ->pluck('cots_no')->toArray();
+
+            foreach ($cots as $cot) {
+               $cot->status = in_array($cot->cart_no, $occupiedCots) ? 'occupied' : 'free';
+            }
+            $room->cots = $cots;
+        }
+        
+
         return view('hostel.show', compact('hostels', 'rooms'));
     }
 

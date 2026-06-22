@@ -3,6 +3,21 @@
 @section('css')
 <link rel="stylesheet" href="{{asset('bundles/datatables/datatables.min.css')}}">
 <link rel="stylesheet" href="{{asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+<style>
+    .badge-success {
+        font-size: 10px;
+        padding: 7px 10px;
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .badge-danger {
+        font-size: 10px;
+        padding: 7px 10px;
+        background-color: #dc3545;
+        color: #fff;
+    }
+</style>
 @endsection
 
 @section('main')
@@ -54,7 +69,13 @@
                                 <td>{{ $room->floor }}</td>
                                 <td>{{ $room->room_no }}</td>
                                 <td>{{ $room->no_of_cots }}</td>
-                                <td>{{ $room->cart_no }}</td>
+                                <td>
+                                    @foreach ($room->cots as $cot)
+                                        <span class="badge badge-{{ $cot->status === 'occupied' ? 'danger' : 'success' }}">
+                                            {{ $cot->cart_no }}
+                                        </span>
+                                    @endforeach
+                                </td>
                                 <td>
                                         <form action="{{ route('room.delete') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this hostel?')">
                                             @csrf
