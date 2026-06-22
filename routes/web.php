@@ -198,6 +198,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/examination_log/students', [ReportController::class, 'ExaminationLogStudents'])->name('examination_log.students');
         Route::get('/student_response/download', [ReportController::class, 'StudentResponseDownload'])->name('student_response.download');
         Route::get('/attendance', [ReportController::class, 'AttendanceReport'])->name('attendance');
+        Route::get('/monthlyattendance', [ReportController::class, 'MonthlyAttendanceReport'])->name('monthlyattendance');
         Route::get('/section_exam', [ReportController::class, 'section_exam'])->name('section_exam');
         Route::get('/batchlist', [ReportController::class, 'BatchList'])->name('batchlist');
         Route::match(['get', 'post'], '/sectionlist', [ReportController::class, 'SectionList'])->name('sectionlist');

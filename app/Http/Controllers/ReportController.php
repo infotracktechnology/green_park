@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier};
+use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -201,25 +201,222 @@ class ReportController extends Controller
     {
         $attendances = [];
         if ($request->has('branch_id')) {
-            $attendances = Attendance::where('branch_id', $request->branch_id)->where('attendance_date', $request->date)->get()->groupBy('section');
+            $attendances = Attendance::where('branch_id', $request->branch_id)->where('academic_year', $this->academic_year)->where('attendance_date', $request->date)->get()->groupBy('section');
             $attendances = $attendances->map(function ($attendance, $section) use ($request) {
                 $present = $attendance->where('status', 'P')->unique('student_id')->count();
                 $absent = $attendance->where('status', 'A')->unique('student_id')->count();
-                $boys = Student::where('section', $section)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Male')->count();
-                $girls = Student::where('section', $section)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Female')->count();
-                return [
-                    'section' => $section,
-                    'boys' => $boys,
-                    'girls' => $girls,
-                    'total' => $boys + $girls,
-                    'present' => $present,
-                    'absent' => $absent
-                ];
+                $boys = Student::where('section', $section)->where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Male')->whereDate('admission_date', '<=', $request->date)->count();
+                $girls = Student::where('section', $section)->where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Female')->whereDate('admission_date', '<=', $request->date)->count();
+                
+                $studentNames = Student::whereIn('student_id', $attendance->where('status', 'P')->pluck('student_id')->unique())->pluck('student_name');
+
+                $absentStudentNames = Student::whereIn('student_id',$attendance->where('status', 'A')->pluck('student_id')->unique())->pluck('student_name');
+
+                return ['section' => $section,'boys' => $boys,'girls' => $girls,'total' => $boys + $girls,'present' => $present,'absent' => $absent,'present_students' => json_encode($studentNames->values()),'absent_students' => json_encode($absentStudentNames->values())];
             });
         }
 
         return view('report.attendancereport', compact('attendances'));
     }
+
+    public function MonthlyAttendanceReport(Request $request)
+    {
+    $branches = Branch::all();
+    
+    $sections = Student::when($request->branch_id, function($q) use ($request) { 
+        return $q->where('campus', $request->branch_id); 
+    })->whereNotNull('section')->where('section', '!=', '')->distinct()->pluck('section');
+
+    $courses = Student::where('academic_year', $this->academic_year)->where('course', '!=', '')->distinct()->pluck('course');
+
+    $report_type = $request->input('report_type');
+    $data = [];
+    $summary = null;
+
+    if ($request->has('branch_id') && $request->filled('start_date') && $request->filled('end_date') && $report_type) {
+        
+        $query = Attendance::where('branch_id', $request->branch_id)
+            ->where('academic_year', $this->academic_year)
+            ->whereBetween('attendance_date', [$request->start_date, $request->end_date]);
+
+        if ($request->filled('section')) {
+            $query->where('section', $request->section);
+        }
+
+        if ($request->filled('course')) {
+            $studentIds = Student::where('course', $request->course)
+                ->where('campus', $request->branch_id)
+                ->where('academic_year', $this->academic_year)
+                ->where('coaching_type', 'OFFLINE')
+                ->pluck('student_id'); 
+            $query->whereIn('student_id', $studentIds);
+        }
+
+        // 1. Monthly Attendance Summary
+        // if ($report_type == 'summary') {
+        //     $attData = (clone $query)->get();
+        //     $working_days = (clone $query)->distinct('attendance_date')->count('attendance_date');
+            
+        //     $present = $attData->where('status', 'P')->unique('student_id')->count();
+        //     $absent = $attData->where('status', 'A')->unique('student_id')->count();
+        //     $total_marked = $present + $absent;
+        //     $overall_percentage = $total_marked > 0 ? round(($present / $total_marked) * 100, 2) : 0;
+            
+        //     $studentQuery = Student::where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')
+        //         ->where('academic_year', $this->academic_year);
+        //     if ($request->filled('course')) $studentQuery->where('course', $request->course);
+        //     if ($request->filled('section')) $studentQuery->where('section', $request->section);
+        //     $total_students = $studentQuery->count();
+
+        //     $summary = (object)[
+        //         'total_students' => $total_students,
+        //         'working_days' => $working_days,
+        //         'present' => $present,
+        //         'absent' => $absent,
+        //         'overall_percentage' => $overall_percentage
+        //     ];
+        // }
+
+        // 2. Section Wise
+        if ($report_type == 'section') {
+            $attendances = $query->get()->groupBy('section');
+            $data = $attendances->map(function ($attendance, $section) use ($request) {
+                $present = $attendance->where('status', 'P')->count() * 0.5;
+                $absent = $attendance->where('status', 'A')->count() * 0.5;
+
+                $boysQuery = Student::where('section', $section)
+                    ->where('academic_year', $this->academic_year)
+                    ->where('campus', $request->branch_id)
+                    ->where('coaching_type', 'OFFLINE')
+                    ->where('gender', 'Male')
+                    ->whereDate('admission_date', '<=', $request->end_date);
+                if ($request->filled('course')) $boysQuery->where('course', $request->course);
+                $boys = $boysQuery->count();
+
+                $girlsQuery = Student::where('section', $section)
+                    ->where('academic_year', $this->academic_year)
+                    ->where('campus', $request->branch_id)
+                    ->where('coaching_type', 'OFFLINE')
+                    ->where('gender', 'Female')
+                    ->whereDate('admission_date', '<=', $request->end_date);
+                if ($request->filled('course')) $girlsQuery->where('course', $request->course);
+                $girls = $girlsQuery->count();
+
+                $totalMarked = $present + $absent;
+                $present_percentage = $totalMarked > 0 ? round(($present * 100) / $totalMarked, 2) : 0;
+                $absent_percentage = $totalMarked > 0 ? round(($absent * 100) / $totalMarked, 2) : 0;
+
+                return [
+                    'section' => $section, 'boys' => $boys, 'girls' => $girls, 'total' => $boys + $girls,
+                    'present' => $present, 'absent' => $absent,
+                    'present_percentage' => $present_percentage, 'absent_percentage' => $absent_percentage
+                ];
+            });
+        }
+
+        // 3. Student Wise
+        elseif ($report_type == 'student') {
+            $attendances = $query->get()->groupBy('student_id');
+            $studentIds = $attendances->keys();
+            $students = Student::withTrashed()->whereIn('student_id', $studentIds)->get()->keyBy('student_id');
+
+            $data = $attendances->map(function ($attendance, $student_id) use ($students) {
+                $student = $students->get($student_id);
+                $present = $attendance->where('status', 'P')->count() * 0.5;
+                $absent = $attendance->where('status', 'A')->count() * 0.5;
+                $holidays = $attendance->where('status', 'H')->count() * 0.5;
+                $totalMarked = $present + $absent ;
+
+                return [
+                    'student_id' => $student_id,
+                    'student_name' => $student->student_name ?? 'N/A',
+                    'course' => $student->course ?? 'N/A',
+                    'section' => $student->section ?? 'N/A',
+                    'working_days' => $totalMarked ,
+                    'present' => $present, 'absent' => $absent, 'holidays' => $holidays,
+                    'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
+                ];
+            });
+        }
+
+        // 4. Course Wise
+        elseif ($report_type == 'course') {
+            $attendances = $query->get();
+            $student_ids = $attendances->pluck('student_id')->unique();
+            $students = Student::whereIn('student_id', $student_ids)->where('academic_year', $this->academic_year)->get()->keyBy('student_id');
+
+            $grouped = $attendances->filter(function ($item) use ($students) {
+                return $students->has($item->student_id);
+            })->groupBy(function ($item) use ($students) {
+                return $students[$item->student_id]->course;
+            });
+
+            $data = $grouped->map(function ($attendance, $course) use ($request) {
+                $present = $attendance->where('status', 'P')->count() * 0.5;
+                $absent = $attendance->where('status', 'A')->count() * 0.5;
+                $totalMarked = $present + $absent;
+
+                $total_students = Student::where('course', $course)
+                    ->where('campus', $request->branch_id)
+                    ->where('coaching_type', 'OFFLINE')
+                    ->where('academic_year', $this->academic_year)
+                    ->count();
+
+                return [
+                    'course' => $course, 'total_students' => $total_students,
+                    'present' => $present, 'absent' => $absent,
+                    'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
+                ];
+            });
+        }
+
+        // 5. Branch Wise
+        elseif ($report_type == 'branch') {
+            $attendances = $query->get()->groupBy('branch_id');
+            $branchesMap = Branch::pluck('name', 'id');
+
+            $data = $attendances->map(function ($attendance, $branch_id) use ($branchesMap) {
+                $present = $attendance->where('status', 'P')->count() * 0.5;
+                $absent = $attendance->where('status', 'A')->count() * 0.5;
+                $totalMarked = $present + $absent;
+
+                $total_students = Student::where('campus', $branch_id)
+                    ->where('academic_year', $this->academic_year)
+                    ->where('coaching_type', 'OFFLINE')
+                    ->count();
+
+                return [
+                    'branch' => $branchesMap->get($branch_id) ?? 'N/A',
+                    'total_students' => $total_students,
+                    'present' => $present, 'absent' => $absent,
+                    'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
+                ];
+            });
+        }
+
+        // 6. Month Wise
+        elseif ($report_type == 'month') {
+            $attendances = $query->get()->groupBy('attendance_date');
+            $student_ids = $query->get()->pluck('student_id')->unique();
+            $studentNames = Student::whereIn('student_id', $student_ids)->pluck('student_name', 'student_id');
+
+            $data = $attendances->map(function ($attendance, $date) use ($studentNames) {
+                $presentStudents = $attendance->where('status', 'P')->map(fn($a) => $studentNames->get($a->student_id) ?? $a->student_id)->unique()->values();
+                $absentStudents = $attendance->where('status', 'A')->map(fn($a) => $studentNames->get($a->student_id) ?? $a->student_id)->unique()->values();
+
+                return [
+                    'date' => $date,
+                    'present_count' => $attendance->where('status', 'P')->count() * 0.5,
+                    'absent_count' => $attendance->where('status', 'A')->count() * 0.5,
+                    'present_students' => json_encode($presentStudents),
+                    'absent_students' => json_encode($absentStudents)
+                ];
+            });
+        }
+    }
+
+    return view('report.monthlyattendancereport', compact('branches', 'sections', 'courses', 'report_type','summary', 'data' ));
+}
 
     public function BatchList(Request $request)
     {
