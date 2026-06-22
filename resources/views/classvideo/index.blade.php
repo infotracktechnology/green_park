@@ -72,6 +72,16 @@
                       @endforeach
                     </select>
                   </div>
+
+                  <div class="form-group col-lg-3">
+                    <select name="course" class="select2" required>
+                      <option value="">Select Course</option>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}" @selected(request('course')==$row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  
                   <div class="form-group col-lg-2">
                     <button type="submit" class="btn btn-primary btn-block">Filter</button>
                   </div>
@@ -91,6 +101,7 @@
                       <th><input type="checkbox" id="checkAll" /></th>
                       <th>Coaching Type</th>
                       <th>Date</th>
+                      <th>Course</th>
                       <th>Subject</th>
                       <th>Period</th>
                       <th>Chapter</th>
@@ -109,6 +120,7 @@
                       <td><input type="checkbox" class='ids' name="ids[]" value="{{$classvideo->id}}" /></td>
                       <td>{{ $classvideo->coaching_type }}</td>
                       <td>{{ $classvideo->date }}</td>
+                      <td>{{ $classvideo->course }}</td>
                       <td>{{ $classvideo->subject }}</td>
                       <td>{{ $classvideo->period }}</td>
                       <td>{{ $classvideo->chapter }}</td>

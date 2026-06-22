@@ -74,8 +74,8 @@
                         <td>{{ $row['boys'] }}</td>
                         <td>{{ $row['girls'] }}</td>
                         <td>{{ $row['total'] }}</td>
-                        <td>{{ $row['present'] }}</td>
-                        <td>{{ $row['absent'] }}</td>
+                        <td> <a href="javascript:void(0)" class="badge badge-success text-white view-students" data-type="Present" data-students='{{ $row["present_students"] }}'>{{ $row['present'] }}</a></td>
+                        <td> <a href="javascript:void(0)" class="badge badge-danger text-white view-students" data-type="Absent" data-students='{{ $row["absent_students"] }}'>{{ $row['absent'] }} </a></td>
                         <td>{{ round($row['present'] * 100 / $row['total'], 2) }}</td>
                         <td>{{ round($row['absent'] * 100 / $row['total'], 2) }}</td>
                       </tr>
@@ -104,6 +104,21 @@
     </div>
   </section>
 </div>
+<div class="modal fade" id="studentsModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Students List</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ul id="studentListContainer" class="list-group row" style="flex-direction: row; flex-wrap: wrap;"></ul>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('js')
@@ -126,6 +141,24 @@
       pageLength: 25,
     });
   });
+  
+$('.view-students').on('click', function() {
+        var type = $(this).data('type');
+        var students = $(this).data('students');
+        
+        $('#modalTitle').text(type + ' Students');
+        $('#studentListContainer').empty();
+
+        if (students.length > 0) {
+            $.each(students, function(index, name) {
+                $('#studentListContainer').append('<li class="list-group-item col-md-6 border-0"><i class="fas fa-user mr-2 text-primary"></i>' + name + '</li>');
+            });
+        } else {
+            $('#studentListContainer').append('<li class="list-group-item col-12 border-0 text-center text-muted">No students found.</li>');
+        }
+
+        $('#studentsModal').modal('show');
+    });
   
 </script>
 @endsection
