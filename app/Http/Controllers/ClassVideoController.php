@@ -16,7 +16,6 @@ class ClassVideoController extends Controller
         $classvideos = ClassVideo::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
-            ->when($request->course, fn($q) => $q->where('course','like','%'.$request->course.'%'))
             ->latest()->get();
 
         return view('classvideo.index', compact('classvideos'));
