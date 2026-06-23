@@ -87,11 +87,11 @@
           <td>{{ $answer->where('mark', 4)->count() }}</td>
           <td>{{ $answer->where('mark', -1)->count() }}</td>
           <td>{{ $answer->where('mark', 0)->count() }}</td>
-          <td>{{ $answer->sum('mark') }}</td>
+          <td>{{ $answer->sum('mark') }} / {{ $answer->count() * 4 }}</td>
         </tr>
       </tbody>
     </table>
-
+    <p>Key Correction: Q.NO: 39</p>
   </div>
   @endforeach
   <script>
