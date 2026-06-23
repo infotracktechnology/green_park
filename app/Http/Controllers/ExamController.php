@@ -386,6 +386,7 @@ class ExamController extends Controller
             'offline' => 'required|mimes:csv,txt|max:4096',
         ]);
 
+        try {
         $answers = $import->parseCSV($request->file('offline')->getRealPath());
         $examtype = '';
 
@@ -393,7 +394,7 @@ class ExamController extends Controller
             return back()->with('error', 'File is not in the template format.');
         }
 
-        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answer[0]['exam_name'])->first();
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answers[0]['exam_name'])->first();
         if(empty($exam)) return back()->with('error', 'No such Exam exists.');
 
         foreach ($answers as $answer) {
@@ -431,8 +432,10 @@ class ExamController extends Controller
             'no_rows' => count($answers),
             'type' => 'offline_key',
         ]);
-
         return back()->with('success', 'Offline file uploaded successfully.');
+        }catch(\Exception $e){
+            return back()->with('error', "OMR Upload Failed:".$e->getMessage());
+        }
     }
 
     public function answerKey($examtype)
@@ -507,7 +510,7 @@ class ExamController extends Controller
             return back()->with('success', "Answer key validated successfully.");
         } catch (\Throwable $e) {
             \Log::error('Answer Key Upload Error', ['error' => $e->getMessage()]);
-            return back()->with('error', 'An error occurred during upload. Check logs for details.');
+            return back()->with('error', "Answer key upload failed:".$e->getMessage());
         }
     }
 
