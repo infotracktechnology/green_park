@@ -37,13 +37,13 @@ class SickRoomEntryController extends Controller
 
     public function edit(SickRoomEntry $sickroom, Request $request)
     {
-        $hostel = Hostel::where('branch_id', $sickroom->branch_id)->get();
+        $hostels = Hostel::where('branch_id', $sickroom->branch_id)->get();
 
         $room = HostelRoom::where('hostel_id', $sickroom->hostel_id)->distinct()->pluck('room_no');
 
         $student = Student::where('hostel_id', $sickroom->hostel_id)->where('room_no', $sickroom->room_no)->get();
 
-        return view('sickroom.edit', compact('hostel', 'room', 'student', 'sickroom'));
+        return view('sickroom.edit', compact('hostels', 'room', 'student', 'sickroom'));
     }
 
 

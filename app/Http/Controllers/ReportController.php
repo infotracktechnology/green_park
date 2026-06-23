@@ -707,11 +707,11 @@ class ReportController extends Controller
 
         $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
-        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
+        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id,mode,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
 
 
 
-        $csvHeaders = ['Student ID', 'Student Name', 'Branch', 'Batch', 'Section', 'Exam Date', 'Overall Correct', 'Overall Wrong', 'Overall UnAttempted', 'Overall Total'];
+        $csvHeaders = ['SID', 'MODE', 'STUDENT NAME', 'CAMPUS','GENDER','CTYPE','OVERALL CORRECT', 'OVERALL WRONG', 'OVERALL UNATTEMPTED', 'OVERALL TOTAL'];
 
         foreach ($subjects as $s) {
             $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total"]);
@@ -719,7 +719,7 @@ class ReportController extends Controller
 
         $csvData = [['Title', 'Subject Wise Marks'], ['Exam Name', $exam->name], [], $csvHeaders];
         foreach ($answers as $a) {
-            $row = [$a->student_id, $a->student?->student_name, $a->student?->branch?->name, $a->student?->batch, $a->student?->section, $a->exam_date, $a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
+            $row = [$a->student_id, $a->mode, $a->student?->student_name, $a->student?->branch?->name,$a->student?->gender, $a->student?->coaching_type,$a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
             foreach ($subjects as $s) {
                 $row = array_merge($row, [$a->{"{$s}_CORRECT"} ?? 0, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $a->{"{$s}_MARK"} ?? 0]);
             }

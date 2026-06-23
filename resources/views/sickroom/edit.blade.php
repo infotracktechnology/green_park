@@ -34,7 +34,7 @@
                     <label>Hostel</label>
                     <select class="select2" id="hostel" name="hostel_id" required>
                       <option value="">Choose Hostel</option>
-                      @foreach ($hostel as $row)
+                      @foreach ($hostels as $row)
                       <option value="{{ $row->id }}" @selected($row->id == $sickroom->hostel_id)>{{ $row->name }}</option>
                       @endforeach
                     </select>
