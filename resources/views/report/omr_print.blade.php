@@ -91,7 +91,7 @@
         </tr>
       </tbody>
     </table>
-    <p>Key Correction: Q.NO: 39</p>
+    <p>Key Correction: Q.NO: 78</p>
   </div>
   @endforeach
   <script>
