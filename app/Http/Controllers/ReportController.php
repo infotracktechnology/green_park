@@ -762,6 +762,101 @@ class ReportController extends Controller
 
         return view('report.hostelattendance', compact('hostels', 'section', 'attendance'));
     }
+        public function HostelList(Request $request)
+       {
+        $branches = Branch::all();
+        $hostels = collect();
+        $sections = collect();
+        $rooms = collect();
+
+        if ($request->filled('branch') && $request->filled('hostel') && $request->input('active_tab') == 'section_tab') {
+            $hostels = Hostel::where('branch_id', $request->branch)->get();
+
+            $sections = Student::where('campus', $request->branch)
+                ->where('hostel_id', $request->hostel)
+                ->where('hostel_dayscholar', 'HOSTEL')
+                ->where('academic_year', $this->academic_year)
+                ->where('section', '!=', '')
+                ->whereNotNull('section')
+                ->distinct()
+                ->pluck('section');
+        }
+
+        if ($request->filled('room_branch') && $request->filled('room_hostel') && $request->input('active_tab') == 'room_tab') {
+            $room_branch = $request->room_branch;
+            $room_hostel = $request->room_hostel;
+
+            $rooms = Student::where('campus', $room_branch)
+                ->where('hostel_id', $room_hostel)
+                ->where('hostel_dayscholar', 'HOSTEL')
+                ->where('academic_year', $this->academic_year)
+                ->select('room_no', DB::raw('count(*) as total_students'))
+                ->whereNotNull('room_no')
+                ->where('room_no', '!=', '')
+                ->groupBy('room_no')
+                ->orderBy('room_no', 'asc')
+                ->get();
+        }
+
+        if ($request->filled('branch') && $hostels->isEmpty()) {
+            $hostels = Hostel::where('branch_id', $request->branch)->get();
+        }
+        
+        $room_hostels = collect();
+        if ($request->filled('room_branch')) {
+            $room_hostels = Hostel::where('branch_id', $request->room_branch)->get();
+        }
+
+        return view('report.hostel_list', compact('branches', 'hostels', 'room_hostels', 'sections', 'rooms'));
+    }
+    public function downloadHostelSectionPdf(Request $request)
+    {
+        $request->validate([
+            'branch' => 'required',
+            'hostel' => 'required',
+            'section' => 'required',
+            'view' => 'required'
+        ]);
+
+        $hostelName = Hostel::find($request->hostel)?->name ?? 'Hostel';
+        $branchname = Branch::find($request->branch)?->name ?? '';
+        $section = $request->section;
+
+        $students = Student::where('campus', $request->branch)
+            ->where('hostel_id', $request->hostel)
+            ->where('section', $section)
+            ->where('hostel_dayscholar', 'HOSTEL')
+            ->where('academic_year', $this->academic_year)
+            ->get();
+
+        $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'section', 'hostelName'));
+        return $pdf->download("$hostelName-$section-$request->view.pdf");
+    }
+    public function downloadHostelRoomPdf(Request $request)
+    {
+        $request->validate([
+            'room_branch' => 'required',
+            'room_hostel' => 'required',
+            'room_no' => 'required',
+            'view' => 'required'
+        ]);
+
+        $room = $request->room_no;
+        $view = $request->view;
+        $hostelName = Hostel::find($request->room_hostel)?->name ?? 'Hostel';
+        
+
+        $students = Student::where('campus', $request->room_branch)
+            ->where('hostel_id', $request->room_hostel) 
+            ->where('room_no', $room)
+        
+            ->where('hostel_dayscholar', 'HOSTEL')
+            ->where('academic_year', $this->academic_year)
+            ->get();
+
+        $pdf = Pdf::loadView("pdf.$view", compact('students', 'room', 'hostelName'));
+        return $pdf->download("Room-$room-$view.pdf");
+    }
 
     public function HostelCourier(Request $request)
     {
