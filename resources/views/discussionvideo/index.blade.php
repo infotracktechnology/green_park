@@ -88,7 +88,7 @@
                         <td>{{ $discussionvideo->start_at }}</td>
                         <td>{{ $discussionvideo->end_at }}</td>
                         <td>
-                          <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$discussionvideo->title}}" data-module="Discussion Videos"> <i class="fas fa-eye"></i></button>
+                          <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$discussionvideo->video_id}}" data-module="Discussion Video"> <i class="fas fa-eye"></i></button>
                         </td>
                         <td>
                           <a href="{{ route('discussionvideo.edit', $discussionvideo->id) }}" class="btn btn-primary">

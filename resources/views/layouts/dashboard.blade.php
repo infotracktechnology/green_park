@@ -193,54 +193,17 @@
     });
     
     $(document).on('click', 'a', function(e) {
-        let href = $(this).attr('href');
-        if (!href || href === '#' || href.startsWith('javascript:')) return;
-    
-        let isPdf = href.toLowerCase().endsWith('.pdf') || href.toLowerCase().includes('.pdf');
-        let isVideo = href.includes('/video/') || $(this).text().toLowerCase().includes('watch');
-        let isAttachment = $(this).text().toLowerCase().includes('attachment') || $(this).closest('.notice-board-item-date').length > 0;
-        let isDownload = $(this).hasClass('btn-primary') && $(this).text().toLowerCase().includes('download');
-    
-        if (isPdf || isVideo || isAttachment || isDownload) {
-            let modules = $('title').text().trim() || 'Communication';
-            let titleText = '';
-    
-            let $row = $(this).closest('tr');
-            if ($row.length > 0) {
-                let $tds = $row.find('td');
-                let pageTitle = modules.toLowerCase();
-                
-                if (pageTitle.includes('class video') && $tds.length > 4) {
-                    titleText = $tds.eq(3).text().trim();
-                } else if (pageTitle.includes('revision video') && $tds.length > 5) {
-                    titleText = $tds.eq(4).text().trim();
-                } else if (pageTitle.includes('discussion video') && $tds.length > 3) {
-                    titleText = $tds.eq(2).text().trim();
-                } else if (pageTitle.includes('chairman Video') && $tds.length > 3) {
-                    titleText = $tds.eq(2).text().trim();
-                } else if ($tds.eq(0).text().trim().length <= 4 && !isNaN($tds.eq(0).text().trim())) {
-                    titleText = $tds.eq(1).text().trim() + ($tds.eq(2).length ? '-' + $tds.eq(2).text().trim() : '');
-                } else {
-                    titleText = $tds.eq(0).text().trim();
-                }
-            } else if ($(this).closest('.notice-board-item').length > 0) {
-                titleText = $(this).closest('.notice-board-item').find('.notice-board-item-title').text().replace('Title :', '').trim();
-            }
-            
-            if (!titleText) titleText = $(this).text().trim() || href.split('/').pop();
-            
-            let action = 'Seen '+titleText;
-    
+        let modules = $('title').text().trim() || 'Communication';
+        let action = $(this).data('action');
+        if (!action || action == '' || action == undefined) return;
             $.post('{{ route("student.logActivity") }}', {
                 _token: '{{ csrf_token() }}',
                 module: modules,
                 action: action,
                 student_id : '{{ auth()->user()->student_id }}'
             });
-        }
     });
   </script>
   @yield('js')
 </body>
-
 </html>

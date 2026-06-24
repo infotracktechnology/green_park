@@ -57,7 +57,7 @@
                         <a href="{{ route('video', base64_encode($video->video_id)) }}" 
                            target="_blank" 
                            class="watch-link" 
-                           data-title="{{ $video->title }}">Watch</a>
+                           data-action="seen {{ $video->video_id }}">Watch</a>
                       </td>
                     </tr>
                     @endforeach
