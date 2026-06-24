@@ -42,7 +42,7 @@
                         <td>{{ $test['exam_date'] }}</td>
                         <td>{{ $test['name'] }}</td>
                         <td><a href="{{ route('student.mark_subject', $test['test_id']) }}">{{ $test['mark']  }} / {{ $test['total'] }}</a></td>
-                        <td> {{ $test['first_mark'] }} </td>
+                        <td> {{ $test['first_mark'] }} / {{ $test['total'] }} </td>
 
                         @if($hasMarkRange)
                         <td>
