@@ -216,6 +216,8 @@
                     titleText = $tds.eq(4).text().trim();
                 } else if (pageTitle.includes('discussion video') && $tds.length > 3) {
                     titleText = $tds.eq(2).text().trim();
+                } else if (pageTitle.includes('chairman Video') && $tds.length > 3) {
+                    titleText = $tds.eq(2).text().trim();
                 } else if ($tds.eq(0).text().trim().length <= 4 && !isNaN($tds.eq(0).text().trim())) {
                     titleText = $tds.eq(1).text().trim() + ($tds.eq(2).length ? '-' + $tds.eq(2).text().trim() : '');
                 } else {

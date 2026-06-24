@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Chairman Videos')
+@section('title', 'Chairman Video')
 
 @section('css')
 @endsection
@@ -75,17 +75,4 @@
 @endsection
 
 @section('js')
-<script>
-  $(document).ready(function() {
-      $('.watch-link').click(function() {
-          const title = $(this).data('title');
-          $.post('{{ route("student.logActivity") }}', {
-              _token: '{{ csrf_token() }}',
-              module: 'Chairman Video',
-              action: 'Seen ' + title,
-              student_id: '{{ auth()->user()->student_id }}'
-          });
-      });
-  });
-</script>
 @endsection
