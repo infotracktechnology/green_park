@@ -15,6 +15,7 @@ use App\Models\Attendance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Options;
 use App\Models\StudentLog;
+use App\Models\HostelCourier;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -297,5 +298,12 @@ class StudentController extends Controller
             return redirect()->back()->with('success', 'Document option deleted successfully!');
         }
     }
+
+    public function CourierEntry(Request $request)
+    {
+        $student = auth()->user();
+        $hostelcouriers = HostelCourier::where('student_id', $student->student_id)->latest()->get();
+        return view('student.hostelcourier', compact('hostelcouriers'));
+     }
     
 }

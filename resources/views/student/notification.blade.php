@@ -60,7 +60,7 @@
                         @forelse($announcements as $announcement)
                             <div class="notice-board-item border mb-3 rounded" x-data="{ open: false, logged: false }">
                                 <div class="p-3 cursor-pointer d-flex justify-content-between align-items-center" 
-                                     @click="open = !open; if(open && !logged) { logAnnouncementView('{{ addslashes($announcement->title) }}'); logged = true; }">
+                                     @click="open = !open; if(open && !logged) { logAnnouncementView('{{ addslashes($announcement->id) }}'); logged = true; }">
                                     <div class="notice-board-item-title mb-0 d-flex align-items-center">
                                         <i class="fas fa-chevron-right mr-3 transition-all" :class="open ? 'rotate-90' : ''"></i>
                                         <span class="col-deep-purple">{{ $announcement->title }}</span>
@@ -103,11 +103,11 @@
 
 @section('js')
 <script>
-    function logAnnouncementView(title) {
+    function logAnnouncementView(id) {
         $.post('{{ route("student.logActivity") }}', {
             _token: '{{ csrf_token() }}',
             module: 'Announcement',
-            action: 'Seen ' + title,
+            action: 'Seen Announcement -' + id,
             student_id : '{{ auth()->user()->student_id }}'
         });
     }
