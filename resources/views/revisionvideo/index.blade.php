@@ -90,7 +90,7 @@
                       <td>{{ $row->video_id }}</td>
                       <td>{{ $row->expire_at }}</td>
                       <td>
-                        <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$row->chapter}}" data-module="Revision Videos"> <i class="fas fa-eye"></i></button>
+                        <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$row->video_id}}" data-module="Revision Video"> <i class="fas fa-eye"></i></button>
                       </td>
                       <td>
                         <a href="{{ route('revisionvideo.edit', $row->id) }}" class="btn btn-primary">

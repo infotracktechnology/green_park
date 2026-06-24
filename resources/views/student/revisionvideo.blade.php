@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Revision Videos')
+@section('title', 'Revision Video')
 
 @section('css')
 @endsection
@@ -40,7 +40,7 @@
                     <td>{{ $video->subject }}</td>
                     <td>{{ $video->chapter }}</td>
                     <td>{{ $video->expire_at->format('d/m/Y H:i') }}</td>
-                    <td><a href="{{ route('video', base64_encode($video->video_id)) }}" target="_blank">Watch</a></td>
+                    <td><a href="{{ route('video', base64_encode($video->video_id)) }}" data-action="seen {{ $video->video_id }}" target="_blank">Watch</a></td>
                   </tr>
                   @endforeach
                 </tbody>
