@@ -14,6 +14,10 @@
         <div class="col-12">
           <div class="card card-primary">
             <form method="get" id="myForm" action="{{ route('studentmenu.student') }}" enctype="multipart/form-data">
+              
+              <!-- Hidden input to trigger controller "assign" logic on submission -->
+              <input type="hidden" name="assign" value="1">
+
               <div class="card-body">
                 <div class="row">
                   <div class="col-12 mb-3">
@@ -57,7 +61,7 @@
                     </select>
                   </div>
 
-                  <div class="d-flex flex-wrap">
+                  <div class="d-flex flex-wrap col-12 mb-3">
                     @foreach($menus as $field)
                       <div class="form-group col-lg-3">
                         <label>
@@ -98,6 +102,16 @@
     branch_name: $("#branch option:selected").data('name')
   });
 
-  $("#branch, #type, #student").on("change", updateMenu);
+  // Handles dropdown dynamic reloading
+  $("#branch, #type, #student").on("change", function(e) {
+    // Optional: Reset nested choices if a higher parent changes
+    if (this.id === 'branch') {
+      goToMenu({ branch: $(this).val() });
+    } else if (this.id === 'type') {
+      goToMenu({ branch: $("#branch").val(), type: $(this).val() });
+    } else {
+      updateMenu();
+    }
+  });
 </script>
 @endsection
