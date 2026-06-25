@@ -740,7 +740,12 @@ class ReportController extends Controller
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $register = $request->room ? InOutRegister::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
+        $register = $request->room ? InOutRegister::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->when($request->filled('from_date'),
+         function ($q) use ($request) {$q->whereDate('created_at', '>=', $request->from_date); })->when($request->filled('to_date'), function ($q) use ($request) {
+            $q->whereDate('created_at', '<=', $request->to_date);
+        })
+        ->with('student')
+        ->get() : collect();
         return view('report.inoutregister', compact('hostels', 'room', 'register'));
     }
 
@@ -748,19 +753,89 @@ class ReportController extends Controller
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $sickroom = $request->room ? SickRoomEntry::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
-        return view('report.sickroom', compact('hostels', 'room', 'sickroom'));
+        $sickroom = $request->room
+            ? SickRoomEntry::where('hostel_id', $request->hostel)
+                ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
+                ->when($request->filled('from_date'), function ($q) use ($request) {
+                    $q->whereDate('in_time', '>=', $request->from_date);
+                })
+                ->when($request->filled('to_date'), function ($q) use ($request) {
+                    $q->whereDate('in_time', '<=', $request->to_date);
+                })
+                ->with('student')
+                ->get()
+            : collect();       
+             return view('report.sickroom', compact('hostels', 'room', 'sickroom'));
     }
 
-    public function HostelAttendance(Request $request)
+   public function HostelAttendance(Request $request)
     {
-        $hostels = $request->branch_id ? Hostel::where('branch_id', $request->branch_id)->get() : collect();
+        $branches = Branch::all(); 
+        $hostels = collect();
+        $section = collect();
+        $rooms = collect();
+        $attendance = collect();
 
-        $section = $request->hostel_id ? Student::where('hostel_id', $request->hostel_id)->distinct()->pluck('section') : collect();
+        $active_tab = $request->input('active_tab', 'section_tab');
 
-        $attendance = $request->date ? HostelAttendance::with('student')->where('hostel_id', $request->hostel_id)->where('section', $request->section)->where('attendance_date', $request->date)->get()->groupBy('student_id') : collect();
+        $selected_branch = ($active_tab == 'section_tab') ? $request->branch_id : $request->room_branch_id;
+        if ($selected_branch) {
+            $hostels = Hostel::where('branch_id', $selected_branch)->get();
+        }
 
-        return view('report.hostelattendance', compact('hostels', 'section', 'attendance'));
+        if ($active_tab == 'section_tab') {
+            if ($request->filled('hostel_id')) {
+                $section = Student::where('hostel_id', $request->hostel_id)
+                    ->where('hostel_dayscholar', 'HOSTEL')
+                    ->where('academic_year', $this->academic_year)
+                    ->distinct()
+                    ->pluck('section');
+            }
+
+            if ($request->filled('from_date') && $request->filled('to_date') && $request->filled('hostel_id') && $request->filled('section')) {
+                $attendance = HostelAttendance::with('student')
+                    ->where('hostel_id', $request->hostel_id)
+                    ->where('section', $request->section)
+                    ->where('academic_year', $this->academic_year)
+                    ->whereBetween('attendance_date', [$request->from_date, $request->to_date])
+                    ->get()
+                    ->groupBy(function($item) {
+                        return $item->student_id . '_' . $item->attendance_date;
+                    });
+            }
+        }
+
+        if ($active_tab == 'room_tab') {
+            $room_hostel_id = $request->room_hostel_id;
+            
+            if ($room_hostel_id) {
+                $rooms = Student::where('hostel_id', $room_hostel_id)
+                    ->where('hostel_dayscholar', 'HOSTEL')
+                    ->where('academic_year', $this->academic_year)
+                    ->whereNotNull('room_no')
+                    ->where('room_no', '!=', '')
+                    ->distinct()
+                    ->pluck('room_no');
+            }
+
+            if ($request->filled('from_date') && $request->filled('to_date') && $room_hostel_id && $request->filled('room_no')) {
+                $studentIds = Student::where('hostel_id', $room_hostel_id)
+                    ->where('room_no', $request->room_no)
+                    ->where('hostel_dayscholar', 'HOSTEL')
+                    ->where('academic_year', $this->academic_year)
+                    ->pluck('student_id');
+
+                $attendance = HostelAttendance::with('student')
+                    ->whereIn('student_id', $studentIds)
+                    ->whereBetween('attendance_date', [$request->from_date, $request->to_date])
+                    ->where('academic_year', $this->academic_year)
+                    ->get()
+                    ->groupBy(function($item) {
+                        return $item->student_id . '_' . $item->attendance_date;
+                    });
+            }
+        }
+        return view('report.hostelattendance', compact('branches', 'hostels', 'section', 'rooms', 'attendance', 'active_tab'));
     }
         public function HostelList(Request $request)
        {
@@ -862,7 +937,18 @@ class ReportController extends Controller
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $hostel_courier = $request->room ? HostelCourier::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->with('student')->get() : collect();
+        $hostel_courier = $request->room
+        ? HostelCourier::where('hostel_id', $request->hostel)
+            ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
+            ->when($request->filled('from_date'), function ($q) use ($request) {
+            $q->whereDate('datetime_arrival', '>=', $request->from_date);
+        })
+            ->when($request->filled('to_date'), function ($q) use ($request) {
+            $q->whereDate('datetime_arrival', '<=', $request->to_date);
+        })
+            ->with('student')
+            ->get()
+            : collect();
 
         return view('report.hostelcourier', compact('hostels', 'room', 'hostel_courier'));
     }
@@ -903,8 +989,24 @@ class ReportController extends Controller
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : [];
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $vacate_log = $request->room ? DB::table('vacate_log')->where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->get() : collect();
+        $vacate_log = collect();
 
+        if ($request->room) {
+
+        $vacate_log = DB::table('vacate_log')
+            ->where('hostel_id', $request->hostel)
+            ->when($request->room != 'all', function ($q) use ($request) {
+            $q->where('room_no', $request->room);
+            })
+                ->when($request->filled('from_date'), function ($q) use ($request) {
+                $q->whereDate('datetime', '>=', $request->from_date);
+            })
+                ->when($request->filled('to_date'), function ($q) use ($request) {
+                $q->whereDate('datetime', '<=', $request->to_date);
+            })
+                ->orderBy('datetime', 'desc')
+                ->get();
+        }
         return view('report.hostelvacate', compact('hostels', 'room', 'vacate_log'));
     }
 }

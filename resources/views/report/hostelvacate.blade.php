@@ -54,6 +54,16 @@
                     </select>
                   </div>
 
+                  <div class="form-group col-2">
+                    <label>From Date</label>
+                    <input type="date" name="from_date" class="form-control" max="{{ date('Y-m-d') }}" value="{{ request('from_date') }}">
+                  </div>
+
+                  <div class="form-group col-2">
+                      <label>To Date</label>
+                      <input type="date" name="to_date" class="form-control" max="{{ date('Y-m-d') }}" value="{{ request('to_date') }}">
+                  </div>
+
                   <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
                     <button type="submit" class="btn m-t-25 btn-primary">Submit</button>
