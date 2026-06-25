@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance,Document,Options};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance,Document,Options,HostelCourier};
 use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
@@ -250,6 +250,11 @@ Route::group(['prefix' => 'v2'], function () {
     Route::get('/sickroomentry/{student_id}', function ($student_id) {
         $sickroomentry = SickRoomEntry::where('student_id', $student_id)->latest()->get();
         return response()->json($sickroomentry);
+    });
+
+     Route::get('/courierentry/{student_id}', function ($student_id) {
+        $hostelcouriers = HostelCourier::where('student_id', $student_id)->latest()->get();
+        return response()->json($hostelcouriers);
     });
 
     Route::get('hostel/inoutregister/{student_id}/', function ($student_id) {

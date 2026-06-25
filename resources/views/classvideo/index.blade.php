@@ -129,7 +129,7 @@
                       <td>{{ $classvideo->start_at }}</td>
                       <td>{{ $classvideo->end_at }}</td>
                       <td>
-                        <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$classvideo->video_id}}" data-module="Class Video"> <i class="fas fa-eye"></i></button>
+                        <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$classvideo->id}}" data-module="Class Video"> <i class="fas fa-eye"></i></button>
                       </td>
                       <td>
                         <a href="{{ route('classvideo.edit', $classvideo->id) }}" class="btn btn-primary">

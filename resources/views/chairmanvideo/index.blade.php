@@ -89,7 +89,7 @@
                         <td>{{ $chairmanvideo->start_at ? date('d M Y H:i', strtotime($chairmanvideo->start_at)) : '-' }}</td>
                         <td>{{ $chairmanvideo->end_at ? date('d M Y H:i', strtotime($chairmanvideo->end_at)) : '-' }}</td>
                         <td>
-                          <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$chairmanvideo->video_id}}" data-module="Chairman Video"> <i class="fas fa-eye"></i></button>
+                          <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$chairmanvideo->id}}" data-module="Chairman Video"> <i class="fas fa-eye"></i></button>
                         </td>
 
                         <td>

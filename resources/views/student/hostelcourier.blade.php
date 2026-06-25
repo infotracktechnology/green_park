@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Sickroom Entries')
+@section('title', 'Courier Entry')
 
 @section('main')
 <div class="main-content">
@@ -9,7 +9,7 @@
         <div class="col-12">
           <div class="card card-primary">
             <div class="card-header">
-              <h4><i style="font-size: 30px;" class="fas fa-hotel"></i> My Sick Room Entries</h4>
+              <h4><i style="font-size: 30px;" class="fas fa-hotel"></i> My Hostel Courier Entries</h4>
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -17,26 +17,28 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>In Time</th>
-                      <th>Out Time</th>
-                      <th>Illness/Injury</th>
-                      <th>Medical Note</th>
-                      <th>Action Taken</th>
+                      <th>Hostel</th>
+                      <th>Room No</th>
+                      <th>Date & Time of Arrival</th>
+                      <th>Courier Company Name</th>
+                      <th>Sender information</th>
+                      <th>Details of Courier</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @forelse($entries as $entry)
+                    @forelse($hostelcouriers as $entry)
                     <tr>
                       <td>{{ $loop->iteration }}</td>
-                      <td>{{ $entry->in_time?->format('d/m/Y h:i A') }}</td>
-                      <td>{{ $entry->out_time?->format('d/m/Y h:i A') }}</td>
-                      <td>{{ $entry->illness }}</td>
-                      <td>{{ $entry->medical_note }}</td>
-                      <td>{{ $entry->action_taken }}</td>
+                      <td>{{ $entry->hostel?->name }}</td>
+                      <td>{{ $entry->room_no }}</td>
+                      <td>{{ $entry->datetime_arrival?->format('d/m/Y h:i A') }}</td>
+                      <td>{{ $entry->courier_company }}</td>
+                      <td>{{ $entry->sender_info }}</td>
+                      <td>{{ $entry->courier_details }}</td>
                     </tr>
                     @empty
                     <tr>
-                      <td colspan="6" class="text-center">No entries found.</td>
+                      <td colspan="7" class="text-center">No entries found.</td>
                     </tr>
                     @endforelse
                   </tbody>

@@ -39,7 +39,7 @@
                     <td>{{ $video->title }}</td>
                     <td>{{ $video->part }}</td>
                     <td>{{ $video->end_at->format('d/m/Y H:i') }}</td>
-                    <td><a href="{{ route('video', base64_encode($video->video_id)) }}" data-action="seen {{ $video->video_id }}" target="_blank">Watch</a></td>
+                    <td><a href="{{ route('video', base64_encode($video->video_id)) }}" data-action="seen Discussion Video - {{ $video->id }}" target="_blank">Watch</a></td>
                   </tr>
                   @endforeach
                 </tbody>

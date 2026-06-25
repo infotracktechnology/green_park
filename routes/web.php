@@ -240,6 +240,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::post('logActivity', 'logActivity')->name('student.logActivity');
         Route::match(['get', 'post'], 'neetdocument', 'NeetDocument')->name('student.neetdocument');
         Route::get('studentdownload', 'StudentDownload')->name('student.studentdownload');
+        Route::get('courierentry', 'CourierEntry')->name('student.courierentry');
     });
 
     Route::controller(AnnouncementController::class)->group(function () {
