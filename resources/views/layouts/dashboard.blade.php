@@ -48,12 +48,28 @@
     [x-cloak] {
       display: none !important;
     }
+    
+    /* Clean Full-Width adjustments for pages without Sidebars */
+    body.no-sidebar .main-sidebar {
+      display: none !important;
+    }
+    body.no-sidebar .main-content {
+      padding-left: 30px !important;
+      padding-right: 30px !important;
+    }
+    body.no-sidebar .main-navbar {
+      left: 0 !important;
+      width: 100% !important;
+    }
+    body.no-sidebar .collapse-btn {
+      display: none !important;
+    }
   </style>
 
   @yield('css')
 </head>
 
-<body>
+<body class="@yield('body_class')">
   <div class="loader"></div>
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
