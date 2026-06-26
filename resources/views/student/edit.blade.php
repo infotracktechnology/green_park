@@ -189,6 +189,11 @@
                   </select>
                 </div>
 
+                <div class="form-group col-lg-3">
+                  <label>description</label>
+                  <textarea name="description" id="description" cols="30" rows="3" class="form-control form-control-sm" >{{ old('description', $Student->description) }}</textarea>
+                </div>
+
                 <div class="form-group col-lg-12">
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
