@@ -126,6 +126,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
     Route::controller(HostelController::class)->group(function () {
         Route::put('sickroom/{sickroom}',[SickRoomEntryController::class, 'update'])->name('sickroom.update');
+        Route::match(['get', 'post'], 'hostel/room/transfer', 'RoomTransfer')->name('room.transfer');
         Route::post('room/delete', 'deleteRoom')->name('room.delete');
         Route::get('allocation/hostel', 'allocation')->name('allocation.hostel');
         Route::post('allocation/hostel', 'storeAllocation')->name('allocation.store');

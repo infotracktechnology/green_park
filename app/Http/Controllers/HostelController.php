@@ -238,6 +238,93 @@ class HostelController extends Controller
         return view('hostel.reallocation', compact('hostels', 'room', 'availableStudents', 'allocatedStudents', 'carts'));
     }
 
+public function RoomTransfer(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'student_id'   => 'required',
+                'to_hostel_id' => 'required',
+                'to_room_no'   => 'required',
+                'to_cot_no'    => 'required',
+            ]);
+
+            $isOccupied = Student::where('hostel_id', $request->to_hostel_id)
+                ->where('academic_year', $request->academic_year)
+                ->where('room_no', $request->to_room_no)
+                ->where('cots_no', $request->to_cot_no)
+                ->exists();
+
+            if ($isOccupied) {
+                return redirect()->back()->with('error', 'Selected cot is already occupied. Please choose another.');
+            }
+
+            $student = Student::findOrFail($request->student_id);
+            $student->update([
+                'hostel_id' => $request->to_hostel_id,
+                'room_no'   => $request->to_room_no,
+                'cots_no'   => $request->to_cot_no,
+            ]);
+
+            return redirect()->back()->with('success', 'Student room transferred successfully!');
+        }
+
+        if ($request->ajax()) {
+            if ($request->has('get_student_details')) {
+                $student = Student::find($request->student_id);
+                if ($student) {
+                    $hostel = Hostel::find($student->hostel_id);
+                    return response()->json([
+                        'success' => true,
+                        'hostel_name' => $hostel ? $hostel->name : 'N/A',
+                        'room_no' => $student->room_no,
+                        'cot_no' => $student->cots_no,
+                    ]);
+                }
+                return response()->json(['success' => false]);
+            }
+
+            if ($request->has('branch_id')) {
+                $hostels = Hostel::where('branch_id', $request->branch_id)->get();
+                return response()->json($hostels);
+            }
+
+            if ($request->has('hostel_id') && !$request->has('room_no')) {
+                $rooms = HostelRoom::where('hostel_id', $request->hostel_id)
+                    ->distinct()
+                    ->pluck('room_no');
+                return response()->json($rooms);
+            }
+
+            if ($request->has('hostel_id') && $request->has('room_no')) {
+                $hostelId = $request->hostel_id;
+                $roomNo = $request->room_no;
+
+                $occupiedCots = Student::where('hostel_id', $hostelId)
+                    ->where('room_no', $roomNo)
+                    ->where('academic_year', $request->academic_year)
+                    ->whereNotNull('cots_no')
+                    ->pluck('cots_no')
+                    ->toArray();
+
+                $freeCots = HostelRoom::where('hostel_id', $hostelId)
+                    ->where('room_no', $roomNo)
+                    ->whereNotIn('cart_no', $occupiedCots)
+                    ->pluck('cart_no');
+
+                return response()->json($freeCots);
+            }
+        }
+        $students = Student::when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))
+            ->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))
+            ->where('hostel_dayscholar', 'HOSTEL')    
+            ->whereNotNull('hostel_id')
+            ->whereNotNull('room_no')
+            ->whereNotNull('cots_no')
+            ->get();
+
+        $branches = Branch::all();
+        return view('hostel.room_transfer', compact('students', 'branches'));
+    }
 
     public function attendanceEntry(Request $request)
     {

@@ -197,6 +197,7 @@
                 <li><a href="{{ route('hostel.index') }}" class="nav-link">Add Hostel</a></li>
                 <li><a href="{{ route('allocation.hostel') }}" class="nav-link">Hostel Allocation</a></li>
                 <li><a href="{{ route('room.reallocation') }}" class="nav-link">Room Reallocation</a></li>
+                <li><a href="{{ route('room.transfer') }}" class="nav-link">Room Transfer</a></li>
                 <li><a href="{{ route('hostelattendance') }}" class="nav-link">Hostel Attendance </a></li>
                 <li><a href="{{ route('report.hostellist') }}" class="nav-link">Hostel Attendance list</a></li>
                 <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
