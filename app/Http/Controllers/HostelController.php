@@ -242,14 +242,14 @@ public function RoomTransfer(Request $request)
     {
         if ($request->isMethod('post')) {
             $request->validate([
-                'student_id'   => 'required',
-                'to_hostel_id' => 'required',
+                'student_id'   => 'required|exists:student,student_id',
+                'to_hostel_id' => 'required|exists:hostel,id',
                 'to_room_no'   => 'required',
                 'to_cot_no'    => 'required',
             ]);
 
             $isOccupied = Student::where('hostel_id', $request->to_hostel_id)
-                ->where('academic_year', $request->academic_year)
+                ->where('academic_year', $this->academic_year)
                 ->where('room_no', $request->to_room_no)
                 ->where('cots_no', $request->to_cot_no)
                 ->exists();
@@ -258,7 +258,7 @@ public function RoomTransfer(Request $request)
                 return redirect()->back()->with('error', 'Selected cot is already occupied. Please choose another.');
             }
 
-            $student = Student::findOrFail($request->student_id);
+            $student = Student::where('student_id', $request->student_id)->firstOrFail();
             $student->update([
                 'hostel_id' => $request->to_hostel_id,
                 'room_no'   => $request->to_room_no,
@@ -270,7 +270,7 @@ public function RoomTransfer(Request $request)
 
         if ($request->ajax()) {
             if ($request->has('get_student_details')) {
-                $student = Student::find($request->student_id);
+                $student = Student::where('student_id', $request->student_id)->first();
                 if ($student) {
                     $hostel = Hostel::find($student->hostel_id);
                     return response()->json([
@@ -301,7 +301,7 @@ public function RoomTransfer(Request $request)
 
                 $occupiedCots = Student::where('hostel_id', $hostelId)
                     ->where('room_no', $roomNo)
-                    ->where('academic_year', $request->academic_year)
+                    ->where('academic_year', $this->academic_year)
                     ->whereNotNull('cots_no')
                     ->pluck('cots_no')
                     ->toArray();
