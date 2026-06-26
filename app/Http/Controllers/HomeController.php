@@ -83,13 +83,13 @@ class HomeController extends Controller
             $parentconcern = ParentConcern::findOrFail($request->id);
 
             $updateData = ['status' => $request->status];
-                if ($request->hasFile('file')) {
-                    if ($parentconcern->file && file_exists($parentconcern->file)) {
-                        unlink($parentconcern->file);
-                    }
-                    $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
-                    $path = $request->file('file')->move('uploads/concern', $fileName);
-                    $updateData['file'] = $path;
+            if ($request->hasFile('file')) {
+                if ($parentconcern->file && file_exists($parentconcern->file)) {
+                    unlink($parentconcern->file);
+                }
+                $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
+                $path = $request->file('file')->move('uploads/concern', $fileName);
+                $updateData['file'] = $path;
 
                 $updateData['remark'] = $request->remark;
             }
@@ -147,34 +147,43 @@ class HomeController extends Controller
     {
         $menus = Options::where('type', 'student menu')->first();
         $menus = $menus->value ?? [];
-        $types = [];
+        $coachingtype = [];
         $menu_student = [];
         $students = [];
+
         if ($request->has('branch')) {
-            $types =  Student::where('campus', $request->branch)->select('coaching_type')->distinct()->get();
+            $coachingtype = Student::where('campus', $request->branch)
+                ->distinct()
+                ->pluck('coaching_type')
+                ->toArray();
         }
 
         if ($request->has('type')) {
-            $students =  Student::where('campus', $request->branch)->where('coaching_type', $request->type)->get();
+            $students = Student::where('campus', $request->branch)
+                ->where('coaching_type', $request->type)
+                ->get();
         }
 
         if ($request->has('student')) {
-            $menu_student = Student::where('student_id', $request->student)->first();
-            $menu_student = collect($menu_student->menu ?? [])->map(function ($menu) {
-                return $menu['title'];
+            $student_record = Student::where('student_id', $request->student)->first();
+            $menu_student = collect($student_record->menu ?? [])->map(function ($menu) {
+                return $menu['title'] ?? '';
             })->toArray();
         }
 
         if ($request->has('assign')) {
-            $menu = collect($request->fields)->map(function ($menu) {
+            $menu = collect($request->fields ?? [])->map(function ($menu) {
                 return json_decode($menu, true);
             })->toArray();
-            Student::where('student_id', $request->student)->update(['menu' => $menu]);
-            return redirect()->route('studentmenu.student')->with('success', 'Menu updated successfully!');
-        }
 
-        return view('studentmenu.student', compact('menus', 'menu_student', 'types', 'students'));
+            Student::where('student_id', $request->student)->update(['menu' => $menu]);
+
+            return redirect()->route('studentmenu.student', ['branch' => $request->branch,'type' => $request->type,'student' => $request->student])->with('success', 'Menu updated successfully!');
+        }
+        // Return view passing 'coachingtype'
+        return view('studentmenu.student', compact('menus', 'menu_student', 'coachingtype', 'students'));
     }
+
 
     public function Filter(Request $request)
     {
