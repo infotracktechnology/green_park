@@ -184,6 +184,8 @@
               <th>Course</th>
               <th>Coaching Type</th>
               <th>Section</th>
+              <th>Father Mobile</th>
+              <th>Mother Mobile</th>
             </tr>
           </thead>
           <tbody id="studentTableBody"></tbody>
@@ -216,6 +218,8 @@ function loadStudents(type) {
                 <td>${student.course}</td>
                 <td>${student.coaching_type}</td>
                 <td>${student.section}</td>
+                <td>${student.father_ph_no}</td>
+                <td>${student.mother_ph_no}</td>
             </tr>
         `);
     });
