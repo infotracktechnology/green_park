@@ -1,5 +1,9 @@
 @extends('layouts.dashboard')
-@section('title', 'Examinations')
+@section('title', 'Online Exam')
+
+<!-- Setting body class to trigger standard sidebar removal on layout -->
+@section('body_class', 'no-sidebar')
+
 @section('css')
 <style>
   .test-questions td a {
@@ -74,6 +78,20 @@
       border-color: #ff9800 !important;
       color: #fff !important;
   }
+
+  /* Improved Helpline Alert layout styles */
+  .contact-helpline-alert {
+      background-color: #e3f2fd !important;
+      border-left: 5px solid #2196f3 !important;
+      border-radius: 4px;
+  }
+
+  /* Restyled instructions card guide list */
+  .guide-card-item {
+      border: 1px solid #e4e6fc;
+      border-radius: 6px;
+      background-color: #fafbfe;
+  }
 </style>
 @endsection
 
@@ -81,37 +99,71 @@
 <div class="main-content">
   <section class="section">
     <div class="section-body">
-      <form method="post" id="examForm" onsubmit="return confirm('Are you sure you want to submit?')" action="{{ route('exam.submit') }}" enctype="multipart/form-data">
+      <form method="post" id="examForm"  action="{{ route('exam.submit') }}" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="test_id" value="{{ $exam->testid }}">
         <input type="hidden" name="testname" value="{{ $exam->name }}">
         <input type="hidden" name="student_id" value="{{ auth()->user()->student_id }}">
+        
         <div class="row exam-paper">
 
-          <!-- Warnings -->
+          <!-- Warnings Section -->
           <div class="col-md-12">
-            <div class="alert alert-danger" role="alert">
-              <p class="font-weight-bold mb-0"><i class="fa fa-exclamation-triangle"></i> Warning: Your exam will be automatically submitted if you switch tabs or leave the exam window.</p>
+            <div class="alert alert-danger shadow-sm mb-3 d-flex align-items-center" role="alert">
+              <i class="fa fa-exclamation-triangle fa-lg mr-3"></i>
+              <div>
+                <p class="font-weight-bold mb-0">Warning: Your exam will be automatically submitted if you switch tabs or leave the exam window.</p>
+              </div>
+            </div>
+
+            <!-- Helpline Numbers Block -->
+            <div class="alert contact-helpline-alert shadow-sm mb-4 d-flex align-items-center text-dark" role="alert">
+              <i class="fa fa-headset fa-lg mr-3 text-primary"></i>
+              <div>
+                <strong>Online Exam Queries / Helpline Contacts:</strong>
+                <span class="mx-1"></span>
+                <a href="tel:9360644836" class="badge badge-white text-dark font-weight-bold border shadow-sm py-2 px-3 mr-1" style="font-size: 13px;">
+                  <i class="fa fa-phone text-primary"></i> 93606 44836
+                </a>
+                <a href="tel:9361048223" class="badge badge-white text-dark font-weight-bold border shadow-sm py-2 px-3 mr-1" style="font-size: 13px;">
+                  <i class="fa fa-phone text-primary"></i> 93610 48223
+                </a>
+                <a href="tel:9342554546" class="badge badge-white text-dark font-weight-bold border shadow-sm py-2 px-3" style="font-size: 13px;">
+                  <i class="fa fa-phone text-primary"></i> 93425 54546
+                </a>
+              </div>
             </div>
           </div>
 
-          <!-- Task 3: Added Instructions Panel -->
-          <div class="col-md-12 mb-3">
-            <div class="card shadow-sm border-info" style="border-radius: 5px;">
+          <!-- Restructured Instructions Panel Guide -->
+          <div class="col-md-12 mb-4">
+            <div class="card shadow-sm border-light" style="border-left: 4px solid #2b66a2; border-radius: 6px;">
               <div class="card-body p-3">
-                <h6 class="text-info font-weight-bold mb-2"><i class="fa fa-info-circle"></i> Instructions</h6>
-                <div class="row small text-muted">
-                  <div class="col-md-6">
-                    <ul class="pl-3 mb-1">
-                      <li><strong>Save & Next:</strong> Saves your selected answer and moves to the next question.</li>
-                      <li><strong>Save & Mark For Review:</strong> Saves your answer and flags it for later review. (It will be evaluated)</li>
-                    </ul>
+                <h6 class="text-primary font-weight-bold mb-3"><i class="fa fa-info-circle"></i> Quick Exam Navigation Guide</h6>
+                <div class="row">
+                  <div class="col-md-3 col-sm-6 mb-2">
+                    <div class="p-2 guide-card-item h-100 shadow-sm">
+                      <span class="badge badge-success mb-2" style="font-size: 11px;">Save &amp; Next</span>
+                      <p class="small text-muted mb-0">Saves your chosen option and goes to the next question.</p>
+                    </div>
                   </div>
-                  <div class="col-md-6">
-                    <ul class="pl-3 mb-1">
-                      <li><strong>Mark for Review & Next:</strong> Flags the question without answering and moves to the next question.</li>
-                      <li><strong>Clear:</strong> Removes your currently selected answer.</li>
-                    </ul>
+                  <div class="col-md-3 col-sm-6 mb-2">
+                    <div class="p-2 guide-card-item h-100 shadow-sm">
+                      <span class="badge btn-orange mb-2 text-white" style="font-size: 11px;">Save &amp; Mark For Review</span>
+                      <p class="small text-muted mb-0">Saves options, sets a flag for later, and marks it for active evaluation.</p>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-6 mb-2">
+                    <div class="p-2 guide-card-item h-100 shadow-sm">
+                      <span class="badge badge-primary mb-2" style="font-size: 11px;">Mark for Review &amp; Next</span>
+                      <p class="small text-muted mb-0">Flags the question without choosing an answer to visit later.</p>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-6 mb-2">
+                    <div class="p-2 guide-card-item h-100 shadow-sm">
+                      <span class="badge badge-light border mb-2 text-dark" style="font-size: 11px;">Clear</span>
+                      <p class="small text-muted mb-0">Deselects and resets any option chosen on the current question.</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -122,7 +174,7 @@
             <table>
               <tbody>
                 <tr>
-                  <td style="padding: 5px 15px;"><i class="fa fa-user" style="font-size:90px;"></i></td>
+                  <td><img src="{{ auth()->user()->photo }}"  onerror="this.src='{{ asset('img/avather.png') }}';" style="height: 100px;width: 100px;" class="profile-img mb-3"></td>
                   <td>
                     <table class="info-table">
                       <tbody>
@@ -146,7 +198,7 @@
                         <tr>
                           <td style="padding: 0px 5px;">Remaining Time</td>
                           <td>
-                            : <span class="badge badge-danger" id="timerDisplay">00:00:00</span>
+                            : <span class="badge badge-danger timerDisplay" style="font-size: 14px;">00:00:00</span>
                           </td>
                         </tr>
                       </tbody>
@@ -156,7 +208,9 @@
               </tbody>
             </table>
           </div>
+          
           <div class="col-md-4">
+            <!-- Modern Prominent Sticky Timer Widget -->
             <div class="mt-2" style="border:dotted;">
               <table class="table table-borderless mb-0 test-questions">
                 <thead>
@@ -345,7 +399,8 @@
               const hours = Math.floor(timer / 3600);
               const minutes = Math.floor((timer % 3600) / 60);
               const seconds = timer % 60;
-              $('#timerDisplay').text(
+              // Updates all classes named timerDisplay in sync
+              $('.timerDisplay').text(
                   `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
               );
           } else {
@@ -665,5 +720,4 @@ function calculateSubjectWiseStats() {
       updateCounts();
   });
 </script>
-
 @endsection

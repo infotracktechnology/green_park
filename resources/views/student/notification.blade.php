@@ -3,9 +3,6 @@
 @section('title', 'Announcements')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
-<link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
     .notice-board {
         margin-top: 20px;

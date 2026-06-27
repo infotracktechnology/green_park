@@ -110,6 +110,7 @@
         <tr>
             @for ($col = 0; $col < 5; $col++)
                 <!-- Data Column -->
+                <?php $rowsize = (int)$exam_total_questions/5; ?>
                 <td>
                     <table class="omr-table">
                         <thead>
@@ -119,9 +120,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for ($row = 1; $row <= 36; $row++)
+                            @for ($row = 1; $row <= $rowsize; $row++)
                                 @php
-                                    $qNum = $row + ($col * 36);
+                                    $qNum = $row + ($col * $rowsize);
                                 @endphp
                                 <tr>
                                     <td>{{ $qNum }}.</td>
