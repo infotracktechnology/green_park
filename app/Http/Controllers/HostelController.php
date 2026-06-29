@@ -78,13 +78,12 @@ class HostelController extends Controller
         $hostels = Hostel::with('rooms')->findOrFail($id);
 
         $staffs = Staff::all();
-        $rooms = HostelRoom::where('hostel_id', $id)->select('floor','room_no','cot_type',
-        DB::raw('MAX(no_of_cots) as no_of_cots'))
-        ->groupBy('floor', 'room_no', 'cot_type')
-        ->orderBy('room_no')
-        ->orderBy('cot_type')
-        ->get()
-        ->toArray();
+        $rooms = HostelRoom::where('hostel_id', $id)->select('floor', 'room_no', 'cot_type', DB::raw('MAX(id) as id'), DB::raw('MAX(no_of_cots) as no_of_cots'))
+            ->groupBy('floor', 'room_no', 'cot_type')
+            ->orderBy('room_no')
+            ->orderBy('cot_type')
+            ->get()
+            ->toArray();
         return view('hostel.edit', compact('hostels',  'staffs', 'rooms'));
     }
 
@@ -132,6 +131,7 @@ class HostelController extends Controller
         session()->flash('success', 'Hostel deleted successfully');
         return to_route('hostel.index');
     }
+
 
     public function show(Request $request,$id)
     {
