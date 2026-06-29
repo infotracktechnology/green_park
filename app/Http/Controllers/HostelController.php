@@ -78,7 +78,13 @@ class HostelController extends Controller
         $hostels = Hostel::with('rooms')->findOrFail($id);
 
         $staffs = Staff::all();
-        $rooms = HostelRoom::where('hostel_id', $id)->groupBy('room_no')->orderBy('id')->get()->toArray();
+        $rooms = HostelRoom::where('hostel_id', $id)->select('floor','room_no','cot_type',
+        DB::raw('MAX(no_of_cots) as no_of_cots'))
+        ->groupBy('floor', 'room_no', 'cot_type')
+        ->orderBy('room_no')
+        ->orderBy('cot_type')
+        ->get()
+        ->toArray();
         return view('hostel.edit', compact('hostels',  'staffs', 'rooms'));
     }
 
