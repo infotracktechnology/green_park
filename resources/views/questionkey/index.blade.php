@@ -65,6 +65,7 @@
                         <th>Branch </th>
                         <th>Coaching Type</th>
                         <th>Title</th>
+                        <th>Schedule At</th>
                         <th>File</th>
                         <th>Edit</th>
                       </tr>
@@ -78,6 +79,7 @@
                         <td>{{ $row->branchNames() }}</td>
                         <td>{{ $row->coaching_type }}</td>
                         <td>{{ $row->title}}</td>
+                        <td>{{ $row->start_at }}</td>
                         <td>
                           @if($row->file_path)
                           <a href="{{ env('APP_URL').'/'.$row->file_path }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
