@@ -115,7 +115,7 @@ class MockTestController extends Controller
         $answersData = ExamAnswer::where('testname', $testname)->where('student_id', $student->student_id)->get()->keyBy('q_no');
 
         $answers = [];
-        for ($i = 1; $i <= $exam->total_question; $i++) {
+        for ($i = 1; $i <= $exam->total_questions; $i++) {
             $answers[$i] = $answersData[$i]->answer ?? 0;
         }
 
