@@ -36,8 +36,7 @@
                   <td>{{ $file->getRelativePath() }}</td>
                   <td>
                     <!-- Generates the correct URL including the subdirectory -->
-<a href="{{ env('APP_URL').'uploads/Student Download/'.$file->getRelativePathname() }}" class="btn btn-primary" download>                      Download
-                    </a>
+                    <a href="{{ env('APP_URL').'uploads/Student Download/'.$file->getRelativePathname() }}" class="btn btn-primary" download>Download</a>
                   </td>
                 </tr>
                 @endforeach
