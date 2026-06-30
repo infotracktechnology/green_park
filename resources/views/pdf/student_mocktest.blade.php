@@ -110,7 +110,7 @@
         <tr>
             @for ($col = 0; $col < 5; $col++)
                 <!-- Data Column -->
-                <?php $rowsize = (int)$exam_total_questions/5; ?>
+                <?php $rowsize = (int)$exam->total_questions/5; ?>
                 <td>
                     <table class="omr-table">
                         <thead>
