@@ -23,15 +23,21 @@
               <thead>
                 <tr>
                   <th>File Name</th>
+                  <th>Category/Subdirectory</th>
                   <th>Download</th>
                 </tr>
               </thead>
               <tbody>
                 @foreach($files as $file)
                 <tr>
+                  <!-- Shows only the file name -->
                   <td>{{ $file->getFilename() }}</td>
+                  <!-- Shows the subdirectory (e.g., passport or postcard) -->
+                  <td>{{ $file->getRelativePath() }}</td>
                   <td>
-                  <a href="{{ env('APP_URL')."uploads/Student Download/".$file->getFilename() }}" class="btn btn-primary" download>Download</a>
+                    <!-- Generates the correct URL including the subdirectory -->
+<a href="{{ env('APP_URL').'uploads/Student Download/'.$file->getRelativePathname() }}" class="btn btn-primary" download>                      Download
+                    </a>
                   </td>
                 </tr>
                 @endforeach
