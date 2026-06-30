@@ -270,15 +270,28 @@ class StudentController extends Controller
         return response()->json(['success' => true, 'logs' => $logs]);
     }
 
-    public function StudentDownload(Request $request)
-    {
-        $student = auth()->user();
-        $allFiles = File::allFiles("uploads/Student Download/");
-        $files = collect($allFiles)->filter(function ($file) use ($student) {
-            return str_starts_with($file->getFilename(), $student->student_id);
-        });
+public function StudentDownload(Request $request)
+{
+    $student = auth()->user();
+    $directory = 'uploads/Student Download';
+
+    if (!File::exists($directory)) {
+        $files = collect();
         return view('student.studentdownload', compact('files'));
     }
+    if (!$student->is_download) {
+        $files = collect();
+        return view('student.studentdownload', compact('files'));
+    }
+
+    $allFiles = File::allFiles($directory);
+
+    $files = collect($allFiles)->filter(function ($file) use ($student) {
+        return str_starts_with($file->getFilename(), $student->student_id);
+    });
+
+    return view('student.studentdownload', compact('files'));
+ }
     public function DocumentOption(Request $request)
     {
         $options = Options::where('type', 'Document Option')->first();

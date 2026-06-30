@@ -277,7 +277,7 @@ Route::group(['prefix' => 'v2'], function () {
         $allFiles = File::allFiles("uploads/Student Download/");
         $files = collect($allFiles)->filter(function ($file) use ($student) {
             return str_starts_with($file->getFilename(), $student->student_id);
-        });
+        })->toArray();
         return response()->json($files);
     });
 
