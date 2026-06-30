@@ -21,6 +21,8 @@ class ExamController extends Controller
 
     public function ViewExams(Request $request, $examtype)
     {
+        Exam::where('end_at', '<', now())->whereNotNull('end_at')->where('status', '!=', 'completed')->update(['status' => 'completed']);
+
         $tests = Exam::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
                 $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');

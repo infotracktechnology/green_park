@@ -96,10 +96,10 @@ class StudentController extends Controller
 
     public function permanentdelete(Request $request)
     {
-      $student = Student::withTrashed()->findOrFail($request->id);
-      if($student){
-        $student->forceDelete();
-      } 
+        $student = Student::withTrashed()->findOrFail($request->id);
+        if ($student) {
+            $student->forceDelete();
+        }
         return redirect()->back()->with('success', 'Student permanently deleted successfully.');
     }
     public function section()
@@ -270,28 +270,28 @@ class StudentController extends Controller
         return response()->json(['success' => true, 'logs' => $logs]);
     }
 
-public function StudentDownload(Request $request)
-{
-    $student = auth()->user();
-    $directory = 'uploads/Student Download';
+    public function StudentDownload(Request $request)
+    {
+        $student = auth()->user();
+        $directory = 'uploads/Student Download';
 
-    if (!File::exists($directory)) {
-        $files = collect();
+        if (!File::exists($directory)) {
+            $files = collect();
+            return view('student.studentdownload', compact('files'));
+        }
+        if (!$student->is_download) {
+            $files = collect();
+            return view('student.studentdownload', compact('files'));
+        }
+
+        $allFiles = File::allFiles($directory);
+
+        $files = collect($allFiles)->filter(function ($file) use ($student) {
+            return str_starts_with($file->getFilename(), $student->student_id);
+        });
+
         return view('student.studentdownload', compact('files'));
     }
-    if (!$student->is_download) {
-        $files = collect();
-        return view('student.studentdownload', compact('files'));
-    }
-
-    $allFiles = File::allFiles($directory);
-
-    $files = collect($allFiles)->filter(function ($file) use ($student) {
-        return str_starts_with($file->getFilename(), $student->student_id);
-    });
-
-    return view('student.studentdownload', compact('files'));
- }
     public function DocumentOption(Request $request)
     {
         $options = Options::where('type', 'Document Option')->first();
@@ -317,6 +317,5 @@ public function StudentDownload(Request $request)
         $student = auth()->user();
         $hostelcouriers = HostelCourier::where('student_id', $student->student_id)->latest()->get();
         return view('student.hostelcourier', compact('hostelcouriers'));
-     }
-    
+    }
 }

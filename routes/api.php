@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest,Attendance,Document,Options,HostelCourier};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier};
 use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
@@ -56,7 +56,7 @@ Route::group(['prefix' => 'v2'], function () {
         $announcement = Announcement::find($id);
         if ($announcement) {
             $announcement->content = preg_replace('/<\/?p>/', '', $announcement->content);
-            $announcement->attachment = $announcement->attachment ? "public/".$announcement->attachment : null;
+            $announcement->attachment = $announcement->attachment ? "public/" . $announcement->attachment : null;
         }
         return response()->json($announcement);
     });
@@ -92,15 +92,15 @@ Route::group(['prefix' => 'v2'], function () {
         $batch = $student->batch;
         $type = $student->coaching_type;
         $course = $student->course;
-        $results = Exam::from("exam as b")->join('exam_answer as a', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch, $type,$course) {
-            if($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")){
+        $results = Exam::from("exam as b")->join('exam_answer as a', 'a.test_id', '=', 'b.testid')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.updated_at', 'desc')->limit(5)->get()->map(function ($test) use ($batch, $type, $course) {
+            if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
                 $markrange = isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null;
-            }else{
+            } else {
                 $markrange = isset($test->markrange_file['online']) ? $test->markrange_file['online'] : null;
             }
-            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total,'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark,'markrange' => $markrange];
+            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total, 'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark, 'markrange' => $markrange];
         });
-        
+
         $testgroup = ExamSubjectReport::where([['category', '!=', ''], ['stuid', $student_id]])->pluck('category')->unique();
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);
@@ -219,23 +219,23 @@ Route::group(['prefix' => 'v2'], function () {
 
 
 
-     Route::get('/document/{student_id}', function (Request $request, $student_id) {
-       $documents = Document::where('student_id', $student_id)->latest()->get();
-       $options = Options::where('type', 'Document Option')->first();
-       $options = $options->value ?? [];
-       return response()->json(['documents' => $documents, 'options' => $options]);
+    Route::get('/document/{student_id}', function (Request $request, $student_id) {
+        $documents = Document::where('student_id', $student_id)->latest()->get();
+        $options = Options::where('type', 'Document Option')->first();
+        $options = $options->value ?? [];
+        return response()->json(['documents' => $documents, 'options' => $options]);
     });
 
     Route::post('/document_upload', function (Request $request) {
-       $studentId = $request->student_id;
-       if ($request->hasFile('document_file')) {
+        $studentId = $request->student_id;
+        if ($request->hasFile('document_file')) {
             $file = $request->file('document_file');
-            $fileName = $studentId.'_'.$request->document_name.'.'.$file->getClientOriginalExtension();
+            $fileName = $studentId . '_' . $request->document_name . '.' . $file->getClientOriginalExtension();
             $file->move('uploads/documents', $fileName);
             Document::create([
                 'student_id' => $studentId,
                 'document_name' => $request->document_name,
-                'file' => 'uploads/documents/'.$fileName,
+                'file' => 'uploads/documents/' . $fileName,
             ]);
         }
         return response()->json(['message' => 'Document uploaded successfully.']);
@@ -252,7 +252,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($sickroomentry);
     });
 
-     Route::get('/courierentry/{student_id}', function ($student_id) {
+    Route::get('/courierentry/{student_id}', function ($student_id) {
         $hostelcouriers = HostelCourier::where('student_id', $student_id)->latest()->get();
         return response()->json($hostelcouriers);
     });
@@ -272,22 +272,39 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($student->GetExam());
     });
 
-      Route::get('/studentdownload/{student_id}', function (Request $request, $student_id) {
+    Route::get('/studentdownload/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $allFiles = File::allFiles("uploads/Student Download/");
-        $files = collect($allFiles)->filter(function ($file) use ($student) {
-            return str_starts_with($file->getFilename(), $student->student_id);
-        })->toArray();
+        if (!$student->is_download) {
+            return response()->json([]);
+        }
+
+        $directory = 'uploads/Student Download/';
+        if (!File::exists($directory)) {
+            return response()->json([]);
+        }
+
+        $allFiles = File::allFiles($directory);
+
+        $files = collect($allFiles)
+            ->filter(function ($file) use ($student) {
+                return str_starts_with($file->getFilename(), $student->student_id);
+            })->map(function ($file) {
+                return [
+                    'filename' => $file->getFilename(),
+                    'category' => $file->getRelativePath(),
+                    'download_url' => env('APP_URL').'uploads/Student Download/'.$file->getRelativePathname(),
+                ];
+            })->values()->all();
         return response()->json($files);
     });
 
-    Route::post('/logactivity',[StudentController::class,'logActivity']);
+    Route::post('/logactivity', [StudentController::class, 'logActivity']);
 
     Route::get('/video/{student_id}/{id}', function (Request $request, $student_id, $id) {
-        try{
+        try {
             $id = base64_decode($id);
             return view('layouts.video', compact('id'));
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()]);
         }
     });
