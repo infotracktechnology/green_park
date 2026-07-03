@@ -83,8 +83,8 @@
                         <label for="no_of_beds">Cot Type</label>
                         <div class="d-flex align-items-center">
                           <select x-model="room.cot_type" :name="`rooms[${index}][cot_type]`" class="form-control form-control-sm me-2" required>
-                          <option value="C-">C- NORMAL</option>
-                          <option value="L-">L- LOW</option>
+                          <option value="C-">C- SINGLE</S></option>
+                          <option value="L-">L- LOWER</option>
                           <option value="U-">U - UPPER</option>
                           </select>
                         </div>

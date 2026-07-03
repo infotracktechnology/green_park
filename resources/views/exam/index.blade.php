@@ -75,7 +75,7 @@
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th>status</th>
-                        <th>Test attend</th>
+                        {{-- <th>Test attend</th> --}}
                         <th>Perview</th>
                         <th>Edit</th>
                       </tr>
@@ -97,7 +97,7 @@
                         <td>
                           <span class="badge badge-{{ $test->status == 'scheduled' ? 'success' : 'danger' }}">{{ $test->status }}</span>
                         </td>
-                        <td>{{ $test->student_count }}</td>
+                        {{-- <td>{{ $test->student_count }}</td> --}}
 
                         <td>
                           <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>

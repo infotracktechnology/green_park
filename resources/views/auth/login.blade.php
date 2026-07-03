@@ -400,14 +400,40 @@
           </form>
           <div class="dived"></div>
           <hr>
-          <div class="app1">
+          {{-- <div class="app1">
             <h4 class="app_txt">GPCC</h4>
             <div class="small">Get on your mobile - Download now</div>
             <div class="download-links">
               <a href="https://play.google.com/store/apps/details?id=com.gpcc.gpcc" target="_blank"><img src="{{asset('img/silde/google-play.png')}}" alt="Google Play">
                 <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank"><img src="{{asset('img/silde/app-store.png')}}" alt="App Store"></a>
             </div>
-          </div>
+          </div> --}}
+
+          {{-- Admission Details --}}
+            <div class="app1 mt-3">
+                <h4 class="text-center text-primary fw-bold mb-3">Admission Details</h4>
+                <table class="table table-borderless mb-0 text-center align-middle">
+                    <tr>
+                        <td width="45%">
+                            <i class="fas fa-headset fa-2x text-primary "></i><br>
+                            <strong class="text-primary">Online Admission</strong><br><br>
+                            9080274132
+                            <br><br><br>
+                        </td>
+                        <td width="10%">
+                            <div style="width:1px;height:120px;background:#ddd;margin:auto;"></div>
+                        </td>
+                        <td width="45%">
+                            <i class="fas fa-users fa-2x text-primary "></i><br>
+                            <strong class="text-primary">Offline Admission</strong><br><br>
+                            9360644836<br>
+                            9342441936<br>
+                            9342440024
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
         </div>
       </div>
     </div>
