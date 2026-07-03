@@ -1009,4 +1009,46 @@ class ReportController extends Controller
         }
         return view('report.hostelvacate', compact('hostels', 'room', 'vacate_log'));
     }
+   public function HostelVacancy(Request $request)
+    {
+        $branches = Branch::all();
+        $hostels = $request->filled('branch') ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $room = $request->filled('hostel') ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->orderBy('room_no')->pluck('room_no') : collect();
+
+        $vacancy_log = collect();
+
+        if ($request->filled('branch') && $request->filled('hostel')) {
+
+            $occupiedCounts = Student::where('hostel_id', $request->hostel)->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))
+            ->whereNotNull('room_no')->where('academic_year', $this->academic_year)->where('room_no', '!=', '')->groupBy('room_no')->select('room_no', DB::raw('count(*) as count'))->pluck('count', 'room_no')->toArray();
+
+            $roomsQuery = HostelRoom::where('hostel_id', $request->hostel);
+
+            if ($request->filled('room') && $request->room !== 'all') {
+                $roomsQuery->where('room_no', $request->room);
+            }
+
+        $roomsData = $roomsQuery->select('room_no',DB::raw('MAX(cot_type) as cot_type'),DB::raw('MAX(no_of_cots) as no_of_cots'))->groupBy('room_no')->orderByRaw('CAST(SUBSTRING(room_no, 3) AS UNSIGNED) ASC')->get();
+
+            $selectedHostel = Hostel::find($request->hostel);
+            $hostelName = $selectedHostel ? $selectedHostel->name : '';
+
+            $vacancy_log = $roomsData->map(function ($roomRecord) use ($occupiedCounts, $hostelName) {
+                $roomNo = trim($roomRecord->room_no);
+                $occupied = $occupiedCounts[$roomNo] ?? 0;
+                $capacity = (int) $roomRecord->no_of_cots;
+                $vacancy = max(0, $capacity - $occupied);
+
+                return (object) [
+                    'hostel_name' => $hostelName,
+                    'room_no'     => $roomRecord->room_no,
+                    'room_type'   => $roomRecord->cot_type ?? 'Standard', 
+                    'capacity'    => $capacity,
+                    'occupied'    => $occupied,
+                    'vacancy'     => $vacancy
+                ];
+            });
+        }
+        return view('report.hostelvacancy', compact('branches','hostels','room','vacancy_log'));
+    }
 }
