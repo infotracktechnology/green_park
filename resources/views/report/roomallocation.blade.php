@@ -53,6 +53,15 @@
                       @endforeach
                     </select>
                   </div>
+                  <div class="form-group col-2">
+                      <label>From Date</label>
+                      <input type="date" name="from_date" class="form-control" max="{{ date('Y-m-d') }}" value="{{ request('from_date') }}">
+                  </div>
+
+                  <div class="form-group col-2">
+                      <label>To Date</label>
+                      <input type="date" name="to_date" class="form-control" max="{{ date('Y-m-d') }}" value="{{ request('to_date') }}">
+                  </div>
 
                   <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
@@ -78,6 +87,7 @@
                           <th>Section</th>
                           <th>Room</th>
                           <th>Cot No</th>
+                          <th>Allocated Date</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -92,6 +102,7 @@
                           <td>{{ $row->section }}</td>
                           <td>{{ $row->room_no }}</td>
                           <td>{{ $row->cots_no }}</td>
+                          <td>{{ $row->allocation_date }}</td>
                         </tr>
                         @endforeach
                       </tbody>

@@ -151,7 +151,7 @@ class HostelController extends Controller
 
             $occupiedCots = Student::where('hostel_id', $hostels->id)
             ->where('room_no', $room->room_no)
-            ->when($request->academic_year, fn($q) => $q->where('academic_year', $request->academic_year))
+            ->where('academic_year', $this->academic_year)
             ->pluck('cots_no')->toArray();
 
             foreach ($cots as $cot) {
@@ -185,8 +185,8 @@ class HostelController extends Controller
         foreach ($csvData as $key => $row) {
             $no = $key + 1;
 
-            if (!isset($row['stuid']) || !isset($row['hosname']) || !isset($row['room_no']) || !isset($row['cot_no'])) {
-              return redirect()->back()->with('error', "CSV file is missing required fields in row ($no) & column (stuid, hosname, room_no, cot_no).");
+            if (!isset($row['stuid']) || !isset($row['hosname']) || !isset($row['room_no']) || !isset($row['cots_no'])) {
+              return redirect()->back()->with('error', "CSV file is missing required fields in row ($no) & column (stuid, hosname, room_no, cots_no).");
             }
 
             $hostel = $hostels[$row['hosname']] ?? null;
@@ -195,7 +195,7 @@ class HostelController extends Controller
               return redirect()->back()->with('error', "CSV file is missing hostel name ($no) row in one or more rows.");
             }
 
-            $room  = HostelRoom::firstWhere(['hostel_id' => $hostel->id, 'room_no' => $row['room_no'], 'cart_no' => $row['cot_no']]);
+            $room  = HostelRoom::firstWhere(['hostel_id' => $hostel->id, 'room_no' => $row['room_no'], 'cart_no' => $row['cots_no']]);
             if($room){
                 $student = Student::firstWhere('student_id', $row['stuid']);
                 if($student){
