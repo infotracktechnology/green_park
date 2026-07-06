@@ -137,7 +137,7 @@ class HomeController extends Controller
         if ($request->has('assign')) {
             $menu = collect($request->fields)->map(fn($m) => json_decode($m, true))->toArray();
             Options::updateOrCreate(['type' => "{$request->course}{$request->branch_name}{$request->type} menu"], ['value' => $menu]);
-            Student::where('course', $request->course)->where('campus', $request->branch)->where('coaching_type', $request->type)->update(['menu' => $menu]);
+            Student::where('academic_year', $this->academic_year)->where('course', $request->course)->where('campus', $request->branch)->where('coaching_type', $request->type)->update(['menu' => $menu]);
             return redirect()->route('studentmenu.type')->with('success', 'Menu updated successfully!');
         }
 
