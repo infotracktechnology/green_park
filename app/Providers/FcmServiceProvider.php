@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Providers;
 
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\WebpushConfig;
 use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\AndroidConfig;
-class FcmServiceProvider {
+
+class FcmServiceProvider
+{
     public $messaging;
 
     public function __construct()
@@ -33,8 +36,8 @@ class FcmServiceProvider {
                 'click_action' => $clickAction ?: 'FLUTTER_NOTIFICATION_CLICK',
             ],
         ]);
-        
-    
+
+
         $webpushConfig = WebpushConfig::fromArray([
             'notification' => [
                 'icon' => $imageUrl ?: env('APP_LOGO'),
@@ -45,8 +48,8 @@ class FcmServiceProvider {
                 'link' => $clickAction ?: url('/'),
             ],
         ]);
-        
-   
+
+
         $apnsConfig = ApnsConfig::fromArray([
             'headers' => [
                 'apns-priority' => '10',
@@ -68,40 +71,47 @@ class FcmServiceProvider {
         ]);
 
         $message = $message
-        ->withAndroidConfig($androidConfig)
-        ->withWebpushConfig($webpushConfig)
-        ->withApnsConfig($apnsConfig);
+            ->withAndroidConfig($androidConfig)
+            ->withWebpushConfig($webpushConfig)
+            ->withApnsConfig($apnsConfig);
 
         return $this->messaging->send($message);
     }
 
-  
+
     public function sendMulticast(array $tokens, $title, $body, $imageUrl = null, $data = [], $clickAction = null)
     {
+        $resolvedImage = $imageUrl ?: env('APP_LOGO');
+
         $message = CloudMessage::new()
             ->withNotification([
                 'title' => $title,
                 'body' => $body,
-                'image' => $imageUrl ?: env('APP_LOGO'),
+                'image' => $resolvedImage,
             ])
             ->withData($data);
 
-        
         $androidConfig = AndroidConfig::fromArray([
             'notification' => [
-                'icon' => $imageUrl ?: env('APP_LOGO'),
-                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                'icon' => 'ic_launcher', // Local drawable asset name
+                'color' => '#20295C',
+                'image' => $resolvedImage, // Correct property for web-based image URLs
+                'click_action' => $clickAction ?: 'FLUTTER_NOTIFICATION_CLICK',
             ],
         ]);
-        
+
         $webpushConfig = WebpushConfig::fromArray([
             'notification' => [
-                'icon' => $imageUrl ?: env('APP_LOGO'),
+                'icon' => env('APP_LOGO'), // Brand logo as a thumbnail
+                'image' => $imageUrl,       // High-resolution image if provided
                 'badge' => config('app.badge_url', ''),
-                'click_action' => url('/'),
+                'click_action' => $clickAction ?: url('/'),
+            ],
+            'fcm_options' => [
+                'link' => $clickAction ?: url('/'),
             ],
         ]);
-        
+
         $apnsConfig = ApnsConfig::fromArray([
             'headers' => [
                 'apns-priority' => '10',
@@ -117,7 +127,7 @@ class FcmServiceProvider {
                     'mutable-content' => 1,
                 ],
                 'fcm_options' => [
-                    'image' => $imageUrl,
+                    'image' => $resolvedImage,
                 ],
             ],
         ]);
