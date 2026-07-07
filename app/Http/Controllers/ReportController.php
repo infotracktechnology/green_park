@@ -1053,7 +1053,7 @@ class ReportController extends Controller
                     DB::raw('MAX(cot_type) as cot_type'),
                     DB::raw('MAX(no_of_cots) as no_of_cots')
                 )
-                ->groupBy('room_no')
+                ->groupBy('room_no','cot_type')
                 ->orderByRaw('CAST(SUBSTRING(room_no, 3) AS UNSIGNED) ASC')
                 ->get();
 
