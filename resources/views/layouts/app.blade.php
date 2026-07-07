@@ -210,12 +210,12 @@
                     <li><a href="{{ route('report.hostelattendance') }}" class="nav-link">Hostel Attendance Report</a></li>
                     <li><a href="{{ route('report.hostelvacate') }}" class="nav-link">Hostel Vacate Report</a></li>
                     <li><a href="{{ route('report.roomallocation') }}" class="nav-link">Room Allocation Report</a></li>
+                    <li><a href="{{ route('report.hostelvacancy') }}" class="nav-link">Hostel Vacancy Report</a></li>
                     <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
                     <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
                     <li><a href="{{ route('report.hostelcourier') }}" class="nav-link">Hostel Courier Report</a></li>
                     <li><a href="{{ route('report.hostelroomlist') }}" class="nav-link">Phone/Sign List (Section)</a></li>
                     <li><a href="{{ route('report.hostelsectionlist') }}" class="nav-link">Phone/Sign List (Room)</a></li>
-                    <li><a href="{{ route('report.hostelvacancy') }}" class="nav-link">Hostel Vacancy Report</a></li>
                   </ul>
                 </li>
               </ul>

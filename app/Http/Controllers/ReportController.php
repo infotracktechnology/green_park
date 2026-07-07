@@ -732,7 +732,21 @@ class ReportController extends Controller
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $student = $request->room ? Student::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->get() : collect();
+        $student = collect();
+        if ($request->filled('hostel')) {
+            $student = Student::where('hostel_id', $request->hostel)->where('academic_year', $this->academic_year)
+                ->when($request->room != 'all' && $request->filled('room'), function ($q) use ($request) {
+                    $q->where('room_no', $request->room);
+                })
+                ->when($request->filled('from_date') && $request->filled('to_date'), function ($q) use ($request) {
+                    $q->whereBetween('allocation_date', [
+                        $request->from_date,
+                        $request->to_date
+                    ]);
+                })
+                ->orderBy('allocation_date', 'asc')
+                ->get();
+        }
         return view('report.roomallocation', compact('hostels', 'room', 'student'));
     }
 

@@ -151,7 +151,7 @@ class HostelController extends Controller
 
             $occupiedCots = Student::where('hostel_id', $hostels->id)
             ->where('room_no', $room->room_no)
-            ->when($request->academic_year, fn($q) => $q->where('academic_year', $request->academic_year))
+            ->where('academic_year', $this->academic_year)
             ->pluck('cots_no')->toArray();
 
             foreach ($cots as $cot) {
@@ -225,7 +225,7 @@ class HostelController extends Controller
         }
 
         if ($request->reason && $request->datetime) {
-            $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '']);
+            $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '', 'hostel_dayscholar' => 'DAYSCHOLAR', 'ac_nonac' => '']);
             $vacate = DB::table('vacate_log')->insert($request->all());
             return back()->with('success', "Room vacated successfully for student $request->student_id");
         }

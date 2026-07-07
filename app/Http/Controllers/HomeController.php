@@ -226,9 +226,10 @@ class HomeController extends Controller
             }
         }
         if ($request->has('gender')) {
-            if ($request->gender == 'all') {
-            } else {
-                $query->where('gender', $request->gender);
+            if ($request->gender == 'OFFLINE') {
+                $query->where('coaching_type', 'OFFLINE');
+            } elseif ($request->gender == 'ONLINE') {
+                $query->where('coaching_type', '!=', 'OFFLINE');
             }
         }
 
