@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Staff;
 use App\Models\Branch;
 use App\Models\Student;
+use App\Models\WorkShift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ImportController;
@@ -81,8 +82,9 @@ class StaffProfileController extends Controller
       
         $districts = DB::table('district_list')->where('State', $staff->state)->select('District')->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
+        $workshift = WorkShift::all();
 
-        return view('staff.edit', compact('staff', 'districts', 'states'));
+        return view('staff.edit', compact('staff', 'districts', 'states', 'workshift'));
     }
 
     public function update(Request $request, Staff $staff)

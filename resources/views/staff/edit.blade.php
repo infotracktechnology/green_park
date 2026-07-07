@@ -51,9 +51,18 @@
                             @endforeach
                         </select>
                     </div>
-                    
 
-
+                    <div class="form-group col-lg-3">
+                        <label for="shift">Shift</label>
+                        <select name="shiftid" id="shift" class="form-control form-control-sm">
+                            <option value="">Select Shift</option>
+                            @foreach ($workshift as $shift)
+                                <option value="{{ $shift->id }}" @if($shift->id == $staff->shiftid) selected @endif>
+                                    {{ $shift->shift_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div class="form-group col-lg-3">
                         <label>Hostel/Dayscholar</label>
