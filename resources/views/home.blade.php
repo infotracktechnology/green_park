@@ -185,9 +185,9 @@
             <tr class="border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               <th class="pb-3 text-start w-10"></th>
               <th class="pb-3 text-start">Branch</th>
-              <th class="pb-3">Total</th>
-              <th class="pb-3">Boys</th>
-              <th class="pb-3">Girls</th>
+              <th class="pb-3">OFFLINE</th>
+              <th class="pb-3">ONLINE</th>
+              <th class="pb-3">TOTAL</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-50">
@@ -200,13 +200,14 @@
                 </span>
               </td>
               <td class="py-4 text-start font-semibold text-slate-700 text-sm">{{ $branch->name }}</td>
+              
+              <td class="py-4 text-blue-600 font-medium text-sm">{{ $branch->student->where('coaching_type', 'OFFLINE')->count() }}</td>
+              <td class="py-4 text-rose-500 font-medium text-sm">{{ $branch->student->where('coaching_type', '!=', 'OFFLINE')->count() }}</td>
               <td class="py-4">
                 <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 border border-slate-200/50">
                   {{ $branch->student->count() }}
                 </span>
               </td>
-              <td class="py-4 text-blue-600 font-medium text-sm">{{ $branch->student->where('gender', 'MALE')->count() }}</td>
-              <td class="py-4 text-rose-500 font-medium text-sm">{{ $branch->student->where('gender', 'FEMALE')->count() }}</td>
             </tr>
             
             <!-- Collapsible Row -->
@@ -217,23 +218,23 @@
                     <thead>
                       <tr class="text-slate-400 font-semibold border-b border-slate-200/60">
                         <th class="py-2 text-start pl-4">Section</th>
+                        <th class="py-2 text-blue-600">OFFLINE</th>
+                        <th class="py-2 text-rose-500">ONLINE</th>
                         <th class="py-2">Total Students</th>
-                        <th class="py-2 text-blue-600">Boys</th>
-                        <th class="py-2 text-rose-500">Girls</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                       @foreach($branch->student->groupBy('section') as $sec => $students)
                       <tr class="hover:bg-slate-100/50 transition-colors">
                         <td class="py-2.5 text-start pl-4 font-medium text-slate-500">Sec: {{ $sec ?: '-' }}</td>
+                        <td class="py-2.5 cursor-pointer text-blue-600 font-semibold hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','OFFLINE')">
+                          {{ $students->where('coaching_type','OFFLINE')->count() }}
+                        </td>
+                        <td class="py-2.5 cursor-pointer text-rose-500 font-semibold hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','ONLINE')">
+                          {{ $students->where('coaching_type', '!=', 'OFFLINE')->count() }}
+                        </td>
                         <td class="py-2.5 cursor-pointer font-bold text-slate-700 hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','all')">
                           {{ $students->count() }}
-                        </td>
-                        <td class="py-2.5 cursor-pointer text-blue-600 font-semibold hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','MALE')">
-                          {{ $students->where('gender','MALE')->count() }}
-                        </td>
-                        <td class="py-2.5 cursor-pointer text-rose-500 font-semibold hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','FEMALE')">
-                          {{ $students->where('gender','FEMALE')->count() }}
                         </td>
                       </tr>
                       @endforeach
