@@ -225,7 +225,7 @@ class HostelController extends Controller
         }
 
         if ($request->reason && $request->datetime) {
-            $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '']);
+            $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '', 'hostel_dayscholar' => 'DAYSCHOLAR', 'ac_nonac' => '']);
             $vacate = DB::table('vacate_log')->insert($request->all());
             return back()->with('success', "Room vacated successfully for student $request->student_id");
         }
