@@ -6,7 +6,7 @@
 @endsection
 <?php
 $details = [
-    'Personal Details' => 'student_id,admission_date,academic_year,course,coaching_type,hostel_dayscholar,section,batch,student_name,ph_no1,ph_no2,gender,dob,father_name,father_ph_no,mother_name,mother_ph_no,admission_opted_for,ac_nonac,blood_group,age,aadhar_card_no,nationality,religion,community,caste,student_whatsapp_no',
+    'Personal Details' => 'student_id,admission_date,academic_year,campus,course,coaching_type,hostel_dayscholar,section,batch,student_name,ph_no1,ph_no2,gender,dob,father_name,father_ph_no,mother_name,mother_ph_no,admission_opted_for,ac_nonac,blood_group,age,aadhar_card_no,nationality,religion,community,caste,student_whatsapp_no',
     'Address Details' => 'door_no,street_name,city,state,pincode,parent_whatsapp_no,email',
     'Parent Details' => 'father_qualification,father_occupation,father_designation,fathers_place_of_work,mother_qualification,mother_occupation,mother_annual_income,mother_designation,mother_place_of_work',
     'Academic Details' => 'board_of_study_X_std,school_name_X_std,district_name_school_X_std,total_marks_X_std,board_of_study_XII_std,school_name_XII_std,district_name_school_XII_std,total_marks_XII_std',
