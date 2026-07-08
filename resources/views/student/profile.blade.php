@@ -120,7 +120,7 @@
 
                 @if(auth()->user()->course =='NEET' || auth()->user()->course =='JEE')
                 <!-- Academic Details -->
-                <div>
+                <div class="mb-3">
                     <h5 class="section-header">Academic Details</h5>
                     <div class="row">
                         <div class="col-md-6">
@@ -150,6 +150,23 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Microsoft Teams Details -->
+                @if (auth()->user()->coaching_type == 'ONLINE LIVE' )
+                <div>
+                    <h5 class="section-header">Microsoft Teams Details</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="label-text">Microsoft Teams ID</div>
+                            <div class="value-text">{{ auth()->user()->teams_id }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="label-text">Microsoft Teams Password</div>
+                            <div class="value-text">{{ auth()->user()->teams_password }}</div>
+                        </div>
+                    </div>
+                </div>
+                 @endif
                 @endif
             </div>
         </div>
