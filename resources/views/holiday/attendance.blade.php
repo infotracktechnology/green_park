@@ -66,7 +66,7 @@
                   </div>
 
 
-                  <div class="form-group col-lg-3">
+                  <div class="form-group col-lg-2">
                     <label for="branch">Branch</label>
                     <select name="branch_id" id="branch_id" class="select2" required>
                       <option value="">Select Branch</option>
@@ -77,8 +77,18 @@
                   </div>
 
                   <div class="form-group col-lg-2">
+                    <label for="branch">course</label>
+                    <select name="course" id="course" class="select2" required>
+                      <option value="">Select Course</option>
+                      @foreach ($courses as $course)
+                      <option value="{{ $course->course }}" @selected(request('course')==$course->course)>{{ $course->course }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-2">
                     <label for="section">Section</label>
-                    <select name="section" id="section" class="select2" required>
+                    <select name="section" id="section" class="select2" >
                       <option value="">Select Section</option>
                       @foreach ($sections as $section)
                       <option value="{{ $section->section }}" @selected(request('section')==$section->section)>{{ $section->section }}</option>
@@ -86,7 +96,17 @@
                     </select>
                   </div>
 
-
+                  <div class="form-group col-lg-2">
+                      <label for="coaching_type">Coaching Type</label>
+                      <select name="coaching_type" id="coaching_type" class="select2">
+                          <option value="OFFLINE" @selected(request('coaching_type') == 'OFFLINE')>
+                              OFFLINE
+                          </option>
+                          <option value="ONLINE LIVE" @selected(request('coaching_type') == 'ONLINE LIVE')>
+                              ONLINE LIVE
+                          </option>
+                      </select>
+                  </div>
 
                   <div class="form-group col-lg-2">
                     <button type="submit" name="show" class="btn btn-primary m-t-25">Show</button>
@@ -117,6 +137,7 @@
                             <th>Academic Year</th>
                             <th>Student Id</th>
                             <th>Name</th>
+                            <th>Course</th>
                             <th>Coaching Type</th>
                             <th>Section</th>
                             @foreach(explode(',', request('attendance_timing')) as $time)
@@ -139,6 +160,7 @@
                             <td>{{ $row->academic_year }}</td>
                             <td>{{ $row->student_id }}</td>
                             <td>{{ \Str::limit($row->student_name, 20) }}</td>
+                            <td>{{ $row->course }}</td>
                             <td>{{ $row->coaching_type }}</td>
                             <td>{{ $row->section }}</td>
                             @foreach(explode(',', request('attendance_timing')) as $time)

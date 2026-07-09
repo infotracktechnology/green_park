@@ -121,8 +121,12 @@ class HolidayController extends Controller
         $students = [];
         $attendance = [];
 
+        $courses = Student::where('academic_year', $this->academic_year)->select('course')->distinct()->orderBy('course')->get();
+        
+        $coaching_types = Student::where('academic_year', $this->academic_year)->select('coaching_type')->distinct()->get();
+
         if ($request->has('branch_id')) {
-            $sections = Student::whereIn('campus', explode(',', $request->branch_id))->select('section')->distinct()->get();
+            $sections = Student::whereIn('campus', explode(',', $request->branch_id))->select('section')->where('academic_year', $this->academic_year)->when($request->course, fn($q) => $q->where('course', $request->course))->distinct()->get();
         }
 
         if ($request->has('show')) {
@@ -130,11 +134,20 @@ class HolidayController extends Controller
                 return redirect()->back()->with('error', 'Holiday already exists for this date!');
             }
 
-            $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->get();
+            $attendance = Attendance::where('attendance_date', $request->attendance_date)
+                ->where('branch_id', $request->branch_id)
+                ->when($request->section, fn($q) => $q->where('section', $request->section))
+                ->get();
 
-            $students = Student::whereIn('campus', explode(',', $request->branch_id))->where('section', $request->section)->where('coaching_type', 'OFFLINE')->where('admission_date', '<=', $request->attendance_date)->get();
+            $students = Student::whereIn('campus', explode(',', $request->branch_id))
+                ->where('academic_year', $this->academic_year)
+                ->when($request->course, fn($q) => $q->where('course', $request->course))
+                ->when($request->section, fn($q) => $q->where('section', $request->section))
+                ->when($request->coaching_type, fn($q) => $q->where('coaching_type', $request->coaching_type))
+                ->where('admission_date', '<=', $request->attendance_date)
+                ->get();
 
-            return view('holiday.attendance', compact('sections', 'students', 'attendance'));
+            return view('holiday.attendance', compact('sections', 'students', 'attendance', 'courses', 'coaching_types'));
         }
 
         if ($request->has('delete')) {
@@ -142,7 +155,7 @@ class HolidayController extends Controller
             return response()->json(['success' => 'Attendance deleted successfully!']);
         }
 
-        return view('holiday.attendance', compact('sections', 'students', 'attendance'));
+        return view('holiday.attendance', compact('sections', 'students', 'attendance', 'courses', 'coaching_types'));
     }
 
 
