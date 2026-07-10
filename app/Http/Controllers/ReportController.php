@@ -247,37 +247,13 @@ class ReportController extends Controller
             $studentIds = Student::where('course', $request->course)
                 ->where('campus', $request->branch_id)
                 ->where('academic_year', $this->academic_year)
-                ->where('coaching_type', 'OFFLINE')
+                ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
                 ->pluck('student_id'); 
             $query->whereIn('student_id', $studentIds);
         }
 
-        // 1. Monthly Attendance Summary
-        // if ($report_type == 'summary') {
-        //     $attData = (clone $query)->get();
-        //     $working_days = (clone $query)->distinct('attendance_date')->count('attendance_date');
-            
-        //     $present = $attData->where('status', 'P')->unique('student_id')->count();
-        //     $absent = $attData->where('status', 'A')->unique('student_id')->count();
-        //     $total_marked = $present + $absent;
-        //     $overall_percentage = $total_marked > 0 ? round(($present / $total_marked) * 100, 2) : 0;
-            
-        //     $studentQuery = Student::where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')
-        //         ->where('academic_year', $this->academic_year);
-        //     if ($request->filled('course')) $studentQuery->where('course', $request->course);
-        //     if ($request->filled('section')) $studentQuery->where('section', $request->section);
-        //     $total_students = $studentQuery->count();
-
-        //     $summary = (object)[
-        //         'total_students' => $total_students,
-        //         'working_days' => $working_days,
-        //         'present' => $present,
-        //         'absent' => $absent,
-        //         'overall_percentage' => $overall_percentage
-        //     ];
-        // }
-
-        // 2. Section Wise
+     
+        // 1. Section Wise
         if ($report_type == 'section') {
             $attendances = $query->get()->groupBy('section');
             $data = $attendances->map(function ($attendance, $section) use ($request) {
@@ -287,7 +263,7 @@ class ReportController extends Controller
                 $boysQuery = Student::where('section', $section)
                     ->where('academic_year', $this->academic_year)
                     ->where('campus', $request->branch_id)
-                    ->where('coaching_type', 'OFFLINE')
+                    ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
                     ->where('gender', 'Male')
                     ->whereDate('admission_date', '<=', $request->end_date);
                 if ($request->filled('course')) $boysQuery->where('course', $request->course);
@@ -296,7 +272,7 @@ class ReportController extends Controller
                 $girlsQuery = Student::where('section', $section)
                     ->where('academic_year', $this->academic_year)
                     ->where('campus', $request->branch_id)
-                    ->where('coaching_type', 'OFFLINE')
+                    ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
                     ->where('gender', 'Female')
                     ->whereDate('admission_date', '<=', $request->end_date);
                 if ($request->filled('course')) $girlsQuery->where('course', $request->course);
@@ -314,7 +290,7 @@ class ReportController extends Controller
             });
         }
 
-        // 3. Student Wise
+        // 2. Student Wise
         elseif ($report_type == 'student') {
             $attendances = $query->get()->groupBy('student_id');
             $studentIds = $attendances->keys();
@@ -339,11 +315,12 @@ class ReportController extends Controller
             });
         }
 
-        // 4. Course Wise
+        // 3. Course Wise
         elseif ($report_type == 'course') {
             $attendances = $query->get();
             $student_ids = $attendances->pluck('student_id')->unique();
             $students = Student::whereIn('student_id', $student_ids)->where('academic_year', $this->academic_year)->get()->keyBy('student_id');
+            
 
             $grouped = $attendances->filter(function ($item) use ($students) {
                 return $students->has($item->student_id);
@@ -358,7 +335,7 @@ class ReportController extends Controller
 
                 $total_students = Student::where('course', $course)
                     ->where('campus', $request->branch_id)
-                    ->where('coaching_type', 'OFFLINE')
+                    ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
                     ->where('academic_year', $this->academic_year)
                     ->count();
 
@@ -370,20 +347,28 @@ class ReportController extends Controller
             });
         }
 
-        // 5. Branch Wise
+        // 4. Branch Wise
         elseif ($report_type == 'branch') {
             $attendances = $query->get()->groupBy('branch_id');
             $branchesMap = Branch::pluck('name', 'id');
 
-            $data = $attendances->map(function ($attendance, $branch_id) use ($branchesMap) {
+            $data = $attendances->map(function ($attendance, $branch_id) use ($branchesMap, $request) {
                 $present = $attendance->where('status', 'P')->count() * 0.5;
                 $absent = $attendance->where('status', 'A')->count() * 0.5;
                 $totalMarked = $present + $absent;
 
-                $total_students = Student::where('campus', $branch_id)
+                $totalStudentQuery = Student::where('campus', $branch_id)
                     ->where('academic_year', $this->academic_year)
-                    ->where('coaching_type', 'OFFLINE')
-                    ->count();
+                    ->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE']);
+
+                if ($request->filled('course')) {
+                    $totalStudentQuery->where('course', $request->course);
+                }
+                if ($request->filled('section')) {
+                    $totalStudentQuery->where('section', $request->section);
+                }
+
+                $total_students = $totalStudentQuery->count();
 
                 return [
                     'branch' => $branchesMap->get($branch_id) ?? 'N/A',
@@ -394,7 +379,7 @@ class ReportController extends Controller
             });
         }
 
-        // 6. Month Wise
+        // 5. Month Wise
         elseif ($report_type == 'month') {
             $attendances = $query->get()->groupBy('attendance_date');
             $student_ids = $query->get()->pluck('student_id')->unique();
