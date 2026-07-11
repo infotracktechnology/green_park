@@ -156,7 +156,7 @@
                       <option value="Part 1" {{ $discussionvideo->part == 'Part 1' ? 'selected' : '' }}>Part 1</option>
                       <option value="Part 2" {{ $discussionvideo->part == 'Part 2' ? 'selected' : '' }}>Part 2</option>
                       <option value="Part 3" {{ $discussionvideo->part == 'Part 3'? 'selected' : '' }}>Part 3</option>
-                      <option value="Part 4" {{ $discussionvideo->part == 'Part 4' ? 'selected' : '' }}>Part 4</option>
+                      <option value="Full Part" {{ $discussionvideo->part == 'Full Part' ? 'selected' : '' }}>Full Part</option>
                     </select>
                   </div>
 
