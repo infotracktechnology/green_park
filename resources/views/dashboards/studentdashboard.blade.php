@@ -83,7 +83,7 @@
 $user = auth()->user();
 $exam = $user->GetExam();
 $mockTest = $user->GetMockTest();
-$isOffline = $user->coaching_type == 'OFFLINE';
+$isOffline = in_array($user->coaching_type, ['OFFLINE', 'ONLINE LIVE']);
 
 $isExamActive = $exam && $exam->start_at <= now() && $exam->end_at >= now();
   $isExamUpcoming = $exam && $exam->start_at > now();
@@ -235,6 +235,23 @@ $isExamActive = $exam && $exam->start_at <= now() && $exam->end_at >= now();
         </div>
         @endif
 
+        <!-- Microsoft Teams Card (Online Only) -->
+        @if(auth()->user()->coaching_type == 'ONLINE LIVE')
+        <div class="col-xl-4 col-lg-6">
+          <div class="card" style="background:linear-gradient(135deg,#36a1f2,#016bbc);color:white;border-radius:12px;">
+            <div class="card-statistic-3">
+              <div class="card-icon card-icon-large"><i class="fa fa-users"></i></div>
+              <div class="card-content">
+                <h5 class="card-title">Microsoft Teams Details</h5>
+                <span style="font-size: 16px;"><strong>Teams ID:</strong> {{ $user->teams_id }}</span>
+                <p class="mb-0 text-sm text-nowrap mt-1">
+                  <span style="font-size: 16px;"><strong>Teams Password:</strong> {{ $user->teams_password }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        @endif
       </div>
     </div>
   </div>

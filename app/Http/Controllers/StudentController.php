@@ -318,4 +318,29 @@ class StudentController extends Controller
         $hostelcouriers = HostelCourier::where('student_id', $student->student_id)->latest()->get();
         return view('student.hostelcourier', compact('hostelcouriers'));
     }
+    
+    public function NeetScorecard(Request $request)
+{
+    $student = auth()->user();
+
+    if ($request->isMethod('post')) {
+
+        if ($request->hasFile('neet_file')) {
+            $file = $request->file('neet_file');
+            $filename = "scorecard-" . $student->student_id . "." . $file->getClientOriginalExtension();
+            $path = 'assets/neetscorecard/' . $filename;
+            $file->move('assets/neetscorecard', $filename);
+            $student->neet_file = $path;
+            $student->neetappno = $request->neetappno;
+            $student->neetrollno = $request->neetrollno;
+            $student->neetcomm = $request->neetcomm;
+            $student->neetmark = $request->neetmark;
+            $student->neetspecialcategory = $request->neetspecialcategory;
+            $student->save();
+        }
+        return redirect()->back()->with('success', 'Scorecard uploaded successfully.');
+    }
+
+    return view('student.neetscorecard', compact('student'));
+}
 }

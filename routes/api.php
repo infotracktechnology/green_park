@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier,  NeetScorecard };
 use App\Http\Controllers\StudentController;
 /*
 |--------------------------------------------------------------------------
@@ -307,5 +307,26 @@ Route::group(['prefix' => 'v2'], function () {
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()]);
         }
+    });
+
+    Route::post('/neetscorecard_upload', function (Request $request) {
+        $student = Student::where('student_id', $request->student_id)->first();
+        if ($request->hasFile('neet_file')) {
+            $file = $request->file('neet_file');
+            $fileName = "scorecard-" . $student->student_id . "." . $file->getClientOriginalExtension();
+            $file->move('assets/neetscorecard', $fileName);
+            $student->update([
+                'neet_file'   => 'assets/neetscorecard/' . $fileName,
+                'neetappno'   => $request->neetappno,
+                'neetrollno'  => $request->neetrollno,
+                'neetcomm'    => $request->neetcomm,
+                'neetmark'    => $request->neetmark,
+                'neetspecialcategory' => $request->neetspecialcategory,
+            ]);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => 'NEET Scorecard uploaded successfully.',
+        ]);
     });
 });

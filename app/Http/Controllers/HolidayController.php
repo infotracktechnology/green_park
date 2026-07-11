@@ -132,7 +132,7 @@ class HolidayController extends Controller
 
             $attendance = Attendance::where('attendance_date', $request->attendance_date)->where('branch_id', $request->branch_id)->where('section', $request->section)->get();
 
-            $students = Student::whereIn('campus', explode(',', $request->branch_id))->where('section', $request->section)->where('coaching_type', 'OFFLINE')->where('admission_date', '<=', $request->attendance_date)->get();
+            $students = Student::whereIn('campus', explode(',', $request->branch_id))->where('academic_year', $this->academic_year)->where('section', $request->section)->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE'])->where('admission_date', '<=', $request->attendance_date)->get();
 
             return view('holiday.attendance', compact('sections', 'students', 'attendance'));
         }

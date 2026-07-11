@@ -151,6 +151,7 @@
                 <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
                 <li><a href="{{ route('achievement.index') }}" class="nav-link">MBBS/BDS Counselling</a></li>
                 <li><a href="{{ route('parent_concern') }}" class="nav-link">Parent Concern</a></li>
+                <li><a href="{{ route('neetscorecard.index') }}" class="nav-link">Document Reupload</a></li>
               </ul>
             </li>
             <li class="dropdown">
