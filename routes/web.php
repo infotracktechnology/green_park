@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController};
+use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController, NeetScorecardController};
 use App\Models\{Student, Exam};
 
 // ------------------------------------------------------
@@ -35,7 +35,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('studentmenu/type', 'studentmenu_type')->name('studentmenu.type');
         Route::get('studentmenu/student', 'studentmenu_student')->name('studentmenu.student');
     });
-
+       Route::match(['get', 'post'], '/neetscorecard/index', [NeetScorecardController::class, 'index'])->name('neetscorecard.index');
     // Staff & Branch Management
     Route::resource('branch', BranchController::class);
     Route::resource('staff', StaffProfileController::class);
@@ -241,6 +241,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::get('attendance', 'attendance')->name('student.attendance');
         Route::post('logActivity', 'logActivity')->name('student.logActivity');
         Route::match(['get', 'post'], 'neetdocument', 'NeetDocument')->name('student.neetdocument');
+        Route::match(['get', 'post'], 'neetscorecard', 'NeetScorecard')->name('student.neetscorecard');
         Route::get('studentdownload', 'StudentDownload')->name('student.studentdownload');
         Route::get('courierentry', 'CourierEntry')->name('student.courierentry');
     });
