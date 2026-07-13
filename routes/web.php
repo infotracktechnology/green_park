@@ -35,7 +35,14 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('studentmenu/type', 'studentmenu_type')->name('studentmenu.type');
         Route::get('studentmenu/student', 'studentmenu_student')->name('studentmenu.student');
     });
-       Route::match(['get', 'post'], '/neetscorecard/index', [NeetScorecardController::class, 'index'])->name('neetscorecard.index');
+    Route::controller(NeetScorecardController::class)->group(function () {
+       Route::match(['get', 'post'], '/neetscorecard', 'NeetScorecard')->name('neetscorecard');
+       Route::match(['get', 'post'], '/neetscorecard/index', 'index')->name('neetscorecard.index');
+       Route::get('/neetscorecard/edit/{student_id}', 'edit')->name('neetscorecard.edit');
+       Route::post('/neetscorecard/update/{student_id}', 'update')->name('neetscorecard.update');
+       Route::post('/neetscorecard/remark', 'saveRemark')->name('neetscorecard.remark');
+    });
+
     // Staff & Branch Management
     Route::resource('branch', BranchController::class);
     Route::resource('staff', StaffProfileController::class);

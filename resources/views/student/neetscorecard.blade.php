@@ -67,7 +67,7 @@
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>NEET Category <span class="text-danger">*</span></label>
+                                        <label>AIQ NEET Category <span class="text-danger">*</span></label>
                                         <select name="neetcomm" class="form-control select2"  required>
                                             <option value="">Select Category</option>
                                             <option value="GENERAL" {{ ($student->neetcomm=='GENERAL')?'selected':'' }}>GENERAL</option>
@@ -85,12 +85,12 @@
                                         <label>Special Category <span class="text-danger">*</span></label>
                                         <select name="neetspecialcategory" class="form-control select2"  required>
                                             <option value="">Select Category</option>
+                                            <option value="NIL" {{ ($student->neetspecialcategory=='NIL')?'selected':'' }}>NIL</option>
                                             <option value="7.5%" {{ ($student->neetspecialcategory=='7.5%')?'selected':'' }}>7.5%</option>
                                             <option value="PWD" {{ ($student->neetspecialcategory=='PWD')?'selected':'' }}>PWD</option>
                                             <option value="EX-ARMY" {{ ($student->neetspecialcategory=='EX-ARMY')?'selected':'' }}>EX-ARMY</option>
                                             <option value="SPORTS" {{ ($student->neetspecialcategory=='SPORTS')?'selected':'' }}>SPORTS</option>
                                             <option value="IRT" {{ ($student->neetspecialcategory=='IRT')?'selected':'' }}>IRT</option>
-                                            <option value="NIL" {{ ($student->neetspecialcategory=='NIL')?'selected':'' }}>NIL</option>
                                         </select>
                                     </div>
                                 </div>
@@ -106,9 +106,9 @@
                                     <div class="form-group">
                                         <label>Upload NEET Scorecard <span class="text-danger">*</span></label>
 
-                                        <input type="file" name="neet_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" {{ $student->neet_file ? 'disabled' : 'required' }}>
+                                        <input type="file" name="neet_file" class="form-control" accept=".pdf" {{ $student->neet_file ? 'disabled' : 'required' }}>
                                         <small class="text-muted">
-                                            Allowed formats : PDF, JPG, JPEG, PNG (Max 2MB)
+                                            Allowed formats : PDF (Max 2MB)
                                         </small>
 
                                         @if($student->neet_file)
