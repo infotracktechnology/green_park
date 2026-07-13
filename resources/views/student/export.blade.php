@@ -10,7 +10,8 @@ $details = [
     'Address Details' => 'door_no,street_name,city,state,pincode,parent_whatsapp_no,email',
     'Parent Details' => 'father_qualification,father_occupation,father_designation,fathers_place_of_work,mother_qualification,mother_occupation,mother_annual_income,mother_designation,mother_place_of_work',
     'Academic Details' => 'board_of_study_X_std,school_name_X_std,district_name_school_X_std,total_marks_X_std,board_of_study_XII_std,school_name_XII_std,district_name_school_XII_std,total_marks_XII_std',
-    'Mark Details' => 'S1,S1_max_marks,S1_obtained_mark,S2,S2_max_marks,S2_obtained_mark,S3,S3_max_marks,S3_obtained_mark,S4,S4_max_marks,S4_obtained_mark,total_marks'
+    'Mark Details' => 'S1,S1_max_marks,S1_obtained_mark,S2,S2_max_marks,S2_obtained_mark,S3,S3_max_marks,S3_obtained_mark,S4,S4_max_marks,S4_obtained_mark,total_marks',
+    'NEET Details' => 'neetappno,neetcomm,neetspecialcategory,neetrollno,neetmark'
 ];
 ?>
 @section('main')
