@@ -685,6 +685,8 @@ function calculateSubjectWiseStats() {
 
   window.addEventListener('beforeunload', function (e) {
       if (!isSubmitting) {
+          isSubmitting = true; // Prevents the submit action from triggering this confirmation again
+          form.submit();
           var confirmationMessage = 'If you leave this page, your exam will be automatically submitted. Are you sure?';
           e.returnValue = confirmationMessage;
           return confirmationMessage;
