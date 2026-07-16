@@ -17,7 +17,7 @@ class ReportController extends Controller
         $exams = [];
 
         if ($request->has('testcategory')) {
-            $exams = Exam::where('testcategory', $request->testcategory)->where("academic_year", $this->academic_year)->select('name')->distinct()->get()->pluck('name');
+            $exams = Exam::where('testcategory', $request->testcategory)->where("academic_year", $this->academic_year)->select('name')->distinct()->orderByDesc('exam_date')->get()->pluck('name');
         }
 
         $test_name = $request->test_name ?? 0;
