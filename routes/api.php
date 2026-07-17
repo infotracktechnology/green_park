@@ -270,7 +270,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/onlineexam/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $exam = $student->GetOnlineExam() ?? [];
+        $exam = $student->GetExam() ?? [];
         return response()->json($exam);
     });
 

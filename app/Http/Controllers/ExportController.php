@@ -23,6 +23,10 @@ class ExportController extends Controller
             ->get()
             ->toArray();
 
+            if (empty($students)) {
+                return redirect()->back()->with('error', 'No student records found matching the selected criteria.');
+            }
+
             $file = fopen('student_export.csv', 'w');
             $headers = array_keys($students[0]);
             fputcsv($file, $headers);
