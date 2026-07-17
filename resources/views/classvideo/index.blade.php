@@ -223,7 +223,7 @@
     $('#logTitle').text(action);
     logTable.clear().draw();
     $('#logBody').html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
-    $.post("{{ route('student.getlogactivity') }}", {
+    $.post("{{ route('student.getlogactivity', [], false) }}", {
       action: action,
       module: modules,
       _token: "{{ csrf_token() }}"
