@@ -264,19 +264,25 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/mocktest/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
+        if (!$student) {
+            return response()->json([]);
+        }
         $mocktest = $student->GetMockTest() ?? [];
         return response()->json($mocktest);
     });
 
     Route::get('/onlineexam/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
+        if (!$student) {
+            return response()->json([]);
+        }
         $exam = $student->GetExam() ?? [];
         return response()->json($exam);
     });
 
     Route::get('/studentdownload/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        if (!$student->is_download) {
+        if (!$student || !$student->is_download) {
             return response()->json([]);
         }
 
@@ -313,6 +319,12 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::post('/neetscorecard_upload', function (Request $request) {
         $student = Student::where('student_id', $request->student_id)->first();
+        if (!$student) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Student not found.',
+            ], 404);
+        }
         if ($request->hasFile('neet_file')) {
             $file = $request->file('neet_file');
             $fileName = "scorecard-" . $student->student_id . "." . $file->getClientOriginalExtension();
