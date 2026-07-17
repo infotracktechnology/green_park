@@ -31,7 +31,7 @@ class NeetScorecardController extends Controller
         }
         $course = Student::where('academic_year', $this->academic_year)->pluck('course')->unique()->values();
 
-        $query = Student::with('branch')->where('academic_year', $this->academic_year)->whereNotNull('neet_file')->where('neet_file', '!=', '');
+        $query = Student::with('branch')->where('academic_year', $this->academic_year)->when(auth()->user()->branch, fn($q) => $q->where('campus', auth()->user()->branch))->whereNotNull('neet_file')->where('neet_file', '!=', '');
 
         if ($request->filled('course')) {
             $query->where('course', $request->course);
