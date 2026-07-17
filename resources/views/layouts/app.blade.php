@@ -319,7 +319,7 @@
     const gender   = $('#gender');
     const students = $('#students');
     
-    const fetchData = (params) => $.get('{{ route("filter") }}', params);
+    const fetchData = (params) => $.get('{{ route("filter", [], false) }}', params);
     
     const populate = ($el, data=[], {placeholder='', addAll=false}={})=>{
       let html = placeholder ? `<option value="">${placeholder}</option>` : '';

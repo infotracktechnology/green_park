@@ -264,12 +264,14 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/mocktest/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        return response()->json($student->GetMockTest());
+        $mocktest = $student->GetMockTest() ?? [];
+        return response()->json($mocktest);
     });
 
     Route::get('/onlineexam/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        return response()->json($student->GetExam());
+        $exam = $student->GetOnlineExam() ?? [];
+        return response()->json($exam);
     });
 
     Route::get('/studentdownload/{student_id}', function (Request $request, $student_id) {
