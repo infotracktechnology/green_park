@@ -23,9 +23,11 @@ class Worksheet extends Model
     }
 
     public static function ForStudent(Student $student)
-    {
-        return self::query()
-            ->where(function ($query) use ($student) {
+   {
+    return self::query()
+        ->where(function ($mainQuery) use ($student) {
+
+            $mainQuery->where(function ($query) use ($student) {
                 $query->where('usertype', 'INDIVIDUAL')
                     ->where('students', $student->student_id);
             })
@@ -44,6 +46,17 @@ class Worksheet extends Model
                         $q->where('section', 'like', "%{$student->section}%");
                     })
                     ->whereIn('gender', [$student->gender, 'All']);
-            })->latest()->get();
+            });
+
+        })
+        ->where(function ($q) {
+            $q->where('is_schedule', 0)
+              ->orWhere(function ($q2) {
+                  $q2->where('is_schedule', 1)
+                     ->where('start_at', '<=', now());
+              });
+        })
+        ->latest()
+        ->get();
     }
 }
