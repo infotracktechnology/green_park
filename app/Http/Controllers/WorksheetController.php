@@ -28,6 +28,7 @@ class WorksheetController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('file');
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
@@ -61,6 +62,7 @@ class WorksheetController extends Controller
     public function update(Request $request, Worksheet $worksheet)
     {
         $data = $request->except('file');
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;

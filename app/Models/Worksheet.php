@@ -11,6 +11,12 @@ class Worksheet extends Model
 
     protected $table = 'worksheet';
     protected $guarded = [];
+
+    protected $casts = [
+        'start_at' => 'datetime',
+        'is_schedule' => 'boolean',
+    ];
+
     public function branchNames()
     {
         return Branch::whereIn('id', explode(',', $this->branch))->get()->implode('name', '/');
