@@ -142,12 +142,14 @@
                             </div>
                         </div>
 
+                        @if (!in_array(auth()->user()->coaching_type, ['ONLINE LIVE', 'ONLINE RECORDED', 'ONLINE TEST BATCH']))
                         <div class="col-md-12">
                             <div class="label-text">Accommodation</div>
                             <div class="value-text">
                                 {{ auth()->user()->hostel_dayscholar }} <span class="text-muted mx-2">|</span> {{ auth()->user()->ac_nonac }}
                             </div>
-                        </div>
+                        </div>   
+                        @endif
                     </div>
                 </div>
 
