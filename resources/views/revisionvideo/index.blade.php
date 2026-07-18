@@ -235,7 +235,7 @@
       });
       
       $.ajax({
-          url: "{{ route('classvideo.schedule') }}",
+          url: "{{ route('classvideo.schedule', [], false) }}",
           type: "POST",
           data: formData,
           processData: false,
@@ -290,7 +290,7 @@
           }
   
           $.ajax({
-              url: "{{ route('revisionvideo.bulkDelete') }}",
+              url: "{{ route('revisionvideo.bulkDelete', [], false) }}",
               type: "POST",
               data: {
                   _token: "{{ csrf_token() }}",
