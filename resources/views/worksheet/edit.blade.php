@@ -143,7 +143,7 @@
 
                             <div class="form-group col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                  <input type="checkbox" name="is_schedule" class="custom-control-input" id="is_schedule" value="1" @checked($ worksheet->is_schedule)>
+                                  <input type="checkbox" name="is_schedule" class="custom-control-input" id="is_schedule" value="1" @checked($worksheet->is_schedule)>
                                   <label class="custom-control-label" for="is_schedule">Is Schedule</label>
                                 </div>
                             </div>
