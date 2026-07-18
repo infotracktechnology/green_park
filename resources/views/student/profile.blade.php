@@ -136,8 +136,8 @@
                         <div class="col-12 mb-3">
                             <div class="label-text mb-2">Class XII Marks</div>
                             <div class="d-flex flex-wrap gap-2">
-                                <span class="badge bg-light text-primary p-2 border">Physics: {{ auth()->user()->S2_obtained_mark }}</span>
-                                <span class="badge bg-light text-success p-2 border">Chemistry: {{ auth()->user()->S1_obtained_mark }}</span>
+                                <span class="badge bg-light text-primary p-2 border">Physics: {{ auth()->user()->S1_obtained_mark }}</span>
+                                <span class="badge bg-light text-success p-2 border">Chemistry: {{ auth()->user()->S2_obtained_mark }}</span>
                                 <span class="badge bg-light text-danger p-2 border">Biology: {{ auth()->user()->S3_obtained_mark }}</span>
                             </div>
                         </div>
