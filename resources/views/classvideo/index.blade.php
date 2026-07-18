@@ -283,7 +283,7 @@
       });
       
       $.ajax({
-          url: "{{ route('classvideo.schedule') }}",
+          url: "{{ route('classvideo.schedule', [], false) }}",
           type: "POST",
           data: formData,
           processData: false,
@@ -318,7 +318,7 @@
   }
   
   $.ajax({
-      url: "{{ route('classvideo.bulk-delete') }}",
+      url: "{{ route('classvideo.bulk-delete', [], false) }}",
       type: "POST",
       data: {
           _token: "{{ csrf_token() }}",
