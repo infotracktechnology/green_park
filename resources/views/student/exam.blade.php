@@ -416,7 +416,7 @@
       document.getElementById('status-'+qno).value = status;
       var subject = $(`[name="subject[${qno}]`).val();
       $.ajax({
-          url: "{{ route('exam.save') }}",
+          url: "{{ route('exam.save',[],false) }}",
           headers: {
               'X-CSRF-TOKEN': '{{ csrf_token() }}'
           },
@@ -437,7 +437,7 @@
 
   function clearLog(testid, qno) {
       $.ajax({
-          url: "{{ route('exam.clearlog') }}",
+          url: "{{ route('exam.clearlog',[],false) }}",
           headers: {
               'X-CSRF-TOKEN': '{{ csrf_token() }}'
           },
