@@ -234,7 +234,7 @@
       if (selectedIds.length > 0) {
           if (confirm("Are you sure you want to delete the selected videos?")) {
               $.ajax({
-  url: "{{ route('discussionvideo.bulkDelete') }}",
+  url: "{{ route('discussionvideo.bulkDelete', [], false) }}",
   type: "POST", 
   data: {
       _token: "{{ csrf_token() }}",
