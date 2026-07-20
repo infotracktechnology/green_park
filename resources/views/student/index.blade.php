@@ -60,6 +60,7 @@
                       <th>Batch</th>
                       <th>User Name</th>
                       <th>Password</th>
+                      <th>MS Teams ID</th>
                       <th>Gender</th>
                       <th>Father No</th>
                       <th>Mother No</th>
@@ -82,6 +83,7 @@
                       <td>{{$student->batch}}</td>
                       <td>{{$student->user_name}}</td>
                       <td>{{$student->password}}</td>
+                      <td>{{$student->teams_id}}</td>
                       <td>{{$student->gender}}</td>
                       <td>{{$student->father_ph_no}}</td>
                       <td>{{$student->mother_ph_no}}</td>
