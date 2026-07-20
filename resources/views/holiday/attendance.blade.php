@@ -215,7 +215,7 @@
   })
   
   function getSection() {
-      $.get(`{{ route('holiday.create') }}?branch=${branch.val()}`, function(data) {
+      $.get(`{{ route('holiday.create',[],false) }}?branch=${branch.val()}`, function(data) {
      var html = '<option value="">Select Section</option>';
      $.each(data, function(key, item) {
          html += '<option value="' + item.section + '">' + item.section + '</option>';
