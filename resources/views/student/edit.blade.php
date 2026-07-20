@@ -190,6 +190,16 @@
                 </div>
 
                 <div class="form-group col-lg-3">
+                  <label>Microsoft Teams ID</label>
+                  <input type="text" name="teams_id" value="{{ old('teams_id', $Student->teams_id) }}" class="form-control form-control-sm ">
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label>Microsoft Teams Password</label>
+                  <input type="text" name="teams_password" value="{{ old('teams_password', $Student->teams_password) }}" class="form-control form-control-sm ">
+                </div>
+                
+                <div class="form-group col-lg-3">
                   <label>description</label>
                   <textarea name="description" id="description" cols="30" rows="3" class="form-control form-control-sm" >{{ old('description', $Student->description) }}</textarea>
                 </div>
