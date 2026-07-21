@@ -661,8 +661,10 @@ class ExamController extends Controller
             try {
                 $chunks = array_chunk($rows, 500);
                 foreach ($chunks as $chunk) {
-                    ExamSubjectReport::insert($chunk);
-                }
+                    foreach ($chunk as $row) {
+                        DB::table('examsubjectreport')->updateOrInsert([ 'stuid'  => $row['stuid'], 'testid' => $row['testid'],'subject' => $row['subject']],$row);
+                    }
+                }            
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', $e->getMessage());
             }
