@@ -92,7 +92,7 @@
 <script>
   const goToMenu = (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    window.location = `{{ route('studentmenu.student') }}?${query}`;
+    window.location = `{{ route('studentmenu.student',[],false) }}?${query}`;
   };
 
   const updateMenu = () => goToMenu({
