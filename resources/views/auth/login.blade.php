@@ -426,7 +426,7 @@
                         <td width="45%">
                             <i class="fas fa-users fa-2x text-primary "></i><br>
                             <strong class="text-primary">Offline Admission</strong><br><br>
-                            9360644836<br>
+                            9361088506<br>
                             9342441936<br>
                             9342440024
                         </td>
