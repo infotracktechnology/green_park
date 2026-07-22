@@ -70,6 +70,7 @@ class NeetScorecardController extends Controller
             'neetcomm' => $request->neetcomm,
             'neetspecialcategory' => $request->neetspecialcategory,
             'neetmark' => $request->neetmark,
+            'neetrank' => $request->neetrank,
         ]);
 
         return redirect()->route('neetscorecard.index')

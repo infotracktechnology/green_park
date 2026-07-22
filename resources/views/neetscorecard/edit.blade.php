@@ -69,6 +69,13 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>All-India Rank <span class="text-danger">*</span></label>
+                                    <input type="number" name="neetrank" class="form-control" value="{{ old('neetrank', $student->neetrank) }}">
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
