@@ -259,6 +259,15 @@
                 </div>
                 <!-- Slide -->
                 <div class="slide">
+                  <img src="{{asset('img/silde/slide-12.jpeg')}}" alt="slide 1">
+                  <div class="slide-info">
+                    <div class="slide-text">Batch 2026</div>
+                    <!-- data-light contains the image to show in lightbox -->
+                    <a href="#" class="slide-btn open-lightbox" data-light="#">College List</a>
+                  </div>
+                </div>
+
+                <div class="slide">
                   <img src="{{asset('img/silde/slide-11.jpg')}}" alt="slide 1">
                   <div class="slide-info">
                     <div class="slide-text">Batch 2025</div>
