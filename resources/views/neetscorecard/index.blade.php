@@ -46,6 +46,7 @@
                                     <th>NEET Application No</th>
                                     <th>NEET Roll No</th>
                                     <th>NEET Mark</th>
+                                    <th>All-India Rank</th>
                                     <th>Document</th>
                                     <th>Edit</th>
                                     <th width="10%">Action</th>
@@ -64,6 +65,7 @@
                                         <td>{{ $student->neetappno }}</td>
                                         <td>{{ $student->neetrollno }}</td>
                                         <td>{{ $student->neetmark }}</td>
+                                        <td>{{ $student->neetrank }}</td>
                                         <td>@if($student->neet_file)
                                                 <a href="{{ url($student->neet_file) }}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> View 
                                                 </a>
