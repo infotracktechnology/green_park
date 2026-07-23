@@ -135,12 +135,21 @@
                             
                             <div class="form-group col-lg-3">
                                 <label for="attachment">Attachment</label>
-                                <input type="file" name="attachment" id="attachment" class="form-control form-control-sm">
+                                <input type="file" name="attachment[]" id="attachment" class="form-control form-control-sm" multiple>
                                 @if (!empty($announcement->attachment))
-                                    <p class="mt-2">Current File: {{ basename($announcement->attachment) }}</p>
+                                    <div class="mt-2">
+                                        <strong>Current Attachments:</strong>
+                                        @foreach($announcement->attachment as $file)
+                                            <div>
+                                                <a href="{{ url($file) }}" target="_blank">
+                                                    {{ basename($file) }}
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 @endif
                             </div>
-
+                            
                             <div class="form-group col-lg-12">
                                 <div class="custom-control custom-checkbox">
                                   <input type="checkbox" name="is_schedule" class="custom-control-input" id="is_schedule" value="1" @checked($announcement->is_schedule)>

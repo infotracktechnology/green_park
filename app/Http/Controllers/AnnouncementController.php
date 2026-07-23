@@ -42,16 +42,20 @@ class AnnouncementController extends Controller
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
 
         $data['student_ids'] = [];
-        if ($request->has('attachment')) {
-            $fileName = time() . '.' . $request->attachment->extension();
-            $request->attachment->move('assets/attachments', $fileName);
-            $data['attachment'] = 'assets/attachments/' . $fileName;
-        }
-
+        $attachments = [];
+            if ($request->hasFile('attachment')) {
+                foreach ($request->file('attachment') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-'. $originalName;
+                    $file->move('assets/attachments', $fileName);
+                    $attachments[] = 'assets/attachments/' . $fileName;
+                }
+            }
+        $data['attachment'] = $attachments ?: null;
         $announcement = Announcement::create($data);
 
          $students = $announcement->StudentList()->map(function ($student) { return $student->device_token;})->filter()->unique()->toArray();
-
+         
         if (count($students) > 0) {
             $fcm->sendMulticast($students,"There is an announcement from GPCC",$announcement->title,env('APP_LOGO'));
         }
@@ -83,14 +87,17 @@ class AnnouncementController extends Controller
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
 
         $data['student_ids'] = [];
-        if ($request->has('attachment')) {
-            $fileName = time() . '.' . $request->attachment->extension();
-            $request->attachment->move('assets/attachments', $fileName);
-            $data['attachment'] = 'assets/attachments/' . $fileName;
-        }
-
+        $attachments = [];
+            if ($request->hasFile('attachment')) {
+                foreach ($request->file('attachment') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-' . $originalName;
+                    $file->move('assets/attachments', $fileName);
+                    $attachments[] = 'assets/attachments/' . $fileName;
+                }
+            }
+            $data['attachment'] = $attachments ?: null;
         $announcement->update($data);
-
         return redirect()->route('announcement.index')->with('success', 'Announcement details successfully updated.');
     }
 

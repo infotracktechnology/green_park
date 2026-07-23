@@ -74,9 +74,12 @@
                                     </div>
                                     @if($announcement->attachment)
                                         <div class="notice-board-item-date mt-3 ml-4">
-                                            <a href="{{ env('APP_URL') }}/{{ $announcement->attachment }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-paperclip"></i> View Attachment
-                                            </a>
+                                            @foreach($announcement->attachment as $file)
+                                                <a href="{{ url($file) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-paperclip"></i>
+                                                    Attachment
+                                                </a>
+                                            @endforeach
                                         </div>
                                     @endif
                                 </div>

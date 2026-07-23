@@ -118,7 +118,7 @@
 
                   <div class="form-group col-lg-3">
                         <label for="attachment">Attachment</label>
-                        <input type="file" name="attachment" class="form-control form-control-sm">             
+                        <input type="file" name="attachment[]" class="form-control form-control-sm " multiple>             
                   </div>
 
                   <div class="form-group col-lg-12">
