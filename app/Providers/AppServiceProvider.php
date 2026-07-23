@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\View;
 use App\Models\AcademicYear;
 use App\Models\Branch;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+        
         if (Route::hasMiddlewareGroup('web')) {
             View::composer('*', function ($view) {
                 $academicyear = AcademicYear::where('academic_year', session('academic_year'))->get();
