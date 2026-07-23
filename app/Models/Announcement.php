@@ -14,6 +14,7 @@ class Announcement extends Model
 
      protected $casts = [
         'student_ids' => 'json',
+        'attachment' => 'json',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
     ];
