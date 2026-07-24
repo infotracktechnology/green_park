@@ -132,7 +132,17 @@
 
                   <div class="form-group col-lg-4">
                     <label for="attachment">Attachment <span class="text-danger">*PDF only</span></label>
-                    <input type="file" name="attachment" id="attachment" class="form-control form-control-sm" accept=".pdf">
+                    <input type="file" name="attachment[]" id="attachment" class="form-control form-control-sm" accept=".pdf" multiple>
+                    @if(!empty($examportion->attachment))
+                    <div class="mt-2">
+                      <storng>Current Attachment</storng>
+                      @foreach ($examportion->attachment as  $file )
+                        <div>
+                          <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                        </div>
+                      @endforeach
+                    </div>
+                    @endif
                   </div>
 
                   <div class="form-group col-lg-12">
