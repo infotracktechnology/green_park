@@ -37,14 +37,18 @@ class AnswerkeyController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
+        $file_path = [];
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time().'_'.$originalName;
-            $request->file('file')->move('answer_key',$fileName);
-            $data['file_path'] = 'answer_key/'.$fileName;
+            foreach($request->file('file') as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('answer_key',$fileName);
+                $file_path[] = 'answer_key/'.$fileName;   
+            }
+           
+           
         }
-
+        $data['file_path'] = $file_path ?: null;
         AnswerKey::create($data);
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key added successfully!');
@@ -71,14 +75,18 @@ class AnswerkeyController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
+        $file_path = [];
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time().'_'.$originalName;
-            $request->file('file')->move('answer_key',$fileName);
-            $data['file_path'] = 'answer_key/'.$fileName;
-        }
+            foreach($request->file('file')as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('answer_key',$fileName);
+                $file_path[] = 'answer_key/'.$fileName;
+            }
+           
 
+        }
+        $data['file_path'] = $file_path ?: null;
         $answerkey->update($data);
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key updated successfully!');
@@ -90,8 +98,12 @@ class AnswerkeyController extends Controller
         if($request->has('ids')) {
             $answerkeys = AnswerKey::whereIn('id', $request->ids)->get();
             foreach ($answerkeys as $answerkey) {
-                if (file_exists($answerkey->file_path)) {
-                    unlink($answerkey->file_path);
+                if(!empty($answerkey->file_path)){
+                    foreach ($answerkey->file_path as $file_path) {
+                        if (file_exists($file_path)) {
+                            unlink($file_path);
+                        }
+                    }
                 }
                 $answerkey->delete();
             }

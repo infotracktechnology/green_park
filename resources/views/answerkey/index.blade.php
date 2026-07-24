@@ -80,7 +80,9 @@
                         <td>{{ $row->start_at }}</td>
                         <td>
                           @if($row->file_path)
-                          <a href="{{ env('APP_URL').'/'.$row->file_path }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                          @foreach($row->file_path as $file)
+                          <a href="{{ env('APP_URL').'/'.$file }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                          @endforeach
                           @endif
                         </td>
                         <td>

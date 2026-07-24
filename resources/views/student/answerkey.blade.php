@@ -35,9 +35,11 @@
                   <td>{{ $answerkey->title }}</td>
                   <td>
                     @if($answerkey->file_path)
-                    <a href="{{ env('APP_URL').$answerkey->file_path }}" class="btn btn-primary" download>
+                    @foreach ($answerkey->file_path as $file)
+                    <a href="{{ env('APP_URL').$file }}" class="btn btn-primary" download>
                       <i class="fas fa-file-download"></i> Download
-                    </a>
+                    </a>   
+                    @endforeach
                     @endif
                   </td>
                 </tr>

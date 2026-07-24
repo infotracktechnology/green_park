@@ -11,6 +11,7 @@ class AnswerKey extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'file_path' => 'json',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'is_schedule' => 'boolean',

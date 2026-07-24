@@ -134,10 +134,12 @@
 
                   <div class="form-group col-lg-4">
                     <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
-                    <input type="file" name="file" id="fileInput" class="form-control form-control-sm">
+                    <input type="file" name="file[]" id="fileInput" class="form-control form-control-sm" multiple>
                     <small id="fileName">
                       @if($answerkey->file_path)
-                      {{ basename($answerkey->file_path) }}
+                      @foreach ($answerkey->file_path as $file)
+                       <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                      @endforeach
                       @endif
                     </small>
                   </div>
@@ -216,7 +218,7 @@
   });
 
   document.getElementById('fileInput').addEventListener('change', function() {
-      let fileName = this.files[0] ? this.files[0].name : "{{ basename($answerkey->file_path) }}";
+      let fileName = this.files[0] ? this.files[0].name : "{{ basename($file) }}";
       document.getElementById('fileName').innerText = fileName;
   });
 </script>
