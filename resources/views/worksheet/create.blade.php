@@ -125,7 +125,7 @@
 
                   <div class="form-group col-lg-4">
                     <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
-                    <input type="file" name="file" id="fileInput" class="form-control form-control-sm">
+                    <input type="file" name="file[]" id="fileInput" class="form-control form-control-sm" multiple>
                   </div>
 
                   <div class="form-group col-lg-12">

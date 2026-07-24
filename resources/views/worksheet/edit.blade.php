@@ -1,5 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Worksheet')
+
+@section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+@endsection 
+
 @section('main')
 <div class="main-content">
   <section class="section">
@@ -133,10 +139,12 @@
                   <div class="form-group col-lg-4">
                     <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
 
-                    <input type="file" name="file" id="fileInput" class="form-control form-control-sm">
+                    <input type="file" name="file[]" id="fileInput" class="form-control form-control-sm" multiple>
                     <small id="fileName">
                       @if($worksheet->file_path)
-                      {{ basename($worksheet->file_path) }}
+                      @foreach ($worksheet->file_path as $file)
+                       <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                      @endforeach
                       @endif
                     </small>
                   </div>
@@ -176,10 +184,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
-  document.getElementById('fileInput').addEventListener('change', function() {
-      let fileName = this.files[0] ? this.files[0].name : "{{ basename($worksheet->file_path) }}";
-      document.getElementById('fileName').innerText = fileName;
-  });
+
 
   flatpickr(".datetime-picker", {
       enableTime: true,
@@ -205,15 +210,11 @@
           $('#end_at').attr('required', false);
       }
   });
-  
-  $('#end_at').change(function() {
-      $('#end_at_error').text('');
-      const startTime = new Date($('#start_at').val());
-      const endTime = new Date($(this).val());
-      if (startTime >= endTime) {
-          $('#end_at_error').text('End time must be greater than start time.');
-          $(this).val('');
-      }
+
+
+    document.getElementById('fileInput').addEventListener('change', function() {
+      let fileName = this.files[0] ? this.files[0].name : "{{ basename($file) }}";
+      document.getElementById('fileName').innerText = fileName;
   });
 
 </script>

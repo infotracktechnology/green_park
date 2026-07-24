@@ -33,14 +33,17 @@ class WorksheetController extends Controller
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
-
+         
+        $file_path = [];
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time() . '_' . $originalName;
-            $request->file('file')->move('worksheet', $fileName);
-            $data['file_path'] = 'worksheet/' . $fileName;
+            foreach($request->file('file')as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('worksheet',$fileName);
+                $file_path[] = 'worksheet/'.$fileName;
+            }
         }
-
+        $data['file_path'] = $file_path ?: null;
         Worksheet::create($data);
 
         return redirect()->route('worksheet.index')->with('success', 'Worksheet created successfully.');
@@ -68,13 +71,16 @@ class WorksheetController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $file_path = [];
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time() . '_' . $originalName;
-            $request->file('file')->move('worksheet', $fileName);
-            $data['file_path'] = 'worksheet/' . $fileName;
+            foreach($request->file('file')as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('worksheet',$fileName);
+                $file_path[] = 'worksheet/'.$fileName;
+            }
         }
-
+        $data['file_path'] = $file_path ?: null;
         $worksheet->update($data);
 
         return redirect()->route('worksheet.index')->with('success', 'Worksheet updated successfully.');
@@ -86,9 +92,14 @@ class WorksheetController extends Controller
         if($request->has('ids')) {
             $worksheets = Worksheet::whereIn('id', $request->ids)->get();
             foreach ($worksheets as $worksheet) {
-                if (file_exists($worksheet->file_path)) {
-                    unlink($worksheet->file_path);
-                }
+                if(!empty($worksheet->file_path)){
+                    foreach($worksheet->file_path as $file_path){
+                        if (file_exists($file_path)) {
+                            unlink($file_path);
+                        }
+
+                    }
+                } 
                 $worksheet->delete();
             }
         }
