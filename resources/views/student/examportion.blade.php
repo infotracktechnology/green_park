@@ -27,9 +27,12 @@
                         <td>{{ $examportion->title }}</td>
                         <td>
                           @if($examportion->attachment)
-                          <a href="{{ env('APP_URL') }}/{{ $examportion->attachment }}" download class="btn btn-primary">
-                             <i class="fas fa-file-download"></i> Download
-                        </a>
+                           @foreach($examportion->attachment as $file)
+                                <a href="{{ url($file) }}" target="_blank" class="btn btn-primary">
+                                    <i class="fas fa-file-download"></i> Download
+                                </a>
+                            @endforeach
+
                           @endif
                         </td>
                       </tr>

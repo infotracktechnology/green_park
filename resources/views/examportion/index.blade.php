@@ -79,9 +79,11 @@
                           <td>{{ $examportion->coaching_type }}</td>
                           <td>{{ $examportion->title }}</td>
                           <td>
-                            @if($examportion->attachment)
-                            <a href="{{ env('APP_URL').'/'.$examportion->attachment }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
-                            @endif
+                              @if($examportion->attachment)
+                                  @foreach($examportion->attachment as $file)
+                                      <a href="{{ env('APP_URL').'/'.$file }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                                  @endforeach
+                              @endif
                           </td>
                           <td>
                             <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$examportion->title}}" data-module="Exam Portion"> <i class="fas fa-eye"></i></button>

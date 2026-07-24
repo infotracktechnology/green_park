@@ -11,6 +11,7 @@ class Examportion extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'attachment' => 'json',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'is_schedule' => 'boolean',

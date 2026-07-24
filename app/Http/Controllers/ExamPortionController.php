@@ -37,14 +37,16 @@ class ExamPortionController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
+        $attachment = [];
         if ($request->hasFile('attachment')) {
-            $originalName = $request->file('attachment')->getClientOriginalName();
-            $fileName = time().'_'.$originalName;
-            $request->file('attachment')->move('assets/examportion',$fileName);
-            $data['attachment'] = 'assets/examportion/'.$fileName;
+            foreach($request->file('attachment') as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time() . '-' . $originalName;
+                $file->move('assets/examportion', $fileName);
+                $attachment[] = 'assets/examportion/' . $fileName;
+            }   
         }
-
+        $data['attachment'] = $attachment ?: null ;
         Examportion::create($data);
         return to_route('examportion.index')->with('success', 'Examportion created successfully');
     }
@@ -69,14 +71,16 @@ class ExamPortionController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
+        $attachment = [];
          if ($request->hasFile('attachment')) {
-            $originalName = $request->file('attachment')->getClientOriginalName();
-            $fileName = time().'_'.$originalName;
-            $request->file('attachment')->move('assets/examportion',$fileName);
-            $data['attachment'] = 'assets/examportion/'.$fileName;
+            foreach ($request->file('attachment') as $file) {
+                $originalName = $file->getClientOriginalName();
+                $fileName = time() . '-' . $originalName;
+                $file->move('assets/examportion', $fileName);
+                $attachment[] = 'assets/examportion/' . $fileName;
+            }
         }
-
+        $data['attachment'] = $attachment ?: null;
         $examportion->update($data);
         return redirect()->route('examportion.index')->with('success', 'Examportion updated successfully.');
     }
@@ -87,8 +91,12 @@ class ExamPortionController extends Controller
        if($request->has('ids')) {
         $examportions = Examportion::whereIn('id', $request->ids)->get();
         foreach ($examportions as $examportion) {
-            if (file_exists($examportion->attachment)) {
-                unlink($examportion->attachment);
+            if(!empty($examportion->attachment)){
+                foreach ($examportion->attachment as $attachment) {
+                    if (file_exists($attachment)) {
+                        unlink($attachment);
+                    }
+                }
             }
             $examportion->delete();
         }
