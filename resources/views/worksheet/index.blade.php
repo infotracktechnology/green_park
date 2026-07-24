@@ -79,7 +79,9 @@
                         <td>{{ $worksheet->title }}</td>
                         <td>
                           @if($worksheet->file_path)
-                          <a href="{{ env('APP_URL').'/'.$worksheet->file_path }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                          @foreach ($worksheet->file_path as $file)
+                          <a href="{{ env('APP_URL').'/'.$file }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                          @endforeach
                           @endif
                         </td>
                         <td>

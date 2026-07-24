@@ -13,6 +13,7 @@ class Worksheet extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'file_path' => 'json',
         'start_at' => 'datetime',
         'is_schedule' => 'boolean',
     ];
