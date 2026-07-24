@@ -19,7 +19,7 @@
               <div class="card-body">
 
                 <div class="row mb-3">
-                  <div class="col-lg-4">
+                  <div class="col-lg-2">
                     <label for="branch">Branch</label>
                     <select name="branch_id" id="branch" class="form-control form-control-sm" required>
                       <option value="">Select Branch</option>
@@ -31,9 +31,35 @@
                     </select>
                   </div>
 
-                  <div class="col-lg-4">
+                  <div class="col-lg-2">
+                      <label>Course</label>
+                      <select name="course" id="course" class="form-control form-control-sm">
+                          <option value="">All Course</option>
+                          @foreach($courses as $course)
+                              <option value="{{ $course->course }}"
+                                  @selected(request('course') == $course->course)>
+                                  {{ $course->course }}
+                              </option>
+                          @endforeach
+                      </select>
+                  </div>
+
+                  <div class="col-lg-2">
+                      <label>Section</label>
+                      <select name="section" id="section" class="form-control form-control-sm">
+                          <option value="">All Section</option>
+                          @foreach($sections as $section)
+                              <option value="{{ $section->section }}"
+                                  @selected(request('section') == $section->section)>
+                                  {{ $section->section }}
+                              </option>
+                          @endforeach
+                      </select>
+                  </div>
+
+                  <div class="col-lg-2">
                     <label for="date">Date</label>
-                    <input type="date" name="date" id="date" value="{{ request('date')  ?? date('Y-m-d') }}" class="form-control form-control-sm" required />
+                    <input type="date" name="date" id="date" class="form-control form-control-sm" value="{{ request('date')  ?? date('Y-m-d') }}" class="form-control form-control-sm" required />
                   </div>
 
                   <div class="col-lg-2 d-flex align-items-end">
