@@ -1,5 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Download')
+
+@section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+@endsection 
+
 @section('main')
 <div class="main-content">
   <section class="section">
@@ -120,8 +126,23 @@
 
                   <div class="form-group col-lg-3">
                     <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
-                    <input type="file" name="file" class="form-control form-control-sm">
+                    <input type="file" name="file[]" class="form-control form-control-sm" multiple>
                   </div>
+
+                  <div class="form-group col-lg-12">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" name="is_schedule" class="custom-control-input" id="is_schedule" value="1">
+                      <label class="custom-control-label" for="is_schedule">Is Schedule</label>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-12 row" id="schedule_fields" style="display: none;">
+                    <div class="form-group col-lg-3">
+                        <label>Start Datetime</label>
+                        <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm">
+                    </div>
+                  </div>
+
 
                   <div class="form-group col-lg-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -141,5 +162,34 @@
 @endsection
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
+<script>
+  flatpickr(".datetime-picker", {
+      enableTime: true,
+      allowInput: true,
+      dateFormat: "Y-m-d H:i",
+      plugins: [
+          new confirmDatePlugin({
+              confirmText: "OK",
+              showAlways: false,
+              theme: "light"
+          })
+      ]
+  });
 
+  $('#is_schedule').change(function() {
+      if ($(this).is(':checked')) {
+          $('#schedule_fields').show();
+          $('#start_at').attr('required', true);
+
+      } else {
+          $('#schedule_fields').hide();
+          $('#start_at').attr('required', false);
+
+      }
+  });
+  
+
+</script>
 @endsection

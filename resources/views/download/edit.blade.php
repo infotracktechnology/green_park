@@ -1,5 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Download')
+
+@section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+@endsection 
+
 @section('main')
 <div class="main-content">
   <section class="section">
@@ -131,14 +137,29 @@
 
                   <div class="form-group col-lg-4">
                     <label>Attachment <span class="text-danger">(Only PDF files, max size: 2MB*)</span></label>
-                    <input type="file" name="file" id="fileInput" class="form-control form-control-sm">
+                    <input type="file" name="file[]" id="fileInput" class="form-control form-control-sm" multiple>
                     <small id="fileName">
                       @if($download->file_path)
-                      {{ basename($download->file_path) }}
+                      @foreach ($download->file_path as $file)
+                       <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                      @endforeach
                       @endif
                     </small>
                   </div>
 
+                   <div class="form-group col-lg-12">
+                                <div class="custom-control custom-checkbox">
+                                  <input type="checkbox" name="is_schedule" class="custom-control-input" id="is_schedule" value="1" @checked($download->is_schedule)>
+                                  <label class="custom-control-label" for="is_schedule">Is Schedule</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 row" id="schedule_fields" style="{{ $download->is_schedule ? '' : 'display: none;' }}">
+                                <div class="form-group col-lg-3">
+                                    <label>Start Datetime</label>
+                                    <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" value="{{ $download->start_at }}" {{ $download->is_schedule ? 'required' : '' }}>
+                                </div>
+                            </div>
 
                   <div class="form-group col-lg-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -158,11 +179,40 @@
 @endsection
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <script>
   document.getElementById('fileInput').addEventListener('change', function() {
-      let fileName = this.files[0] ? this.files[0].name : "{{ basename($download->file_path) }}";
+      let fileName = this.files[0] ? this.files[0].name : "{{ basename($file) }}";
       document.getElementById('fileName').innerText = fileName;
   });
+
+  flatpickr(".datetime-picker", {
+      enableTime: true,
+      allowInput: true,
+      dateFormat: "Y-m-d H:i",
+      plugins: [
+          new confirmDatePlugin({
+              confirmText: "OK",
+              showAlways: false,
+              theme: "light"
+          })
+      ]
+  });
+
+  $('#is_schedule').change(function() {
+      if ($(this).is(':checked')) {
+          $('#schedule_fields').show();
+          $('#start_at').attr('required', true);
+          $('#end_at').attr('required', true);
+      } else {
+          $('#schedule_fields').hide();
+          $('#start_at').attr('required', false);
+          $('#end_at').attr('required', false);
+      }
+  });
+  
+
 </script>
 
 @endsection

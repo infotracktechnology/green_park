@@ -39,13 +39,17 @@ class DownloadController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        $file_path = [] ;
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time() . '_' . $originalName;
-            $request->file('file')->move('download', $fileName);
-            $data['file_path'] = 'download/' . $fileName;
+            foreach($request->file('file') as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('download',$fileName);
+                $file_path[] = 'download/'.$fileName;   
+            }
         }
-
+        $data['file_path'] = $file_path ?: null;
         Download::create($data);
 
         return redirect()->route('download.index')->with('success', 'Answer Key added successfully!');
@@ -72,12 +76,17 @@ class DownloadController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        $file_path = [];
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time() . '_' . $originalName;
-            $request->file('file')->move('download', $fileName);
-            $data['file_path'] = 'download/' . $fileName;
+            foreach($request->file('file')as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('download',$fileName);
+                $file_path[] = 'download/'.$fileName;
+            }
         }
+        $data['file_path'] = $file_path ?: null;
         $download->update($data);
 
         return redirect()->route('download.index')->with('success', 'Answer Key updated successfully!');
@@ -89,9 +98,14 @@ class DownloadController extends Controller
         if($request->has('ids')) {
             $downloads = Download::whereIn('id', $request->ids)->get();
             foreach ($downloads as $download) {
-                if (file_exists($download->file_path)) {
-                    unlink($download->file_path);
-                }
+                if(!empty($download->file_path)){
+                    foreach($download->file_path as $file_path){
+                        if (file_exists($file_path)) {
+                            unlink($file_path);
+                        }
+
+                    }
+                } 
                 $download->delete();
             }
         }
