@@ -38,10 +38,11 @@
                                         <td>{{ $questionkey->title }}</td>
                                         <td>
                                             @if($questionkey->file_path)
-                                            <a href="{{ env('APP_URL').'/'.$questionkey->file_path }}" 
-                                               class="btn btn-primary" download>
-                                                <i class="fas fa-file-download"></i> Download
-                                            </a>
+                                                @foreach ($questionkey->file_path as $file )
+                                                <a href="{{ env('APP_URL').'/'.$file }}" class="btn btn-primary" download>
+                                                    <i class="fas fa-file-download"></i> Download
+                                                </a>   
+                                                @endforeach
                                             @endif
                                         </td>
                                     </tr>

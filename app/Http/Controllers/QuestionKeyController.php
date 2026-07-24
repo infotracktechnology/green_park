@@ -37,14 +37,16 @@ class QuestionKeyController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
+        $file_path = [];
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time().'_'.$originalName;
-            $request->file('file')->move('questionkey',$fileName);
-            $data['file_path'] = 'questionkey/'.$fileName;
+            foreach($request->file('file') as $file){
+                $originalName = $file->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('questionkey',$fileName);
+                $file_path[] = 'questionkey/'.$fileName;
+            }   
         }
-
+        $data['file_path'] = $file_path ?: null;
         QuestionKey::create($data);
         return redirect()->route('questionkey.index')->with('success', 'Question Key added successfully!');
     }
@@ -70,14 +72,16 @@ class QuestionKeyController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
+        $file_path = [];
         if ($request->hasFile('file')) {
-            $originalName = $request->file('file')->getClientOriginalName();
-            $fileName = time().'_'.$originalName;
-            $request->file('file')->move('questionkey',$fileName);
-            $data['file_path'] = 'questionkey/'.$fileName;
+            foreach($request->file('file') as $file){
+                $originalName = $request->file('file')->getClientOriginalName();
+                $fileName = time().'_'.$originalName;
+                $file->move('questionkey',$fileName);  
+                $file_path[] = 'questionkey/'.$fileName;  
+            }   
         }
-
+        $data['file_path'] = $file_path ?: null;
         $questionkey->update($data);
 
         return redirect()->route('questionkey.index')->with('success', 'Question Key updated successfully!');
@@ -89,8 +93,12 @@ class QuestionKeyController extends Controller
        if($request->has('ids')) {
         $questionkeys = QuestionKey::whereIn('id', $request->ids)->get();
         foreach ($questionkeys as $questionkey) {
-            if (file_exists($questionkey->file_path)) {
-                unlink($questionkey->file_path);
+            if(!empty($questionkey->file_path)){
+                foreach ($questionkey->file_path as $file_path) {
+                    if (file_exists($file_path)) {
+                        unlink($file_path);
+                    }
+                }
             }
             $questionkey->delete();
         }
