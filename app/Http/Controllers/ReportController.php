@@ -199,14 +199,28 @@ class ReportController extends Controller
 
     public function AttendanceReport(Request $request)
     {
+        $courses = Student::select('course')->where('academic_year', $this->academic_year)->distinct()->orderBy('course')->get();
+
+        $sections = Attendance::select('section')->where('academic_year', $this->academic_year)->distinct()->orderBy('section')->get();
+
         $attendances = [];
         if ($request->has('branch_id')) {
-            $attendances = Attendance::where('branch_id', $request->branch_id)->where('academic_year', $this->academic_year)->where('attendance_date', $request->date)->get()->groupBy('section');
+            $studentIds = Student::where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE'])->when($request->filled('course'), function ($q) use ($request) { $q->where('course', $request->course); }) ->when($request->filled('section'), function ($q) use ($request) { $q->where('section', $request->section); })->pluck('student_id');
+
+           $attendances = Attendance::where('branch_id', $request->branch_id)->where('academic_year', $this->academic_year)->where('attendance_date', $request->date)->whereIn('student_id', $studentIds)->get()->groupBy('section');
+
             $attendances = $attendances->map(function ($attendance, $section) use ($request) {
                 $present = $attendance->where('status', 'P')->unique('student_id')->count();
                 $absent = $attendance->where('status', 'A')->unique('student_id')->count();
-                $boys = Student::where('section', $section)->where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Male')->whereDate('admission_date', '<=', $request->date)->count();
-                $girls = Student::where('section', $section)->where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->where('coaching_type', 'OFFLINE')->where('gender', 'Female')->whereDate('admission_date', '<=', $request->date)->count();
+
+                $studentQuery = Student::where('section', $section)->where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE'])->whereDate('admission_date', '<=', $request->date);
+
+                if ($request->filled('course')) {
+                    $studentQuery->where('course', $request->course);
+                }
+
+                $boys = (clone $studentQuery)->where('gender', 'Male')->count();
+                $girls = (clone $studentQuery)->where('gender', 'Female')->count();
                 
                 $studentNames = Student::whereIn('student_id', $attendance->where('status', 'P')->pluck('student_id')->unique())->pluck('student_name');
 
@@ -216,7 +230,7 @@ class ReportController extends Controller
             });
         }
 
-        return view('report.attendancereport', compact('attendances'));
+        return view('report.attendancereport', compact('attendances','sections','courses'));
     }
 
     public function MonthlyAttendanceReport(Request $request)
