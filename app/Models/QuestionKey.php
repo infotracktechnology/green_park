@@ -14,6 +14,7 @@ class QuestionKey extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'file_path' => 'json',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'start_at' => 'datetime',
