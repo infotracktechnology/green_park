@@ -1086,7 +1086,8 @@ class ReportController extends Controller
                 ->when(auth()->user()->branch, function ($q) { $q->where('campus', auth()->user()->branch); })
                 ->when($request->filled('branch'), function ($q) use ($request) { $q->where('campus', $request->branch); })
                 ->when($request->filled('course'), function ($q) use ($request) { $q->where('course', $request->course); })
-                ->when($request->filled('section'), function ($q) use ($request) { $q->where('section', $request->section); })
+                // ->when($request->filled('section'), function ($q) use ($request) { $q->where('section', $request->section); })
+                ->when($request->filled('coaching_type'), function ($q) use ($request) { $q->where('coaching_type', $request->coaching_type); })
                 ->when($request->filled('status'), function ($q) use ($request) {
                     if ($request->status == '1') {
                         $q->where('active', 1);
@@ -1134,8 +1135,8 @@ class ReportController extends Controller
                 ->whereDate('last_login', today())->where('device', 'IOS')->count();
 
             $courses = Student::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($q) { $q->where('campus', auth()->user()->branch); })->when($request->filled('branch'), function ($q) use ($request) { $q->where('campus', $request->branch); })->select('course')->distinct()->orderBy('course')->pluck('course');
-            $sections = Student::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($q) { $q->where('campus', auth()->user()->branch); })->when($request->filled('branch'), function ($q) use ($request) { $q->where('campus', $request->branch); })->when($request->filled('course'), function ($q) use ($request) { $q->where('course', $request->course); })->select('section')->distinct()->orderBy('section')->pluck('section');
-
-            return view('report.userloginreport', compact('students','branches','courses','sections','totalStudents','todayLogin','onlineStudents','webLogin','androidLogin','iosLogin'));
+            // $sections = Student::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($q) { $q->where('campus', auth()->user()->branch); })->when($request->filled('branch'), function ($q) use ($request) { $q->where('campus', $request->branch); })->when($request->filled('course'), function ($q) use ($request) { $q->where('course', $request->course); })->select('section')->distinct()->orderBy('section')->pluck('section');
+            $coaching_type = Student::select('coaching_type')->where('academic_year', $this->academic_year)->distinct()->get();
+            return view('report.userloginreport', compact('students','branches','courses','coaching_type','totalStudents','todayLogin','onlineStudents','webLogin','androidLogin','iosLogin'));
         }
 }

@@ -134,12 +134,22 @@
                     </select>
                   </div>
 
-                  <div class="col-md-2 col-sm-6 form-group">
+                  {{-- <div class="col-md-2 col-sm-6 form-group">
                     <label>Section</label>
                     <select class="form-control form-control-sm" name="section" onchange="document.getElementById('filterForm').submit();">
                       <option value="">All Sections</option>
                       @foreach($sections as $row)
                       <option value="{{ $row }}" @selected(request('section') == $row)>{{ $row }}</option>
+                      @endforeach
+                    </select>
+                  </div> --}}
+
+                 <div class="col-md-2 col-sm-6 form-group">
+                    <label>Coaching Type</label>
+                    <select class="form-control form-control-sm" name="coaching_type" onchange="document.getElementById('filterForm').submit();">
+                      <option value="">All Coaching Type</option>
+                      @foreach($coaching_type as $row)
+                      <option value="{{ $row->coaching_type }}" @selected(request('coaching_type') == $row->coaching_type)>{{ $row->coaching_type }}</option>
                       @endforeach
                     </select>
                   </div>
@@ -199,7 +209,6 @@
                         <th>coaching type</th>
                         <th>Course</th>
                         <th>Section</th>
-
                         <th>Device</th>
                         <th>Status</th>
                         <th>Last Login</th>
