@@ -124,6 +124,7 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ route('studentmenu.type') }}" class="nav-link">Type Assign</a></li>
                 <li><a href="{{ route('studentmenu.student') }}" class="nav-link">Student Assign</a></li>
+                <li><a href="{{ route('report.userlogin') }}" class="nav-link">User Login Report</a></li>
               </ul>
             </li>
 

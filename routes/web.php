@@ -232,6 +232,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('/hostel-list/download-section-pdf', [ReportController::class, 'downloadHostelSectionPdf'])->name('hostellist.sectionpdf');
         Route::post('/hostel-list/download-room-pdf', [ReportController::class, 'downloadHostelRoomPdf'])->name('hostellist.roompdf');
         Route::get('/hostel/hostelvacancy', [ReportController::class, 'HostelVacancy'])->name('hostelvacancy');
+        Route::get('/userlogin', [ReportController::class, 'UserLoginReport'])->name('userlogin');
     });
 });
 
