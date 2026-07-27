@@ -67,6 +67,7 @@
                         <th>#</th>
                         <th>Test ID</th>
                         <th>Branch </th>
+                        <th>course</th>
                         <th>Coaching Type</th>
                         <th>Test Category</th>
                         <th>Test Name</th>
@@ -87,6 +88,7 @@
                         <td><input type="checkbox" name="ids[]" value="{{ $test->id }}"></td>
                         <td>{{ $test->testid }}</td>
                         <td>{{ $test->branchNames() }}</td>
+                        <td>{{ $test->course }}</td>
                         <td>{{ $test->coaching_type }}</td>
                         <td>{{ $test->testcategory }}</td>
                         <td>{{ $test->name }}</td>
