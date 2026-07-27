@@ -196,8 +196,10 @@
                         <th>Student ID</th>
                         <th>Student Name</th>
                         <th>Campus</th>
+                        <th>coaching type</th>
                         <th>Course</th>
                         <th>Section</th>
+
                         <th>Device</th>
                         <th>Status</th>
                         <th>Last Login</th>
@@ -210,6 +212,7 @@
                         <td>{{ $student->student_id }}</td>
                         <td>{{ $student->student_name }}</td>
                         <td>{{ $student->branch->name ?? $student->campus }}</td>
+                        <td>{{ $student->coaching_type }}</td>
                         <td>{{ $student->course }}</td>
                         <td>{{ $student->section }}</td>
                         <td>{{ $student->device ?? 'N/A' }}</td>
