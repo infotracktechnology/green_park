@@ -41,6 +41,16 @@
                                   @if ($errors->has('answer_key'))
                                       <span class="text-danger">{{ $errors->first('answer_key') }}</span>
                                   @endif
+
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" id="key_correction_check" name="key_correction_enable">
+                                        <label class="form-check-label" for="key_correction_check"> Key Correction </label>
+                                    </div>
+
+                                    <div id="key_correction_div" style="display:none;" class="mt-2">
+                                        <input type="text" class="form-control" name="key_correction" id="key_correction" placeholder="Enter Key Correction Value" min="0">
+                                    </div>
+
                                </div>
     
                                {{-- <div class="form-group col-lg-2">
@@ -154,5 +164,17 @@
     }
 });
     })
+
+    $(document).ready(function () {
+      $('#key_correction_check').change(function () {
+          if ($(this).is(':checked')) {
+              $('#key_correction_div').show();
+          } else {
+              $('#key_correction_div').hide();
+              $('#key_correction').val('');
+          }
+      });
+
+  });
   </script>
 @endsection
