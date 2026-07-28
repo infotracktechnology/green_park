@@ -81,6 +81,7 @@
                         <thead>
                           <tr>
                             <th>Test ID</th>
+                            <th>course</th>
                             <th>Test Name</th>
                             <th>Test Category</th>
                             <th>Total Questions</th>
@@ -92,6 +93,7 @@
                           @foreach($exams as $exam)
                           <tr>
                             <td>{{ $exam->testid }}</td>
+                            <td>{{ $exam->course }}</td>
                             <td>{{ $exam->name }}</td>
                             <td>{{ $exam->testcategory }}</td>
                             <td>{{ $exam->total_questions }}</td>
