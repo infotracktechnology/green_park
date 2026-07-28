@@ -91,8 +91,12 @@
         </tr>
       </tbody>
     </table>
-    {{-- <p>Key Correction: Q.NO: 78</p> --}}
-  </div>
+    
+    @if(!@empty($key_correction) && $key_correction != 0)
+      <p>Key Correction: Q.NO: {{ $key_correction }}</p>
+    @endif
+
+    </div>
   @endforeach
   <script>
     window.onload = function() {
