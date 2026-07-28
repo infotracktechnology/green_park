@@ -130,6 +130,16 @@ class ReportController extends Controller
                     'finished' => Student::whereIn('student_id', $finishedStudentIds)->get(),
                     'absent' => Student::whereIn('student_id', $absentStudentIds)->get(),
                 ];
+
+                if ($request->filled('search')) {
+
+                $students = Student::whereIn('student_id', $eligibleStudentIds)
+                    ->where(function ($query) use ($request) {
+                        $query->where('student_id', 'like', '%' . $request->search . '%')
+                            ->orWhere('student_name', 'like', '%' . $request->search . '%');
+                    })
+                    ->get();
+                }
             }
         }
 
