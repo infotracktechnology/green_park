@@ -596,17 +596,18 @@ class ExamController extends Controller
         }
 
         if ($request->isMethod('POST')) {
-            foreach ($request->publish as $name => $publish) {
+            foreach ($request->publish as $key => $publish) {
+                $name = $request->exam_name[$key];
                 $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
                 $files = $exam->markrange_file ?? [];
-                if ($request->hasFile("batch.$name")) {
-                    foreach ($request->file("batch.$name") as $batch => $file) {
+                if ($request->hasFile("batch.$key")) {
+                    foreach ($request->file("batch.$key") as $batch => $file) {
                         $filename = "{$name}-{$batch}.pdf";
                         $file->move('assets/markrange', $filename);
                         $files[$batch] = "assets/markrange/$filename";
                     }
                 }
-                $update = Exam::where('name', $name)->where('academic_year', $this->academic_year)->update(['publish' => $publish, 'markrange_file' => $files]);
+                $exam->update(['publish' => $publish,'markrange_file' => $files,]);
             }
             $this->MovePervious("ONLINE");
             return back()->with('success', 'Exams Publish Updated Successfully.');

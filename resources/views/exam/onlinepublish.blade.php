@@ -99,16 +99,18 @@
                             <td>{{ $exam->total_questions }}</td>
 
                             <td class="markrange-col" style="display:none;">
+                              <input type="hidden" name="exam_name[{{ md5($exam->name) }}]" value="{{ $exam->name }}">
                               @if(isset($exam->markrange_file['online']))
                               <a href="{{ env('APP_URL').$exam->markrange_file['online'] }}" download>{{ basename($exam->markrange_file['online']) }}</a><br>
                               <a class="btn btn-danger text-white" href="{{ route('exam.onlinepublish',['delete'=>$exam->name,'batch'=>'online'])}}"><i class="fas fa-trash"></i></a>
                               @else
-                              <input type="file" name="batch[{{ $exam->name }}][online]" accept="application/pdf" class="form-control form-control-sm">
+                              
+                              <input type="file" name="batch[{{ md5($exam->name) }}][online]" accept="application/pdf" class="form-control form-control-sm">
                               @endif
                             </td>
 
                             <td>
-                              <select name="publish[{{ $exam->name }}]" class="form-control form-control-sm" required>
+                              <select name="publish[{{ md5($exam->name) }}]" class="form-control form-control-sm" required>
                                 <option value="">Select Option</option>
                                 <option value="Yes" @selected($exam->publish == 'Yes')>Yes</option>
                                 <option value="No" @selected($exam->publish == 'No')>No</option>
