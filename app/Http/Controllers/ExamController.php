@@ -465,6 +465,7 @@ class ExamController extends Controller
             if(empty($exam)) return back()->with('error', 'No such Exam exists.');
 
             $examtype = $exam->examtype;
+            $exam->update([ 'key_correction' => $request->key_correction ]);
 
             foreach ($answers as $answer) {
                 $testId = $answer['test_id'];
