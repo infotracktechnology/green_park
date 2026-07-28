@@ -581,7 +581,7 @@ class ExamController extends Controller
     {
         $exams = [];
         if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'ONLINE')->groupBy('name')->get();
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,course,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'ONLINE')->groupBy('name')->get();
         }
 
         if ($request->delete && $request->batch) {
