@@ -582,7 +582,7 @@ class ExamController extends Controller
     {
         $exams = [];
         if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,course,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'ONLINE')->groupBy('name')->get();
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->where('academic_year', $this->academic_year)->selectRaw("group_concat(testid) as testid,course,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'ONLINE')->groupBy('name')->get();
         }
 
         if ($request->delete && $request->batch) {
@@ -596,28 +596,55 @@ class ExamController extends Controller
             return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
         }
 
-        if ($request->isMethod('POST')) {
-            foreach ($request->publish as $name => $publish) {
-                $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
-                $files = $exam->markrange_file ?? [];
-                if ($request->hasFile("batch.$name")) {
-                    foreach ($request->file("batch.$name") as $batch => $file) {
-                        $filename = "{$name}-{$batch}.pdf";
-                        $file->move('assets/markrange', $filename);
-                        $files[$batch] = "assets/markrange/$filename";
-                    }
-                }
-                $update = Exam::where('name', $name)->where('academic_year', $this->academic_year)->update(['publish' => $publish, 'markrange_file' => $files]);
-            }
-            $this->MovePervious("ONLINE");
-            return back()->with('success', 'Exams Publish Updated Successfully.');
-        }
+        // if ($request->isMethod('POST')) {
+        //     foreach ($request->publish as $name => $publish) {
+        //         $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
+        //         $files = $exam->markrange_file ?? [];
+        //         if ($request->hasFile("batch.$name")) {
+        //             foreach ($request->file("batch.$name") as $batch => $file) {
+        //                 $filename = "{$name}-{$batch}.pdf";
+        //                 $file->move('assets/markrange', $filename);
+        //                 $files[$batch] = "assets/markrange/$filename";
+        //             }
+        //         }
+        //         $update = Exam::where('name', $name)->where('academic_year', $this->academic_year)->update(['publish' => $publish, 'markrange_file' => $files]);
+        //     }
+        //     $this->MovePervious("ONLINE");
+        //     return back()->with('success', 'Exams Publish Updated Successfully.');
+        // }
 
         return view('exam.onlinepublish', compact('exams'));
     }
+
+   public function OnlinePublishStore(Request $request)
+    {
+        $allBatchFiles = $request->file('batch', []);
+        
+        foreach ($request->publish as $name => $publish) {
+            $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
+            if (!$exam) {
+                continue;
+            }
+            $files = $exam->markrange_file ?? [];
+            $batchFiles = $allBatchFiles[$name] ?? [];
+            foreach ($batchFiles as $batch => $file) {
+                if ($file instanceof \Illuminate\Http\UploadedFile) {
+                    $filename = "{$name}-{$batch}.pdf";
+                    $file->move('assets/markrange', $filename);
+                    $files[$batch] = "assets/markrange/$filename";
+                }
+            }
+            $exam->update([
+                'publish' => $publish,
+                'markrange_file' => $files,
+            ]);
+        }
+        $this->MovePervious("ONLINE");
+        return back()->with('success', 'Exams Publish Updated Successfully.');
+    }
     public function MovePervious($type)
     {
-        $sub = Exam::select('name')->where('examtype', $type)->groupBy('name')->orderByRaw('max(id) desc')->limit(3);
+        $sub = Exam::select('name')->where('examtype', $type)->groupBy('name')->orderByRaw('max(id) desc')->limit(6);
         $exams = Exam::leftJoinSub($sub, 't', fn($j) => $j->on('exam.name', '=', 't.name'))->whereNull('t.name')->where('examtype', $type)->select('exam.*')->get();
 
         foreach ($exams as $exam) {

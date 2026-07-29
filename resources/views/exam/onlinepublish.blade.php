@@ -72,7 +72,7 @@
                 Show Mark Range File Column?
               </label>
 
-              <form method="post" id="publishForm" action="{{ route('exam.onlinepublish') }}" enctype="multipart/form-data">
+              <form method="post" id="publishForm" action="{{ route('exam.onlinepublish.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                   <div class="col-lg-12">
