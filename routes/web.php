@@ -91,7 +91,9 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::delete('examination/offline/delete/{id}/{test_id}', 'deleteOfflineKey')->name('offline.delete');
         Route::get('examination/csv_download/{test_ids}', 'csv_download')->name('exam.csv_download');
         Route::match(['get', 'post'], 'examination/offlinepublish', 'OfflinePublish')->name('exam.offlinepublish');
-        Route::match(['get', 'post'], 'examination/onlinepublish', 'OnlinePublish')->name('exam.onlinepublish');
+        // Route::match(['get', 'post'], 'examination/onlinepublish', 'OnlinePublish')->name('exam.onlinepublish');
+        Route::get('examination/onlinepublish', 'OnlinePublish')->name('exam.onlinepublish');
+        Route::post('examination/onlinepublish', 'OnlinePublishStore')->name('exam.onlinepublish.store');
         Route::get('examination/perviousexamresult/', 'PerviousExamResult')->name('exam.perviousexamresult');
         Route::match(['get', 'post'], 'examination/previousexamupload', 'PreviousExamUpload')->name('exam.previousexamupload');
     });
