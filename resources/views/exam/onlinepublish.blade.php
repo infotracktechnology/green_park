@@ -81,7 +81,7 @@
                         <thead>
                           <tr>
                             <th>Test ID</th>
-                            <th>course</th>
+                            <th>Course</th>
                             <th>Test Name</th>
                             <th>Test Category</th>
                             <th>Total Questions</th>
