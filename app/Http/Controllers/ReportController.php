@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier};
+use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -148,6 +148,27 @@ class ReportController extends Controller
         return view('report.examination_log_report', compact('category', 'exams', 'stats', 'students', 'test_name', 'studentDetails'));
     }
 
+    public function examLogReport(Request $request)
+    {
+        $exams = Exam::select('id', 'name')->orderBy('id','desc')->get();
+        
+        if ($request->isMethod('post')) {
+            $student = Student::where('student_id', $request->student_id)->first();
+            if (!$student) {
+                return back()->with('error','Student not found');
+            }
+            $exam = Exam::find($request->exam_id);
+            $logs = StudentLog::where('student_id', $student->student_id)->whereRaw("action LIKE ?", ['%' . $exam->name . '%'])->orderBy('created_at')->get();
+
+            if ($logs->isEmpty()) {
+                return back()->with('error', 'This student did not attend the selected exam.');
+            }
+            
+            $pdf = PDF::loadView('pdf.examlog', compact('student', 'logs', 'exam'));
+            return $pdf->download('examlog.pdf');
+        }
+       return view('report.examlogreport', compact('exams'));
+    }
     public function StudentResponseDownload(Request $request)
     {
         $examname = $request->examname;
