@@ -47,7 +47,7 @@
                         @if($hasMarkRange)
                         <td>
                           @if($test['markrange'])
-                          <a href="{{ env('APP_URL').$test['markrange'] }}" class="btn btn-primary">Markrange</a>
+                          <a href="{{ env('APP_URL').$test['markrange'] }}" target="_blank" class="btn btn-primary">Markrange</a>
                           @endif
                         </td>
                         @endif
