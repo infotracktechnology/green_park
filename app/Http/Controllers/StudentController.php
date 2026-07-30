@@ -24,8 +24,12 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $students = [];
-        if ($request->has('course')) {
-            $students = Student::when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))->where('course', $request->course)->get();
+
+        if ($request->filled('course') || $request->filled('search')) {
+            $students = Student::when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))->when($request->filled('course'), function ($q) use ($request) { $q->where('course', $request->course); })
+                ->when($request->filled('search'), function ($q) use ($request) { $search = $request->search;$q->where(function ($query) use ($search) { $query->where('student_id', 'like', "%{$search}%")->orWhere('student_name', 'like', "%{$search}%")->orWhere('user_name', 'like', "%{$search}%")->orWhere('father_ph_no', 'like', "%{$search}%")->orWhere('mother_ph_no', 'like', "%{$search}%")->orWhere('batch', 'like', "%{$search}%")->orWhere('section', 'like', "%{$search}%"); });
+                })
+                ->get();
         }
 
         return view('student.index', compact('students'));

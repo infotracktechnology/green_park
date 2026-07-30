@@ -209,11 +209,13 @@
                         <th>coaching type</th>
                         <th>Course</th>
                         <th>Section</th>
+                        <th>Father Number</th>
+                        <th>Mother Number</th>
                         <th>Device</th>
                         <th>Status</th>
                         <th>Last Login</th>
                       </tr>
-                    </thead>
+                    </thead> 
                     <tbody>
                       @forelse ($students as $student)
                       <tr>
@@ -224,6 +226,8 @@
                         <td>{{ $student->coaching_type }}</td>
                         <td>{{ $student->course }}</td>
                         <td>{{ $student->section }}</td>
+                        <td>{{ $student->father_ph_no }}</td>
+                        <td>{{ $student->mother_ph_no }}</td>
                         <td>{{ $student->device ?? 'N/A' }}</td>
                        <td>
                             @if(is_null($student->last_login))

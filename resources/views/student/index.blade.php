@@ -32,14 +32,31 @@
             </div>
 
             <form action="{{route('student.index')}}" id="myForm" method="get">
-              <div class="col-md-4 form-group">
-                <select class="form-control form-control-sm" onchange="document.getElementById('myForm').submit();" name="course">
-                  <option value="">Select Course</option>
-                  @foreach($course as $row)
-                  <option value="{{$row}}" @selected($row==request('course'))>{{$row}}</option>
-                  @endforeach
-                </select>
-              </div>
+              <div class="row py-3">
+
+                <div class="col-md-4">
+                    <select class="form-control form-control-sm"
+                            onchange="document.getElementById('myForm').submit();"
+                            name="course">
+                        <option value="">Select Course</option>
+                        @foreach($course as $row)
+                            <option value="{{ $row }}" @selected($row == request('course'))>
+                                {{ $row }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2 ml-auto">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="search" class="form-control" placeholder="Global Search" value="{{ request('search') }}">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary"> <i class="fas fa-search"></i> </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             </form>
 
 
