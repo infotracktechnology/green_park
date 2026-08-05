@@ -254,6 +254,7 @@
                 {{-- <li><a href="{{ route('report.log') }}" class="nav-link">Logs Report</a></li> --}}
                 <li><a href="{{ route('report.batchlist') }}" class="nav-link">BatchList</a></li>
                 <li><a href="{{ route('report.sectionlist') }}" class="nav-link">SectionList</a></li>
+                <li><a href="{{ route('report.individualstudent') }}">Individual Student Report</a></li>
               </ul>
             </li>
             @else
