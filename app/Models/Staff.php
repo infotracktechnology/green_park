@@ -31,7 +31,7 @@ class Staff extends Model
 
 	public function shift()
 	{
-		return $this->belongsTo(Workshift::class, 'shiftid');
+		return $this->belongsTo(WorkShift::class, 'shiftid');
 	}
 	// public function AttendedShift($sno=1,$date = null){
 	// 	$date = $date ? Carbon::parse($date) : Carbon::now();

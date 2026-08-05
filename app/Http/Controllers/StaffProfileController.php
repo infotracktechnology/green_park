@@ -83,8 +83,9 @@ class StaffProfileController extends Controller
         $districts = DB::table('district_list')->where('State', $staff->state)->select('District')->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $workshift = WorkShift::all();
+        $branches = Branch::all();
 
-        return view('staff.edit', compact('staff', 'districts', 'states', 'workshift'));
+        return view('staff.edit', compact('staff', 'districts', 'states', 'workshift', 'branches'));
     }
 
     public function update(Request $request, Staff $staff)

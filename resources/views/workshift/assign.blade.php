@@ -59,11 +59,11 @@
                                                 <td x-text="group.teaching_count"></td>
                                                 <td x-text="group.non_teaching_count"></td>
                                                 <td>
-                                                    <a href="javascript:void(0);" 
-                                                       x-on:click="group.shift_name == 'Not Assigned' ? showAllStaffs() : null"
-                                                       :class="group.shift_name == 'Not Assigned' ? 'col-red' : 'col-blue'"
-                                                       x-text="group.total_count">
-                                                    </a>
+                                                    <a href="javascript:void(0);"
+                                                x-on:click="showAllStaffs(group.staffs)"
+                                                :class="group.shift_name == 'Not Assigned' ? 'col-red' : 'col-blue'"
+                                                x-text="group.total_count">
+                                                </a>
                                                 </td>
                                             </tr>
                                         </template>
@@ -107,7 +107,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <template x-for="staff in filteredStaffs" :key="staff.id">
+                                                <template x-for="staff in displayStaffs" :key="staff.id">
                                                     <tr>
                                                         <td>
                                                             <input type="checkbox" 
@@ -150,6 +150,7 @@ function workshift() {
         allStaffs: @json($staffs),
         allShifts: @json($shifts),
         filteredStaffs: [],
+        displayStaffs: [],
         
         get availableShifts() {
             return this.allShifts.filter(shift => shift.branchid == this.branchid);
@@ -199,12 +200,13 @@ function workshift() {
             this.selectedShiftForAssignment = '';
         },
         
-        showAllStaffs() {
-            this.showStaffList = false;
-            this.filteredStaffList = true;
-            this.selectedStaffs = [];
-            this.checkAll = false;
-            this.selectedShiftForAssignment = '';
+        showAllStaffs(staffs) {
+    this.displayStaffs = staffs;
+    this.showStaffList = false;
+    this.filteredStaffList = true;
+    this.selectedStaffs = [];
+    this.checkAll = false;
+    this.selectedShiftForAssignment = '';
         },
         
         // updateCheckboxes() {
