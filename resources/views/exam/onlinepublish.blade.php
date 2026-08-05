@@ -60,6 +60,16 @@
                     <input type="date" value="{{ request('end_date', date('Y-m-d')) }}" name="end_date" class="form-control form-control-sm" required>
                   </div>
 
+                  <div class="form-group col-lg-3">
+                    <label>Course</label>
+                    <select name="course" id="course" class="form-control form-control-sm" >
+                      <option value="">Select Course</option>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}" @selected(request('course') == $row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
                   <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
                     <button type="submit" class="btn btn-primary btn-block">Submit</button>
@@ -97,7 +107,7 @@
                             <td>{{ $exam->name }}</td>
                             <td>{{ $exam->testcategory }}</td>
                             <td>{{ $exam->total_questions }}</td>
-
+                            <input type="hidden" name="course" value="{{ $exam->course }}" />
                             <td class="markrange-col" style="display:none;">
                               @if(isset($exam->markrange_file['online']))
                               <a href="{{ env('APP_URL').$exam->markrange_file['online'] }}" download>{{ basename($exam->markrange_file['online']) }}</a><br>

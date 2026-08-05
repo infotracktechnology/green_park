@@ -171,7 +171,7 @@ class StudentController extends Controller
         $category = ExamSubjectReport::where([['stuid', $sid], ['category', '!=', '']])->pluck('category')->unique();
         $subjectexam = collect();
         if ($request->exam) {
-            $subjectexam = ExamSubjectReport::where("category", $request->exam)->where("stuid", $sid)->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+            $subjectexam = ExamSubjectReport::where("category", $request->exam)->where("stuid", $sid)->whereNotIn('subject', function ($query) use ($sid) { $query->select('testname')->from('exam_answer')->where('student_id', $sid); })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         }
         return view('student.marksheet', compact('exams', 'subjectexam', 'category'));
     }

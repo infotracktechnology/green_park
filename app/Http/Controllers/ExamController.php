@@ -389,54 +389,54 @@ class ExamController extends Controller
         ]);
 
         try {
-        $answers = $import->parseCSV($request->file('offline')->getRealPath());
-        $examtype = '';
+            $answers = $import->parseCSV($request->file('offline')->getRealPath());
+            $examtype = '';
 
-        if (empty($answers) || !isset($answers[0]['exam_name'], $answers[0]['student_id'], $answers[0]['qorder'])) {
-            return back()->with('error', 'File is not in the template format.');
-        }
-
-        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answers[0]['exam_name'])->first();
-        if(empty($exam)) return back()->with('error', 'No such Exam exists.');
-
-        foreach ($answers as $answer) {
-            $examtype = $exam->examtype;
-            $exists = ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->exists();
-
-            if ($exists) {
-                ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->delete();
+            if (empty($answers) || !isset($answers[0]['exam_name'], $answers[0]['student_id'], $answers[0]['qorder'])) {
+                return back()->with('error', 'File is not in the template format.');
             }
 
-            $record = [];
-            $qno = 1;
-            foreach (explode(',', $answer['qorder']) as $col) {
-                $subjectkey = strtolower($col);
-                $subtotal = (int) ($exam->{"{$subjectkey}_questions"} ?? 0);
-                for ($i = 1; $i <= $subtotal; $i++) {
-                    $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => strtoupper($col), 'q_no' => $qno, 'answer' => $answer["q$qno"] ?? null, 'mode' => 'OMR'];
-                    $qno++;
+            $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answers[0]['exam_name'])->first();
+            if (empty($exam)) return back()->with('error', 'No such Exam exists.');
+
+            foreach ($answers as $answer) {
+                $examtype = $exam->examtype;
+                $exists = ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->exists();
+
+                if ($exists) {
+                    ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->delete();
                 }
+
+                $record = [];
+                $qno = 1;
+                foreach (explode(',', $answer['qorder']) as $col) {
+                    $subjectkey = strtolower($col);
+                    $subtotal = (int) ($exam->{"{$subjectkey}_questions"} ?? 0);
+                    for ($i = 1; $i <= $subtotal; $i++) {
+                        $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => strtoupper($col), 'q_no' => $qno, 'answer' => $answer["q$qno"] ?? null, 'mode' => 'OMR'];
+                        $qno++;
+                    }
+                }
+                $exam_answer = DB::table('exam_answer')->insert($record);
             }
-            $exam_answer = DB::table('exam_answer')->insert($record);
-        }
 
-        $file = $request->file('offline');
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move('answer_key', $filename);
+            $file = $request->file('offline');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move('answer_key', $filename);
 
-        DB::table('key_log')->insert([
-            'file_name' => $filename,
-            'upload_time' => now(),
-            'examtype' => $examtype,
-            'test_name' => implode(',', array_unique(array_column($answers, 'exam_name'))),
-            'path' => 'answer_key/' . $filename,
-            'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
-            'no_rows' => count($answers),
-            'type' => 'offline_key',
-        ]);
-        return back()->with('success', 'Offline file uploaded successfully.');
-        }catch(\Exception $e){
-            return back()->with('error', "OMR Upload Failed:".$e->getMessage());
+            DB::table('key_log')->insert([
+                'file_name' => $filename,
+                'upload_time' => now(),
+                'examtype' => $examtype,
+                'test_name' => implode(',', array_unique(array_column($answers, 'exam_name'))),
+                'path' => 'answer_key/' . $filename,
+                'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
+                'no_rows' => count($answers),
+                'type' => 'offline_key',
+            ]);
+            return back()->with('success', 'Offline file uploaded successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', "OMR Upload Failed:" . $e->getMessage());
         }
     }
 
@@ -581,8 +581,8 @@ class ExamController extends Controller
     public function OnlinePublish(Request $request)
     {
         $exams = [];
-        if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->where('academic_year', $this->academic_year)->selectRaw("group_concat(testid) as testid,course,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'ONLINE')->groupBy('name')->get();
+        if ($request->start_date && $request->end_date && $request->course) {
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->where('course', $request->course)->where('academic_year', $this->academic_year)->selectRaw("group_concat(testid) as testid,course,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'ONLINE')->groupBy('name')->get();
         }
 
         if ($request->delete && $request->batch) {
@@ -596,27 +596,10 @@ class ExamController extends Controller
             return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
         }
 
-        // if ($request->isMethod('POST')) {
-        //     foreach ($request->publish as $name => $publish) {
-        //         $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
-        //         $files = $exam->markrange_file ?? [];
-        //         if ($request->hasFile("batch.$name")) {
-        //             foreach ($request->file("batch.$name") as $batch => $file) {
-        //                 $filename = "{$name}-{$batch}.pdf";
-        //                 $file->move('assets/markrange', $filename);
-        //                 $files[$batch] = "assets/markrange/$filename";
-        //             }
-        //         }
-        //         $update = Exam::where('name', $name)->where('academic_year', $this->academic_year)->update(['publish' => $publish, 'markrange_file' => $files]);
-        //     }
-        //     $this->MovePervious("ONLINE");
-        //     return back()->with('success', 'Exams Publish Updated Successfully.');
-        // }
-
         return view('exam.onlinepublish', compact('exams'));
     }
 
-   public function OnlinePublishStore(Request $request)
+    public function OnlinePublishStore(Request $request)
     {
         $allBatchFiles = $request->file('batch', []);
         
@@ -634,30 +617,68 @@ class ExamController extends Controller
                     $files[$batch] = "assets/markrange/$filename";
                 }
             }
-            $exam->update([
-                'publish' => $publish,
-                'markrange_file' => $files,
-            ]);
+            $exam->update(['publish' => $publish, 'markrange_file' => $files,]);
+
+            if ($publish) {
+                $this->MovePervious($exam);
+            }
         }
-        $this->MovePervious("ONLINE");
+
+        $this->ClearOldExamAnswers("ONLINE", $request->course);
         return back()->with('success', 'Exams Publish Updated Successfully.');
     }
-    public function MovePervious($type)
-    {
-        $sub = Exam::select('name')->where('examtype', $type)->groupBy('name')->orderByRaw('max(id) desc')->limit(6);
-        $exams = Exam::leftJoinSub($sub, 't', fn($j) => $j->on('exam.name', '=', 't.name'))->whereNull('t.name')->where('examtype', $type)->select('exam.*')->get();
 
+    public function MovePervious(Exam $exam)
+    {
+        $subjects = array_map('strtolower', explode(',', $exam->subject_name));
+
+        $expr = collect($subjects)->map(function ($s) {
+            $sr = substr($s, 0, 3);
+
+            return "sum(if(subject='$s' and mark=4,1,0)) as `{$sr}_r`,sum(if(subject='$s' and mark=-1,1,0)) as `{$sr}_w`,sum(if(subject='$s' and mark=0,1,0)) as `{$sr}_l`,sum(if(subject='$s',mark,0)) as `{$sr}_tot`";
+        })->implode(',');
+
+        $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')
+            ->where('testname', $exam->name)
+            ->selectRaw(" s.student_id as stuid,exam_answer.mode as omr,s.student_name as sname,s.batch,test_id as testid,s.section as sec,(count(mark)*4) as totmark,sum(mark) as nettot,$expr")
+            ->groupBy('stuid')
+            ->get()
+            ->map(function ($answer) use ($exam) {
+                return array_merge($answer->toArray(), [
+                    'category' => $exam->testcategory,
+                    'subject'  => $exam->name,
+                    'exdate'   => date('d-m-Y', strtotime($exam->exam_date)),
+                ]);
+            })
+            ->toArray();
+
+        foreach (array_chunk($answers, 500) as $chunk) {
+            foreach ($chunk as $row) {
+                ExamSubjectReport::updateOrInsert(
+                    ['stuid'   => $row['stuid'], 'testid'  => $row['testid'], 'subject' => $row['subject'],],
+                    $row
+                );
+            }
+        }
+    }
+
+    public function ClearOldExamAnswers($type, $course)
+    {
+
+        $sub = Exam::select('name')->where('course', $course)->where('examtype', $type)->groupBy('name')->orderByRaw('max(id) desc')->limit(3);
+        $exams = Exam::leftJoinSub($sub, 't', function ($join) {
+            $join->on('exam.name', '=', 't.name');
+        })->whereNull('t.name')->where('examtype', $type)->where('course', $course)->select('exam.*')->get();
         foreach ($exams as $exam) {
-            $subjects = array_map('strtolower', explode(',', $exam->subject_name));
-            $expr = collect($subjects)->map(function ($s) {
-                $sr = substr($s, 0, 3);
-                return "sum(if(subject='$s' and mark=4,1,0)) as `{$sr}_r`,sum(if(subject='$s' and mark=-1,1,0)) as `{$sr}_w`,sum(if(subject='$s' and mark=0,1,0)) as `{$sr}_l`,sum(if(subject='$s',mark,0)) as `{$sr}_tot`";
-            })->implode(',');
-            $answers = ExamAnswer::join('student as s', 'exam_answer.student_id', '=', 's.student_id')->where('testname', $exam->name)->selectRaw("s.student_id as stuid,s.student_name as sname,s.batch,test_id as testid,s.section as sec,(count(mark)*4)totmark,sum(mark)nettot,$expr")->groupBy('stuid')->get()->map(function ($answer) use ($exam) {
-                return array_merge($answer->toArray(), ['category' => $exam->testcategory, 'subject' => $exam->name, 'exdate' => date('d-m-Y', strtotime($exam->exam_date))]);
-            })->toArray();
-            foreach (array_chunk($answers, 500) as $row) {
-                ExamSubjectReport::insert($row);
+            if (!empty($exam->questions)) {
+                foreach ($exam->questions as $question) {
+                    if (!empty($question['image'])) {
+                        $path = public_path($question['image']);
+                        if (file_exists($path)) {
+                            unlink($path);
+                        }
+                    }
+                }
             }
             Exam::where('name', $exam->name)->delete();
             ExamAnswer::where('testname', $exam->name)->delete();
