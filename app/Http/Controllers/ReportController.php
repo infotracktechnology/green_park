@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog};
+use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -1172,4 +1172,48 @@ class ReportController extends Controller
             $coaching_type = Student::select('coaching_type')->where('academic_year', $this->academic_year)->distinct()->get();
             return view('report.userloginreport', compact('students','branches','courses','coaching_type','totalStudents','todayLogin','onlineStudents','webLogin','androidLogin','iosLogin'));
         }
+    public function individualStudentReport(Request $request)
+    {
+        $students = Student::select('student_id', 'student_name')->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
+
+        if ($request->isMethod('post')) {
+            $student = Student::with('branch')->where('student_id', $request->student_id)->first();
+            if (!$student) {
+                return back()->with('error', 'Student not found');
+            }
+            $allExams = ExamSubjectReport::select('category','subject','exdate','sec')->where('sec', $student->course)->groupBy( 'category', 'subject', 'exdate', 'sec')->orderBy('category')->orderBy('created_at', 'asc')->get();
+
+        $marks = ExamSubjectReport::where('stuid', $request->student_id)->get();
+
+        $report = collect();
+
+        foreach ($allExams as $exam) {
+            $mark = $marks->firstWhere('subject', $exam->subject);
+
+        $report->push((object)[
+            'category' => $exam->category,
+            'subject'  => $exam->subject,
+            'exdate'   => $exam->exdate,
+            'phy_tot'  => $mark->phy_tot ?? null,
+            'che_tot'  => $mark->che_tot ?? null,
+            'bot_tot'  => $mark->bot_tot ?? null,
+            'zoo_tot'  => $mark->zoo_tot ?? null,
+            'bio_tot'  => $mark->bio_tot ?? null,
+            'nettot'   => $mark->nettot ?? null,
+        ]);
+        }
+            $average = [
+                'phy'   => round($marks->avg('phy_tot')),
+                'che'   => round($marks->avg('che_tot')),
+                'bot'   => round($marks->avg('bot_tot')),
+                'zoo'   => round($marks->avg('zoo_tot')),
+                'bio'   => round($marks->avg('bio_tot')),
+                'total' => round($marks->avg('nettot')),
+            ];
+            $pdf = PDF::loadView('pdf.individualstudentreport', compact('student', 'marks', 'average', 'report') );
+
+            return $pdf->download( $student->student_id . '_IndividualStudentReport.pdf');
+        }
+        return view('report.individualstudent', compact('students'));
+    }
 }

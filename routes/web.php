@@ -236,6 +236,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/hostel/hostelvacancy', [ReportController::class, 'HostelVacancy'])->name('hostelvacancy');
         Route::get('/userlogin', [ReportController::class, 'UserLoginReport'])->name('userlogin');
         Route::match(['get','post'], '/report/examlog', [ReportController::class, 'examLogReport'])->name('examlog');
+        Route::match(['get', 'post'], '/report/individualstudent', [ReportController::class, 'individualStudentReport'])->name('individualstudent');
     });
 });
 
