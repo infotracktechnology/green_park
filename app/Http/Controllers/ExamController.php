@@ -469,7 +469,11 @@ class ExamController extends Controller
 
             foreach ($answers as $answer) {
                 $testId = $answer['test_id'];
-                $uniqueTests[$testId] = $answer['test_name'] ?? '';
+                $testname = $answer['test_name'] ?? $exam->name;
+                $uniqueTests[$testId] = $testname;
+
+                $this->insertMissingAnswers($testId,$testname, $exam);
+
 
                 ExamAnswer::where('test_id', $testId)->where('academic_year', $this->academic_year)->orderBy('id')
                     ->chunk(20000, function ($rows) use ($answer) {
@@ -516,7 +520,56 @@ class ExamController extends Controller
             return back()->with('error', "Answer key upload failed:".$e->getMessage());
         }
     }
+ private function insertMissingAnswers($testId, $testname, $exam)
+    {
+        $incompleteStudents = ExamAnswer::where('test_id', $testId)->where('testname', $testname)->where('academic_year', $this->academic_year)->where('mode', 'ONLINE')->whereNotNull('student_id')->select('student_id')->selectRaw('COUNT(DISTINCT q_no) as question_count')->groupBy('student_id')->havingRaw('COUNT(DISTINCT q_no) < ?',[$exam->total_questions])->get();
 
+        if ($incompleteStudents->isEmpty()) {
+            return;
+        }
+
+        $studentIds = $incompleteStudents->pluck('student_id');
+
+        $existingAnswers = ExamAnswer::where('test_id', $testId)->where('testname', $testname)->where('academic_year', $this->academic_year)->whereIn('student_id', $studentIds)->select('student_id', 'q_no')->get()->groupBy('student_id');
+
+        $insertData = [];
+
+        foreach ($studentIds as $studentId) {
+            $existingQuestionNumbers = isset($existingAnswers[$studentId]) ? $existingAnswers[$studentId]->pluck('q_no')->map(fn ($q) => (int) $q)->toArray(): [];
+
+            for ($qNo = 1; $qNo <= $exam->total_questions; $qNo++) {
+                if (in_array($qNo, $existingQuestionNumbers, true)) {
+                    continue;
+                }
+
+                $subject = null;
+                if (!empty($exam->questions[$qNo - 1])) {
+                    $subject = $exam->questions[$qNo - 1]['subject'] ?? null;
+                }
+
+                $insertData[] = [
+                    'testname'      => $testname,
+                    'student_id'    => $studentId,
+                    'q_no'          => $qNo,
+                    'subject'       => $subject,
+                    'answer'        => 0,
+                    'status'        => 'not-visited',
+                    'academic_year' => $this->academic_year,
+                    'test_id'       => $testId,
+                    'mode'          => 'ONLINE',
+                ];
+
+                if (count($insertData) >= 5000) {
+                    ExamAnswer::insert($insertData);
+                    $insertData = [];
+                }
+            }
+        }
+
+        if (!empty($insertData)) {
+            ExamAnswer::insert($insertData);
+        }
+    }
 
     private function executeBatchUpdate(array $bulkData): void
     {
