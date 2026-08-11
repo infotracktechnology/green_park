@@ -6,6 +6,14 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
   @yield('meta')
   <title>@yield('title')</title>
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-S6Y9QBHDM9"></script>
+  <script> window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-S6Y9QBHDM9');
+  </script>
 
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{{ asset('css/app.min.css') }}">
