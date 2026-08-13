@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController, NeetScorecardController};
+use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController, NeetScorecardController, PhoneCardController};
 use App\Models\{Student, Exam};
 
 // ------------------------------------------------------
@@ -130,6 +130,10 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     });
     Route::resource('referencevideo', ReferencevideoController::class)->except(['show']);
 
+    Route::get('phoneturn/create', [PhoneCardController::class, 'create'])->name('phoneturn.create');
+    Route::post('phoneturn', [PhoneCardController::class, 'store'])->name('phoneturn.store');
+    Route::match(['get', 'post'],'hostel/topup',[HostelController::class, 'Topup'])->name('hostel.topup');
+    
     // Hostel & Sickroom
     Route::resource('hostel', HostelController::class);
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
@@ -237,6 +241,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/userlogin', [ReportController::class, 'UserLoginReport'])->name('userlogin');
         Route::match(['get','post'], '/report/examlog', [ReportController::class, 'examLogReport'])->name('examlog');
         Route::match(['get', 'post'], '/report/individualstudent', [ReportController::class, 'individualStudentReport'])->name('individualstudent');
+        Route::get('/studentexpense', [ReportController::class, 'StudentExpense'])->name('studentexpense');
     });
 });
 

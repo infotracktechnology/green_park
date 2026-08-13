@@ -213,7 +213,9 @@
                 <li><a href="{{ route('report.hostellist') }}" class="nav-link">Hostel Attendance list</a></li>
                 <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
                 <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
+                <li><a href="{{ route('phoneturn.create') }}" class="nav-link">Phone Turn Entry</a></li>
                 <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li>
+                <li><a href="{{ route('hostel.topup') }}" class="nav-link">Student Topup</a></li>
                 {{-- Reports --}}
                 <li class="dropdown">
                   <a href="#" class="menu-toggle nav-link has-dropdown">Hostel Reports</a>
@@ -225,6 +227,7 @@
                     <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
                     <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
                     <li><a href="{{ route('report.hostelcourier') }}" class="nav-link">Hostel Courier Report</a></li>
+                    <li><a href="{{ route('report.studentexpense') }}" class="nav-link">Student Expense Report</a></li>
                     <li><a href="{{ route('report.hostelroomlist') }}" class="nav-link">Phone/Sign List (Section)</a></li>
                     <li><a href="{{ route('report.hostelsectionlist') }}" class="nav-link">Phone/Sign List (Room)</a></li>
                   </ul>

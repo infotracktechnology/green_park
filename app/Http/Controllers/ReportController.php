@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport};
+use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport, PhoneCard};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -1215,5 +1215,71 @@ class ReportController extends Controller
             return $pdf->download( $student->student_id . '_IndividualStudentReport.pdf');
         }
         return view('report.individualstudent', compact('students'));
+    }   
+    public function StudentExpense(Request $request)
+    {
+        $branches = Branch::orderBy('name')->get();
+
+        $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
+        $students = Student::where('academic_year', $this->academic_year)->where('hostel_dayscholar', 'HOSTEL')
+            ->when($request->branch, function ($query) use ($request) {
+                $query->where('campus', $request->branch);
+                })
+            ->when($request->hostel, function ($query) use ($request) {
+                $query->where('hostel_id', $request->hostel);
+                })
+            ->when($request->room && $request->room != 'all', function ($query) use ($request) {
+                $query->where('room_no', $request->room);
+                })
+            ->when($request->student_id, function ($query) use ($request) {
+                $query->where('student_id', $request->student_id);
+                })
+            ->orderBy('student_name')
+            ->get();
+
+
+        $phoneCardExpenses = PhoneCard::select('student_id', DB::raw('SUM(expense) as phone_card_total'))
+            ->when($request->from_date, function ($query) use ($request) {
+                $query->whereDate('phone_date', '>=', $request->from_date);
+            })
+            ->when($request->to_date, function ($query) use ($request) {
+                $query->whereDate('phone_date', '<=', $request->to_date);
+            })
+            ->groupBy('student_id')
+            ->pluck('phone_card_total', 'student_id');
+
+
+        $sickRoomExpenses = SickRoomEntry::select('student_id', DB::raw('SUM(expense) as sick_room_total'))
+            ->when($request->from_date, function ($query) use ($request) {
+                $query->whereDate('in_time', '>=', $request->from_date);
+            })
+            ->when($request->to_date, function ($query) use ($request) {
+                $query->whereDate('in_time', '<=', $request->to_date);
+            })
+            ->groupBy('student_id')
+            ->pluck('sick_room_total', 'student_id');
+
+        $expenseData = [];
+
+        foreach ($students as $student) {
+            $phoneCardTotal = $phoneCardExpenses[$student->student_id] ?? 0;
+            $sickRoomTotal = $sickRoomExpenses[$student->student_id] ?? 0;
+            $expenseData[$student->student_id] = [
+                'phone_card_total' => $phoneCardTotal,
+                'sick_room_total' => $sickRoomTotal,
+                'total_expense' => $phoneCardTotal + $sickRoomTotal,
+            ];
+        }
+        if ($request->filled('from_date') || $request->filled('to_date')) {
+            $students = $students->filter(function ($student) use ($expenseData) {
+            $expense = $expenseData[$student->student_id] ?? null;
+            if (!$expense) {
+                return false;
+            }
+            return $expense['phone_card_total'] || $expense['sick_room_total'] ;
+        })->values();
+        }
+        return view('report.studentexpance', compact('branches','hostels','room','students','expenseData'));
     }
 }
