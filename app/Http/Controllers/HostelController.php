@@ -426,4 +426,41 @@ public function RoomTransfer(Request $request)
         $hostelcourier = HostelCourier::with(['hostel', 'student'])->latest()->get();
         return view('hostel.hostelcourier', compact('hostelcourier'));
      }
-}
+     public function Topup(Request $request) {
+         if ($request->ajax()) {
+
+            if ($request->has('branch')) {
+                $hostels = Hostel::where('branch_id',$request->branch)->get();
+                return response()->json($hostels);
+            }
+            if ($request->has('hostel')) {
+                $rooms = HostelRoom::where('hostel_id',$request->hostel)->distinct()->pluck('room_no');
+                return response()->json($rooms);
+            }
+         }
+
+            if ($request->isMethod('post')) {
+                foreach ($request->student_id as $studentId) {
+                    $student = Student::where('student_id', $studentId)->where('academic_year', $this->academic_year)->where('hostel_dayscholar', 'HOSTEL')->first();
+                    if ($student) {
+                        $student->deposit = ($student->deposit) + $request->amount;
+                        $student->save();
+                    }
+                }
+
+                return redirect()->route('hostel.topup')->with('success', 'Top Up completed successfully.');
+            }
+
+            $branches = Branch::orderBy('name')->get();
+            $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+            $rooms = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
+            $students = collect();
+
+            if ($request->has('show')) {
+
+                $students = Student::where('academic_year', $this->academic_year)->where('hostel_dayscholar', 'HOSTEL')->where('campus', $request->branch_id)->where('hostel_id', $request->hostel_id)->when( $request->room_no && $request->room_no != 'all', function ($query) use ($request) { $query->where('room_no', $request->room_no); } )->orderBy('student_name')->get();
+            }
+            return view('hostel.topup', compact('branches','hostels','rooms','students'));
+        }
+     }
+
