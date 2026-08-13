@@ -47,6 +47,7 @@
                           <th>Action Taken</th>
                           <th>Medical Note</th>
                           <th>Total Hrs spent</th>
+                          <th>Expance</th>
                           <th>Edit</th>
                           <th>Delete</th>
                         </tr>
@@ -65,6 +66,7 @@
                           <td>{{ $entry->action_taken }}</td>
                           <td>{{ $entry->medical_note }}</td>
                           <td>{{ $entry->hours_spent }}</td>
+                          <td>{{ $entry->expense }}</td>
                           <td>
                             <a href="{{ route('sickroom.edit', $entry->id) }}" class="btn btn-warning text-white">
                               <i class="fas fa-edit"></i>
