@@ -368,7 +368,7 @@ Route::group(['prefix' => 'v2'], function () {
             return response()->json(['status' => false, 'message' => 'Student not found'], 404);
         }
         $counts = [
-        'announcement' => calculateUnseenCount($student, Announcement::class, 'Announcement'),
+        'announcement' => calculateUnseenCount($student, Announcement::class, 'Announcements'),
         'chairman_video' => calculateUnseenCount($student, Chairmanvideo::class, 'Chairman Video'),
         ];
         return response()->json($counts);

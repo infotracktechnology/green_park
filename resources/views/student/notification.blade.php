@@ -106,8 +106,8 @@
     function logAnnouncementView(id) {
         $.post('{{ route("student.logActivity") }}', {
             _token: '{{ csrf_token() }}',
-            module: 'Announcement',
-            action: 'Seen Announcement -' + id,
+            module: 'Announcements',
+            action: 'Seen Announcements -' + id,
             student_id : '{{ auth()->user()->student_id }}'
         });
     }

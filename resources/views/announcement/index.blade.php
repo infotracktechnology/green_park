@@ -78,7 +78,7 @@
                           <td>{{$announcement->category}}</td>
                           <td>{{$announcement->title}}</td>
                           <td>
-                            <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$announcement->id}}" data-module="Announcement"> <i class="fas fa-eye"></i></button>
+                            <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$announcement->id}}" data-module="Announcements"> <i class="fas fa-eye"></i></button>
                           </td>
 
                           <td>
