@@ -3,8 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier, StudentLog};
 use App\Http\Controllers\StudentController;
+use Illuminate\Support\Collection;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -107,7 +108,9 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/perviousexamresult/{student_id}/{subject}', function (Request $request, $student_id, $subject) {
-        $subjectexam = ExamSubjectReport::where("subject", "like", "%$subject%")->where("stuid", $student_id)->whereNotIn('subject', function ($query) use ($student_id) { $query->select('testname')->from('exam_answer')->where('student_id', $student_id); })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+        $subjectexam = ExamSubjectReport::where("subject", "like", "%$subject%")->where("stuid", $student_id)->whereNotIn('subject', function ($query) use ($student_id) {
+            $query->select('testname')->from('exam_answer')->where('student_id', $student_id);
+        })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         return response()->json(['results' => $subjectexam]);
     });
 
@@ -300,7 +303,7 @@ Route::group(['prefix' => 'v2'], function () {
                 return [
                     'filename' => $file->getFilename(),
                     'category' => $file->getRelativePath(),
-                    'download_url' => env('APP_URL').'uploads/Student Download/'.$file->getRelativePathname(),
+                    'download_url' => env('APP_URL') . 'uploads/Student Download/' . $file->getRelativePathname(),
                 ];
             })->values()->all();
         return response()->json($files);
@@ -342,5 +345,32 @@ Route::group(['prefix' => 'v2'], function () {
             'status' => true,
             'message' => 'NEET Scorecard uploaded successfully.',
         ]);
+    });
+
+    function calculateUnseenCount(Student $student, string $modelClass, string $moduleName)
+    {
+        $seenItemIds = StudentLog::where('student_id', $student->student_id)->where('module', $moduleName)->pluck('action')->map(function ($action) {
+            preg_match('/\d+$/', $action, $matches);
+            return $matches[0] ?? null;
+        })->filter()->toArray();
+
+        $query = $modelClass::ForStudent($student);
+        $items = ($query instanceof Collection) ? $query : $query->get();
+
+        return $items->reject(function ($item) use ($seenItemIds) {
+            return in_array((string)$item->id, $seenItemIds);
+        })->count();
+    }
+
+    Route::get('/unseen_counts/{student_id}', function ($student_id) {
+        $student = Student::where('student_id', $student_id)->first();
+        if (!$student) {
+            return response()->json(['status' => false, 'message' => 'Student not found'], 404);
+        }
+        $counts = [
+        'announcement' => calculateUnseenCount($student, Announcement::class, 'Announcement'),
+        'chairman_video' => calculateUnseenCount($student, Chairmanvideo::class, 'Chairmanvideo'),
+        ];
+        return response()->json($counts);
     });
 });
