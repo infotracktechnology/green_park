@@ -246,6 +246,10 @@ class StudentController extends Controller
 
     public function logActivity(Request $request)
     {
+        if($request->module == 'Mark Details' || $request->module == 'MBBS/BDS Counselling' || $request->module == 'Student Download') {
+            return response()->json(['error' => 'Invalid Module'],404);
+        }
+        
         $exists = StudentLog::where('module', $request->module)
             ->where('student_id', $request->student_id)
             ->where('action', $request->action)
