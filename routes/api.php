@@ -369,7 +369,7 @@ Route::group(['prefix' => 'v2'], function () {
         }
         $counts = [
         'announcement' => calculateUnseenCount($student, Announcement::class, 'Announcement'),
-        'chairman_video' => calculateUnseenCount($student, Chairmanvideo::class, 'Chairmanvideo'),
+        'chairman_video' => calculateUnseenCount($student, Chairmanvideo::class, 'Chairman Video'),
         ];
         return response()->json($counts);
     });
