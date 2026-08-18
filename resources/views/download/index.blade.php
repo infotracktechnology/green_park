@@ -85,7 +85,7 @@
                           </td>
 
                           <td>
-                            <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$download->id}}" data-module="Download"> <i class="fas fa-eye"></i></button>
+                            <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$download->id}}" data-module="Downloads"> <i class="fas fa-eye"></i></button>
                           </td>
 
                           <td>

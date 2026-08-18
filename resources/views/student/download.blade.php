@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Download')
+@section('title', 'Downloads')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
@@ -34,7 +34,7 @@
                                         <td>
                                             @if($download->file_path)
                                             @foreach ($download->file_path as $file)
-                                            <a href="{{ env('APP_URL').$file }}" data-action="seen Download - {{ $download->id }}" class="btn btn-primary" download>
+                                            <a href="{{ env('APP_URL').$file }}" data-action="seen Downloads - {{ $download->id }}" class="btn btn-primary" download>
                                             <i class="fas fa-file-download"></i> Download
                                             </a>   
                                             @endforeach
