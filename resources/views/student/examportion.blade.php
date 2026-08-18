@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Exam Portion')
+@section('title', 'Exam Portions')
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
@@ -28,7 +28,7 @@
                         <td>
                           @if($examportion->attachment)
                            @foreach($examportion->attachment as $file)
-                                <a href="{{ url($file) }}" data-action="seen Exam Portion - {{ $examportion->id }}" target="_blank" class="btn btn-primary">
+                                <a href="{{ url($file) }}" data-action="seen Exam Portions - {{ $examportion->id }}" target="_blank" class="btn btn-primary">
                                     <i class="fas fa-file-download"></i> Download
                                 </a>
                             @endforeach

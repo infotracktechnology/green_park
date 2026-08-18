@@ -86,7 +86,7 @@
                               @endif
                           </td>
                           <td>
-                            <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$examportion->id}}" data-module="Exam Portion"> <i class="fas fa-eye"></i></button>
+                            <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$examportion->id}}" data-module="Exam Portions"> <i class="fas fa-eye"></i></button>
                           </td>
                           <td>
                             <a href="{{ route('examportion.edit', $examportion->id) }}" class="btn btn-primary">
