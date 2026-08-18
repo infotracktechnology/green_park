@@ -475,6 +475,7 @@
     $(document).on('click', 'a', function(e) {
         let modules = $('title').text().trim() || 'Communication';
         let action = $(this).data('action');
+        if(modules == 'Mark Details' || modules == 'MBBS/BDS Counselling' || modules == 'Student Download') return;
         if (!action || action == '' || action == undefined) return;
             $.post('{{ route("student.logActivity") }}', {
                 _token: '{{ csrf_token() }}',

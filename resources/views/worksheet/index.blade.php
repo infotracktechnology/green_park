@@ -65,6 +65,7 @@
                         <th>Coaching Type</th>
                         <th>Title</th>
                         <th>Attachment</th>
+                        <th>Seen Log</th>
                         <th>Edit</th>
                       </tr>
                     </thead>
@@ -84,6 +85,10 @@
                           @endforeach
                           @endif
                         </td>
+                        <td>
+                        <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$worksheet->id}}" data-module="Worksheet"> <i class="fas fa-eye"></i></button>
+                      </td>
+
                         <td>
                           <a href="{{ route('worksheet.edit', $worksheet->id) }}" class="btn btn-primary">
                             <i class="fas fa-edit"></i>
@@ -107,6 +112,37 @@
 
   </section>
 </div>
+
+
+<div class="modal fade" id="seenlog" tabindex="-1" role="dialog" aria-labelledby="seenlogLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="seenlogLabel">Seen Log - <span id="logTitle"></span></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm" id="logTable" style="width: 100%;">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Section</th>
+                <th>Action</th>
+                <th>Seen At</th>
+              </tr>
+            </thead>
+            <tbody id="logBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('js')
@@ -116,6 +152,34 @@
 <script>
   const table = $('#myTable').DataTable({
     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+  });
+  
+   $(document).on('click', '.logbtn', function() {
+    var action = $(this).data('action');
+    var modules = $(this).data('module');
+    $('#logTitle').text(action);
+    logTable.clear().draw();
+    $('#logBody').html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
+    $.post("{{ route('student.getlogactivity', [], false) }}", {
+      action: action,
+      module: modules,
+      _token: "{{ csrf_token() }}"
+    },
+    function(data, status) {
+      logTable.clear();
+      if(data.success && data.logs.length > 0) {
+        data.logs.forEach(log => {
+          logTable.row.add([
+            log.student_name || '',
+            log.student_id || '',
+            log.section || '',
+            log.action || '',
+            log.created_at ? new Date(log.created_at).toLocaleString() : ''
+          ]);
+        });
+      }
+      logTable.draw();
+    });
   });
 </script>
 @endsection

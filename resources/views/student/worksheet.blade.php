@@ -28,7 +28,7 @@
                   <td>
                     @if($worksheet->file_path)
                     @foreach ($worksheet->file_path as $file)
-                      <a href="{{ env('APP_URL').$file }}" class="btn btn-primary" download> <i class="fas fa-file-download"></i> Download</a>   
+                      <a href="{{ env('APP_URL').$file }}" class="btn btn-primary" data-action="seen Worksheet - {{ $worksheet->id }}" download> <i class="fas fa-file-download"></i> Download</a>   
                     @endforeach
                     @endif
                   </td>
