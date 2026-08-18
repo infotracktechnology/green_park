@@ -91,7 +91,7 @@
                         </td>
 
                         <td>
-                        <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$row->id}}" data-module="Revision Video"> <i class="fas fa-eye"></i></button>
+                        <button type="button" class="btn btn-primary logbtn" data-toggle="modal" data-target="#seenlog" data-action="{{$row->id}}" data-module="Question Papers"> <i class="fas fa-eye"></i></button>
                       </td>
 
                         <td>
