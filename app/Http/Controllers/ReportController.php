@@ -1177,11 +1177,11 @@ class ReportController extends Controller
         $students = Student::select('student_id', 'student_name')->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
 
         if ($request->isMethod('post')) {
-            $student = Student::with('branch')->where('student_id', $request->student_id)->first();
+            $student = Student::where('student_id', $request->student_id)->first();
             if (!$student) {
                 return back()->with('error', 'Student not found');
             }
-            $allExams = ExamSubjectReport::select('category','subject','exdate','sec')->where('sec', $student->course)->groupBy( 'category', 'subject', 'exdate', 'sec')->orderBy('category')->orderBy('created_at', 'asc')->get();
+            $allExams = ExamSubjectReport::select('category','subject','exdate','sec')->where('sec', $student->section)->groupBy( 'category', 'subject', 'exdate', 'sec')->orderBy('category')->orderBy('created_at', 'asc')->get();
 
         $marks = ExamSubjectReport::where('stuid', $request->student_id)->get();
 
