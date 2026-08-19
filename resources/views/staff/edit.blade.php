@@ -226,7 +226,7 @@
 
 <div class="form-group col-lg-3">
     <label>Password</label>
-    <input type="text" name="password1" class="form-control form-control-sm" value="{{ $staff->password1 }}">
+    <input type="text" name="password" class="form-control form-control-sm" value="{{ $staff->password }}">
 </div>
 
 

@@ -65,7 +65,7 @@ class StaffProfileController extends Controller
         $staff->children_studying = $childrenStudying; // Store 1 if Yes, 0 if No
         $staff->children_details =  $children_details;
         $staff->username = $request->biometric_no;
-        $staff->password = bcrypt($request->mob_no);
+        $staff->password = $request->mob_no;
         $staff->mob_no = $request->mob_no;
 
         $staff->save();
@@ -109,7 +109,7 @@ class StaffProfileController extends Controller
         }
         $data['children_studying'] = $request->has('children_studying') && $request->children_studying == 1 ? 1 : 0;
         $data['children_details'] =  $children_details;
-        $data['password'] = bcrypt($request->password1);
+        $data['password'] = $request->password;
 
         $staff->update($data);
 

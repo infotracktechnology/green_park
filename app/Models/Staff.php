@@ -1,17 +1,17 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-
-class Staff extends Model
+class Staff extends Authenticatable
 {
  
-	use SoftDeletes;
+	use SoftDeletes, HasApiTokens;
     public $table = 'staff';
 
     protected $guarded = [];

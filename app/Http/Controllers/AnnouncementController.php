@@ -22,6 +22,10 @@ class AnnouncementController extends Controller
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
             ->latest()->get();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true,'announcements' => $announcements], 200);
+        }
+
         return view('announcement.index', compact('announcements'));
     }
 
@@ -60,6 +64,10 @@ class AnnouncementController extends Controller
             $fcm->sendMulticast($students,"There is an announcement from GPCC",$announcement->title,env('APP_LOGO'));
         }
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true,'message' => 'Announcement created successfully.'], 200);
+        }
+
         return to_route('announcement.index')->with('success', 'Announcement created successfully.');
     }
 
@@ -71,6 +79,9 @@ class AnnouncementController extends Controller
 
         $students = Student::StudentFilterQuery($announcement->branch, $announcement->course, $announcement->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true,'announcement' => $announcement,'type' => $type,'section' => $section,'students' => $students]);
+        }
 
         return view('announcement.edit', compact('announcement', 'type', 'section', 'students'));
     }
@@ -98,6 +109,11 @@ class AnnouncementController extends Controller
             }
             $data['attachment'] = $attachments ?: null;
         $announcement->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true,'message' => 'Announcement details updated successfully.','data' => $announcement], 200);
+        }
+
         return redirect()->route('announcement.index')->with('success', 'Announcement details successfully updated.');
     }
 
