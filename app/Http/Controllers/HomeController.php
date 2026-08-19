@@ -187,13 +187,29 @@ class HomeController extends Controller
 
     public function Filter(Request $request)
     {
+        if ($request->has('students') || $request->has('get_students')) {
+            $query = Student::StudentFilterQuery($request->branch, $request->course, $request->type, $request->category, $request->batch, $request->gender);
+            if ($request->filled('section')) {
+                $query->whereIn('section', explode(',', $request->section));
+            }
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('student_id', 'like', "%{$search}%")
+                      ->orWhere('student_name', 'like', "%{$search}%");
+                });
+            }
+            $students = $query->get()->pluck('student_name', 'student_id');
+            return response()->json($students);
+        }
+
         if ($request->has('gender')) {
             $section = Student::StudentFilterQuery($request->branch, $request->course, $request->type, $request->category, $request->batch, $request->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section');
             return response()->json($section);
         }
 
         if ($request->has('type')) {
-            $students = Student::StudentFilterQuery($request->branch, $request->course, $request->type, null, null)->get()->pluck('student_name', 'student_id');
+            $students = Student::StudentFilterQuery($request->branch, $request->course, $request->type, $request->category, $request->batch, $request->gender)->get()->pluck('student_name', 'student_id');
             return response()->json($students);
         }
 
