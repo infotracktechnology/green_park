@@ -45,30 +45,36 @@ class AnnouncementController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
         $data['student_ids'] = [];
         $attachments = [];
+
         if ($request->hasFile('attachment')) {
             foreach ($request->file('attachment') as $file) {
                 $originalName = $file->getClientOriginalName();
                 $fileName = time() . '-' . $originalName;
-                $file->move('assets/attachments', $fileName);
+                $file->move(public_path('assets/attachments'), $fileName);
                 $attachments[] = 'assets/attachments/' . $fileName;
             }
         }
+
         $data['attachment'] = $attachments ?: null;
         $announcement = Announcement::create($data);
 
         try {
-            $students = $announcement->StudentList()->map(function ($student) {
-                return $student->device_token;
-            })->filter()->unique()->toArray();
+            $tokens = $announcement->StudentList()->map(fn($student) => $student->device_token)->filter()->unique()->values()->toArray();
 
-            if (count($students) > 0) {
-                $fcm->sendMulticast($students, "There is an announcement from GPCC", $announcement->title, env('APP_LOGO'));
+            if (!empty($tokens)) {
+                foreach (array_chunk($tokens, 500) as $chunk) {
+                    $fcm->sendMulticast(
+                        $chunk,
+                        "There is an announcement from GPCC",
+                        $announcement->title,
+                        config('app.logo', env('APP_LOGO'))
+                    );
+                }
             }
-        } catch (\Exception $e) {
-            Log::info($e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('FCM Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
         }
 
         if ($request->wantsJson()) {
