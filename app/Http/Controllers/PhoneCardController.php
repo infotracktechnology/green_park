@@ -13,7 +13,6 @@ class PhoneCardController extends Controller
 {
     public function create(Request $request)
     {
-    
         if ($request->ajax()) {
 
             if ($request->has('branch')) {
