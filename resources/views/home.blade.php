@@ -48,7 +48,7 @@
 <div class="main-content">
   
   <!-- Dashboard Welcome & Header Block -->
-  <div style="background-color: #207034;" class="mb-8 p-6 rounded-3xl shadow-xl border border-green-800/30 relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  {{-- <div style="background-color: #207034;" class="mb-8 p-6 rounded-3xl shadow-xl border border-green-800/30 relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
   
     <div class="absolute -right-16 -top-16 w-48 h-48 bg-emerald-400 rounded-full blur-3xl opacity-20"></div>
     <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-lime-400 rounded-full blur-3xl opacity-10"></div>
@@ -76,10 +76,10 @@
         <span>{{ date('l, d M Y') }}</span>
       </div>
     </div>
-  </div>
+  </div> --}}
 
   <!-- Top Stats Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-4">
     <!-- Card 1: Total Students -->
     <div class="group relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-lg shadow-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
       <div class="absolute -right-6 -bottom-6 text-white/10 text-9xl font-bold transition-transform duration-300 group-hover:scale-110 pointer-events-none">
@@ -167,178 +167,236 @@
 
   <!-- Row 2: Overview Cards -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-    <!-- Students Overview Column -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
-      <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <i class="fas fa-users text-emerald-600 !text-2xl"></i>
-          </div>
-          <h3 class="text-lg font-bold text-slate-800">Students Overview</h3>
+  <!-- Students Overview Column -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col">
+    <!-- Card Header -->
+    <div class="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center ring-1 ring-emerald-500/20">
+          <i class="fas fa-users text-lg"></i>
         </div>
-        <span class="text-xs text-slate-400 font-medium">{{ count($data) }} Branches</span>
+        <div>
+          <h3 class="text-base font-bold text-slate-800 tracking-tight">Students Overview</h3>
+          <p class="text-[11px] text-slate-400 font-medium">Branch & Section wise distribution</p>
+        </div>
       </div>
-      
-      <div class="p-6 scroll-area overflow-y-auto max-h-[400px]">
-        <table class="w-full text-center border-collapse">
-          <thead>
-            <tr class="border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              <th class="pb-3 text-start w-10"></th>
-              <th class="pb-3 text-start">Branch</th>
-              <th class="pb-3">OFFLINE</th>
-              <th class="pb-3">ONLINE</th>
-              <th class="pb-3">TOTAL</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-50">
-            @foreach($data as $branch)
-            <!-- Parent Row -->
-            <tr class="group cursor-pointer hover:bg-slate-50/70 transition-colors animate-all duration-150 ripple-dark active:bg-slate-100/50" data-toggle="collapse" data-target="#stu-{{ Str::slug($branch->name) }}">
-              <td class="py-4 text-start">
-                <span class="inline-flex w-6 h-6 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100 transition-colors">
-                  <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="chevron-stu-{{ Str::slug($branch->name) }}"></i>
-                </span>
-              </td>
-              <td class="py-4 text-start font-semibold text-slate-700 text-sm">{{ $branch->name }}</td>
-              
-              <td class="py-4 text-blue-600 font-medium text-sm">{{ $branch->student->where('coaching_type', 'OFFLINE')->count() }}</td>
-              <td class="py-4 text-rose-500 font-medium text-sm">{{ $branch->student->where('coaching_type', '!=', 'OFFLINE')->count() }}</td>
-              <td class="py-4">
-                <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 border border-slate-200/50">
-                  {{ $branch->student->count() }}
-                </span>
-              </td>
-            </tr>
+      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+        {{ count($data) }} Branches
+      </span>
+    </div>
+    
+    <!-- Scrollable Area -->
+    <div class="p-4 scroll-area overflow-y-auto max-h-[420px]">
+      <table class="w-full text-center border-separate border-spacing-y-1">
+        <thead>
+          <tr class="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+            <th class="pb-3 text-start w-10 pl-2"></th>
+            <th class="pb-3 text-start">Branch</th>
+            <th class="pb-3">OFFLINE</th>
+            <th class="pb-3">ONLINE</th>
+            <th class="pb-3">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @foreach($data as $branch)
+          <!-- Parent Branch Row -->
+          <tr class="group cursor-pointer hover:bg-slate-50 transition-all duration-150 rounded-lg active:bg-slate-100/70" data-toggle="collapse" data-target="#stu-{{ Str::slug($branch->name) }}">
+            <td class="py-3.5 pl-2 text-start rounded-l-xl">
+              <span class="inline-flex w-6 h-6 items-center justify-center rounded-lg bg-slate-100 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="chevron-stu-{{ Str::slug($branch->name) }}"></i>
+              </span>
+            </td>
+            <td class="py-3.5 text-start font-semibold text-slate-800 text-sm">
+              {{ $branch->name }}
+            </td>
             
-            <!-- Collapsible Row -->
-            <tr class="collapse" id="stu-{{ Str::slug($branch->name) }}">
-              <td colspan="5" class="p-0 bg-slate-50/50 border-y border-slate-100">
-                <div class="px-4 py-3">
-                  <table class="w-full text-center text-xs">
-                    <thead>
-                      <tr class="text-slate-400 font-semibold border-b border-slate-200/60">
-                        <th class="py-2 text-start pl-4">Section</th>
-                        <th class="py-2 text-blue-600">OFFLINE</th>
-                        <th class="py-2 text-rose-500">ONLINE</th>
-                        <th class="py-2">Total Students</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                      @foreach($branch->student->groupBy('section') as $sec => $students)
-                      <tr class="hover:bg-slate-100/50 transition-colors">
-                        <td class="py-2.5 text-start pl-4 font-medium text-slate-500">Sec: {{ $sec ?: '-' }}</td>
-                        <td class="py-2.5 cursor-pointer text-blue-600 font-semibold hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','OFFLINE')">
+            <td class="py-3.5">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100">
+                {{ $branch->student->where('coaching_type', 'OFFLINE')->count() }}
+              </span>
+            </td>
+            <td class="py-3.5">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-rose-50 text-rose-500 border border-rose-100">
+                {{ $branch->student->where('coaching_type', '!=', 'OFFLINE')->count() }}
+              </span>
+            </td>
+            <td class="py-3.5 pr-2">
+              <span class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700">
+                {{ $branch->student->count() }}
+              </span>
+            </td>
+          </tr>
+          
+          <!-- Collapsible Section Details Row -->
+          <tr class="collapse" id="stu-{{ Str::slug($branch->name) }}">
+            <td colspan="5" class="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 my-1">
+              <div class="px-3 py-2">
+                {{-- <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-left mb-2 pl-1">
+                  Section Breakdown
+                </div> --}}
+                <table class="w-full text-center text-xs">
+                  <thead>
+                    <tr class="text-slate-400 font-semibold border-b border-slate-200/60 pb-1">
+                      <th class="py-2 text-start pl-2">Section</th>
+                      <th class="py-2 text-blue-600">Offline</th>
+                      <th class="py-2 text-rose-500">Online</th>
+                      <th class="py-2 pr-2">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200/40">
+                    @foreach($branch->student->groupBy('section') as $sec => $students)
+                    <tr class="hover:bg-white/80 transition-colors">
+                      <td class="py-2.5 text-start pl-2 font-medium text-slate-700">
+                        <span class="inline-block px-2 py-0.5 bg-slate-200/60 text-slate-700 rounded text-[11px] font-semibold">
+                          Sec: {{ $sec ?: '-' }}
+                        </span>
+                      </td>
+                      <td class="py-2.5">
+                        <button type="button" class="px-2.5 py-1 text-blue-600 font-semibold rounded-md hover:bg-blue-100/60 active:scale-95 transition-all cursor-pointer" onclick="fetchData('{{$sec}}','{{$branch->id}}','OFFLINE')">
                           {{ $students->where('coaching_type','OFFLINE')->count() }}
-                        </td>
-                        <td class="py-2.5 cursor-pointer text-rose-500 font-semibold hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','ONLINE')">
+                        </button>
+                      </td>
+                      <td class="py-2.5">
+                        <button type="button" class="px-2.5 py-1 text-rose-500 font-semibold rounded-md hover:bg-rose-100/60 active:scale-95 transition-all cursor-pointer" onclick="fetchData('{{$sec}}','{{$branch->id}}','ONLINE')">
                           {{ $students->where('coaching_type', '!=', 'OFFLINE')->count() }}
-                        </td>
-                        <td class="py-2.5 cursor-pointer font-bold text-slate-700 hover:underline ripple-dark active:scale-95" onclick="fetchData('{{$sec}}','{{$branch->id}}','all')">
+                        </button>
+                      </td>
+                      <td class="py-2.5 pr-2">
+                        <button type="button" class="px-2.5 py-1 font-bold text-slate-800 rounded-md hover:bg-slate-200/60 active:scale-95 transition-all cursor-pointer" onclick="fetchData('{{$sec}}','{{$branch->id}}','all')">
                           {{ $students->count() }}
-                        </td>
-                      </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            @endforeach
-          </tbody>
-        </table>
-      </div>
+                        </button>
+                      </td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+          @endforeach
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <!-- Attendance Column -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
-      <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
-            <i class="fas fa-calendar-check !text-2xl"></i>
-          </div>
-          <h3 class="text-lg font-bold text-slate-800">Attendance Today</h3>
+  <!-- Attendance Column -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col">
+    
+    <!-- Card Header -->
+    <div class="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center ring-1 ring-indigo-500/20">
+          <i class="fas fa-calendar-check text-lg"></i>
         </div>
-        <span class="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2 py-1 rounded-lg">Realtime</span>
+        <div>
+          <h3 class="text-base font-bold text-slate-800 tracking-tight">Attendance Today</h3>
+          <p class="text-[11px] text-slate-400 font-medium">Daily student attendance breakdown</p>
+        </div>
       </div>
-      
-      <div class="p-6 scroll-area overflow-y-auto max-h-[400px]">
-        <table class="w-full text-center border-collapse">
-          <thead>
-            <tr class="border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              <th class="pb-3 text-start w-10"></th>
-              <th class="pb-3 text-start">Branch</th>
-              <th class="pb-3">Total</th>
-              <th class="pb-3">Present</th>
-              <th class="pb-3">Absent</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-50">
-            @foreach($data as $branch)
-            <?php
-              $presentCount = $branch->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->unique('student_id')->count(); 
-              $absentCount = $branch->student->count() - $presentCount;
-            ?>
-            <!-- Parent Row -->
-            <tr class="group cursor-pointer hover:bg-slate-50/70 transition-colors animate-all duration-150 ripple-dark active:bg-slate-100/50" data-toggle="collapse" data-target="#att-{{ Str::slug($branch->name) }}">
-              <td class="py-4 text-start">
-                <span class="inline-flex w-6 h-6 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100 transition-colors">
-                  <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="chevron-att-{{ Str::slug($branch->name) }}"></i>
-                </span>
-              </td>
-              <td class="py-4 text-start font-semibold text-slate-700 text-sm">{{ $branch->name }}</td>
-              <td class="py-4">
-                <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">
-                  {{ $branch->student->count() }}
-                </span>
-              </td>
-              <td class="py-4">
-                <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                  {{ $presentCount }}
-                </span>
-              </td>
-              <td class="py-4">
-                <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-100">
-                  {{ $absentCount }}
-                </span>
-              </td>
-            </tr>
-            
-            <!-- Collapsible Row -->
-            <tr class="collapse" id="att-{{ Str::slug($branch->name) }}">
-              <td colspan="5" class="p-0 bg-slate-50/50 border-y border-slate-100">
-                <div class="px-4 py-3">
-                  <table class="w-full text-center text-xs">
-                    <thead>
-                      <tr class="text-slate-400 font-semibold border-b border-slate-200/60">
-                        <th class="py-2 text-start pl-4">Section</th>
-                        <th class="py-2">Total Students</th>
-                        <th class="py-2 text-emerald-600">Present</th>
-                        <th class="py-2 text-rose-500">Absent</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                      @foreach($branch->student->groupBy('section') as $sec => $students)
-                      <?php 
-                        $secPres = $branch->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->where('section', $sec)->unique('student_id')->count(); 
-                        $secAbs = $students->count() - $secPres;
-                      ?>
-                      <tr class="hover:bg-slate-100/50 transition-colors">
-                        <td class="py-2.5 text-start pl-4 font-medium text-slate-500">Sec: {{ $sec ?: '-' }}</td>
-                        <td class="py-2.5 font-semibold text-slate-700">{{ $students->count() }}</td>
-                        <td class="py-2.5 text-emerald-600 font-semibold">{{ $secPres }}</td>
-                        <td class="py-2.5 text-rose-500 font-semibold">{{ $secAbs }}</td>
-                      </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            @endforeach
-          </tbody>
-        </table>
-      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+        Realtime
+      </span>
     </div>
+    
+    <!-- Scrollable Area -->
+    <div class="p-4 scroll-area overflow-y-auto max-h-[420px]">
+      <table class="w-full text-center border-separate border-spacing-y-1">
+        <thead>
+          <tr class="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+            <th class="pb-3 text-start w-10 pl-2"></th>
+            <th class="pb-3 text-start">Branch</th>
+            <th class="pb-3">Total</th>
+            <th class="pb-3">Present</th>
+            <th class="pb-3 pr-2">Absent</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @foreach($data as $branch)
+          <?php
+            $presentCount = $branch->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->unique('student_id')->count(); 
+            $absentCount = $branch->student->count() - $presentCount;
+          ?>
+          <!-- Parent Branch Row -->
+          <tr class="group cursor-pointer hover:bg-slate-50 transition-all duration-150 rounded-lg active:bg-slate-100/70" data-toggle="collapse" data-target="#att-{{ Str::slug($branch->name) }}">
+            <td class="py-3.5 pl-2 text-start rounded-l-xl">
+              <span class="inline-flex w-6 h-6 items-center justify-center rounded-lg bg-slate-100 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="chevron-att-{{ Str::slug($branch->name) }}"></i>
+              </span>
+            </td>
+            <td class="py-3.5 text-start font-semibold text-slate-800 text-sm">
+              {{ $branch->name }}
+            </td>
+            <td class="py-3.5">
+              <span class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700">
+                {{ $branch->student->count() }}
+              </span>
+            </td>
+            <td class="py-3.5">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                {{ $presentCount }}
+              </span>
+            </td>
+            <td class="py-3.5 pr-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-rose-50 text-rose-600 border border-rose-100">
+                {{ $absentCount }}
+              </span>
+            </td>
+          </tr>
+          
+          <!-- Collapsible Section Details Row -->
+          <tr class="collapse" id="att-{{ Str::slug($branch->name) }}">
+            <td colspan="5" class="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 my-1">
+              <div class="px-3 py-2">
+                {{-- <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-left mb-2 pl-1">
+                  Section Attendance Breakdown
+                </div> --}}
+                <table class="w-full text-center text-xs">
+                  <thead>
+                    <tr class="text-slate-400 font-semibold border-b border-slate-200/60 pb-1">
+                      <th class="py-2 text-start pl-2">Section</th>
+                      <th class="py-2">Total Students</th>
+                      <th class="py-2 text-emerald-600">Present</th>
+                      <th class="py-2 pr-2 text-rose-500">Absent</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200/40">
+                    @foreach($branch->student->groupBy('section') as $sec => $students)
+                    <?php 
+                      $secPres = $branch->attendance->where('attendance_date', date('Y-m-d'))->where('status', 'P')->where('section', $sec)->unique('student_id')->count(); 
+                      $secAbs = $students->count() - $secPres;
+                    ?>
+                    <tr class="hover:bg-white/80 transition-colors">
+                      <td class="py-2.5 text-start pl-2 font-medium text-slate-700">
+                        <span class="inline-block px-2 py-0.5 bg-slate-200/60 text-slate-700 rounded text-[11px] font-semibold">
+                          Sec: {{ $sec ?: '-' }}
+                        </span>
+                      </td>
+                      <td class="py-2.5 font-bold text-slate-800">
+                        {{ $students->count() }}
+                      </td>
+                      <td class="py-2.5">
+                        <span class="px-2 py-0.5 font-semibold text-emerald-600 bg-emerald-50/80 rounded-md">
+                          {{ $secPres }}
+                        </span>
+                      </td>
+                      <td class="py-2.5 pr-2">
+                        <span class="px-2 py-0.5 font-semibold text-rose-500 bg-rose-50/80 rounded-md">
+                          {{ $secAbs }}
+                        </span>
+                      </td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
   </div>
 
   <!-- Row 3: Staff, Concerns, and Latest Updates -->

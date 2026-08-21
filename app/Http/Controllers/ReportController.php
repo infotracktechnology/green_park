@@ -1289,7 +1289,7 @@ public function studentReport(Request $request)
 
         if ($request->isMethod('get') && !$request->ajax()) {
             $branches = Branch::all();
-            return view('report.studentReport', compact('branches'));
+            return view('report.studentreport', compact('branches'));
         }
 
         if ($request->ajax()) {
