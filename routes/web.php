@@ -241,6 +241,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/userlogin', [ReportController::class, 'UserLoginReport'])->name('userlogin');
         Route::match(['get','post'], '/report/examlog', [ReportController::class, 'examLogReport'])->name('examlog');
         Route::match(['get', 'post'], '/report/individualstudent', [ReportController::class, 'individualStudentReport'])->name('individualstudent');
+        Route::match(['get', 'post'], '/report/studentReport', [ReportController::class, 'studentReport'])->name('studentreport');
         Route::get('/studentexpense', [ReportController::class, 'StudentExpense'])->name('studentexpense');
     });
 });
