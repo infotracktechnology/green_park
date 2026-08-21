@@ -11,6 +11,7 @@ use App\Models\Student;
 use App\Providers\FcmServiceProvider;
 use App\Http\Controllers\HomeController;
 use App\Jobs\SendAnnouncementNotification;
+use Illuminate\Support\Facades\Log;
 
 class AnnouncementController extends Controller
 {
@@ -18,12 +19,12 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         $announcements = Announcement::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
-            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch', 'like', '%' . auth()->user()->branch . '%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type', 'like', '%' . $request->coaching_type . '%'))
             ->latest()->get();
 
         if ($request->wantsJson()) {
-            return response()->json(['status' => true,'announcements' => $announcements], 200);
+            return response()->json(['status' => true, 'announcements' => $announcements], 200);
         }
 
         return view('announcement.index', compact('announcements'));
@@ -44,28 +45,40 @@ class AnnouncementController extends Controller
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-
         $data['student_ids'] = [];
         $attachments = [];
-            if ($request->hasFile('attachment')) {
-                foreach ($request->file('attachment') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $fileName = time() . '-'. $originalName;
-                    $file->move('assets/attachments', $fileName);
-                    $attachments[] = 'assets/attachments/' . $fileName;
-                }
+
+        if ($request->hasFile('attachment')) {
+            foreach ($request->file('attachment') as $file) {
+                $originalName = $file->getClientOriginalName();
+                $fileName = time() . '-' . $originalName;
+                $file->move(public_path('assets/attachments'), $fileName);
+                $attachments[] = 'assets/attachments/' . $fileName;
             }
+        }
+
         $data['attachment'] = $attachments ?: null;
         $announcement = Announcement::create($data);
 
-         $students = $announcement->StudentList()->map(function ($student) { return $student->device_token;})->filter()->unique()->toArray();
-         
-        if (count($students) > 0) {
-            $fcm->sendMulticast($students,"There is an announcement from GPCC",$announcement->title,env('APP_LOGO'));
+        try {
+            $tokens = $announcement->StudentList()->map(fn($student) => $student->device_token)->filter()->unique()->values()->toArray();
+
+            if (!empty($tokens)) {
+                foreach (array_chunk($tokens, 500) as $chunk) {
+                    $fcm->sendMulticast(
+                        $chunk,
+                        "There is an announcement from GPCC",
+                        $announcement->title,
+                        config('app.logo', env('APP_LOGO'))
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('FCM Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
         }
 
         if ($request->wantsJson()) {
-            return response()->json(['status' => true,'message' => 'Announcement created successfully.'], 200);
+            return response()->json(['status' => true, 'message' => 'Announcement created successfully.'], 200);
         }
 
         return to_route('announcement.index')->with('success', 'Announcement created successfully.');
@@ -80,7 +93,7 @@ class AnnouncementController extends Controller
         $students = Student::StudentFilterQuery($announcement->branch, $announcement->course, $announcement->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
         if ($request->wantsJson()) {
-            return response()->json(['status' => true,'announcement' => $announcement,'type' => $type,'section' => $section,'students' => $students]);
+            return response()->json(['status' => true, 'announcement' => $announcement, 'type' => $type, 'section' => $section, 'students' => $students]);
         }
 
         return view('announcement.edit', compact('announcement', 'type', 'section', 'students'));
@@ -99,19 +112,19 @@ class AnnouncementController extends Controller
 
         $data['student_ids'] = [];
         $attachments = [];
-            if ($request->hasFile('attachment')) {
-                foreach ($request->file('attachment') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $fileName = time() . '-' . $originalName;
-                    $file->move('assets/attachments', $fileName);
-                    $attachments[] = 'assets/attachments/' . $fileName;
-                }
+        if ($request->hasFile('attachment')) {
+            foreach ($request->file('attachment') as $file) {
+                $originalName = $file->getClientOriginalName();
+                $fileName = time() . '-' . $originalName;
+                $file->move('assets/attachments', $fileName);
+                $attachments[] = 'assets/attachments/' . $fileName;
             }
-            $data['attachment'] = $attachments ?: null;
+        }
+        $data['attachment'] = $attachments ?: null;
         $announcement->update($data);
 
         if ($request->wantsJson()) {
-            return response()->json(['status' => true,'message' => 'Announcement details updated successfully.','data' => $announcement], 200);
+            return response()->json(['status' => true, 'message' => 'Announcement details updated successfully.', 'data' => $announcement], 200);
         }
 
         return redirect()->route('announcement.index')->with('success', 'Announcement details successfully updated.');
