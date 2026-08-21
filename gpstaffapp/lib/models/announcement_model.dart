@@ -93,4 +93,32 @@ class AnnouncementModel {
     if (content == null) return '';
     return content!.replaceAll(RegExp(r'<[^>]*>'), '').trim();
   }
+
+  String get branchDisplay {
+    if (branch == null) return 'All';
+    if (branch is List) return (branch as List).join(', ');
+    return branch.toString();
+  }
+
+  String get coachingTypeDisplay {
+    if (coachingType == null || coachingType.toString().isEmpty) return 'ALL';
+    if (coachingType is List) return (coachingType as List).join(', ');
+    return coachingType.toString();
+  }
+
+  String get categoryDisplay {
+    if (category == null || category.toString().isEmpty) return 'All Categories';
+    if (category is List) return (category as List).join(', ');
+    return category.toString();
+  }
+
+  String get batchDisplay {
+    if (batch == null || batch.toString().isEmpty) return 'All Batches';
+    if (batch is List) return (batch as List).join(', ');
+    return batch.toString();
+  }
+
+  static String getAttachmentFileName(String path) {
+    return path.split('/').last;
+  }
 }

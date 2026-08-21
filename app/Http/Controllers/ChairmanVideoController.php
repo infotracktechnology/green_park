@@ -48,10 +48,16 @@ class ChairmanVideoController extends Controller
 
         $chairmanvideo = Chairmanvideo::create($data);
 
-         $students = $chairmanvideo->StudentList()->map(function ($student) { return $student->device_token;})->filter()->unique()->toArray();
+         try {
+            $tokens = $chairmanvideo->StudentList()->map(fn($student) => $student->device_token)->filter()->unique()->values()->toArray();
 
-        if (count($students) > 0) {
-            $fcm->sendMulticast($students,"There is an chairman video from GPCC",$chairmanvideo->title,env('APP_LOGO'));
+            if (!empty($tokens)) {
+                foreach (array_chunk($tokens, 500) as $chunk) {
+                    $fcm->sendMulticast($chunk, "There is an Chairman video from GPCC", $chairmanvideo->title, env('APP_LOGO'), [], "Chairman Video");
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('FCM Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
         }
 
         return redirect()->route('chairmanvideo.index')->with('success', 'Chairman video created successfully.');
