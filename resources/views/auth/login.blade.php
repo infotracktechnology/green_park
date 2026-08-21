@@ -416,17 +416,17 @@
           </form>
           <div class="dived"></div>
           <hr>
-          {{-- <div class="app1">
+          <div class="app1">
             <h4 class="app_txt">GPCC</h4>
             <div class="small">Get on your mobile - Download now</div>
             <div class="download-links">
               <a href="https://play.google.com/store/apps/details?id=com.gpcc.gpcc" target="_blank"><img src="{{asset('img/silde/google-play.png')}}" alt="Google Play">
-                <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank"><img src="{{asset('img/silde/app-store.png')}}" alt="App Store"></a>
+                {{-- <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank"><img src="{{asset('img/silde/app-store.png')}}" alt="App Store"></a> --}}
             </div>
-          </div> --}}
+          </div>
 
           {{-- Admission Details --}}
-            <div class="app1 mt-3">
+            {{-- <div class="app1 mt-3">
                 <h4 class="text-center text-primary fw-bold mb-3">Admission Details</h4>
                 <table class="table table-borderless mb-0 text-center align-middle">
                     <tr>
@@ -448,7 +448,7 @@
                         </td>
                     </tr>
                 </table>
-            </div>
+            </div> --}}
             
         </div>
       </div>
