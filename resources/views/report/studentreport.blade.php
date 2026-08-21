@@ -72,10 +72,8 @@
                                         </select>
                                     </div>
 
-                                    <div class="form-group col-lg-2 col-md-6 mt-4">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-file-pdf mr-1"></i> Download PDF
-                                        </button>
+                                     <div class="col-md-2 mt-4">
+                                        <button class="btn btn-primary"> Download Report </button>
                                     </div>
                                 </div>
                             </form>
@@ -184,11 +182,7 @@ $(document).ready(function () {
     });
 
 });
-document.getElementById('myForm').addEventListener('submit', function () {
-        setTimeout(function () {
-            window.location.reload();
-        }, 4000);
-    });
+
 
 </script>
 @endsection
