@@ -502,7 +502,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                   // Branches Multi-select Chips
                   MultiSelectChips<BranchItem>(
                     label: 'Branches *',
-                    options: filters.master?.branches ?? [],
+                    options: filters.availableBranches,
                     selected: filters.branches,
                     labelBuilder: (b) => b.name,
                     valueBuilder: (b) => b.id,
@@ -512,9 +512,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                   // Coaching Types Multi-select Chips
                   MultiSelectChips<String>(
                     label: 'Coaching Type',
-                    options: filters.coachingTypes.isNotEmpty
-                        ? filters.coachingTypes
-                        : filters.master?.coachingTypes ?? [],
+                    options: filters.availableCoachingTypes,
                     selected: filters.coachingTypes,
                     onToggle: (val) => filters.toggleCoachingType(val),
                   ),

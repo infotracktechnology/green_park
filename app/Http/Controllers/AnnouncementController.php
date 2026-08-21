@@ -36,28 +36,51 @@ class AnnouncementController extends Controller
         return view('announcement.create');
     }
 
+    public function show(Request $request, Announcement $announcement)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'announcement' => $announcement]);
+        }
+
+        return redirect()->route('announcement.index');
+    }
+
     public function store(Request $request, FcmServiceProvider $fcm)
     {
-        $data = $request->all();
+        $data = $request->except(['_token', '_method', 'existing_attachment']);
 
         foreach (['coaching_type', 'branch', 'batch', 'category'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
+        }
+
         $data['student_ids'] = [];
         $attachments = [];
 
         if ($request->hasFile('attachment')) {
+            $destinationPath = public_path('assets/attachments');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
             foreach ($request->file('attachment') as $file) {
-                $originalName = $file->getClientOriginalName();
-                $fileName = time() . '-' . $originalName;
-                $file->move(public_path('assets/attachments'), $fileName);
-                $attachments[] = 'assets/attachments/' . $fileName;
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-' . uniqid() . '-' . $originalName;
+                    $file->move($destinationPath, $fileName);
+                    $attachments[] = 'assets/attachments/' . $fileName;
+                }
             }
         }
 
-        $data['attachment'] = $attachments ?: null;
+        $data['attachment'] = !empty($attachments) ? array_values($attachments) : null;
         $announcement = Announcement::create($data);
 
         try {
@@ -65,12 +88,7 @@ class AnnouncementController extends Controller
 
             if (!empty($tokens)) {
                 foreach (array_chunk($tokens, 500) as $chunk) {
-                    $fcm->sendMulticast(
-                        $chunk,
-                        "There is an announcement from GPCC",
-                        $announcement->title,
-                        config('app.logo', env('APP_LOGO'))
-                    );
+                    $fcm->sendMulticast($chunk, "There is an announcement from GPCC", $announcement->title, env('APP_LOGO'), [], "Announcements");
                 }
             }
         } catch (\Throwable $e) {
@@ -78,7 +96,7 @@ class AnnouncementController extends Controller
         }
 
         if ($request->wantsJson()) {
-            return response()->json(['status' => true, 'message' => 'Announcement created successfully.'], 200);
+            return response()->json(['status' => true, 'message' => 'Announcement created successfully.', 'data' => $announcement], 200);
         }
 
         return to_route('announcement.index')->with('success', 'Announcement created successfully.');
@@ -102,25 +120,51 @@ class AnnouncementController extends Controller
 
     public function update(Request $request, Announcement $announcement)
     {
-        $data = $request->all();
+        $data = $request->except(['_token', '_method', 'existing_attachment']);
 
         foreach (['coaching_type', 'branch', 'batch', 'category'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
+        }
 
-        $data['student_ids'] = [];
+        $data['student_ids'] = $announcement->student_ids ?? [];
+
+        // Retain remaining existing attachments
         $attachments = [];
-        if ($request->hasFile('attachment')) {
-            foreach ($request->file('attachment') as $file) {
-                $originalName = $file->getClientOriginalName();
-                $fileName = time() . '-' . $originalName;
-                $file->move('assets/attachments', $fileName);
-                $attachments[] = 'assets/attachments/' . $fileName;
+        if ($request->has('existing_attachment')) {
+            $existing = $request->input('existing_attachment');
+            if (is_array($existing)) {
+                $attachments = array_values(array_filter($existing));
+            } elseif (is_string($existing) && !empty($existing)) {
+                $attachments = [$existing];
             }
         }
-        $data['attachment'] = $attachments ?: null;
+
+        // Upload and append new files
+        if ($request->hasFile('attachment')) {
+            $destinationPath = public_path('assets/attachments');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+            foreach ($request->file('attachment') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-' . uniqid() . '-' . $originalName;
+                    $file->move($destinationPath, $fileName);
+                    $attachments[] = 'assets/attachments/' . $fileName;
+                }
+            }
+        }
+
+        $data['attachment'] = !empty($attachments) ? array_values($attachments) : null;
         $announcement->update($data);
 
         if ($request->wantsJson()) {
