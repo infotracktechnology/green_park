@@ -1655,7 +1655,10 @@ public function studentReport(Request $request)
 
     private function sumOrNull(array $subjects)
     {
-        $vals = array_filter($subjects, fn($v) => $v !== null);
+        $vals = array_filter($subjects, function ($v) {
+            return $v !== null && is_numeric($v);
+        });
+
         return empty($vals) ? null : array_sum($vals);
     }
 
