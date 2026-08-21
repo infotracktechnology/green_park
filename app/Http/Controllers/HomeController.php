@@ -41,6 +41,17 @@ class HomeController extends Controller
                 });
         }])->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
 
+       $data->each(function ($branch) use ($today) {
+
+            $todayLogins = $branch->student->filter(function ($student) use ($today) {
+                return $student->last_login
+                    && date('Y-m-d', strtotime($student->last_login)) === $today;
+            });
+            $branch->login_web = $todayLogins->where('device', 'Web')->count();
+            $branch->login_android = $todayLogins->where('device', 'Android')->count();
+            $branch->login_ios = $todayLogins->where('device', 'Ios')->count();
+            $branch->login_total = $todayLogins->count();
+        });
         $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
 
         $boys = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'MALE')->count();
@@ -70,7 +81,12 @@ class HomeController extends Controller
             'count'  => Chairmanvideo::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count()
         ]);
 
-        return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman', 'academic_years', 'active_year'));
+        $exams = Exam::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+            })->orderBy('start_at', 'desc')->take(7)->get();
+
+        return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman', 'academic_years', 'active_year', 'exams'));
     }
 
 

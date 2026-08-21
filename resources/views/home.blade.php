@@ -81,7 +81,7 @@
   <!-- Top Stats Grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-4">
     <!-- Card 1: Total Students -->
-    <div class="group relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-lg shadow-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
+    <div class="group relative overflow-hidden bg-gradient-to-br from-emerald-300 to-teal-400 rounded-3xl p-6 text-white shadow-lg shadow-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
       <div class="absolute -right-6 -bottom-6 text-white/10 text-9xl font-bold transition-transform duration-300 group-hover:scale-110 pointer-events-none">
         <i class="fa fa-user-friends"></i>
       </div>
@@ -102,7 +102,7 @@
     </div>
 
     <!-- Card 2: Boys -->
-    <div class="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl p-6 text-white shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
+    <div class="group relative overflow-hidden bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl p-6 text-white shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
       <div class="absolute -right-6 -bottom-6 text-white/10 text-9xl font-bold transition-transform duration-300 group-hover:scale-110 pointer-events-none">
         <i class="fa fa-mars"></i>
       </div>
@@ -123,7 +123,7 @@
     </div>
 
     <!-- Card 3: Girls -->
-    <div class="group relative overflow-hidden bg-gradient-to-br from-rose-500 to-pink-600 rounded-3xl p-6 text-white shadow-lg shadow-rose-500/10 hover:shadow-xl hover:shadow-rose-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
+    <div class="group relative overflow-hidden bg-gradient-to-br from-rose-400 to-pink-500 rounded-3xl p-6 text-white shadow-lg shadow-rose-500/10 hover:shadow-xl hover:shadow-rose-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
       <div class="absolute -right-6 -bottom-6 text-white/10 text-9xl font-bold transition-transform duration-300 group-hover:scale-110 pointer-events-none">
         <i class="fa fa-venus"></i>
       </div>
@@ -144,7 +144,7 @@
     </div>
 
     <!-- Card 4: Present Today -->
-    <div class="group relative overflow-hidden bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl p-6 text-white shadow-lg shadow-cyan-500/10 hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
+    <div class="group relative overflow-hidden bg-gradient-to-br from-cyan-400 to-blue-500 rounded-3xl p-6 text-white shadow-lg shadow-cyan-500/10 hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 transform hover:-translate-y-1 ripple-light active:scale-[0.98] cursor-pointer">
       <div class="absolute -right-6 -bottom-6 text-white/10 text-9xl font-bold transition-transform duration-300 group-hover:scale-110 pointer-events-none">
         <i class="fa fa-calendar-check"></i>
       </div>
@@ -400,192 +400,326 @@
   </div>
 
   <!-- Row 3: Staff, Concerns, and Latest Updates -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-    <!-- Staff Overview Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
-      <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center text-sm">
-            <i class="fas fa-user-tie"></i>
-          </div>
-          <h3 class="text-lg font-bold text-slate-800">Staff Overview</h3>
-        </div>
-        <span class="text-xs text-slate-400 font-medium">Overview</span>
-      </div>
-      
-      <div class="p-6 scroll-area overflow-y-auto max-h-[350px] space-y-4">
-        <!-- Teaching Staff Section -->
-        <div>
-          <div class="p-4 rounded-2xl bg-indigo-50/40 border border-indigo-100/50 cursor-pointer flex justify-between items-center hover:bg-indigo-50 transition-colors ripple-dark active:scale-[0.99]" data-toggle="collapse" data-target="#teachStaff">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    
+    <!-- 1. Staff Overview Card -->
+    <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 overflow-hidden flex flex-col h-full">
+        <div class="px-6 pt-4 pb-4  border-b border-slate-200 flex justify-between items-center bg-white">
             <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-xl bg-indigo-500 text-white flex items-center justify-center text-xs">
-                <i class="fas fa-chalkboard-teacher"></i>
-              </span>
-              <span class="font-bold text-slate-800 text-sm">Teaching</span>
+                <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shadow-sm border border-violet-100">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-none">Staff Overview</h3>
+                    <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Directory</span>
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-white text-indigo-700 shadow-sm border border-indigo-100">
-                {{ $staffs->except('Others')->map->count()->sum() }}
-              </span>
-              <i class="fas fa-chevron-down text-xs text-slate-400 transition-transform duration-200" id="chevron-teachStaff"></i>
-            </div>
-          </div>
-          
-          <div class="collapse" id="teachStaff">
-            <div class="mt-2 pl-3 border-l-2 border-indigo-100 space-y-1 py-1">
-              @foreach($staffs->except('Others') as $dept => $staff)
-              <div class="flex justify-between items-center py-2 px-3 hover:bg-slate-50 rounded-xl transition-colors">
-                <span class="text-xs text-slate-600 font-medium">{{ $dept }}</span>
-                <span class="px-2 py-0.5 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700 cursor-pointer transition-colors ripple-dark active:scale-90" onclick="fetchStaff('{{ $dept }}')">
-                  {{ $staff->count() }}
-                </span>
-              </div>
-              @endforeach
-            </div>
-          </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         </div>
+        
+        <div class="p-2 pt-3 overflow-y-auto max-h-[380px] space-y-3 custom-scrollbar">
+            <!-- Teaching -->
+            <div class="group w-full border border-slate-50 rounded-2xl p-1 hover:bg-indigo-50/30 transition-all cursor-pointer" data-toggle="collapse" data-target="#teachStaff">
+                <div class="flex items-center justify-between p-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shadow-md shadow-indigo-100">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </span>
+                        <span class="font-bold text-slate-700 text-[13px]">Teaching Staff</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white text-indigo-600 border border-indigo-100 shadow-sm">
+                            {{ $staffs->except('Others')->map->count()->sum() }}
+                        </span>
+                        <i class="fas fa-chevron-down text-[10px] text-slate-300 transition-transform group-focus:rotate-180"></i>
+                    </div>
+                </div>
+                <div class="collapse" id="teachStaff">
+                    <div class="px-3 pb-2 space-y-1">
+                        @foreach($staffs->except('Others') as $dept => $staff)
+                        <div class="flex justify-between items-center py-2 px-3 rounded-xl hover:bg-white transition-all">
+                            <span class="text-[11px] text-slate-500 font-medium">{{ $dept }}</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white cursor-pointer transition-all active:scale-90 shadow-sm" onclick="fetchStaff('{{ $dept }}')">
+                                {{ $staff->count() }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
 
-        <!-- Non-Teaching Staff Section -->
-        <div>
-          <div class="p-4 rounded-2xl bg-violet-50/40 border border-violet-100/50 cursor-pointer flex justify-between items-center hover:bg-violet-50 transition-colors ripple-dark active:scale-[0.99]" data-toggle="collapse" data-target="#nonTeachStaff">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-xl bg-violet-500 text-white flex items-center justify-center text-xs">
-                <i class="fas fa-broom"></i>
-              </span>
-              <span class="font-bold text-slate-800 text-sm">Non-Teaching</span>
+            <!-- Non-Teaching -->
+            <div class="group border border-slate-50 rounded-2xl p-1 hover:bg-violet-50/30 transition-all cursor-pointer" data-toggle="collapse" data-target="#nonTeachStaff">
+                <div class="flex items-center justify-between p-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-violet-500 text-white flex items-center justify-center text-xs shadow-md shadow-violet-100">
+                            <i class="fas fa-broom"></i>
+                        </span>
+                        <span class="font-bold text-slate-700 text-[13px]">Non-Teaching</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white text-violet-600 border border-violet-100 shadow-sm">
+                            {{ $staffs->only('Others')->map->count()->sum() }}
+                        </span>
+                        <i class="fas fa-chevron-down text-[10px] text-slate-300 transition-transform group-focus:rotate-180"></i>
+                    </div>
+                </div>
+                <div class="collapse" id="nonTeachStaff">
+                    <div class="px-3 pb-2 space-y-1">
+                        @foreach($staffs->only('Others') as $dept => $staff)
+                        <div class="flex justify-between items-center py-2 px-3 rounded-xl hover:bg-white transition-all">
+                            <span class="text-[11px] text-slate-500 font-medium">{{ $dept == 'Others' ? 'General' : $dept }}</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600 hover:bg-violet-600 hover:text-white cursor-pointer transition-all active:scale-90 shadow-sm" onclick="fetchStaff('{{ $dept }}')">
+                                {{ $staff->count() }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-white text-violet-700 shadow-sm border border-violet-100">
-                {{ $staffs->only('Others')->map->count()->sum() }}
-              </span>
-              <i class="fas fa-chevron-down text-xs text-slate-400 transition-transform duration-200" id="chevron-nonTeachStaff"></i>
-            </div>
-          </div>
-          
-          <div class="collapse" id="nonTeachStaff">
-            <div class="mt-2 pl-3 border-l-2 border-violet-100 space-y-1 py-1">
-              @foreach($staffs->only('Others') as $dept => $staff)
-              <div class="flex justify-between items-center py-2 px-3 hover:bg-slate-50 rounded-xl transition-colors">
-                <span class="text-xs text-slate-600 font-medium">{{ $dept == 'Others' ? 'General' : $dept }}</span>
-                <span class="px-2 py-0.5 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-violet-100 hover:text-violet-700 cursor-pointer transition-colors ripple-dark active:scale-90" onclick="fetchStaff('{{ $dept }}')">
-                  {{ $staff->count() }}
-                </span>
-              </div>
-              @endforeach
-            </div>
-          </div>
         </div>
-      </div>
     </div>
 
-    <!-- Parent Concerns Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
-      <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm">
-            <i class="fas fa-exclamation-circle"></i>
-          </div>
-          <h3 class="text-lg font-bold text-slate-800">Parent Concerns</h3>
+    <!-- 2. Parent Concerns Card -->
+    <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 overflow-hidden flex flex-col h-full">
+        <div class="px-6 pt-4 pb-4  border-b border-slate-200 flex justify-between items-center bg-white">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shadow-sm border border-rose-100">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-none">Parent Concerns</h3>
+                    <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Tickets Status</span>
+                </div>
+            </div>
         </div>
-        <span class="text-xs text-slate-400 font-medium">Status</span>
-      </div>
-      
-      <div class="p-6 scroll-area overflow-y-auto max-h-[350px] flex flex-col justify-center">
-        <div class="grid grid-cols-1 gap-4">
-          <!-- Total Open Concerns -->
-          <a href="{{ route('parent_concern') }}" class="group flex items-center justify-between p-4 rounded-2xl border border-rose-100 bg-rose-50/30 hover:bg-rose-50 transition-all duration-200 ripple-dark active:scale-[0.98]">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-sm shadow-rose-500/20">
-                <i class="fas fa-folder-open text-sm"></i>
-              </div>
-              <div>
-                <h4 class="font-bold text-slate-800 text-sm group-hover:text-rose-700 transition-colors">Total Open</h4>
-                <p class="text-[10px] text-slate-400">Awaiting resolution</p>
-              </div>
-            </div>
-            <span class="text-2xl font-extrabold text-rose-600">{{ $concerns->count() }}</span>
-          </a>
+        
+        <div class="p-2 pt-3 space-y-4">
+            <!-- Open -->
+            <a href="{{ route('parent_concern') }}" class="flex items-center justify-between px-3 py-2  rounded-2xl bg-rose-50/40 border border-rose-100/50 hover:bg-rose-50 transition-all active:scale-[0.98] group">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-200 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-folder-open text-xs"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-700 text-sm">Open Issues</h4>
+                        <p class="text-[10px] text-slate-400">Action Required</p>
+                    </div>
+                </div>
+                <span class="text-xl font-black text-rose-600 leading-none">{{ $concerns->count() }}</span>
+            </a>
 
-          <!-- In Progress Concerns -->
-          <a href="{{ route('parent_concern') }}" class="group flex items-center justify-between p-4 rounded-2xl border border-amber-100 bg-amber-50/30 hover:bg-amber-50 transition-all duration-200 ripple-dark active:scale-[0.98]">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm shadow-amber-500/20">
-                <i class="fas fa-spinner fa-spin text-sm"></i>
-              </div>
-              <div>
-                <h4 class="font-bold text-slate-800 text-sm group-hover:text-amber-700 transition-colors">In Progress</h4>
-                <p class="text-[10px] text-slate-400">Under review</p>
-              </div>
-            </div>
-            <span class="text-2xl font-extrabold text-amber-600">{{ $concerns->where('status', 'In Progress')->count() }}</span>
-          </a>
+            <!-- In Progress -->
+            <a href="{{ route('parent_concern') }}" class="flex items-center justify-between px-3 py-2 rounded-2xl bg-amber-50/40 border border-amber-100/50 hover:bg-amber-50 transition-all active:scale-[0.98] group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-spinner fa-spin text-xs"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-700 text-sm">Processing</h4>
+                        <p class="text-[10px] text-slate-400">Under Review</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-black text-amber-600 leading-none">{{ $concerns->where('status', 'In Progress')->count() }}</span>
+            </a>
 
-          <!-- Closed Concerns -->
-          <a href="{{ route('parent_concern') }}" class="group flex items-center justify-between p-4 rounded-2xl border border-emerald-100 bg-emerald-50/30 hover:bg-emerald-50 transition-all duration-200 ripple-dark active:scale-[0.98]">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm shadow-emerald-500/20">
-                <i class="fas fa-check-circle text-sm"></i>
-              </div>
-              <div>
-                <h4 class="font-bold text-slate-800 text-sm group-hover:text-emerald-700 transition-colors">Closed</h4>
-                <p class="text-[10px] text-slate-400">Resolved</p>
-              </div>
-            </div>
-            <span class="text-2xl font-extrabold text-emerald-600">{{ $concerns->where('status', 'Closed')->count() }}</span>
-          </a>
+            <!-- Closed -->
+            <a href="{{ route('parent_concern') }}" class="flex items-center justify-between px-3 py-2 rounded-2xl bg-emerald-50/40 border border-emerald-100/50 hover:bg-emerald-50 transition-all active:scale-[0.98] group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-check-circle text-xs"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-700 text-sm">Resolved</h4>
+                        <p class="text-[10px] text-slate-400">Successfully Closed</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-black text-emerald-600 leading-none">{{ $concerns->where('status', 'Closed')->count() }}</span>
+            </a>
         </div>
-      </div>
     </div>
 
-    <!-- Latest Updates Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
-      <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
-            <i class="fas fa-bullhorn"></i>
-          </div>
-          <h3 class="text-lg font-bold text-slate-800">Latest Updates</h3>
-        </div>
-        <span class="text-xs text-slate-400 font-medium">Broadcasts</span>
-      </div>
-      
-      <div class="p-6 scroll-area overflow-y-auto max-h-[350px] space-y-5">
-        <!-- Announcements Section -->
-        <div>
-          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <i class="fas fa-bullhorn text-amber-500 text-[10px]"></i> Announcements
-          </h4>
-          <div class="space-y-2">
-            @foreach($announcement as $row)
-            <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
-              <span class="text-xs text-slate-600 font-medium">{{ $row['branch'] }}</span>
-              <a href="{{ route('announcement.index') }}" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-100/70 text-amber-800 hover:bg-amber-200 transition-colors ripple-dark active:scale-90">
-                {{ $row['count'] }}
-              </a>
+    <!-- 3. Latest Updates Card -->
+    <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 overflow-hidden flex flex-col h-full">
+        <div class="px-6 pt-4 pb-4  border-b border-slate-200 flex justify-between items-center bg-white">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-sm border border-amber-100">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-none">Latest Updates</h3>
+                    <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Communication</span>
+                </div>
             </div>
-            @endforeach
-          </div>
         </div>
+        
+        <div class="p-6 overflow-y-auto max-h-[380px] space-y-5 custom-scrollbar">
+            <!-- Announcements -->
+            <div>
+                <h4 class="text-[1px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <span class="w-4 h-[1px] bg-amber-200"></span> Announcements
+                </h4>
+                <div class="grid grid-cols-1 gap-2">
+                    @foreach($announcement as $row)
+                    <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm hover:border-amber-100 transition-all group">
+                        <span class="text-[11px] text-slate-600 font-semibold group-hover:text-amber-700">{{ $row['branch'] }}</span>
+                        <a href="{{ route('announcement.index') }}" class="px-3 py-1 text-[10px] font-bold rounded-lg bg-white text-amber-600 border border-amber-100 group-hover:bg-amber-600 group-hover:text-white transition-all shadow-sm">
+                            {{ $row['count'] }}
+                        </a>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
 
-        <!-- Chairman Videos Section -->
-        <div>
-          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <i class="fas fa-video text-rose-500 text-[10px]"></i> Chairman Videos
-          </h4>
-          <div class="space-y-2">
-            @foreach($chairman as $row)
-            <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
-              <span class="text-xs text-slate-600 font-medium">{{ $row['branch'] }}</span>
-              <a href="{{ route('chairmanvideo.index') }}" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-100/70 text-rose-800 hover:bg-rose-200 transition-colors ripple-dark active:scale-90">
-                {{ $row['count'] }}
-              </a>
+            <!-- Chairman Videos -->
+            <div>
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <span class="w-4 h-[1px] bg-rose-200"></span> Chairman Videos
+                </h4>
+                <div class="grid grid-cols-1 gap-2">
+                    @foreach($chairman as $row)
+                    <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm hover:border-rose-100 transition-all group">
+                        <span class="text-[11px] text-slate-600 font-semibold group-hover:text-rose-700">{{ $row['branch'] }}</span>
+                        <a href="{{ route('chairmanvideo.index') }}" class="px-3 py-1 text-[10px] font-bold rounded-lg bg-white text-rose-600 border border-rose-100 group-hover:bg-rose-600 group-hover:text-white transition-all shadow-sm">
+                            {{ $row['count'] }}
+                        </a>
+                    </div>
+                    @endforeach
+                </div>
             </div>
-            @endforeach
-          </div>
         </div>
-      </div>
     </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+  <!-- Exam Overview Card -->
+  <div class="bg-white mt-8 rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+      <!-- Header -->
+      <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <i class="fas fa-file-alt"></i>
+              </div>
+              <div>
+                  <h3 class="text-lg font-bold text-slate-800"> Exam Overview </h3>
+                  <p class="text-[11px] text-slate-400 font-medium"> Latest examination schedule</p>
+              </div>
+          </div>
+          <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100"> Exams </span>
+      </div>
+      <!-- Exam List -->
+      <div class="p-4 scroll-area overflow-y-auto max-h-[350px]">
+        
+          <table class="w-full">
+              <thead>
+                  <tr class="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                      <th class="pb-3 text-center "> Exam Name </th>
+                      <th class="pb-3 text-center"> Course </th>
+                      <th class="pb-3 text-center"> Start Time </th>
+                      <th class="pb-3 text-center "> Status </th>
+                  </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                  @foreach($exams as $exam)
+                  <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="py-3.5 pl-2 text-start">
+                          <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-700"> {{ $exam->name }} </span>
+                          </div>
+                      </td>
+                      <td class="py-3.5 text-start">
+                          <span class="text-xs font-medium text-slate-600">{{ $exam->course }}</span>
+                      </td>
+                      <td class="py-3.5 text-start">
+                          <span class="text-xs font-medium text-slate-600">{{ $exam->start_at ? \Carbon\Carbon::parse($exam->start_at)->format('d M Y H:i') : '-' }}</span>
+                      </td>
+                      
+                      <td class="py-3.5 pr-2 text-end">
+                        <a href="{{ route('exam.viewexams','ONLINE') }}">
+                          @if($exam->status === 'completed')
+                            <span class="px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-[10px] font-bold">
+                                Completed
+                            </span>
+                        @elseif($exam->status === 'scheduled')
+                            <span class="px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-bold">
+                                Scheduled
+                            </span>
+                        @elseif($exam->status === 'preview')
+                            <span class="px-2.5 py-1 rounded-full bg-yellow-50 text-yellow-600 text-[10px] font-bold">
+                                Preview
+                            </span>
+                        @endif
+                        </a>
+                      </td>
+                  </tr>
+                  @endforeach
+              </tbody>
+          </table>
+      </div>
   </div>
+
+<!-- Student Login Overview -->
+  <div class="bg-white mt-8 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col">
+    <!-- Card Header -->
+    <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center ring-1 ring-violet-500/20">
+                <i class="fas fa-sign-in-alt text-lg"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-800 tracking-tight">Student Login Overview</h3>
+                <p class="text-[11px] text-slate-400 font-medium">Branch wise login distribution</p>
+            </div>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200/60">
+            Today
+        </span>
+    </div>
+    
+    <!-- Scrollable Area -->
+    <div class="p-4 scroll-area overflow-y-auto max-h-[420px]">
+        <table class="w-full text-center border-separate border-spacing-y-1">
+            <thead>
+                <tr class="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                    <th class="pb-3 text-start w-10 pl-2"></th> <!-- Icon Space -->
+                    <th class="pb-3 text-start">Branch</th>
+                    <th class="pb-3 text-blue-600">Web</th>
+                    <th class="pb-3 text-violet-600">App</th>
+                    <th class="pb-3 text-teal-600">Ios</th>
+                    <th class="pb-3 pr-2">Total</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach($data as $branch)
+                <tr class="group hover:bg-slate-50 transition-all duration-150 rounded-lg">
+                    <!-- Icon Cell -->
+                    <td class="py-3.5 pl-2 text-start rounded-l-xl">
+                        <span class="inline-flex w-7 h-7 items-center justify-center rounded-lg bg-slate-100 text-slate-500 group-hover:bg-violet-50 group-hover:text-violet-600 transition-colors">
+                            <i class="fas fa-building text-[11px]"></i>
+                        </span>
+                    </td>
+                    <a href="{{ route('report.userlogin') }}">
+                    <td class="py-3.5 text-start font-semibold text-slate-800 text-sm"> {{ $branch->name }} </td>
+                    <td class="py-3.5">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100"> {{ $branch->login_web }} </span>
+                    </td>
+                    <td class="py-3.5">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-violet-50 text-violet-600 border border-violet-100"> {{ $branch->login_android }} </span>
+                    </td>
+                    <td class="py-3.5">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-teal-50 text-teal-600 border border-teal-100"> {{ $branch->login_ios }} </span>
+                    </td>
+                    <td class="py-3.5 pr-2 rounded-r-xl">
+                        <span class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700"> {{ $branch->login_total }} </span>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
   
   <!-- Details Info Modal -->
   <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
