@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Chairmanvideo;
 use App\Providers\FcmServiceProvider;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChairmanVideoController extends Controller
 {
