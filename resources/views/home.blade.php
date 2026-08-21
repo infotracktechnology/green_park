@@ -428,7 +428,7 @@
                         <span class="font-bold text-slate-700 text-[13px]">Teaching Staff</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white text-indigo-600 border border-indigo-100 shadow-sm">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white text-indigo-600 border border-indigo-100 shadow-sm" style="color: rgb(135, 70, 182)">
                             {{ $staffs->except('Others')->map->count()->sum() }}
                         </span>
                         <i class="fas fa-chevron-down text-[10px] text-slate-300 transition-transform group-focus:rotate-180"></i>
@@ -458,7 +458,7 @@
                         <span class="font-bold text-slate-700 text-[13px]">Non-Teaching</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white text-violet-600 border border-violet-100 shadow-sm">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-white text-violet-600 border border-violet-100 shadow-sm" style="color: rgb(135, 70, 182)">
                             {{ $staffs->only('Others')->map->count()->sum() }}
                         </span>
                         <i class="fas fa-chevron-down text-[10px] text-slate-300 transition-transform group-focus:rotate-180"></i>
