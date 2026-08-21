@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport, PhoneCard};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
@@ -1280,6 +1281,404 @@ class ReportController extends Controller
             return $expense['phone_card_total'] || $expense['sick_room_total'] ;
         })->values();
         }
-        return view('report.studentexpance', compact('branches','hostels','room','students','expenseData'));
+        return view('report.studentexpance', compact('branches', 'hostels', 'room', 'students', 'expenseData'));
+    }
+
+public function studentReport(Request $request)
+    {
+
+        if ($request->isMethod('get') && !$request->ajax()) {
+            $branches = Branch::all();
+            return view('report.studentReport', compact('branches'));
+        }
+
+        if ($request->ajax()) {
+
+            if ($request->has('branch') && !$request->has('course')) {
+                $courses = Student::where('academic_year', $this->academic_year)->where('campus', $request->branch)->whereNotNull('course')->where('course', '!=', '')->distinct()->orderBy('course')->pluck('course');
+                return response()->json($courses);
+            }
+
+            if ($request->has('branch') && $request->has('course') && !$request->has('section')) {
+                $sections = Student::where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('course', $request->course)->whereNotNull('section')->where('section', '!=', '')->distinct()->orderBy('section')->pluck('section');
+                return response()->json($sections);
+            }
+
+
+        if ($request->has('branch') && $request->has('course') && $request->has('section') && !$request->has('coaching_type')) {
+            $coachingTypes = Student::where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('course', $request->course)->where('section', $request->section)->where('coaching_type', '!=', '')->distinct()->orderBy('coaching_type')->pluck('coaching_type');
+            return response()->json($coachingTypes);
+        }
+
+        if ( $request->has('branch') && $request->has('course') && $request->has('section') &&
+        $request->has('coaching_type')) {
+            $students = Student::where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('course', $request->course)->where('section', $request->section)->where('coaching_type', $request->coaching_type)->select('student_id','student_name')->orderBy('student_name')->get();
+            return response()->json($students);
+        }
+        }
+        if ($request->student_id === 'all') {
+
+            $students = Student::with('branch')->where('academic_year', $this->academic_year)->where('campus', $request->branch)->where('course', $request->course)->where('section', $request->section)->where('coaching_type', $request->coaching_type)->orderBy('student_name')->get();
+        } else {
+            $student = Student::with('branch')->where('student_id', $request->student_id)->first();
+            if (!$student) {
+                return back()->with( 'error','Student not found');
+            }
+            $students = collect([$student]);
+        }
+        if ($students->isEmpty()) {
+            return back()->with( 'error', 'No students found');
+        }
+
+        $reports = [];
+        $allExamRows = DB::table('examsubjectreport')->join('student', 'student.student_id', '=', 'examsubjectreport.stuid')->where('student.academic_year', $this->academic_year)->where('student.campus', $request->branch)->where('student.course', $request->course)->where('student.section', $request->section)->where('student.coaching_type', $request->coaching_type)->select('examsubjectreport.testid','examsubjectreport.category','examsubjectreport.subject','examsubjectreport.exdate')->distinct()->orderBy('examsubjectreport.exdate')->get();
+
+        foreach ($students as $student) {
+
+            $studentRows = DB::table('examsubjectreport')->where('stuid', $student->student_id)->get()->map(function ($row) { 
+                $row = $this->normalizeRow($row);
+                $row->_is_absent_exam = false;
+                return $row;
+                })
+                ->keyBy('subject');
+
+            $rows = $allExamRows->map(function ($exam) use ($studentRows) {
+                if ($studentRows->has($exam->subject)) {
+                    return $studentRows->get($exam->subject);
+                }
+                $row = new \stdClass();
+
+                $row->testid = $exam->testid;
+                $row->category = $exam->category;
+                $row->subject = $exam->subject;
+                $row->exdate = $exam->exdate;
+                $row->_is_absent_exam = true;
+
+                foreach ([ 'phy', 'che', 'bot','zoo','bio'] as $key) {
+                    $row->{$key . '_r'} = 0;
+                    $row->{$key . '_w'} = 0;
+                    $row->{$key . '_l'} = 0;
+                    $row->{$key . '_tot'} = null;
+                }
+                $row->nettot = null;
+                return $row;
+            });
+
+            $rows = $rows->map(
+                fn($row) => $this->normalizeRow($row)
+            );
+
+            $subjectMaxMarks = [];
+            $firstStudentRow = $studentRows->first();
+            if ($firstStudentRow) {
+                $subjectKeys = $this->detectSubjectKeys($firstStudentRow);
+                foreach ($subjectKeys as $key => $label) {
+
+                    $maxQuestions = $studentRows->max(function ($row) use ($key) {
+                        $r = (int) ($row->{$key . '_r'} ?? 0);
+                        $w = (int) ($row->{$key . '_w'} ?? 0);
+                        $l = (int) ($row->{$key . '_l'} ?? 0);
+                        return $r + $w + $l;
+                    });
+
+                    $subjectMaxMarks[$key] = [
+                        'label' => $label,
+                        'mark'  => $maxQuestions * 4,
+                    ];
+                }
+            }
+
+            if ($rows->isNotEmpty()) {
+                $studentReport = $this->buildDynamicReport($rows, $subjectMaxMarks, $request->section); 
+            } else {
+                $studentReport = collect();
+            }
+
+            $reports[] = [
+                'student' => $student,
+                'marks' => $rows,
+                'report' => $studentReport,
+                'subjects' => ['phy' => 'Phy', 'che' => 'Che', 'bot' => 'Bot', 'zoo' => 'Zoo', 'bio' => 'Bio',],
+                'max_marks' => $subjectMaxMarks,
+                'weeklySummaries' => [],
+            ];
+        }
+    
+        if (empty($reports)) {
+            return back()->with( 'error','No students found');
+        }
+
+        $pdf = PDF::loadView( 'pdf.studentreport',compact('reports'));
+        return $pdf->download('studentReport.pdf');
+    }
+    private function normalizeRow($row)
+    {
+        $category = trim($row->category ?? '');
+        $subject  = trim($row->subject ?? '');
+
+        $categorySubject = null;
+        if (preg_match('/\(([^()]*)\)\s*$/', $category, $m)) {
+            $categorySubject = trim($m[1]);
+        }
+
+        $baseCategory = $categorySubject? trim(preg_replace('/\s*\([^)]*\)\s*$/', '', $category)) : $category;
+
+        $examName = preg_replace('/\s*-\s*\d{1,2}[.\/-]\d{1,2}[.\/-]\d{4}\s*$/', '', $subject);
+        $examName = trim(preg_replace('/\s*\([^)]*\)\s*$/', '', $examName));
+
+        if ($examName === '') {
+            $examName = $baseCategory;
+        }
+
+        $row->parsed_date       = $this->parseDate($row->exdate);
+        $row->_base_category    = $baseCategory;
+        $row->_category_subject = $categorySubject;
+        $row->_exam_name        = $examName;
+        $row->_is_numbered      = (bool) preg_match('/\d/', $examName);
+
+        return $row;
+    }
+
+    private function buildDynamicReport($rows, $subjectMaxMarks = [], $section = null)
+    {
+        $groups = $rows->groupBy('_base_category');
+        $report = collect();
+
+        foreach ($groups as $categoryName => $categoryRows) {
+            $categoryRows = $categoryRows->sortBy(function ($r) {
+                return $r->parsed_date ? $r->parsed_date->timestamp : PHP_INT_MAX;
+            })->values();
+
+            $isSubjectWise = $categoryRows->contains(fn($r) => !empty($r->_category_subject));
+            $isNumbered    = $categoryRows->contains(fn($r) => $r->_is_numbered);
+
+            if ($isSubjectWise && !$isNumbered) {
+                $type = 'weekly';
+                $data = $this->buildWeeklyReport($categoryRows);
+            } elseif ($isSubjectWise && $isNumbered) {
+                $type = 'numbered';
+                $data = $this->buildMergedReport($categoryRows, groupField: '_exam_name');
+            } else {
+                $type = 'simple';
+                $data = $this->buildMergedReport($categoryRows, groupField: '_exam_name', includeOverallTop: true, section: $section);
+            }
+
+            $report->push([
+                'category' => $categoryName,
+                'type'     => $type,
+                'rows'     => $data,
+                'max_marks'=>$subjectMaxMarks
+            ]);
+        }
+
+        return $report->values();
+    }
+
+    private function buildWeeklyReport($rows)
+    {
+        $startDate = $rows->pluck('parsed_date')->filter()->sort()->first();
+
+        if (!$startDate) {
+            return collect();
+        }
+
+        $grouped = $rows->groupBy(function ($row) use ($startDate) {
+            if (!$row->parsed_date) {
+                return 0;
+            }
+            return (int) floor($startDate->diffInDays($row->parsed_date) / 7) + 1;
+        });
+
+        $weeks = collect();
+        foreach ($grouped->sortKeys() as $week => $group) {
+            if ($week == 0) {
+                continue;
+            }
+
+            $dates = $group->pluck('parsed_date')->filter()->sort();
+            $from  = $dates->first();
+            $to    = $dates->last();
+            $subjects = $this->allSubjectTotals($group);
+
+            $weeks->push([
+                'sno'   => $week,
+                'label' => 'Week - ' . $week,
+                'range' => ($from && $to) ? $from->format('d-m-Y') . ' To ' . $to->format('d-m-Y') : '',
+                'subjects' => $subjects,
+                'total'    => $this->sumOrNull($subjects),
+            ]);
+        }
+
+        return $weeks->values();
+    }
+
+    private function buildMergedReport($rows, $groupField = null,  $includeOverallTop = false, $section = null)
+    {
+        $groups = $groupField ? $rows->groupBy($groupField) : $rows->map(fn($r) => collect([$r]));
+
+        $result = collect();
+        $i = 0;
+
+        foreach ($groups as $examName => $group) {
+            $i++;
+
+            $dates = $group->pluck('parsed_date')->filter()->sort();
+            $date  = $dates->first();
+            $subjects = $this->allSubjectTotals($group);
+
+        foreach ($group as $examRow) {
+            if (($examRow->_is_absent_exam ?? false) !== true) {
+                continue;
+            }
+            $examSubject = $examRow->subject ?? null;
+            if (!$examSubject) {
+                continue;
+            }
+            $examRecords = DB::table('examsubjectreport')->where('subject', $examSubject)->where('sec', $section)->get();
+
+            $subjectMap = ['phy' => 'PHYSICS', 'che' => 'CHEMISTRY','bot' => 'BOTANY', 'zoo' => 'ZOOLOGY', 'bio' => 'BIOLOGY', ];
+
+            foreach ($subjectMap as $key => $label) {
+                $conducted = $examRecords->contains(function ($record) use ($key) {
+                    return
+                        (int) ($record->{$key . '_r'} ?? 0) > 0 ||
+                        (int) ($record->{$key . '_w'} ?? 0) > 0 ||
+                        (int) ($record->{$key . '_l'} ?? 0) > 0 ||
+                        (int) ($record->{$key . '_tot'} ?? 0) > 0;
+                });
+
+                if ($conducted) {
+                    $subjects[$label] = 'AB';
+                }
+            }
+        }
+        $allSubjectsAbsent = collect($subjects)->filter(fn($value) => $value === 'AB')->isNotEmpty();
+
+        $hasActualMark = collect($subjects)->contains(function ($value) {
+                return is_numeric($value);
+            });
+
+            $netTotals = $group->pluck('nettot')->filter(fn($v) => is_numeric($v));
+
+             $row = [
+                'sno' => $i,
+                'exam' => $groupField ? $examName : ($group->first()->_exam_name ?? $examName),
+                'date' => $date ? $date->format('d-m-Y') : ($group->first()->exdate ?? ''),
+                'subjects' => $subjects,
+                'total' => $hasActualMark ? (int) $netTotals->sum() : ($allSubjectsAbsent ? 'AB' : $this->sumOrNull($subjects)),
+            ];
+            if ($includeOverallTop) {
+                $examSubject = $group->first()->subject;
+                
+
+            $overallTop = DB::table('examsubjectreport')->where('subject', $examSubject)
+                ->where('sec', $section)
+                ->whereNotNull('nettot')
+                ->orderBy('nettot', 'DESC')
+                ->limit(1)
+                ->value('nettot');
+
+                $row['overall_top'] = $overallTop;
+            }
+            $result->push($row);
+        }
+        return $result->values();
+    }
+
+
+    private function allSubjectTotals($group)
+    {
+        
+        $subjectKeys = $this->detectSubjectKeys($group->first());
+        $subjects = [];
+
+        foreach ($subjectKeys as $key => $label) {
+        $actualMark = null;     
+        $examExists = false;
+
+            foreach ($group as $row) {
+
+                if (($row->_is_absent_exam ?? false) === false) {
+
+                    $r = (int) ($row->{$key . '_r'} ?? 0);
+                    $w = (int) ($row->{$key . '_w'} ?? 0);
+                    $l = (int) ($row->{$key . '_l'} ?? 0);
+
+                    if ($r > 0 || $w > 0 || $l > 0) {
+                        $examExists = true;
+                        if (is_numeric($row->{$key . '_tot'} ?? null)) {
+                            $actualMark = (int) $row->{$key . '_tot'};
+                        }
+                    }
+                }
+
+                else {
+                    $examSubject = strtoupper(
+                        trim($row->_category_subject ?? '')
+                    );
+                    if ($examSubject === $label) {
+                        $examExists = true;
+                    }
+                }
+            }
+
+            if ($actualMark !== null) {
+                $subjects[$label] = $actualMark;
+            } elseif ($examExists) {
+                $subjects[$label] = 'AB';
+            } else {
+                $subjects[$label] = null;
+            }
+        }
+
+        return $subjects;
+    }
+
+    private function detectSubjectKeys($row)
+    {
+        $labels = [
+            'phy' => 'PHYSICS',
+            'che' => 'CHEMISTRY',
+            'bot' => 'BOTANY',
+            'zoo' => 'ZOOLOGY',
+            'bio' => 'BIOLOGY',
+        ];
+
+        $keys = [];
+        foreach ($labels as $key => $label) {
+            if (property_exists($row, $key . '_tot')) {
+                $keys[$key] = $label;
+            }
+        }
+        return $keys;
+    }
+
+    private function sumOrNull(array $subjects)
+    {
+        $vals = array_filter($subjects, fn($v) => $v !== null);
+        return empty($vals) ? null : array_sum($vals);
+    }
+
+ private function parseDate($exdate)
+    {
+        $exdate = trim((string) $exdate);
+ 
+        if ($exdate === '' || strtoupper($exdate) === 'NULL') {
+            return null;
+        }
+ 
+        foreach (['d-m-Y', 'd.m.Y', 'd/m/Y', 'Y-m-d'] as $format) {
+            try {
+                return Carbon::createFromFormat($format, $exdate)->startOfDay();
+            } catch (\Exception $e) {
+                // try next format
+            }
+        }
+ 
+        try {
+            return Carbon::parse($exdate)->startOfDay();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
