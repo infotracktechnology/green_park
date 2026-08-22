@@ -19,7 +19,7 @@ class AppColors {
   static const Color textMuted = Color(0xFF94A3B8); // slate-400
   static const Color border = Color(0xFFE2E8F0); // slate-200
   static const Color borderLight = Color(0xFFF1F5F9); // slate-100
-  
+
   // Status Colors
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
@@ -75,7 +75,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: const Color(0xFFF8FAFC),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

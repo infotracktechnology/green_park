@@ -50,19 +50,22 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
 
   Future<void> _loadData() async {
     setState(() => _fetching = true);
-    final filters = Provider.of<AnnouncementFilterProvider>(context, listen: false);
+    final filters =
+        Provider.of<AnnouncementFilterProvider>(context, listen: false);
     await filters.fetchMasterData();
 
     try {
       final dio = ApiClient().dio;
-      final res = await dio.get('/admin/announcement/${widget.announcementId}/edit');
+      final res =
+          await dio.get('/admin/announcement/${widget.announcementId}/edit');
 
       if (res.data != null && res.data['status'] == true) {
         final annData = res.data['announcement'] as Map<String, dynamic>;
         final model = AnnouncementModel.fromJson(annData);
 
         // Pre-fill filters
-        final Map<String, dynamic> combined = Map<String, dynamic>.from(annData);
+        final Map<String, dynamic> combined =
+            Map<String, dynamic>.from(annData);
         if (res.data['students'] != null && res.data['students'] is Map) {
           combined['studentOptions'] = res.data['students'];
         }
@@ -87,7 +90,9 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
       debugPrint('Edit announcement fetch error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to load announcement details'), backgroundColor: AppColors.error),
+          const SnackBar(
+              content: Text('Failed to load announcement details'),
+              backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -183,7 +188,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
   }
 
   Future<void> _handleSubmit() async {
-    final filters = Provider.of<AnnouncementFilterProvider>(context, listen: false);
+    final filters =
+        Provider.of<AnnouncementFilterProvider>(context, listen: false);
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
 
@@ -196,7 +202,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
       return;
     }
     if (filters.branches.isEmpty) {
-      _showErrorDialog('Validation Error', 'Please select at least one branch.');
+      _showErrorDialog(
+          'Validation Error', 'Please select at least one branch.');
       return;
     }
     if (filters.usertype == 'INDIVIDUAL' && filters.student.isEmpty) {
@@ -285,8 +292,11 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
             context: context,
             barrierDismissible: false,
             builder: (ctx) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: const Text('Success', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: const Text('Success',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: AppColors.primary)),
               content: const Text('Announcement updated successfully!'),
               actions: [
                 TextButton(
@@ -294,13 +304,17 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                     Navigator.pop(ctx);
                     Navigator.pop(context, true);
                   },
-                  child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+                  child: const Text('OK',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary)),
                 ),
               ],
             ),
           );
         } else {
-          final msg = (res.data is Map ? res.data['message'] : null) ?? 'Update failed';
+          final msg =
+              (res.data is Map ? res.data['message'] : null) ?? 'Update failed';
           _showErrorDialog('Error', msg.toString());
         }
       }
@@ -328,7 +342,9 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+            child: const Text('OK',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: AppColors.primary)),
           ),
         ],
       ),
@@ -396,7 +412,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.tune, size: 16, color: AppColors.primary),
+                        child: const Icon(Icons.tune,
+                            size: 16, color: AppColors.primary),
                       ),
                       const SizedBox(width: 10),
                       const Text(
@@ -415,11 +432,15 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   // Academic Year (Locked)
                   const Text(
                     'ACADEMIC YEAR',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(16),
@@ -429,10 +450,16 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          filters.academicYear.isNotEmpty ? filters.academicYear : 'Active Year',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                          filters.academicYear.isNotEmpty
+                              ? filters.academicYear
+                              : 'Active Year',
+                          style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary),
                         ),
-                        const Icon(Icons.lock_outline, size: 18, color: AppColors.textMuted),
+                        const Icon(Icons.lock_outline,
+                            size: 18, color: AppColors.textMuted),
                       ],
                     ),
                   ),
@@ -441,7 +468,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   // User Type Toggle
                   const Text(
                     'USER TYPE *',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -453,10 +483,14 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
-                              color: filters.usertype == 'GROUP' ? AppColors.primary : const Color(0xFFF8FAFC),
+                              color: filters.usertype == 'GROUP'
+                                  ? AppColors.primary
+                                  : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: filters.usertype == 'GROUP' ? AppColors.primary : AppColors.border,
+                                color: filters.usertype == 'GROUP'
+                                    ? AppColors.primary
+                                    : AppColors.border,
                               ),
                             ),
                             child: Row(
@@ -465,7 +499,9 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                                 Icon(
                                   Icons.people,
                                   size: 16,
-                                  color: filters.usertype == 'GROUP' ? Colors.white : AppColors.textSecondary,
+                                  color: filters.usertype == 'GROUP'
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
@@ -473,7 +509,9 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: filters.usertype == 'GROUP' ? Colors.white : AppColors.textSecondary,
+                                    color: filters.usertype == 'GROUP'
+                                        ? Colors.white
+                                        : AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -489,10 +527,14 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
-                              color: filters.usertype == 'INDIVIDUAL' ? AppColors.primary : const Color(0xFFF8FAFC),
+                              color: filters.usertype == 'INDIVIDUAL'
+                                  ? AppColors.primary
+                                  : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: filters.usertype == 'INDIVIDUAL' ? AppColors.primary : AppColors.border,
+                                color: filters.usertype == 'INDIVIDUAL'
+                                    ? AppColors.primary
+                                    : AppColors.border,
                               ),
                             ),
                             child: Row(
@@ -501,7 +543,9 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                                 Icon(
                                   Icons.person,
                                   size: 16,
-                                  color: filters.usertype == 'INDIVIDUAL' ? Colors.white : AppColors.textSecondary,
+                                  color: filters.usertype == 'INDIVIDUAL'
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
@@ -509,7 +553,9 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: filters.usertype == 'INDIVIDUAL' ? Colors.white : AppColors.textSecondary,
+                                    color: filters.usertype == 'INDIVIDUAL'
+                                        ? Colors.white
+                                        : AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -524,7 +570,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   // Course Chips
                   const Text(
                     'COURSE *',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   SingleChildScrollView(
@@ -540,13 +589,18 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                             labelStyle: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: active ? Colors.white : AppColors.textPrimary,
+                              color:
+                                  active ? Colors.white : AppColors.textPrimary,
                             ),
                             selected: active,
                             selectedColor: AppColors.primary,
                             backgroundColor: const Color(0xFFF8FAFC),
-                            side: BorderSide(color: active ? AppColors.primary : AppColors.border),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            side: BorderSide(
+                                color: active
+                                    ? AppColors.primary
+                                    : AppColors.border),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
                             onSelected: (_) => filters.setCourse(c),
                           ),
                         );
@@ -595,7 +649,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   if (filters.showGender) ...[
                     const Text(
                       'GENDER',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -608,13 +665,18 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                             labelStyle: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: active ? Colors.white : AppColors.textPrimary,
+                              color:
+                                  active ? Colors.white : AppColors.textPrimary,
                             ),
                             selected: active,
                             selectedColor: AppColors.primary,
                             backgroundColor: const Color(0xFFF8FAFC),
-                            side: BorderSide(color: active ? AppColors.primary : AppColors.border),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            side: BorderSide(
+                                color: active
+                                    ? AppColors.primary
+                                    : AppColors.border),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
                             onSelected: (_) => filters.setGender(g),
                           ),
                         );
@@ -627,7 +689,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   if (filters.usertype == 'GROUP' && filters.showSection) ...[
                     const Text(
                       'SECTION',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     SingleChildScrollView(
@@ -642,15 +707,20 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                               labelStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: filters.section.isEmpty ? Colors.white : AppColors.textPrimary,
+                                color: filters.section.isEmpty
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
                               ),
                               selected: filters.section.isEmpty,
                               selectedColor: AppColors.primary,
                               backgroundColor: const Color(0xFFF8FAFC),
                               side: BorderSide(
-                                color: filters.section.isEmpty ? AppColors.primary : AppColors.border,
+                                color: filters.section.isEmpty
+                                    ? AppColors.primary
+                                    : AppColors.border,
                               ),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
                               onSelected: (_) => filters.setSection(''),
                             ),
                           ),
@@ -662,15 +732,20 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                                 labelStyle: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: filters.section == sec ? Colors.white : AppColors.textPrimary,
+                                  color: filters.section == sec
+                                      ? Colors.white
+                                      : AppColors.textPrimary,
                                 ),
                                 selected: filters.section == sec,
                                 selectedColor: AppColors.primary,
                                 backgroundColor: const Color(0xFFF8FAFC),
                                 side: BorderSide(
-                                  color: filters.section == sec ? AppColors.primary : AppColors.border,
+                                  color: filters.section == sec
+                                      ? AppColors.primary
+                                      : AppColors.border,
                                 ),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
                                 onSelected: (_) => filters.setSection(sec),
                               ),
                             ),
@@ -728,7 +803,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                           color: AppColors.fanta.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.edit_note, size: 20, color: AppColors.fanta),
+                        child: const Icon(Icons.edit_note,
+                            size: 20, color: AppColors.fanta),
                       ),
                       const SizedBox(width: 10),
                       const Text(
@@ -747,12 +823,18 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   // Title
                   const Text(
                     'TITLE *',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _titleController,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary),
                     decoration: const InputDecoration(
                       hintText: 'Enter announcement headline',
                     ),
@@ -762,13 +844,17 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   // Content Body
                   const Text(
                     'MESSAGE BODY',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _contentController,
                     maxLines: 5,
-                    style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                    style: const TextStyle(
+                        fontSize: 14, color: AppColors.textPrimary),
                     decoration: const InputDecoration(
                       hintText: 'Write announcement details here...',
                     ),
@@ -778,7 +864,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   // Attachments Section
                   const Text(
                     'ATTACHMENTS',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
 
@@ -786,7 +875,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   if (_existingAttachments.isNotEmpty) ...[
                     Text(
                       'CURRENT SAVED FILES (${_existingAttachments.length})',
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 6),
                     ListView.separated(
@@ -798,7 +890,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                         final filePath = _existingAttachments[index];
                         final fileName = filePath.split('/').last;
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(14),
@@ -806,7 +899,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.description, color: AppColors.primary, size: 20),
+                              const Icon(Icons.description,
+                                  color: AppColors.primary, size: 20),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
@@ -821,8 +915,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.close, color: AppColors.error, size: 18),
-                                onPressed: () => _removeExistingAttachment(index),
+                                icon: const Icon(Icons.close,
+                                    color: AppColors.error, size: 18),
+                                onPressed: () =>
+                                    _removeExistingAttachment(index),
                               ),
                             ],
                           ),
@@ -836,7 +932,10 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                   if (_newAttachments.isNotEmpty) ...[
                     Text(
                       'NEW FILES TO UPLOAD (${_newAttachments.length})',
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary),
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary),
                     ),
                     const SizedBox(height: 6),
                     ListView.separated(
@@ -847,15 +946,18 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                       itemBuilder: (context, index) {
                         final file = _newAttachments[index];
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withOpacity(0.04),
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                            border: Border.all(
+                                color: AppColors.primary.withOpacity(0.2)),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.attach_file, color: AppColors.primary, size: 20),
+                              const Icon(Icons.attach_file,
+                                  color: AppColors.primary, size: 20),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
@@ -873,13 +975,16 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                                     ),
                                     Text(
                                       _formatFileSize(file.size),
-                                      style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                                      style: const TextStyle(
+                                          fontSize: 10,
+                                          color: AppColors.textMuted),
                                     ),
                                   ],
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.close, color: AppColors.error, size: 18),
+                                icon: const Icon(Icons.close,
+                                    color: AppColors.error, size: 18),
                                 onPressed: () => _removeNewAttachment(index),
                               ),
                             ],
@@ -908,7 +1013,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.cloud_upload_outlined, color: AppColors.primary, size: 20),
+                          Icon(Icons.cloud_upload_outlined,
+                              color: AppColors.primary, size: 20),
                           SizedBox(width: 8),
                           Text(
                             '+ Select Files to Attach',
@@ -936,11 +1042,15 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                         children: [
                           Text(
                             'Schedule Broadcast',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary),
                           ),
                           Text(
                             'Publish at a specific future date & time',
-                            style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                            style: TextStyle(
+                                fontSize: 11, color: AppColors.textMuted),
                           ),
                         ],
                       ),
@@ -957,14 +1067,18 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                     const SizedBox(height: 14),
                     const Text(
                       'PUBLISH DATE & TIME',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     InkWell(
                       onTap: _selectDateTime,
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF8FAFC),
                           borderRadius: BorderRadius.circular(16),
@@ -975,10 +1089,12 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.calendar_today, size: 18, color: AppColors.fanta),
+                                const Icon(Icons.calendar_today,
+                                    size: 18, color: AppColors.fanta),
                                 const SizedBox(width: 10),
                                 Text(
-                                  DateFormat('dd MMM yyyy, hh:mm a').format(_startAt),
+                                  DateFormat('dd MMM yyyy, hh:mm a')
+                                      .format(_startAt),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -1013,7 +1129,8 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                 onPressed: _submitting ? null : _handleSubmit,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.fanta,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18)),
                   elevation: 4,
                   shadowColor: AppColors.fanta.withOpacity(0.4),
                 ),
@@ -1021,16 +1138,21 @@ class _EditAnnouncementScreenState extends State<EditAnnouncementScreen> {
                     ? const SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2.5),
                       )
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.check_circle_outline, color: Colors.white, size: 22),
+                          Icon(Icons.check_circle_outline,
+                              color: Colors.white, size: 22),
                           SizedBox(width: 8),
                           Text(
                             'Update Announcement',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                           ),
                         ],
                       ),

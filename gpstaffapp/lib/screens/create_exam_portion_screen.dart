@@ -12,17 +12,16 @@ import '../theme/app_theme.dart';
 import '../widgets/multi_select_chips.dart';
 import '../widgets/student_selector.dart';
 
-class CreateAnnouncementScreen extends StatefulWidget {
-  const CreateAnnouncementScreen({super.key});
+class CreateExamPortionScreen extends StatefulWidget {
+  const CreateExamPortionScreen({super.key});
 
   @override
-  State<CreateAnnouncementScreen> createState() =>
-      _CreateAnnouncementScreenState();
+  State<CreateExamPortionScreen> createState() =>
+      _CreateExamPortionScreenState();
 }
 
-class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
+class _CreateExamPortionScreenState extends State<CreateExamPortionScreen> {
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
 
   bool _isSchedule = false;
   DateTime _startAt = DateTime.now().add(const Duration(hours: 1));
@@ -43,7 +42,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
   @override
   void dispose() {
     _titleController.dispose();
-    _contentController.dispose();
     super.dispose();
   }
 
@@ -51,7 +49,8 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     try {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
-        type: FileType.any,
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
       );
 
       if (result != null && result.files.isNotEmpty) {
@@ -139,10 +138,9 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     final filters =
         Provider.of<AnnouncementFilterProvider>(context, listen: false);
     final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
 
     if (title.isEmpty) {
-      _showErrorDialog('Validation Error', 'Please enter announcement title.');
+      _showErrorDialog('Validation Error', 'Please enter exam portion title.');
       return;
     }
     if (filters.course.isEmpty) {
@@ -156,6 +154,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     }
     if (filters.usertype == 'INDIVIDUAL' && filters.student.isEmpty) {
       _showErrorDialog('Validation Error', 'Please select a target student.');
+      return;
+    }
+    if (_attachments.isEmpty) {
+      _showErrorDialog(
+          'Validation Error', 'Please attach at least one PDF file.');
       return;
     }
 
@@ -190,7 +193,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       }
 
       formData.fields.add(MapEntry('title', title));
-      formData.fields.add(MapEntry('content', content));
 
       if (_isSchedule) {
         formData.fields.add(const MapEntry('is_schedule', '1'));
@@ -224,7 +226,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
 
       final dio = ApiClient().dio;
       final res = await dio.post(
-        '/admin/announcement',
+        '/admin/examportion',
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -240,7 +242,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               title: const Text('Success',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: AppColors.primary)),
-              content: const Text('Announcement created successfully!'),
+              content: const Text('Exam portion created successfully!'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -301,7 +303,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     if (filters.loading) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Add Announcement')),
+        appBar: AppBar(title: const Text('Add Exam Portion')),
         body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -321,7 +323,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Add Announcement'),
+        title: const Text('Add Exam Portion'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
@@ -718,7 +720,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Card: Announcement Details
+            // Card: Exam Portion Details
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -746,12 +748,12 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                           color: AppColors.fanta.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.edit_note,
+                        child: const Icon(Icons.description_outlined,
                             size: 20, color: AppColors.fanta),
                       ),
                       const SizedBox(width: 10),
                       const Text(
-                        'CONTENT & DETAILS',
+                        'EXAM PORTION DETAILS',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
@@ -779,34 +781,14 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary),
                     decoration: const InputDecoration(
-                      hintText: 'Enter announcement headline',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Content Body
-                  const Text(
-                    'MESSAGE BODY',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _contentController,
-                    maxLines: 5,
-                    style: const TextStyle(
-                        fontSize: 14, color: AppColors.textPrimary),
-                    decoration: const InputDecoration(
-                      hintText: 'Write announcement details here...',
+                      hintText: 'Enter exam portion title',
                     ),
                   ),
                   const SizedBox(height: 16),
 
                   // Attachments
                   const Text(
-                    'ATTACHMENTS',
+                    'ATTACHMENTS (PDF) *',
                     style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -832,7 +814,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.attach_file,
+                              const Icon(Icons.picture_as_pdf_outlined,
                                   color: AppColors.primary, size: 20),
                               const SizedBox(width: 10),
                               Expanded(
@@ -893,7 +875,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                               color: AppColors.primary, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            '+ Select Files to Attach',
+                            '+ Select PDF Files to Attach',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -913,22 +895,24 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Schedule Broadcast',
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary),
-                          ),
-                          Text(
-                            'Publish at a specific future date & time',
-                            style: TextStyle(
-                                fontSize: 11, color: AppColors.textMuted),
-                          ),
-                        ],
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Schedule Publish',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary),
+                            ),
+                            Text(
+                              'Publish at a specific future date & time',
+                              style: TextStyle(
+                                  fontSize: 11, color: AppColors.textMuted),
+                            ),
+                          ],
+                        ),
                       ),
                       Switch(
                         value: _isSchedule,
@@ -1020,10 +1004,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.campaign, color: Colors.white, size: 22),
+                          Icon(Icons.description,
+                              color: Colors.white, size: 22),
                           SizedBox(width: 8),
                           Text(
-                            'Publish Announcement',
+                            'Publish Exam Portion',
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

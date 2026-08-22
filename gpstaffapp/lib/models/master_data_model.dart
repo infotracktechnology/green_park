@@ -8,7 +8,12 @@ class BranchItem {
     if (item is Map<String, dynamic>) {
       return BranchItem(
         id: item['id'] ?? item['branch_id'] ?? item['value'] ?? '',
-        name: (item['name'] ?? item['branch_name'] ?? item['label'] ?? item['id'] ?? '').toString(),
+        name: (item['name'] ??
+                item['branch_name'] ??
+                item['label'] ??
+                item['id'] ??
+                '')
+            .toString(),
       );
     }
     return BranchItem(id: item, name: item.toString());
@@ -56,7 +61,8 @@ class MasterDataModel {
 
     List<String> coachingTypesList = [];
     if (json['coachingtype'] is List) {
-      coachingTypesList = (json['coachingtype'] as List).map((e) => e.toString()).toList();
+      coachingTypesList =
+          (json['coachingtype'] as List).map((e) => e.toString()).toList();
     }
 
     List<String> hostelsList = [];

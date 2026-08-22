@@ -3,28 +3,28 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_client.dart';
-import '../models/announcement_model.dart';
+import '../models/exam_portion_model.dart';
 import '../providers/announcement_filter_provider.dart';
 import '../theme/app_theme.dart';
-import 'create_announcement_screen.dart';
-import 'edit_announcement_screen.dart';
+import 'create_exam_portion_screen.dart';
+import 'edit_exam_portion_screen.dart';
 
-class AnnouncementListScreen extends StatefulWidget {
-  const AnnouncementListScreen({super.key});
+class ExamPortionListScreen extends StatefulWidget {
+  const ExamPortionListScreen({super.key});
 
   @override
-  State<AnnouncementListScreen> createState() => _AnnouncementListScreenState();
+  State<ExamPortionListScreen> createState() => _ExamPortionListScreenState();
 }
 
-class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
+class _ExamPortionListScreenState extends State<ExamPortionListScreen> {
   String _filterType = '';
-  List<AnnouncementModel> _announcements = [];
+  List<ExamPortionModel> _examPortions = [];
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchAnnouncements();
+    _fetchExamPortions();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final filters =
           Provider.of<AnnouncementFilterProvider>(context, listen: false);
@@ -34,26 +34,26 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     });
   }
 
-  Future<void> _fetchAnnouncements() async {
+  Future<void> _fetchExamPortions() async {
     setState(() => _loading = true);
     try {
       final dio = ApiClient().dio;
       final endpoint = _filterType.isNotEmpty && _filterType != 'ALL'
-          ? '/admin/announcement?coaching_type=$_filterType'
-          : '/admin/announcement';
+          ? '/admin/examportion?coaching_type=$_filterType'
+          : '/admin/examportion';
 
       final res = await dio.get(endpoint);
       if (res.data != null && res.data['status'] == true) {
-        final list = res.data['announcements'];
+        final list = res.data['examportions'];
         if (list is List) {
           setState(() {
-            _announcements =
-                list.map((e) => AnnouncementModel.fromJson(e)).toList();
+            _examPortions =
+                list.map((e) => ExamPortionModel.fromJson(e)).toList();
           });
         }
       }
     } catch (e) {
-      debugPrint('Fetch announcements error: $e');
+      debugPrint('Fetch exam portions error: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -99,8 +99,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     }
   }
 
-  void _showAnnouncementDetailsModal(
-      BuildContext context, AnnouncementModel item) {
+  void _showDetailsModal(BuildContext context, ExamPortionModel item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -144,12 +143,12 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 color: AppColors.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.campaign,
+                              child: const Icon(Icons.description_outlined,
                                   color: AppColors.primary, size: 20),
                             ),
                             const SizedBox(width: 10),
                             const Text(
-                              'Announcement Details',
+                              'Exam Portion Details',
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -341,56 +340,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                         ),
                         const SizedBox(height: 18),
 
-                        // Message Body Card
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.borderLight),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.02),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                children: [
-                                  Icon(Icons.notes,
-                                      size: 16, color: AppColors.fanta),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'MESSAGE CONTENT',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.textPrimary,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              SelectableText(
-                                item.cleanContent.isNotEmpty
-                                    ? item.cleanContent
-                                    : 'No content body provided.',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-
                         // Attachments Card
                         if (item.attachments.isNotEmpty) ...[
                           Container(
@@ -429,7 +378,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                   itemBuilder: (context, idx) {
                                     final path = item.attachments[idx];
                                     final fileName =
-                                        AnnouncementModel.getAttachmentFileName(
+                                        ExamPortionModel.getAttachmentFileName(
                                             path);
                                     final fullUrl = path.startsWith('http')
                                         ? path
@@ -446,7 +395,8 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.description_outlined,
+                                          const Icon(
+                                              Icons.picture_as_pdf_outlined,
                                               color: AppColors.primary,
                                               size: 20),
                                           const SizedBox(width: 10),
@@ -589,7 +539,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Announcements'),
+        title: const Text('Exam Portions'),
       ),
       body: Column(
         children: [
@@ -625,7 +575,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                         setState(() {
                           _filterType = type == 'ALL' ? '' : type;
                         });
-                        _fetchAnnouncements();
+                        _fetchExamPortions();
                       },
                     ),
                   );
@@ -635,23 +585,23 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
           ),
           const Divider(height: 1, color: AppColors.borderLight),
 
-          // Announcements List
+          // Exam Portions List
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
                 await Future.wait([
-                  _fetchAnnouncements(),
+                  _fetchExamPortions(),
                   Provider.of<AnnouncementFilterProvider>(context,
                           listen: false)
                       .fetchMasterData(),
                 ]);
               },
               color: AppColors.fanta,
-              child: _loading && _announcements.isEmpty
+              child: _loading && _examPortions.isEmpty
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.fanta),
                     )
-                  : _announcements.isEmpty
+                  : _examPortions.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 100),
@@ -662,12 +612,12 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                   CircleAvatar(
                                     radius: 36,
                                     backgroundColor: Color(0xFFE0F2FE),
-                                    child: Icon(Icons.campaign_outlined,
+                                    child: Icon(Icons.description_outlined,
                                         size: 36, color: AppColors.primary),
                                   ),
                                   SizedBox(height: 16),
                                   Text(
-                                    'No Announcements',
+                                    'No Exam Portions',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -676,7 +626,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Tap + to add a new announcement',
+                                    'Tap + to add a new exam portion',
                                     style: TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textMuted),
@@ -688,15 +638,14 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                         )
                       : ListView.separated(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
-                          itemCount: _announcements.length,
+                          itemCount: _examPortions.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                            final item = _announcements[index];
+                            final item = _examPortions[index];
 
                             return InkWell(
-                              onTap: () =>
-                                  _showAnnouncementDetailsModal(context, item),
+                              onTap: () => _showDetailsModal(context, item),
                               borderRadius: BorderRadius.circular(20),
                               child: Container(
                                 padding: const EdgeInsets.all(16),
@@ -721,75 +670,80 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Wrap(
-                                          spacing: 6,
-                                          runSpacing: 4,
-                                          children: [
-                                            // User Type
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 3),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.primary
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                item.usertype,
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.primary,
-                                                ),
-                                              ),
-                                            ),
-                                            // Course
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 3),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.fanta
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                item.course ?? 'All',
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.fanta,
-                                                ),
-                                              ),
-                                            ),
-                                            // Scheduled
-                                            if (item.isSchedule == 1)
+                                        Expanded(
+                                          child: Wrap(
+                                            spacing: 6,
+                                            runSpacing: 4,
+                                            children: [
+                                              // User Type
                                               Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 8,
                                                         vertical: 3),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.amber.shade100,
+                                                  color: AppColors.primary
+                                                      .withOpacity(0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
-                                                  'SCHEDULED',
-                                                  style: TextStyle(
+                                                  item.usertype,
+                                                  style: const TextStyle(
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.bold,
-                                                    color:
-                                                        Colors.amber.shade900,
+                                                    color: AppColors.primary,
                                                   ),
                                                 ),
                                               ),
-                                          ],
+                                              // Course
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 3),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.fanta
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  item.course ?? 'All',
+                                                  style: const TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.fanta,
+                                                  ),
+                                                ),
+                                              ),
+                                              // Scheduled
+                                              if (item.isSchedule == 1)
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 3),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        Colors.amber.shade100,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                  ),
+                                                  child: Text(
+                                                    'SCHEDULED',
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          Colors.amber.shade900,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
                                         ),
                                         Text(
                                           _formatDate(item.createdAt),
@@ -810,20 +764,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-
-                                    // Clean Content Preview
-                                    if (item.cleanContent.isNotEmpty)
-                                      Text(
-                                        item.cleanContent,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                          height: 1.4,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
 
                                     const SizedBox(height: 12),
                                     const Divider(
@@ -900,9 +840,8 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                           children: [
                                             // View Details button
                                             InkWell(
-                                              onTap: () =>
-                                                  _showAnnouncementDetailsModal(
-                                                      context, item),
+                                              onTap: () => _showDetailsModal(
+                                                  context, item),
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                               child: Container(
@@ -917,6 +856,8 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: const Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
                                                     Icon(
                                                         Icons
@@ -948,13 +889,12 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (_) =>
-                                                        EditAnnouncementScreen(
-                                                            announcementId:
-                                                                item.id),
+                                                        EditExamPortionScreen(
+                                                            portionId: item.id),
                                                   ),
                                                 );
                                                 if (res == true) {
-                                                  _fetchAnnouncements();
+                                                  _fetchExamPortions();
                                                 }
                                               },
                                               borderRadius:
@@ -971,6 +911,8 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: const Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
                                                     Icon(Icons.edit_outlined,
                                                         size: 13,
@@ -1007,9 +949,9 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
         onPressed: () async {
           final res = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const CreateAnnouncementScreen()),
+            MaterialPageRoute(builder: (_) => const CreateExamPortionScreen()),
           );
-          if (res == true) _fetchAnnouncements();
+          if (res == true) _fetchExamPortions();
         },
         backgroundColor: AppColors.fanta,
         elevation: 4,

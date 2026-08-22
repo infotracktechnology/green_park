@@ -17,39 +17,68 @@ class AnswerkeyController extends Controller
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
             ->latest()->get();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'answerkeys' => $answerkeys], 200);
+        }
+
         return view('answerkey.index', compact('answerkeys'));
     }
 
 
     public function create()
     {
-     
+
         return view('answerkey.create',);
+    }
+
+    public function show(Request $request, AnswerKey $answerkey)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'answerkey' => $answerkey]);
+        }
+
+        return redirect()->route('answerkey.index');
     }
 
 
     public function store(Request $request)
     {
-         $data = $request->except('file');
+         $data = $request->except(['_token', '_method', 'file']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
+        }
+
         $file_path = [];
         if ($request->hasFile('file')) {
-            foreach($request->file('file') as $file){
-                $originalName = $file->getClientOriginalName();
-                $fileName = time().'_'.$originalName;
-                $file->move('answer_key',$fileName);
-                $file_path[] = 'answer_key/'.$fileName;   
+            $destinationPath = public_path('answer_key');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
             }
-           
-           
+            foreach ($request->file('file') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-' . uniqid() . '-' . $originalName;
+                    $file->move($destinationPath, $fileName);
+                    $file_path[] = 'answer_key/' . $fileName;
+                }
+            }
         }
-        $data['file_path'] = $file_path ?: null;
-        AnswerKey::create($data);
+        $data['file_path'] = !empty($file_path) ? array_values($file_path) : null;
+        $answerkey = AnswerKey::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Answer key created successfully.', 'data' => $answerkey], 200);
+        }
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key added successfully!');
     }
@@ -63,31 +92,62 @@ class AnswerkeyController extends Controller
 
         $students = Student::StudentFilterQuery($answerkey->branch, $answerkey->course, $answerkey->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'answerkey' => $answerkey, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
+
         return view('answerkey.edit', compact('answerkey', 'type', 'section', 'students'));
     }
 
     public function update(Request $request, AnswerKey $answerkey)
     {
-         $data = $request->except('file');
+         $data = $request->except(['_token', '_method', 'file']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-        $file_path = [];
-        if ($request->hasFile('file')) {
-            foreach($request->file('file')as $file){
-                $originalName = $file->getClientOriginalName();
-                $fileName = time().'_'.$originalName;
-                $file->move('answer_key',$fileName);
-                $file_path[] = 'answer_key/'.$fileName;
-            }
-           
-
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
         }
-        $data['file_path'] = $file_path ?: null;
+
+        // Retain remaining existing files
+        $file_path = [];
+        if ($request->has('existing_file')) {
+            $existing = $request->input('existing_file');
+            if (is_array($existing)) {
+                $file_path = array_values(array_filter($existing));
+            } elseif (is_string($existing) && !empty($existing)) {
+                $file_path = [$existing];
+            }
+        }
+
+        // Upload and append new files
+        if ($request->hasFile('file')) {
+            $destinationPath = public_path('answer_key');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+            foreach ($request->file('file') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-' . uniqid() . '-' . $originalName;
+                    $file->move($destinationPath, $fileName);
+                    $file_path[] = 'answer_key/' . $fileName;
+                }
+            }
+        }
+        $data['file_path'] = !empty($file_path) ? array_values($file_path) : null;
         $answerkey->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Answer key updated successfully.', 'data' => $answerkey], 200);
+        }
 
         return redirect()->route('answerkey.index')->with('success', 'Answer Key updated successfully!');
     }

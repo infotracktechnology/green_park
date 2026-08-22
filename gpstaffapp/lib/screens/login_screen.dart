@@ -45,18 +45,23 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       setState(() => _submitting = false);
       if (res['success'] == true) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/dashboard', (route) => false);
       } else {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: const Text('Authentication Failed', style: TextStyle(fontWeight: FontWeight.bold)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Text('Authentication Failed',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             content: Text(res['message'] ?? 'Invalid username or password.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('OK', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                child: const Text('OK',
+                    style: TextStyle(
+                        color: AppColors.primary, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -75,7 +80,8 @@ class _LoginScreenState extends State<LoginScreen> {
             // Top Primary Curved Banner
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(top: 64, bottom: 48, left: 24, right: 24),
+              padding: const EdgeInsets.only(
+                  top: 64, bottom: 48, left: 24, right: 24),
               decoration: const BoxDecoration(
                 color: AppColors.primary,
                 borderRadius: BorderRadius.only(
@@ -100,7 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+                      border: Border.all(
+                          color: Colors.white.withOpacity(0.5), width: 2),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.15),
@@ -175,7 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 4),
                       const Text(
                         'Sign in with your admin or staff credentials',
-                        style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                        style:
+                            TextStyle(fontSize: 12, color: AppColors.textMuted),
                       ),
                       const SizedBox(height: 24),
 
@@ -192,10 +200,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _usernameController,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary),
                         decoration: const InputDecoration(
                           hintText: 'Enter your username',
-                          prefixIcon: Icon(Icons.person, color: AppColors.primary, size: 20),
+                          prefixIcon: Icon(Icons.person,
+                              color: AppColors.primary, size: 20),
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -214,17 +226,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextField(
                         controller: _passwordController,
                         obscureText: !_showPassword,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary),
                         decoration: InputDecoration(
                           hintText: 'Enter your password',
-                          prefixIcon: const Icon(Icons.lock_outline, color: AppColors.primary, size: 20),
+                          prefixIcon: const Icon(Icons.lock_outline,
+                              color: AppColors.primary, size: 20),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _showPassword ? Icons.visibility_off : Icons.visibility,
+                              _showPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: AppColors.textMuted,
                               size: 20,
                             ),
-                            onPressed: () => setState(() => _showPassword = !_showPassword),
+                            onPressed: () =>
+                                setState(() => _showPassword = !_showPassword),
                           ),
                         ),
                       ),
@@ -238,7 +257,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: _submitting ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.fanta,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                             elevation: 4,
                             shadowColor: AppColors.fanta.withOpacity(0.4),
                           ),
@@ -246,17 +266,22 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? const SizedBox(
                                   width: 22,
                                   height: 22,
-                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2.5),
                                 )
                               : const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
                                       'Sign In',
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
                                     ),
                                     SizedBox(width: 8),
-                                    Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+                                    Icon(Icons.arrow_forward,
+                                        size: 18, color: Colors.white),
                                   ],
                                 ),
                         ),
@@ -272,7 +297,10 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Text(
                 'GPCC Academic Management System',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.textMuted),
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textMuted),
               ),
             ),
           ],

@@ -48,10 +48,12 @@ class _StudentSelectorState extends State<StudentSelector> {
   @override
   void didUpdateWidget(covariant StudentSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedStudentId != widget.selectedStudentId && widget.selectedStudentId.isNotEmpty) {
+    if (oldWidget.selectedStudentId != widget.selectedStudentId &&
+        widget.selectedStudentId.isNotEmpty) {
       _isExpanded = false;
     }
-    if (oldWidget.searchValue != widget.searchValue && widget.searchValue != _searchController.text) {
+    if (oldWidget.searchValue != widget.searchValue &&
+        widget.searchValue != _searchController.text) {
       _searchController.text = widget.searchValue;
     }
   }
@@ -89,7 +91,8 @@ class _StudentSelectorState extends State<StudentSelector> {
 
   String get _selectedStudentName {
     if (widget.selectedStudentId.isEmpty) return '';
-    return widget.studentOptions[widget.selectedStudentId] ?? widget.selectedStudentId;
+    return widget.studentOptions[widget.selectedStudentId] ??
+        widget.selectedStudentId;
   }
 
   @override
@@ -109,7 +112,6 @@ class _StudentSelectorState extends State<StudentSelector> {
           ),
         ),
         const SizedBox(height: 8),
-
         if (widget.selectedStudentId.isNotEmpty && !_isExpanded)
           // Collapsed Selected Card
           Container(
@@ -128,7 +130,8 @@ class _StudentSelectorState extends State<StudentSelector> {
                     color: AppColors.primary.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.person, color: AppColors.primary, size: 22),
+                  child: const Icon(Icons.person,
+                      color: AppColors.primary, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -161,13 +164,18 @@ class _StudentSelectorState extends State<StudentSelector> {
                   onPressed: () => setState(() => _isExpanded = true),
                   style: TextButton.styleFrom(
                     backgroundColor: AppColors.primary.withOpacity(0.1),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                     minimumSize: Size.zero,
                   ),
                   child: const Text(
                     'Change',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary),
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -176,7 +184,8 @@ class _StudentSelectorState extends State<StudentSelector> {
                     widget.onSelectStudent('');
                     setState(() => _isExpanded = true);
                   },
-                  icon: const Icon(Icons.close, color: AppColors.error, size: 18),
+                  icon:
+                      const Icon(Icons.close, color: AppColors.error, size: 18),
                   style: IconButton.styleFrom(
                     backgroundColor: AppColors.error.withOpacity(0.08),
                     padding: const EdgeInsets.all(6),
@@ -204,7 +213,8 @@ class _StudentSelectorState extends State<StudentSelector> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.search, size: 16, color: AppColors.primary),
+                        const Icon(Icons.search,
+                            size: 16, color: AppColors.primary),
                         const SizedBox(width: 6),
                         const Text(
                           'Search & Filter Students',
@@ -217,7 +227,8 @@ class _StudentSelectorState extends State<StudentSelector> {
                         if (!widget.loading && students.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
@@ -238,14 +249,18 @@ class _StudentSelectorState extends State<StudentSelector> {
                       GestureDetector(
                         onTap: () => setState(() => _isExpanded = false),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade200,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
                             'Done',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textSecondary),
                           ),
                         ),
                       ),
@@ -268,14 +283,18 @@ class _StudentSelectorState extends State<StudentSelector> {
                       _debounceTimer?.cancel();
                       widget.onSearch?.call(val);
                     },
-                    style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+                    style: const TextStyle(
+                        fontSize: 13, color: AppColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'Search by student name or ID...',
-                      hintStyle: const TextStyle(fontSize: 12, color: AppColors.textMuted),
-                      prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.primary),
+                      hintStyle: const TextStyle(
+                          fontSize: 12, color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.search,
+                          size: 18, color: AppColors.primary),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.cancel, size: 16, color: AppColors.textMuted),
+                              icon: const Icon(Icons.cancel,
+                                  size: 16, color: AppColors.textMuted),
                               onPressed: () {
                                 _searchController.clear();
                                 _onSearchInput('');
@@ -285,7 +304,8 @@ class _StudentSelectorState extends State<StudentSelector> {
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
                     ),
                   ),
                 ),
@@ -305,15 +325,20 @@ class _StudentSelectorState extends State<StudentSelector> {
                             labelStyle: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: widget.selectedSection.isEmpty ? Colors.white : AppColors.textSecondary,
+                              color: widget.selectedSection.isEmpty
+                                  ? Colors.white
+                                  : AppColors.textSecondary,
                             ),
                             selected: widget.selectedSection.isEmpty,
                             selectedColor: AppColors.primary,
                             backgroundColor: Colors.white,
                             side: BorderSide(
-                              color: widget.selectedSection.isEmpty ? AppColors.primary : AppColors.border,
+                              color: widget.selectedSection.isEmpty
+                                  ? AppColors.primary
+                                  : AppColors.border,
                             ),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                             onSelected: (_) => widget.onSelectSection?.call(''),
                           ),
                         ),
@@ -325,16 +350,22 @@ class _StudentSelectorState extends State<StudentSelector> {
                               labelStyle: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: widget.selectedSection == sec ? Colors.white : AppColors.textSecondary,
+                                color: widget.selectedSection == sec
+                                    ? Colors.white
+                                    : AppColors.textSecondary,
                               ),
                               selected: widget.selectedSection == sec,
                               selectedColor: AppColors.primary,
                               backgroundColor: Colors.white,
                               side: BorderSide(
-                                color: widget.selectedSection == sec ? AppColors.primary : AppColors.border,
+                                color: widget.selectedSection == sec
+                                    ? AppColors.primary
+                                    : AppColors.border,
                               ),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              onSelected: (_) => widget.onSelectSection?.call(sec),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              onSelected: (_) =>
+                                  widget.onSelectSection?.call(sec),
                             ),
                           ),
                         ),
@@ -354,12 +385,14 @@ class _StudentSelectorState extends State<StudentSelector> {
                           SizedBox(
                             width: 24,
                             height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.fanta),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.fanta),
                           ),
                           SizedBox(height: 8),
                           Text(
                             'Loading students...',
-                            style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                            style: TextStyle(
+                                fontSize: 11, color: AppColors.textMuted),
                           ),
                         ],
                       ),
@@ -389,12 +422,17 @@ class _StudentSelectorState extends State<StudentSelector> {
                           },
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary.withOpacity(0.08) : Colors.white,
+                              color: isSelected
+                                  ? AppColors.primary.withOpacity(0.08)
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: isSelected ? AppColors.primary.withOpacity(0.3) : AppColors.borderLight,
+                                color: isSelected
+                                    ? AppColors.primary.withOpacity(0.3)
+                                    : AppColors.borderLight,
                               ),
                             ),
                             child: Row(
@@ -403,41 +441,52 @@ class _StudentSelectorState extends State<StudentSelector> {
                                   width: 32,
                                   height: 32,
                                   decoration: BoxDecoration(
-                                    color: isSelected ? AppColors.primary : Colors.grey.shade100,
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
                                     Icons.person,
                                     size: 16,
-                                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppColors.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item.name,
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
-                                          color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : AppColors.textPrimary,
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
                                         'ID: ${item.id}',
-                                        style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                                        style: const TextStyle(
+                                            fontSize: 10,
+                                            color: AppColors.textMuted),
                                       ),
                                     ],
                                   ),
                                 ),
                                 if (isSelected)
-                                  const Icon(Icons.check_circle, size: 18, color: AppColors.primary)
+                                  const Icon(Icons.check_circle,
+                                      size: 18, color: AppColors.primary)
                                 else
-                                  const Icon(Icons.chevron_right, size: 16, color: AppColors.textMuted),
+                                  const Icon(Icons.chevron_right,
+                                      size: 16, color: AppColors.textMuted),
                               ],
                             ),
                           ),
@@ -451,16 +500,21 @@ class _StudentSelectorState extends State<StudentSelector> {
                     child: Center(
                       child: Column(
                         children: [
-                          Icon(Icons.person_search_outlined, size: 28, color: AppColors.textMuted),
+                          Icon(Icons.person_search_outlined,
+                              size: 28, color: AppColors.textMuted),
                           SizedBox(height: 6),
                           Text(
                             'No matching students',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textSecondary),
                           ),
                           SizedBox(height: 2),
                           Text(
                             'Try searching with a different name or ID',
-                            style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                            style: TextStyle(
+                                fontSize: 11, color: AppColors.textMuted),
                           ),
                         ],
                       ),

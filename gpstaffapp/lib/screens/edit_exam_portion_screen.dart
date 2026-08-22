@@ -7,73 +7,121 @@ import 'package:dio/dio.dart';
 
 import '../api/api_client.dart';
 import '../models/master_data_model.dart';
+import '../models/exam_portion_model.dart';
 import '../providers/announcement_filter_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/multi_select_chips.dart';
 import '../widgets/student_selector.dart';
 
-class CreateAnnouncementScreen extends StatefulWidget {
-  const CreateAnnouncementScreen({super.key});
+class EditExamPortionScreen extends StatefulWidget {
+  final dynamic portionId;
+
+  const EditExamPortionScreen({super.key, required this.portionId});
 
   @override
-  State<CreateAnnouncementScreen> createState() =>
-      _CreateAnnouncementScreenState();
+  State<EditExamPortionScreen> createState() => _EditExamPortionScreenState();
 }
 
-class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
+class _EditExamPortionScreenState extends State<EditExamPortionScreen> {
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
 
   bool _isSchedule = false;
-  DateTime _startAt = DateTime.now().add(const Duration(hours: 1));
-  final List<PlatformFile> _attachments = [];
+  DateTime _startAt = DateTime.now();
+  final List<PlatformFile> _newAttachments = [];
+  List<String> _existingAttachments = [];
+  bool _fetching = true;
   bool _submitting = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final filters =
-          Provider.of<AnnouncementFilterProvider>(context, listen: false);
-      filters.resetAll();
-      filters.fetchMasterData();
+      _loadData();
     });
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _contentController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _fetching = true);
+    final filters =
+        Provider.of<AnnouncementFilterProvider>(context, listen: false);
+    await filters.fetchMasterData();
+
+    try {
+      final dio = ApiClient().dio;
+      final res = await dio.get('/admin/examportion/${widget.portionId}/edit');
+
+      if (res.data != null && res.data['status'] == true) {
+        final data = res.data['examportion'] as Map<String, dynamic>;
+        final model = ExamPortionModel.fromJson(data);
+
+        // Pre-fill filters
+        final Map<String, dynamic> combined = Map<String, dynamic>.from(data);
+        if (res.data['students'] != null && res.data['students'] is Map) {
+          combined['studentOptions'] = res.data['students'];
+        }
+        if (res.data['section'] != null && res.data['section'] is List) {
+          combined['sectionOptions'] = res.data['section'];
+        }
+        filters.setAllFilters(combined);
+
+        _titleController.text = model.title;
+        _isSchedule = model.isSchedule == 1;
+
+        if (model.startAt != null && model.startAt!.isNotEmpty) {
+          try {
+            _startAt = DateTime.parse(model.startAt!);
+          } catch (_) {}
+        }
+
+        _existingAttachments = List<String>.from(model.attachments);
+      }
+    } catch (e) {
+      debugPrint('Edit exam portion fetch error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Failed to load exam portion details'),
+              backgroundColor: AppColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _fetching = false);
+    }
   }
 
   Future<void> _pickFiles() async {
     try {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
-        type: FileType.any,
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
       );
 
       if (result != null && result.files.isNotEmpty) {
         setState(() {
-          _attachments.addAll(result.files);
+          _newAttachments.addAll(result.files);
         });
       }
     } catch (e) {
       debugPrint('File picker error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Failed to pick files'),
-              backgroundColor: AppColors.error),
-        );
-      }
     }
   }
 
-  void _removeAttachment(int index) {
+  void _removeNewAttachment(int index) {
     setState(() {
-      _attachments.removeAt(index);
+      _newAttachments.removeAt(index);
+    });
+  }
+
+  void _removeExistingAttachment(int index) {
+    setState(() {
+      _existingAttachments.removeAt(index);
     });
   }
 
@@ -139,10 +187,9 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     final filters =
         Provider.of<AnnouncementFilterProvider>(context, listen: false);
     final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
 
     if (title.isEmpty) {
-      _showErrorDialog('Validation Error', 'Please enter announcement title.');
+      _showErrorDialog('Validation Error', 'Please enter exam portion title.');
       return;
     }
     if (filters.course.isEmpty) {
@@ -163,6 +210,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
 
     try {
       final formData = FormData();
+      formData.fields.add(const MapEntry('_method', 'PUT'));
 
       formData.fields.add(MapEntry('academic_year', filters.academicYear));
       formData.fields.add(MapEntry('usertype', filters.usertype));
@@ -190,7 +238,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       }
 
       formData.fields.add(MapEntry('title', title));
-      formData.fields.add(MapEntry('content', content));
 
       if (_isSchedule) {
         formData.fields.add(const MapEntry('is_schedule', '1'));
@@ -198,7 +245,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
         formData.fields.add(MapEntry('start_at', dateStr));
       }
 
-      for (var file in _attachments) {
+      for (var file in _existingAttachments) {
+        formData.fields.add(MapEntry('existing_attachment[]', file));
+      }
+
+      for (var file in _newAttachments) {
         if (!kIsWeb && file.path != null) {
           formData.files.add(
             MapEntry(
@@ -224,7 +275,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
 
       final dio = ApiClient().dio;
       final res = await dio.post(
-        '/admin/announcement',
+        '/admin/examportion/${widget.portionId}?_method=PUT',
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -240,7 +291,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               title: const Text('Success',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: AppColors.primary)),
-              content: const Text('Announcement created successfully!'),
+              content: const Text('Exam portion updated successfully!'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -256,13 +307,13 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
             ),
           );
         } else {
-          final msg = (res.data is Map ? res.data['message'] : null) ??
-              'Creation failed';
+          final msg =
+              (res.data is Map ? res.data['message'] : null) ?? 'Update failed';
           _showErrorDialog('Error', msg.toString());
         }
       }
     } on DioException catch (e) {
-      String msg = 'Submission failed';
+      String msg = 'Update failed';
       if (e.response?.data != null && e.response?.data is Map) {
         msg = e.response?.data['message']?.toString() ?? msg;
       }
@@ -298,10 +349,10 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
   Widget build(BuildContext context) {
     final filters = Provider.of<AnnouncementFilterProvider>(context);
 
-    if (filters.loading) {
+    if (_fetching || filters.loading) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Add Announcement')),
+        appBar: AppBar(title: const Text('Edit Exam Portion')),
         body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -309,7 +360,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               CircularProgressIndicator(color: AppColors.fanta),
               SizedBox(height: 12),
               Text(
-                'Loading master data...',
+                'Loading exam portion...',
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
@@ -321,7 +372,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Add Announcement'),
+        title: const Text('Edit Exam Portion'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
@@ -718,7 +769,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Card: Announcement Details
+            // Card: Exam Portion Details
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -746,12 +797,12 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                           color: AppColors.fanta.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.edit_note,
+                        child: const Icon(Icons.description_outlined,
                             size: 20, color: AppColors.fanta),
                       ),
                       const SizedBox(width: 10),
                       const Text(
-                        'CONTENT & DETAILS',
+                        'EXAM PORTION DETAILS',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
@@ -779,34 +830,14 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary),
                     decoration: const InputDecoration(
-                      hintText: 'Enter announcement headline',
+                      hintText: 'Enter exam portion title',
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Content Body
+                  // Attachments Section
                   const Text(
-                    'MESSAGE BODY',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _contentController,
-                    maxLines: 5,
-                    style: const TextStyle(
-                        fontSize: 14, color: AppColors.textPrimary),
-                    decoration: const InputDecoration(
-                      hintText: 'Write announcement details here...',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Attachments
-                  const Text(
-                    'ATTACHMENTS',
+                    'ATTACHMENTS (PDF)',
                     style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -814,14 +845,24 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                   ),
                   const SizedBox(height: 8),
 
-                  if (_attachments.isNotEmpty)
+                  // Existing Saved Files
+                  if (_existingAttachments.isNotEmpty) ...[
+                    Text(
+                      'CURRENT SAVED FILES (${_existingAttachments.length})',
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 6),
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _attachments.length,
+                      itemCount: _existingAttachments.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 6),
                       itemBuilder: (context, index) {
-                        final file = _attachments[index];
+                        final filePath = _existingAttachments[index];
+                        final fileName = filePath.split('/').last;
                         return Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 10),
@@ -829,6 +870,63 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                             color: const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(color: AppColors.border),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.picture_as_pdf_outlined,
+                                  color: AppColors.primary, size: 20),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  fileName,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close,
+                                    color: AppColors.error, size: 18),
+                                onPressed: () =>
+                                    _removeExistingAttachment(index),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // Newly Added Files
+                  if (_newAttachments.isNotEmpty) ...[
+                    Text(
+                      'NEW FILES TO UPLOAD (${_newAttachments.length})',
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 6),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _newAttachments.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 6),
+                      itemBuilder: (context, index) {
+                        final file = _newAttachments[index];
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.04),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                                color: AppColors.primary.withOpacity(0.2)),
                           ),
                           child: Row(
                             children: [
@@ -844,7 +942,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
+                                        color: AppColors.primary,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -861,15 +959,15 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                               IconButton(
                                 icon: const Icon(Icons.close,
                                     color: AppColors.error, size: 18),
-                                onPressed: () => _removeAttachment(index),
+                                onPressed: () => _removeNewAttachment(index),
                               ),
                             ],
                           ),
                         );
                       },
                     ),
-
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 12),
+                  ],
 
                   // Pick File Button
                   InkWell(
@@ -893,7 +991,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                               color: AppColors.primary, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            '+ Select Files to Attach',
+                            '+ Select PDF Files to Attach',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -913,22 +1011,24 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Schedule Broadcast',
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary),
-                          ),
-                          Text(
-                            'Publish at a specific future date & time',
-                            style: TextStyle(
-                                fontSize: 11, color: AppColors.textMuted),
-                          ),
-                        ],
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Schedule Publish',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary),
+                            ),
+                            Text(
+                              'Publish at a specific future date & time',
+                              style: TextStyle(
+                                  fontSize: 11, color: AppColors.textMuted),
+                            ),
+                          ],
+                        ),
                       ),
                       Switch(
                         value: _isSchedule,
@@ -1020,10 +1120,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.campaign, color: Colors.white, size: 22),
+                          Icon(Icons.check_circle_outline,
+                              color: Colors.white, size: 22),
                           SizedBox(width: 8),
                           Text(
-                            'Publish Announcement',
+                            'Update Exam Portion',
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

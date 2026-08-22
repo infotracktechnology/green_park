@@ -3,28 +3,28 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_client.dart';
-import '../models/announcement_model.dart';
+import '../models/question_key_model.dart';
 import '../providers/announcement_filter_provider.dart';
 import '../theme/app_theme.dart';
-import 'create_announcement_screen.dart';
-import 'edit_announcement_screen.dart';
+import 'create_question_key_screen.dart';
+import 'edit_question_key_screen.dart';
 
-class AnnouncementListScreen extends StatefulWidget {
-  const AnnouncementListScreen({super.key});
+class QuestionKeyListScreen extends StatefulWidget {
+  const QuestionKeyListScreen({super.key});
 
   @override
-  State<AnnouncementListScreen> createState() => _AnnouncementListScreenState();
+  State<QuestionKeyListScreen> createState() => _QuestionKeyListScreenState();
 }
 
-class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
+class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
   String _filterType = '';
-  List<AnnouncementModel> _announcements = [];
+  List<QuestionKeyModel> _items = [];
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchAnnouncements();
+    _fetchItems();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final filters =
           Provider.of<AnnouncementFilterProvider>(context, listen: false);
@@ -34,26 +34,25 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     });
   }
 
-  Future<void> _fetchAnnouncements() async {
+  Future<void> _fetchItems() async {
     setState(() => _loading = true);
     try {
       final dio = ApiClient().dio;
       final endpoint = _filterType.isNotEmpty && _filterType != 'ALL'
-          ? '/admin/announcement?coaching_type=$_filterType'
-          : '/admin/announcement';
+          ? '/admin/questionkey?coaching_type=$_filterType'
+          : '/admin/questionkey';
 
       final res = await dio.get(endpoint);
       if (res.data != null && res.data['status'] == true) {
-        final list = res.data['announcements'];
+        final list = res.data['questionkeys'];
         if (list is List) {
           setState(() {
-            _announcements =
-                list.map((e) => AnnouncementModel.fromJson(e)).toList();
+            _items = list.map((e) => QuestionKeyModel.fromJson(e)).toList();
           });
         }
       }
     } catch (e) {
-      debugPrint('Fetch announcements error: $e');
+      debugPrint('Fetch question keys error: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -99,8 +98,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     }
   }
 
-  void _showAnnouncementDetailsModal(
-      BuildContext context, AnnouncementModel item) {
+  void _showDetailsModal(BuildContext context, QuestionKeyModel item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -118,7 +116,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
               ),
               child: Column(
                 children: [
-                  // Drag Handle
                   const SizedBox(height: 12),
                   Container(
                     width: 40,
@@ -129,8 +126,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Header
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
@@ -144,12 +139,12 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 color: AppColors.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.campaign,
+                              child: const Icon(Icons.quiz_outlined,
                                   color: AppColors.primary, size: 20),
                             ),
                             const SizedBox(width: 10),
                             const Text(
-                              'Announcement Details',
+                              'Question Paper Details',
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -167,14 +162,11 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                     ),
                   ),
                   const Divider(height: 1, color: AppColors.borderLight),
-
-                  // Body Content
                   Expanded(
                     child: ListView(
                       controller: scrollController,
                       padding: const EdgeInsets.all(20),
                       children: [
-                        // Badges Row
                         Wrap(
                           spacing: 8,
                           runSpacing: 6,
@@ -231,8 +223,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                           ],
                         ),
                         const SizedBox(height: 12),
-
-                        // Title
                         SelectableText(
                           item.title,
                           style: const TextStyle(
@@ -243,8 +233,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                           ),
                         ),
                         const SizedBox(height: 6),
-
-                        // Created Date & Schedule Date
                         Row(
                           children: [
                             const Icon(Icons.access_time,
@@ -277,8 +265,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                           ),
                         ],
                         const SizedBox(height: 18),
-
-                        // Target Audience Card
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -340,59 +326,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-
-                        // Message Body Card
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.borderLight),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.02),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                children: [
-                                  Icon(Icons.notes,
-                                      size: 16, color: AppColors.fanta),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'MESSAGE CONTENT',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.textPrimary,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              SelectableText(
-                                item.cleanContent.isNotEmpty
-                                    ? item.cleanContent
-                                    : 'No content body provided.',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-
-                        // Attachments Card
-                        if (item.attachments.isNotEmpty) ...[
+                        if (item.files.isNotEmpty) ...[
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -409,7 +343,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                         size: 16, color: AppColors.primary),
                                     const SizedBox(width: 6),
                                     Text(
-                                      'ATTACHMENTS (${item.attachments.length})',
+                                      'ATTACHMENTS (${item.files.length})',
                                       style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w900,
@@ -423,18 +357,16 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 ListView.separated(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: item.attachments.length,
+                                  itemCount: item.files.length,
                                   separatorBuilder: (_, __) =>
                                       const SizedBox(height: 8),
                                   itemBuilder: (context, idx) {
-                                    final path = item.attachments[idx];
+                                    final path = item.files[idx];
                                     final fileName =
-                                        AnnouncementModel.getAttachmentFileName(
-                                            path);
+                                        QuestionKeyModel.getFileName(path);
                                     final fullUrl = path.startsWith('http')
                                         ? path
                                         : '${ApiClient.baseUrl}/${path.startsWith('/') ? path.substring(1) : path}';
-
                                     return Container(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 12, vertical: 10),
@@ -589,11 +521,10 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Announcements'),
+        title: const Text('Question Papers'),
       ),
       body: Column(
         children: [
-          // Filter Tabs Bar
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -625,7 +556,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                         setState(() {
                           _filterType = type == 'ALL' ? '' : type;
                         });
-                        _fetchAnnouncements();
+                        _fetchItems();
                       },
                     ),
                   );
@@ -634,24 +565,22 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
             ),
           ),
           const Divider(height: 1, color: AppColors.borderLight),
-
-          // Announcements List
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
                 await Future.wait([
-                  _fetchAnnouncements(),
+                  _fetchItems(),
                   Provider.of<AnnouncementFilterProvider>(context,
                           listen: false)
                       .fetchMasterData(),
                 ]);
               },
               color: AppColors.fanta,
-              child: _loading && _announcements.isEmpty
+              child: _loading && _items.isEmpty
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.fanta),
                     )
-                  : _announcements.isEmpty
+                  : _items.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 100),
@@ -662,12 +591,12 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                   CircleAvatar(
                                     radius: 36,
                                     backgroundColor: Color(0xFFE0F2FE),
-                                    child: Icon(Icons.campaign_outlined,
+                                    child: Icon(Icons.quiz_outlined,
                                         size: 36, color: AppColors.primary),
                                   ),
                                   SizedBox(height: 16),
                                   Text(
-                                    'No Announcements',
+                                    'No Question Papers',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -676,7 +605,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Tap + to add a new announcement',
+                                    'Tap + to add a new question paper',
                                     style: TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textMuted),
@@ -688,15 +617,13 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                         )
                       : ListView.separated(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
-                          itemCount: _announcements.length,
+                          itemCount: _items.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                            final item = _announcements[index];
-
+                            final item = _items[index];
                             return InkWell(
-                              onTap: () =>
-                                  _showAnnouncementDetailsModal(context, item),
+                              onTap: () => _showDetailsModal(context, item),
                               borderRadius: BorderRadius.circular(20),
                               child: Container(
                                 padding: const EdgeInsets.all(16),
@@ -716,80 +643,81 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Top Row: Badges + Date
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Wrap(
-                                          spacing: 6,
-                                          runSpacing: 4,
-                                          children: [
-                                            // User Type
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 3),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.primary
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                item.usertype,
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.primary,
-                                                ),
-                                              ),
-                                            ),
-                                            // Course
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 3),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.fanta
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                item.course ?? 'All',
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.fanta,
-                                                ),
-                                              ),
-                                            ),
-                                            // Scheduled
-                                            if (item.isSchedule == 1)
+                                        Expanded(
+                                          child: Wrap(
+                                            spacing: 6,
+                                            runSpacing: 4,
+                                            children: [
                                               Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 8,
                                                         vertical: 3),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.amber.shade100,
+                                                  color: AppColors.primary
+                                                      .withOpacity(0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
-                                                  'SCHEDULED',
-                                                  style: TextStyle(
+                                                  item.usertype,
+                                                  style: const TextStyle(
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.bold,
-                                                    color:
-                                                        Colors.amber.shade900,
+                                                    color: AppColors.primary,
                                                   ),
                                                 ),
                                               ),
-                                          ],
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 3),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.fanta
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  item.course ?? 'All',
+                                                  style: const TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.fanta,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (item.isSchedule == 1)
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 3),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        Colors.amber.shade100,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                  ),
+                                                  child: Text(
+                                                    'SCHEDULED',
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          Colors.amber.shade900,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
                                         ),
                                         Text(
                                           _formatDate(item.createdAt),
@@ -800,8 +728,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: 10),
-
-                                    // Title
                                     Text(
                                       item.title,
                                       style: const TextStyle(
@@ -810,28 +736,11 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-
-                                    // Clean Content Preview
-                                    if (item.cleanContent.isNotEmpty)
-                                      Text(
-                                        item.cleanContent,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                          height: 1.4,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-
                                     const SizedBox(height: 12),
                                     const Divider(
                                         height: 1,
                                         color: AppColors.borderLight),
                                     const SizedBox(height: 10),
-
-                                    // Bottom Row: Summary & Action buttons
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -855,8 +764,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                       TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              if (item
-                                                  .attachments.isNotEmpty) ...[
+                                              if (item.files.isNotEmpty) ...[
                                                 const SizedBox(width: 6),
                                                 Container(
                                                   padding: const EdgeInsets
@@ -881,7 +789,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                               .primary),
                                                       const SizedBox(width: 2),
                                                       Text(
-                                                        '${item.attachments.length}',
+                                                        '${item.files.length}',
                                                         style: const TextStyle(
                                                             fontSize: 10,
                                                             fontWeight:
@@ -898,11 +806,9 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                         ),
                                         Row(
                                           children: [
-                                            // View Details button
                                             InkWell(
-                                              onTap: () =>
-                                                  _showAnnouncementDetailsModal(
-                                                      context, item),
+                                              onTap: () => _showDetailsModal(
+                                                  context, item),
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                               child: Container(
@@ -917,6 +823,8 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: const Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
                                                     Icon(
                                                         Icons
@@ -940,7 +848,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 8),
-                                            // Edit button
                                             InkWell(
                                               onTap: () async {
                                                 final res =
@@ -948,14 +855,11 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (_) =>
-                                                        EditAnnouncementScreen(
-                                                            announcementId:
-                                                                item.id),
+                                                        EditQuestionKeyScreen(
+                                                            keyId: item.id),
                                                   ),
                                                 );
-                                                if (res == true) {
-                                                  _fetchAnnouncements();
-                                                }
+                                                if (res == true) _fetchItems();
                                               },
                                               borderRadius:
                                                   BorderRadius.circular(8),
@@ -971,6 +875,8 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: const Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
                                                     Icon(Icons.edit_outlined,
                                                         size: 13,
@@ -1007,9 +913,9 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
         onPressed: () async {
           final res = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const CreateAnnouncementScreen()),
+            MaterialPageRoute(builder: (_) => const CreateQuestionKeyScreen()),
           );
-          if (res == true) _fetchAnnouncements();
+          if (res == true) _fetchItems();
         },
         backgroundColor: AppColors.fanta,
         elevation: 4,

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class AnnouncementModel {
+class ExamPortionModel {
   final dynamic id;
   final String? academicYear;
   final String usertype;
@@ -13,14 +13,13 @@ class AnnouncementModel {
   final String? section;
   final dynamic students;
   final String title;
-  final String? content;
   final int isSchedule;
   final String? startAt;
   final List<String> attachments;
   final String? createdAt;
   final String? updatedAt;
 
-  AnnouncementModel({
+  ExamPortionModel({
     required this.id,
     this.academicYear,
     this.usertype = 'GROUP',
@@ -33,7 +32,6 @@ class AnnouncementModel {
     this.section,
     this.students,
     required this.title,
-    this.content,
     this.isSchedule = 0,
     this.startAt,
     this.attachments = const [],
@@ -41,7 +39,7 @@ class AnnouncementModel {
     this.updatedAt,
   });
 
-  factory AnnouncementModel.fromJson(Map<String, dynamic> json) {
+  factory ExamPortionModel.fromJson(Map<String, dynamic> json) {
     List<String> parsedAttachments = [];
     if (json['attachment'] != null) {
       if (json['attachment'] is List) {
@@ -68,7 +66,7 @@ class AnnouncementModel {
       sched = int.tryParse(json['is_schedule'].toString()) ?? 0;
     }
 
-    return AnnouncementModel(
+    return ExamPortionModel(
       id: json['id'] ?? '',
       academicYear: json['academic_year']?.toString(),
       usertype: json['usertype']?.toString() ?? 'GROUP',
@@ -81,18 +79,12 @@ class AnnouncementModel {
       section: json['section']?.toString(),
       students: json['students'],
       title: (json['title'] ?? '').toString(),
-      content: json['content']?.toString(),
       isSchedule: sched,
       startAt: json['start_at']?.toString(),
       attachments: parsedAttachments,
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),
     );
-  }
-
-  String get cleanContent {
-    if (content == null) return '';
-    return content!.replaceAll(RegExp(r'<[^>]*>'), '').trim();
   }
 
   String get branchDisplay {

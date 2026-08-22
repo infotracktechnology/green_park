@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-class AnnouncementModel {
+class ChairmanVideoModel {
   final dynamic id;
   final String? academicYear;
   final String usertype;
@@ -13,14 +11,13 @@ class AnnouncementModel {
   final String? section;
   final dynamic students;
   final String title;
-  final String? content;
-  final int isSchedule;
+  final dynamic videoId;
   final String? startAt;
-  final List<String> attachments;
+  final String? endAt;
   final String? createdAt;
   final String? updatedAt;
 
-  AnnouncementModel({
+  ChairmanVideoModel({
     required this.id,
     this.academicYear,
     this.usertype = 'GROUP',
@@ -33,42 +30,15 @@ class AnnouncementModel {
     this.section,
     this.students,
     required this.title,
-    this.content,
-    this.isSchedule = 0,
+    this.videoId,
     this.startAt,
-    this.attachments = const [],
+    this.endAt,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory AnnouncementModel.fromJson(Map<String, dynamic> json) {
-    List<String> parsedAttachments = [];
-    if (json['attachment'] != null) {
-      if (json['attachment'] is List) {
-        parsedAttachments =
-            (json['attachment'] as List).map((e) => e.toString()).toList();
-      } else if (json['attachment'] is String) {
-        try {
-          final decoded = jsonDecode(json['attachment']);
-          if (decoded is List) {
-            parsedAttachments = decoded.map((e) => e.toString()).toList();
-          } else {
-            parsedAttachments = [json['attachment'].toString()];
-          }
-        } catch (_) {
-          if (json['attachment'].toString().isNotEmpty) {
-            parsedAttachments = [json['attachment'].toString()];
-          }
-        }
-      }
-    }
-
-    int sched = 0;
-    if (json['is_schedule'] != null) {
-      sched = int.tryParse(json['is_schedule'].toString()) ?? 0;
-    }
-
-    return AnnouncementModel(
+  factory ChairmanVideoModel.fromJson(Map<String, dynamic> json) {
+    return ChairmanVideoModel(
       id: json['id'] ?? '',
       academicYear: json['academic_year']?.toString(),
       usertype: json['usertype']?.toString() ?? 'GROUP',
@@ -81,18 +51,12 @@ class AnnouncementModel {
       section: json['section']?.toString(),
       students: json['students'],
       title: (json['title'] ?? '').toString(),
-      content: json['content']?.toString(),
-      isSchedule: sched,
+      videoId: json['video_id'],
       startAt: json['start_at']?.toString(),
-      attachments: parsedAttachments,
+      endAt: json['end_at']?.toString(),
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),
     );
-  }
-
-  String get cleanContent {
-    if (content == null) return '';
-    return content!.replaceAll(RegExp(r'<[^>]*>'), '').trim();
   }
 
   String get branchDisplay {
@@ -119,9 +83,5 @@ class AnnouncementModel {
     if (batch == null || batch.toString().isEmpty) return 'All Batches';
     if (batch is List) return (batch as List).join(', ');
     return batch.toString();
-  }
-
-  static String getAttachmentFileName(String path) {
-    return path.split('/').last;
   }
 }

@@ -97,7 +97,8 @@ class AnnouncementFilterProvider with ChangeNotifier {
         if (_academicYear.isEmpty && _master!.activeAcademicYear.isNotEmpty) {
           _academicYear = _master!.activeAcademicYear;
         }
-        if (_availableCoachingTypes.isEmpty && _master!.coachingTypes.isNotEmpty) {
+        if (_availableCoachingTypes.isEmpty &&
+            _master!.coachingTypes.isNotEmpty) {
           _availableCoachingTypes = List<String>.from(_master!.coachingTypes);
         }
       }
@@ -138,7 +139,8 @@ class AnnouncementFilterProvider with ChangeNotifier {
 
     if (data['coaching_type'] != null) {
       if (data['coaching_type'] is List) {
-        _coachingTypes = (data['coaching_type'] as List).map((e) => e.toString()).toList();
+        _coachingTypes =
+            (data['coaching_type'] as List).map((e) => e.toString()).toList();
       } else {
         _coachingTypes = data['coaching_type']
             .toString()
@@ -151,7 +153,8 @@ class AnnouncementFilterProvider with ChangeNotifier {
 
     if (data['category'] != null) {
       if (data['category'] is List) {
-        _category = (data['category'] as List).map((e) => e.toString()).toList();
+        _category =
+            (data['category'] as List).map((e) => e.toString()).toList();
       } else {
         _category = data['category']
             .toString()
@@ -186,7 +189,8 @@ class AnnouncementFilterProvider with ChangeNotifier {
     }
     if (data['sectionOptions'] != null) {
       if (data['sectionOptions'] is List) {
-        _sectionOptions = (data['sectionOptions'] as List).map((e) => e.toString()).toList();
+        _sectionOptions =
+            (data['sectionOptions'] as List).map((e) => e.toString()).toList();
       }
     }
 
@@ -223,7 +227,8 @@ class AnnouncementFilterProvider with ChangeNotifier {
 
     // In JS: if XI-OB or XII-OB, remove branches 1, 4, 5
     if (['XI-OB', 'XII-OB'].contains(_course.toUpperCase())) {
-      _branches.removeWhere((b) => [1, 4, 5].contains(int.tryParse(b.toString()) ?? 0));
+      _branches.removeWhere(
+          (b) => [1, 4, 5].contains(int.tryParse(b.toString()) ?? 0));
     }
 
     _updateVisibility();
@@ -308,12 +313,14 @@ class AnnouncementFilterProvider with ChangeNotifier {
     _showStudent = _usertype == 'INDIVIDUAL';
     _showGender = _usertype != 'INDIVIDUAL';
 
-    final hasOffline = _coachingTypes.any((t) => t.toUpperCase().contains('OFFLINE'));
+    final hasOffline =
+        _coachingTypes.any((t) => t.toUpperCase().contains('OFFLINE'));
     final isGroup = _usertype == 'GROUP';
 
     if (hasOffline && isGroup) {
       final isTargetCourse = ['NEET', 'JEE'].contains(_course.toUpperCase());
-      final branchIdNums = _branches.map((b) => int.tryParse(b.toString()) ?? 0).toList();
+      final branchIdNums =
+          _branches.map((b) => int.tryParse(b.toString()) ?? 0).toList();
 
       if (isTargetCourse) {
         if (branchIdNums.any((id) => [1, 4, 5].contains(id))) {
@@ -395,7 +402,9 @@ class AnnouncementFilterProvider with ChangeNotifier {
 
   // Fetch Students (Matching JS type.change INDIVIDUAL / student fetch)
   Future<void> fetchStudents([String? customSearch]) async {
-    if (_usertype != 'INDIVIDUAL' || _course.isEmpty || _branches.isEmpty) return;
+    if (_usertype != 'INDIVIDUAL' || _course.isEmpty || _branches.isEmpty) {
+      return;
+    }
     _studentLoading = true;
     notifyListeners();
 
@@ -422,7 +431,8 @@ class AnnouncementFilterProvider with ChangeNotifier {
         for (var item in res.data) {
           if (item is Map) {
             final id = (item['student_id'] ?? item['id'] ?? '').toString();
-            final name = (item['student_name'] ?? item['name'] ?? id).toString();
+            final name =
+                (item['student_name'] ?? item['name'] ?? id).toString();
             if (id.isNotEmpty) mapped[id] = name;
           }
         }
@@ -449,7 +459,9 @@ class AnnouncementFilterProvider with ChangeNotifier {
     _gender = 'All';
     _section = '';
     _student = '';
-    _availableCoachingTypes = _master?.coachingTypes != null ? List<String>.from(_master!.coachingTypes) : [];
+    _availableCoachingTypes = _master?.coachingTypes != null
+        ? List<String>.from(_master!.coachingTypes)
+        : [];
     _sectionOptions = [];
     _studentOptions = {};
     _studentSearch = '';

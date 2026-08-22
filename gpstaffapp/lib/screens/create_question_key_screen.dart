@@ -12,21 +12,20 @@ import '../theme/app_theme.dart';
 import '../widgets/multi_select_chips.dart';
 import '../widgets/student_selector.dart';
 
-class CreateAnnouncementScreen extends StatefulWidget {
-  const CreateAnnouncementScreen({super.key});
+class CreateQuestionKeyScreen extends StatefulWidget {
+  const CreateQuestionKeyScreen({super.key});
 
   @override
-  State<CreateAnnouncementScreen> createState() =>
-      _CreateAnnouncementScreenState();
+  State<CreateQuestionKeyScreen> createState() =>
+      _CreateQuestionKeyScreenState();
 }
 
-class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
+class _CreateQuestionKeyScreenState extends State<CreateQuestionKeyScreen> {
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
 
   bool _isSchedule = false;
   DateTime _startAt = DateTime.now().add(const Duration(hours: 1));
-  final List<PlatformFile> _attachments = [];
+  final List<PlatformFile> _files = [];
   bool _submitting = false;
 
   @override
@@ -43,7 +42,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
   @override
   void dispose() {
     _titleController.dispose();
-    _contentController.dispose();
     super.dispose();
   }
 
@@ -53,10 +51,9 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
         allowMultiple: true,
         type: FileType.any,
       );
-
       if (result != null && result.files.isNotEmpty) {
         setState(() {
-          _attachments.addAll(result.files);
+          _files.addAll(result.files);
         });
       }
     } catch (e) {
@@ -71,9 +68,9 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     }
   }
 
-  void _removeAttachment(int index) {
+  void _removeFile(int index) {
     setState(() {
-      _attachments.removeAt(index);
+      _files.removeAt(index);
     });
   }
 
@@ -102,7 +99,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
         );
       },
     );
-
     if (pickedDate != null && mounted) {
       final pickedTime = await showTimePicker(
         context: context,
@@ -120,7 +116,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
           );
         },
       );
-
       if (pickedTime != null && mounted) {
         setState(() {
           _startAt = DateTime(
@@ -139,10 +134,10 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     final filters =
         Provider.of<AnnouncementFilterProvider>(context, listen: false);
     final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
 
     if (title.isEmpty) {
-      _showErrorDialog('Validation Error', 'Please enter announcement title.');
+      _showErrorDialog(
+          'Validation Error', 'Please enter question paper title.');
       return;
     }
     if (filters.course.isEmpty) {
@@ -158,16 +153,18 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       _showErrorDialog('Validation Error', 'Please select a target student.');
       return;
     }
+    if (_files.isEmpty) {
+      _showErrorDialog('Validation Error', 'Please attach at least one file.');
+      return;
+    }
 
     setState(() => _submitting = true);
 
     try {
       final formData = FormData();
-
       formData.fields.add(MapEntry('academic_year', filters.academicYear));
       formData.fields.add(MapEntry('usertype', filters.usertype));
       formData.fields.add(MapEntry('course', filters.course));
-
       for (var b in filters.branches) {
         formData.fields.add(MapEntry('branch[]', b.toString()));
       }
@@ -180,43 +177,31 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       for (var bat in filters.batch) {
         formData.fields.add(MapEntry('batch[]', bat));
       }
-
       formData.fields.add(MapEntry('gender', filters.gender));
-
       if (filters.usertype == 'INDIVIDUAL') {
         formData.fields.add(MapEntry('students', filters.student));
       } else {
         formData.fields.add(MapEntry('section', filters.section));
       }
-
       formData.fields.add(MapEntry('title', title));
-      formData.fields.add(MapEntry('content', content));
-
       if (_isSchedule) {
         formData.fields.add(const MapEntry('is_schedule', '1'));
         final dateStr = DateFormat('yyyy-MM-dd HH:mm:00').format(_startAt);
         formData.fields.add(MapEntry('start_at', dateStr));
       }
-
-      for (var file in _attachments) {
+      for (var file in _files) {
         if (!kIsWeb && file.path != null) {
           formData.files.add(
             MapEntry(
-              'attachment[]',
-              await MultipartFile.fromFile(
-                file.path!,
-                filename: file.name,
-              ),
+              'file[]',
+              await MultipartFile.fromFile(file.path!, filename: file.name),
             ),
           );
         } else if (file.bytes != null) {
           formData.files.add(
             MapEntry(
-              'attachment[]',
-              MultipartFile.fromBytes(
-                file.bytes!,
-                filename: file.name,
-              ),
+              'file[]',
+              MultipartFile.fromBytes(file.bytes!, filename: file.name),
             ),
           );
         }
@@ -224,7 +209,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
 
       final dio = ApiClient().dio;
       final res = await dio.post(
-        '/admin/announcement',
+        '/admin/questionkey',
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -240,7 +225,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               title: const Text('Success',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: AppColors.primary)),
-              content: const Text('Announcement created successfully!'),
+              content: const Text('Question paper created successfully!'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -297,37 +282,31 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
   @override
   Widget build(BuildContext context) {
     final filters = Provider.of<AnnouncementFilterProvider>(context);
-
     if (filters.loading) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Add Announcement')),
+        appBar: AppBar(title: const Text('Add Question Paper')),
         body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(color: AppColors.fanta),
               SizedBox(height: 12),
-              Text(
-                'Loading master data...',
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
+              Text('Loading master data...',
+                  style:
+                      TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             ],
           ),
         ),
       );
     }
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Add Announcement'),
-      ),
+      appBar: AppBar(title: const Text('Add Question Paper')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
         child: Column(
           children: [
-            // Card: Target Audience
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -336,86 +315,70 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                 border: Border.all(color: AppColors.borderLight),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2))
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Section Title
                   Row(
                     children: [
                       Container(
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10)),
                         child: const Icon(Icons.tune,
                             size: 16, color: AppColors.primary),
                       ),
                       const SizedBox(width: 10),
-                      const Text(
-                        'TARGET AUDIENCE',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.textPrimary,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
+                      const Text('TARGET AUDIENCE',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textPrimary,
+                              letterSpacing: 0.8)),
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Academic Year (Locked)
-                  const Text(
-                    'ACADEMIC YEAR',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
+                  const Text('ACADEMIC YEAR',
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary)),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                    ),
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.border)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          filters.academicYear.isNotEmpty
-                              ? filters.academicYear
-                              : 'Active Year',
-                          style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary),
-                        ),
+                            filters.academicYear.isNotEmpty
+                                ? filters.academicYear
+                                : 'Active Year',
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary)),
                         const Icon(Icons.lock_outline,
                             size: 18, color: AppColors.textMuted),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // User Type Toggle
-                  const Text(
-                    'USER TYPE *',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
+                  const Text('USER TYPE *',
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -431,32 +394,26 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                                   : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: filters.usertype == 'GROUP'
-                                    ? AppColors.primary
-                                    : AppColors.border,
-                              ),
+                                  color: filters.usertype == 'GROUP'
+                                      ? AppColors.primary
+                                      : AppColors.border),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.people,
-                                  size: 16,
-                                  color: filters.usertype == 'GROUP'
-                                      ? Colors.white
-                                      : AppColors.textSecondary,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Group Broadcast',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                Icon(Icons.people,
+                                    size: 16,
                                     color: filters.usertype == 'GROUP'
                                         ? Colors.white
-                                        : AppColors.textSecondary,
-                                  ),
-                                ),
+                                        : AppColors.textSecondary),
+                                const SizedBox(width: 8),
+                                Text('Group Broadcast',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: filters.usertype == 'GROUP'
+                                            ? Colors.white
+                                            : AppColors.textSecondary)),
                               ],
                             ),
                           ),
@@ -475,32 +432,26 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                                   : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: filters.usertype == 'INDIVIDUAL'
-                                    ? AppColors.primary
-                                    : AppColors.border,
-                              ),
+                                  color: filters.usertype == 'INDIVIDUAL'
+                                      ? AppColors.primary
+                                      : AppColors.border),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.person,
-                                  size: 16,
-                                  color: filters.usertype == 'INDIVIDUAL'
-                                      ? Colors.white
-                                      : AppColors.textSecondary,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Individual Student',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                Icon(Icons.person,
+                                    size: 16,
                                     color: filters.usertype == 'INDIVIDUAL'
                                         ? Colors.white
-                                        : AppColors.textSecondary,
-                                  ),
-                                ),
+                                        : AppColors.textSecondary),
+                                const SizedBox(width: 8),
+                                Text('Individual Student',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: filters.usertype == 'INDIVIDUAL'
+                                            ? Colors.white
+                                            : AppColors.textSecondary)),
                               ],
                             ),
                           ),
@@ -509,15 +460,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-
-                  // Course Chips
-                  const Text(
-                    'COURSE *',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
+                  const Text('COURSE *',
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary)),
                   const SizedBox(height: 8),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -530,11 +477,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                           child: ChoiceChip(
                             label: Text(c),
                             labelStyle: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  active ? Colors.white : AppColors.textPrimary,
-                            ),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: active
+                                    ? Colors.white
+                                    : AppColors.textPrimary),
                             selected: active,
                             selectedColor: AppColors.primary,
                             backgroundColor: const Color(0xFFF8FAFC),
@@ -551,52 +498,36 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Branches Multi-select Chips
                   MultiSelectChips<BranchItem>(
-                    label: 'Branches *',
-                    options: filters.availableBranches,
-                    selected: filters.branches,
-                    labelBuilder: (b) => b.name,
-                    valueBuilder: (b) => b.id,
-                    onToggle: (val) => filters.toggleBranch(val),
-                  ),
-
-                  // Coaching Types Multi-select Chips
+                      label: 'Branches *',
+                      options: filters.availableBranches,
+                      selected: filters.branches,
+                      labelBuilder: (b) => b.name,
+                      valueBuilder: (b) => b.id,
+                      onToggle: (val) => filters.toggleBranch(val)),
                   MultiSelectChips<String>(
-                    label: 'Coaching Type',
-                    options: filters.availableCoachingTypes,
-                    selected: filters.coachingTypes,
-                    onToggle: (val) => filters.toggleCoachingType(val),
-                  ),
-
-                  // Category (H/D) Chips (Conditional)
+                      label: 'Coaching Type',
+                      options: filters.availableCoachingTypes,
+                      selected: filters.coachingTypes,
+                      onToggle: (val) => filters.toggleCoachingType(val)),
                   if (filters.showCategory)
                     MultiSelectChips<String>(
-                      label: 'H/D (Category)',
-                      options: filters.master?.hostels ?? [],
-                      selected: filters.category,
-                      onToggle: (val) => filters.toggleCategory(val),
-                    ),
-
-                  // Batch Chips (Conditional)
+                        label: 'H/D (Category)',
+                        options: filters.master?.hostels ?? [],
+                        selected: filters.category,
+                        onToggle: (val) => filters.toggleCategory(val)),
                   if (filters.showBatch)
                     MultiSelectChips<String>(
-                      label: 'Batch',
-                      options: filters.master?.batches ?? [],
-                      selected: filters.batch,
-                      onToggle: (val) => filters.toggleBatch(val),
-                    ),
-
-                  // Gender Chips
+                        label: 'Batch',
+                        options: filters.master?.batches ?? [],
+                        selected: filters.batch,
+                        onToggle: (val) => filters.toggleBatch(val)),
                   if (filters.showGender) ...[
-                    const Text(
-                      'GENDER',
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary),
-                    ),
+                    const Text('GENDER',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary)),
                     const SizedBox(height: 8),
                     Row(
                       children: ['All', 'MALE', 'FEMALE'].map((g) {
@@ -606,11 +537,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                           child: ChoiceChip(
                             label: Text(g == 'All' ? 'All Genders' : g),
                             labelStyle: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  active ? Colors.white : AppColors.textPrimary,
-                            ),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: active
+                                    ? Colors.white
+                                    : AppColors.textPrimary),
                             selected: active,
                             selectedColor: AppColors.primary,
                             backgroundColor: const Color(0xFFF8FAFC),
@@ -627,16 +558,12 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                     ),
                     const SizedBox(height: 16),
                   ],
-
-                  // Section Chips (For GROUP)
                   if (filters.usertype == 'GROUP' && filters.showSection) ...[
-                    const Text(
-                      'SECTION',
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary),
-                    ),
+                    const Text('SECTION',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary)),
                     const SizedBox(height: 8),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -648,20 +575,18 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                             child: ChoiceChip(
                               label: const Text('All Sections'),
                               labelStyle: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: filters.section.isEmpty
-                                    ? Colors.white
-                                    : AppColors.textPrimary,
-                              ),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: filters.section.isEmpty
+                                      ? Colors.white
+                                      : AppColors.textPrimary),
                               selected: filters.section.isEmpty,
                               selectedColor: AppColors.primary,
                               backgroundColor: const Color(0xFFF8FAFC),
                               side: BorderSide(
-                                color: filters.section.isEmpty
-                                    ? AppColors.primary
-                                    : AppColors.border,
-                              ),
+                                  color: filters.section.isEmpty
+                                      ? AppColors.primary
+                                      : AppColors.border),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
                               onSelected: (_) => filters.setSection(''),
@@ -673,20 +598,18 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                               child: ChoiceChip(
                                 label: Text(sec),
                                 labelStyle: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: filters.section == sec
-                                      ? Colors.white
-                                      : AppColors.textPrimary,
-                                ),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: filters.section == sec
+                                        ? Colors.white
+                                        : AppColors.textPrimary),
                                 selected: filters.section == sec,
                                 selectedColor: AppColors.primary,
                                 backgroundColor: const Color(0xFFF8FAFC),
                                 side: BorderSide(
-                                  color: filters.section == sec
-                                      ? AppColors.primary
-                                      : AppColors.border,
-                                ),
+                                    color: filters.section == sec
+                                        ? AppColors.primary
+                                        : AppColors.border),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)),
                                 onSelected: (_) => filters.setSection(sec),
@@ -698,8 +621,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                     ),
                     const SizedBox(height: 16),
                   ],
-
-                  // Student Selector Widget (For INDIVIDUAL)
                   if (filters.showStudent)
                     StudentSelector(
                       selectedStudentId: filters.student,
@@ -717,161 +638,110 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Card: Announcement Details
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.borderLight),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.borderLight),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.02),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2))
+                  ]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Section Title
                   Row(
                     children: [
                       Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: AppColors.fanta.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.edit_note,
-                            size: 20, color: AppColors.fanta),
-                      ),
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                              color: AppColors.fanta.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.quiz_outlined,
+                              size: 20, color: AppColors.fanta)),
                       const SizedBox(width: 10),
-                      const Text(
-                        'CONTENT & DETAILS',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.textPrimary,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
+                      const Text('QUESTION PAPER DETAILS',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textPrimary,
+                              letterSpacing: 0.8)),
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Title
-                  const Text(
-                    'TITLE *',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
+                  const Text('TITLE *',
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary)),
                   const SizedBox(height: 8),
                   TextField(
-                    controller: _titleController,
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary),
-                    decoration: const InputDecoration(
-                      hintText: 'Enter announcement headline',
-                    ),
-                  ),
+                      controller: _titleController,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary),
+                      decoration: const InputDecoration(
+                          hintText: 'Enter question paper title')),
                   const SizedBox(height: 16),
-
-                  // Content Body
-                  const Text(
-                    'MESSAGE BODY',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
+                  const Text('ATTACHMENTS *',
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondary)),
                   const SizedBox(height: 8),
-                  TextField(
-                    controller: _contentController,
-                    maxLines: 5,
-                    style: const TextStyle(
-                        fontSize: 14, color: AppColors.textPrimary),
-                    decoration: const InputDecoration(
-                      hintText: 'Write announcement details here...',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Attachments
-                  const Text(
-                    'ATTACHMENTS',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 8),
-
-                  if (_attachments.isNotEmpty)
+                  if (_files.isNotEmpty)
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _attachments.length,
+                      itemCount: _files.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 6),
                       itemBuilder: (context, index) {
-                        final file = _attachments[index];
+                        final file = _files[index];
                         return Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.border),
-                          ),
+                              color: const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: AppColors.border)),
                           child: Row(
                             children: [
-                              const Icon(Icons.attach_file,
+                              const Icon(Icons.description_outlined,
                                   color: AppColors.primary, size: 20),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      file.name,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      _formatFileSize(file.size),
-                                      style: const TextStyle(
-                                          fontSize: 10,
-                                          color: AppColors.textMuted),
-                                    ),
+                                    Text(file.name,
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textPrimary),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis),
+                                    Text(_formatFileSize(file.size),
+                                        style: const TextStyle(
+                                            fontSize: 10,
+                                            color: AppColors.textMuted)),
                                   ],
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.close,
-                                    color: AppColors.error, size: 18),
-                                onPressed: () => _removeAttachment(index),
-                              ),
+                                  icon: const Icon(Icons.close,
+                                      color: AppColors.error, size: 18),
+                                  onPressed: () => _removeFile(index)),
                             ],
                           ),
                         );
                       },
                     ),
-
                   const SizedBox(height: 10),
-
-                  // Pick File Button
                   InkWell(
                     onTap: _pickFiles,
                     borderRadius: BorderRadius.circular(16),
@@ -879,75 +749,58 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.primary.withOpacity(0.4),
-                          style: BorderStyle.solid,
-                        ),
-                      ),
+                          color: AppColors.primary.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: AppColors.primary.withOpacity(0.4))),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.cloud_upload_outlined,
                               color: AppColors.primary, size: 20),
                           SizedBox(width: 8),
-                          Text(
-                            '+ Select Files to Attach',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
+                          Text('+ Select Files to Attach',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary))
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   const Divider(height: 1, color: AppColors.borderLight),
                   const SizedBox(height: 14),
-
-                  // Schedule Toggle
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Schedule Broadcast',
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary),
-                          ),
-                          Text(
-                            'Publish at a specific future date & time',
-                            style: TextStyle(
-                                fontSize: 11, color: AppColors.textMuted),
-                          ),
-                        ],
-                      ),
+                      const Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Text('Schedule Publish',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary)),
+                            Text('Publish at a specific future date & time',
+                                style: TextStyle(
+                                    fontSize: 11, color: AppColors.textMuted))
+                          ])),
                       Switch(
-                        value: _isSchedule,
-                        activeColor: AppColors.fanta,
-                        onChanged: (val) => setState(() => _isSchedule = val),
-                      ),
+                          value: _isSchedule,
+                          activeColor: AppColors.fanta,
+                          onChanged: (val) =>
+                              setState(() => _isSchedule = val)),
                     ],
                   ),
-
-                  // Date & Time Picker
                   if (_isSchedule) ...[
                     const SizedBox(height: 14),
-                    const Text(
-                      'PUBLISH DATE & TIME',
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary),
-                    ),
+                    const Text('PUBLISH DATE & TIME',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary)),
                     const SizedBox(height: 8),
                     InkWell(
                       onTap: _selectDateTime,
@@ -956,37 +809,29 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.border),
-                        ),
+                            color: const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.border)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.calendar_today,
-                                    size: 18, color: AppColors.fanta),
-                                const SizedBox(width: 10),
-                                Text(
+                            Row(children: [
+                              const Icon(Icons.calendar_today,
+                                  size: 18, color: AppColors.fanta),
+                              const SizedBox(width: 10),
+                              Text(
                                   DateFormat('dd MMM yyyy, hh:mm a')
                                       .format(_startAt),
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Text(
-                              'Change',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary))
+                            ]),
+                            const Text('Change',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary)),
                           ],
                         ),
                       ),
@@ -996,41 +841,34 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Submit Button
             SizedBox(
               width: double.infinity,
               height: 54,
               child: ElevatedButton(
                 onPressed: _submitting ? null : _handleSubmit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.fanta,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                  elevation: 4,
-                  shadowColor: AppColors.fanta.withOpacity(0.4),
-                ),
+                    backgroundColor: AppColors.fanta,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18)),
+                    elevation: 4,
+                    shadowColor: AppColors.fanta.withOpacity(0.4)),
                 child: _submitting
                     ? const SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2.5),
-                      )
+                            color: Colors.white, strokeWidth: 2.5))
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.campaign, color: Colors.white, size: 22),
-                          SizedBox(width: 8),
-                          Text(
-                            'Publish Announcement',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ],
-                      ),
+                            Icon(Icons.quiz, color: Colors.white, size: 22),
+                            SizedBox(width: 8),
+                            Text('Publish Question Paper',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white))
+                          ]),
               ),
             ),
           ],

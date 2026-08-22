@@ -42,7 +42,8 @@ class MultiSelectChips<T> extends StatelessWidget {
           child: Row(
             children: options.map((item) {
               final val = valueBuilder != null ? valueBuilder!(item) : item;
-              final text = labelBuilder != null ? labelBuilder!(item) : item.toString();
+              final text =
+                  labelBuilder != null ? labelBuilder!(item) : item.toString();
               final isSelected = selected.contains(val);
 
               return Padding(
@@ -54,11 +55,13 @@ class MultiSelectChips<T> extends StatelessWidget {
                     onTap: () => onToggle(val),
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.border,
+                          color:
+                              isSelected ? AppColors.primary : AppColors.border,
                           width: 1,
                         ),
                       ),
@@ -67,7 +70,8 @@ class MultiSelectChips<T> extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? Colors.white : AppColors.textPrimary,
+                          color:
+                              isSelected ? Colors.white : AppColors.textPrimary,
                         ),
                       ),
                     ),

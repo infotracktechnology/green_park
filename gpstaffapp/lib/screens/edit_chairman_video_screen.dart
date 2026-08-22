@@ -1,92 +1,111 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
 
 import '../api/api_client.dart';
+import '../models/chairman_video_model.dart';
 import '../models/master_data_model.dart';
 import '../providers/announcement_filter_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/multi_select_chips.dart';
 import '../widgets/student_selector.dart';
 
-class CreateAnnouncementScreen extends StatefulWidget {
-  const CreateAnnouncementScreen({super.key});
+class EditChairmanVideoScreen extends StatefulWidget {
+  final dynamic videoId;
+
+  const EditChairmanVideoScreen({super.key, required this.videoId});
 
   @override
-  State<CreateAnnouncementScreen> createState() =>
-      _CreateAnnouncementScreenState();
+  State<EditChairmanVideoScreen> createState() =>
+      _EditChairmanVideoScreenState();
 }
 
-class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
+class _EditChairmanVideoScreenState extends State<EditChairmanVideoScreen> {
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
+  final TextEditingController _videoIdController = TextEditingController();
 
-  bool _isSchedule = false;
-  DateTime _startAt = DateTime.now().add(const Duration(hours: 1));
-  final List<PlatformFile> _attachments = [];
+  DateTime? _startAt;
+  DateTime? _endAt;
+  bool _fetching = true;
   bool _submitting = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final filters =
-          Provider.of<AnnouncementFilterProvider>(context, listen: false);
-      filters.resetAll();
-      filters.fetchMasterData();
+      _loadData();
     });
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _contentController.dispose();
+    _videoIdController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickFiles() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.any,
-      );
+  Future<void> _loadData() async {
+    setState(() => _fetching = true);
+    final filters =
+        Provider.of<AnnouncementFilterProvider>(context, listen: false);
+    await filters.fetchMasterData();
 
-      if (result != null && result.files.isNotEmpty) {
-        setState(() {
-          _attachments.addAll(result.files);
-        });
+    try {
+      final dio = ApiClient().dio;
+      final res = await dio.get('/admin/chairmanvideo/${widget.videoId}/edit');
+
+      if (res.data != null && res.data['status'] == true) {
+        final videoData = res.data['chairmanvideo'] as Map<String, dynamic>;
+        final model = ChairmanVideoModel.fromJson(videoData);
+
+        // Pre-fill filters
+        final Map<String, dynamic> combined =
+            Map<String, dynamic>.from(videoData);
+        if (res.data['students'] != null && res.data['students'] is Map) {
+          combined['studentOptions'] = res.data['students'];
+        }
+        if (res.data['section'] != null && res.data['section'] is List) {
+          combined['sectionOptions'] = res.data['section'];
+        }
+        filters.setAllFilters(combined);
+
+        _titleController.text = model.title;
+        _videoIdController.text = model.videoId?.toString() ?? '';
+
+        if (model.startAt != null && model.startAt!.isNotEmpty) {
+          try {
+            _startAt = DateTime.parse(model.startAt!);
+          } catch (_) {}
+        }
+        if (model.endAt != null && model.endAt!.isNotEmpty) {
+          try {
+            _endAt = DateTime.parse(model.endAt!);
+          } catch (_) {}
+        }
       }
     } catch (e) {
-      debugPrint('File picker error: $e');
+      debugPrint('Edit chairman video fetch error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Failed to pick files'),
+              content: Text('Failed to load video details'),
               backgroundColor: AppColors.error),
         );
       }
+    } finally {
+      if (mounted) setState(() => _fetching = false);
     }
   }
 
-  void _removeAttachment(int index) {
-    setState(() {
-      _attachments.removeAt(index);
-    });
-  }
+  Future<void> _selectDateTime({required bool isStart}) async {
+    final initial = isStart
+        ? (_startAt ?? DateTime.now())
+        : (_endAt ?? (_startAt ?? DateTime.now()));
 
-  String _formatFileSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-  }
-
-  Future<void> _selectDateTime() async {
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: _startAt,
+      initialDate: initial,
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
@@ -106,7 +125,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     if (pickedDate != null && mounted) {
       final pickedTime = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(_startAt),
+        initialTime: TimeOfDay.fromDateTime(initial),
         builder: (context, child) {
           return Theme(
             data: Theme.of(context).copyWith(
@@ -122,27 +141,107 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       );
 
       if (pickedTime != null && mounted) {
-        setState(() {
-          _startAt = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
+        final picked = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        if (!isStart && _startAt != null && _startAt!.isAfter(picked)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('End time must be greater than start time.'),
+                backgroundColor: AppColors.error),
           );
+          return;
+        }
+
+        setState(() {
+          if (isStart) {
+            _startAt = picked;
+            if (_endAt != null && _endAt!.isBefore(picked)) _endAt = null;
+          } else {
+            _endAt = picked;
+          }
         });
       }
     }
+  }
+
+  Widget _buildDateTimeField(String label, DateTime? value, bool isStart) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textSecondary),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => _selectDateTime(isStart: isStart),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(isStart ? Icons.play_arrow : Icons.stop,
+                        size: 18, color: AppColors.fanta),
+                    const SizedBox(width: 10),
+                    Text(
+                      value != null
+                          ? DateFormat('dd MMM yyyy, hh:mm a').format(value)
+                          : 'Select',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: value != null
+                            ? AppColors.textPrimary
+                            : AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+                const Text(
+                  'Change',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Future<void> _handleSubmit() async {
     final filters =
         Provider.of<AnnouncementFilterProvider>(context, listen: false);
     final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
+    final videoId = _videoIdController.text.trim();
 
     if (title.isEmpty) {
-      _showErrorDialog('Validation Error', 'Please enter announcement title.');
+      _showErrorDialog('Validation Error', 'Please enter video title.');
+      return;
+    }
+    if (videoId.isEmpty) {
+      _showErrorDialog('Validation Error', 'Please enter video ID.');
       return;
     }
     if (filters.course.isEmpty) {
@@ -158,11 +257,22 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       _showErrorDialog('Validation Error', 'Please select a target student.');
       return;
     }
+    if (_startAt == null || _endAt == null) {
+      _showErrorDialog(
+          'Validation Error', 'Please select start and end date/time.');
+      return;
+    }
+    if (_startAt!.isAfter(_endAt!)) {
+      _showErrorDialog(
+          'Validation Error', 'End time must be greater than start time.');
+      return;
+    }
 
     setState(() => _submitting = true);
 
     try {
       final formData = FormData();
+      formData.fields.add(const MapEntry('_method', 'PUT'));
 
       formData.fields.add(MapEntry('academic_year', filters.academicYear));
       formData.fields.add(MapEntry('usertype', filters.usertype));
@@ -190,41 +300,15 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       }
 
       formData.fields.add(MapEntry('title', title));
-      formData.fields.add(MapEntry('content', content));
-
-      if (_isSchedule) {
-        formData.fields.add(const MapEntry('is_schedule', '1'));
-        final dateStr = DateFormat('yyyy-MM-dd HH:mm:00').format(_startAt);
-        formData.fields.add(MapEntry('start_at', dateStr));
-      }
-
-      for (var file in _attachments) {
-        if (!kIsWeb && file.path != null) {
-          formData.files.add(
-            MapEntry(
-              'attachment[]',
-              await MultipartFile.fromFile(
-                file.path!,
-                filename: file.name,
-              ),
-            ),
-          );
-        } else if (file.bytes != null) {
-          formData.files.add(
-            MapEntry(
-              'attachment[]',
-              MultipartFile.fromBytes(
-                file.bytes!,
-                filename: file.name,
-              ),
-            ),
-          );
-        }
-      }
+      formData.fields.add(MapEntry('video_id', videoId));
+      formData.fields.add(MapEntry(
+          'start_at', DateFormat('yyyy-MM-dd HH:mm:00').format(_startAt!)));
+      formData.fields.add(MapEntry(
+          'end_at', DateFormat('yyyy-MM-dd HH:mm:00').format(_endAt!)));
 
       final dio = ApiClient().dio;
       final res = await dio.post(
-        '/admin/announcement',
+        '/admin/chairmanvideo/${widget.videoId}?_method=PUT',
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -240,7 +324,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               title: const Text('Success',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: AppColors.primary)),
-              content: const Text('Announcement created successfully!'),
+              content: const Text('Chairman video updated successfully!'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -256,13 +340,13 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
             ),
           );
         } else {
-          final msg = (res.data is Map ? res.data['message'] : null) ??
-              'Creation failed';
+          final msg =
+              (res.data is Map ? res.data['message'] : null) ?? 'Update failed';
           _showErrorDialog('Error', msg.toString());
         }
       }
     } on DioException catch (e) {
-      String msg = 'Submission failed';
+      String msg = 'Update failed';
       if (e.response?.data != null && e.response?.data is Map) {
         msg = e.response?.data['message']?.toString() ?? msg;
       }
@@ -298,10 +382,10 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
   Widget build(BuildContext context) {
     final filters = Provider.of<AnnouncementFilterProvider>(context);
 
-    if (filters.loading) {
+    if (_fetching || filters.loading) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Add Announcement')),
+        appBar: AppBar(title: const Text('Edit Chairman Video')),
         body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -309,7 +393,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               CircularProgressIndicator(color: AppColors.fanta),
               SizedBox(height: 12),
               Text(
-                'Loading master data...',
+                'Loading video...',
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
@@ -321,7 +405,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Add Announcement'),
+        title: const Text('Edit Chairman Video'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
@@ -345,7 +429,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Section Title
                   Row(
                     children: [
                       Container(
@@ -718,7 +801,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Card: Announcement Details
+            // Card: Video Details
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -736,7 +819,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Section Title
                   Row(
                     children: [
                       Container(
@@ -746,12 +828,12 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                           color: AppColors.fanta.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.edit_note,
-                            size: 20, color: AppColors.fanta),
+                        child: const Icon(Icons.videocam_outlined,
+                            size: 18, color: AppColors.fanta),
                       ),
                       const SizedBox(width: 10),
                       const Text(
-                        'CONTENT & DETAILS',
+                        'VIDEO DETAILS',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
@@ -779,14 +861,14 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary),
                     decoration: const InputDecoration(
-                      hintText: 'Enter announcement headline',
+                      hintText: 'Enter video title',
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Content Body
+                  // Video ID
                   const Text(
-                    'MESSAGE BODY',
+                    'VIDEO ID *',
                     style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -794,204 +876,21 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    controller: _contentController,
-                    maxLines: 5,
+                    controller: _videoIdController,
+                    keyboardType: TextInputType.number,
                     style: const TextStyle(
-                        fontSize: 14, color: AppColors.textPrimary),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary),
                     decoration: const InputDecoration(
-                      hintText: 'Write announcement details here...',
+                      hintText: 'Enter video ID',
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Attachments
-                  const Text(
-                    'ATTACHMENTS',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 8),
-
-                  if (_attachments.isNotEmpty)
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _attachments.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 6),
-                      itemBuilder: (context, index) {
-                        final file = _attachments[index];
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.attach_file,
-                                  color: AppColors.primary, size: 20),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      file.name,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      _formatFileSize(file.size),
-                                      style: const TextStyle(
-                                          fontSize: 10,
-                                          color: AppColors.textMuted),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close,
-                                    color: AppColors.error, size: 18),
-                                onPressed: () => _removeAttachment(index),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-
-                  const SizedBox(height: 10),
-
-                  // Pick File Button
-                  InkWell(
-                    onTap: _pickFiles,
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.primary.withOpacity(0.4),
-                          style: BorderStyle.solid,
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.cloud_upload_outlined,
-                              color: AppColors.primary, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            '+ Select Files to Attach',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildDateTimeField('START DATE & TIME *', _startAt, true),
                   const SizedBox(height: 16),
-
-                  const Divider(height: 1, color: AppColors.borderLight),
-                  const SizedBox(height: 14),
-
-                  // Schedule Toggle
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Schedule Broadcast',
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary),
-                          ),
-                          Text(
-                            'Publish at a specific future date & time',
-                            style: TextStyle(
-                                fontSize: 11, color: AppColors.textMuted),
-                          ),
-                        ],
-                      ),
-                      Switch(
-                        value: _isSchedule,
-                        activeColor: AppColors.fanta,
-                        onChanged: (val) => setState(() => _isSchedule = val),
-                      ),
-                    ],
-                  ),
-
-                  // Date & Time Picker
-                  if (_isSchedule) ...[
-                    const SizedBox(height: 14),
-                    const Text(
-                      'PUBLISH DATE & TIME',
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary),
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _selectDateTime,
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.calendar_today,
-                                    size: 18, color: AppColors.fanta),
-                                const SizedBox(width: 10),
-                                Text(
-                                  DateFormat('dd MMM yyyy, hh:mm a')
-                                      .format(_startAt),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Text(
-                              'Change',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                  _buildDateTimeField('END DATE & TIME *', _endAt, false),
                 ],
               ),
             ),
@@ -1020,10 +919,11 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.campaign, color: Colors.white, size: 22),
+                          Icon(Icons.check_circle_outline,
+                              color: Colors.white, size: 22),
                           SizedBox(width: 8),
                           Text(
-                            'Publish Announcement',
+                            'Update Video',
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

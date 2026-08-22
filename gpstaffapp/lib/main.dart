@@ -9,6 +9,8 @@ import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/announcement_list_screen.dart';
 import 'screens/create_announcement_screen.dart';
+import 'screens/chairman_video_list_screen.dart';
+import 'screens/create_chairman_video_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,9 +38,10 @@ class GPStaffApp extends StatelessWidget {
           '/dashboard': (_) => const DashboardScreen(),
           '/announcements': (_) => const AnnouncementListScreen(),
           '/create_announcement': (_) => const CreateAnnouncementScreen(),
+          '/chairman_videos': (_) => const ChairmanVideoListScreen(),
+          '/create_chairman_video': (_) => const CreateChairmanVideoScreen(),
         },
       ),
     );
   }
 }
-

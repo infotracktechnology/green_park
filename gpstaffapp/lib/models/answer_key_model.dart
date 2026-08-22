@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class AnnouncementModel {
+class AnswerKeyModel {
   final dynamic id;
   final String? academicYear;
   final String usertype;
@@ -13,14 +13,13 @@ class AnnouncementModel {
   final String? section;
   final dynamic students;
   final String title;
-  final String? content;
   final int isSchedule;
   final String? startAt;
-  final List<String> attachments;
+  final List<String> files;
   final String? createdAt;
   final String? updatedAt;
 
-  AnnouncementModel({
+  AnswerKeyModel({
     required this.id,
     this.academicYear,
     this.usertype = 'GROUP',
@@ -33,31 +32,30 @@ class AnnouncementModel {
     this.section,
     this.students,
     required this.title,
-    this.content,
     this.isSchedule = 0,
     this.startAt,
-    this.attachments = const [],
+    this.files = const [],
     this.createdAt,
     this.updatedAt,
   });
 
-  factory AnnouncementModel.fromJson(Map<String, dynamic> json) {
-    List<String> parsedAttachments = [];
-    if (json['attachment'] != null) {
-      if (json['attachment'] is List) {
-        parsedAttachments =
-            (json['attachment'] as List).map((e) => e.toString()).toList();
-      } else if (json['attachment'] is String) {
+  factory AnswerKeyModel.fromJson(Map<String, dynamic> json) {
+    List<String> parsedFiles = [];
+    if (json['file_path'] != null) {
+      if (json['file_path'] is List) {
+        parsedFiles =
+            (json['file_path'] as List).map((e) => e.toString()).toList();
+      } else if (json['file_path'] is String) {
         try {
-          final decoded = jsonDecode(json['attachment']);
+          final decoded = jsonDecode(json['file_path']);
           if (decoded is List) {
-            parsedAttachments = decoded.map((e) => e.toString()).toList();
+            parsedFiles = decoded.map((e) => e.toString()).toList();
           } else {
-            parsedAttachments = [json['attachment'].toString()];
+            parsedFiles = [json['file_path'].toString()];
           }
         } catch (_) {
-          if (json['attachment'].toString().isNotEmpty) {
-            parsedAttachments = [json['attachment'].toString()];
+          if (json['file_path'].toString().isNotEmpty) {
+            parsedFiles = [json['file_path'].toString()];
           }
         }
       }
@@ -68,7 +66,7 @@ class AnnouncementModel {
       sched = int.tryParse(json['is_schedule'].toString()) ?? 0;
     }
 
-    return AnnouncementModel(
+    return AnswerKeyModel(
       id: json['id'] ?? '',
       academicYear: json['academic_year']?.toString(),
       usertype: json['usertype']?.toString() ?? 'GROUP',
@@ -81,18 +79,12 @@ class AnnouncementModel {
       section: json['section']?.toString(),
       students: json['students'],
       title: (json['title'] ?? '').toString(),
-      content: json['content']?.toString(),
       isSchedule: sched,
       startAt: json['start_at']?.toString(),
-      attachments: parsedAttachments,
+      files: parsedFiles,
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),
     );
-  }
-
-  String get cleanContent {
-    if (content == null) return '';
-    return content!.replaceAll(RegExp(r'<[^>]*>'), '').trim();
   }
 
   String get branchDisplay {
@@ -121,7 +113,7 @@ class AnnouncementModel {
     return batch.toString();
   }
 
-  static String getAttachmentFileName(String path) {
+  static String getFileName(String path) {
     return path.split('/').last;
   }
 }

@@ -21,6 +21,10 @@ class ExamPortionController extends Controller
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
             ->latest()->get();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'examportions' => $examportions], 200);
+        }
+
         return view('examportion.index', compact('examportions'));
     }
     public function create()
@@ -28,26 +32,54 @@ class ExamPortionController extends Controller
 
         return view('examportion.create');
     }
+
+    public function show(Request $request, Examportion $examportion)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'examportion' => $examportion]);
+        }
+
+        return redirect()->route('examportion.index');
+    }
     public function store(Request $request)
     {
-        $data = $request->except('attachment');
+        $data = $request->except(['_token', '_method', 'attachment', 'existing_attachment']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-        $attachment = [];
-        if ($request->hasFile('attachment')) {
-            foreach($request->file('attachment') as $file){
-                $originalName = $file->getClientOriginalName();
-                $fileName = time() . '-' . $originalName;
-                $file->move('assets/examportion', $fileName);
-                $attachment[] = 'assets/examportion/' . $fileName;
-            }   
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
         }
-        $data['attachment'] = $attachment ?: null ;
-        Examportion::create($data);
+
+        $attachments = [];
+        if ($request->hasFile('attachment')) {
+            $destinationPath = public_path('assets/examportion');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+            foreach ($request->file('attachment') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-' . uniqid() . '-' . $originalName;
+                    $file->move($destinationPath, $fileName);
+                    $attachments[] = 'assets/examportion/' . $fileName;
+                }
+            }
+        }
+        $data['attachment'] = !empty($attachments) ? array_values($attachments) : null;
+        $examportion = Examportion::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Exam portion created successfully.', 'data' => $examportion], 200);
+        }
+
         return to_route('examportion.index')->with('success', 'Examportion created successfully');
     }
 
@@ -59,29 +91,63 @@ class ExamPortionController extends Controller
 
         $students = Student::StudentFilterQuery($examportion->branch, $examportion->course, $examportion->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'examportion' => $examportion, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
+
         return view('examportion.edit', compact('examportion', 'type', 'section', 'students'));
     }
 
     public function update(Request $request, Examportion $examportion)
     {
-        $data = $request->except('attachment');
+        $data = $request->except(['_token', '_method', 'attachment', 'existing_attachment']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
-        $attachment = [];
-         if ($request->hasFile('attachment')) {
-            foreach ($request->file('attachment') as $file) {
-                $originalName = $file->getClientOriginalName();
-                $fileName = time() . '-' . $originalName;
-                $file->move('assets/examportion', $fileName);
-                $attachment[] = 'assets/examportion/' . $fileName;
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
+        }
+
+        // Retain remaining existing attachments
+        $attachments = [];
+        if ($request->has('existing_attachment')) {
+            $existing = $request->input('existing_attachment');
+            if (is_array($existing)) {
+                $attachments = array_values(array_filter($existing));
+            } elseif (is_string($existing) && !empty($existing)) {
+                $attachments = [$existing];
             }
         }
-        $data['attachment'] = $attachment ?: null;
+
+        // Upload and append new files
+        if ($request->hasFile('attachment')) {
+            $destinationPath = public_path('assets/examportion');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+            foreach ($request->file('attachment') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time() . '-' . uniqid() . '-' . $originalName;
+                    $file->move($destinationPath, $fileName);
+                    $attachments[] = 'assets/examportion/' . $fileName;
+                }
+            }
+        }
+        $data['attachment'] = !empty($attachments) ? array_values($attachments) : null;
         $examportion->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Exam portion updated successfully.', 'data' => $examportion], 200);
+        }
+
         return redirect()->route('examportion.index')->with('success', 'Examportion updated successfully.');
     }
 
@@ -101,7 +167,7 @@ class ExamPortionController extends Controller
             $examportion->delete();
         }
        }
-       
+
         return redirect()->back()->with('success', 'Examportion deleted successfully.');
     }
 

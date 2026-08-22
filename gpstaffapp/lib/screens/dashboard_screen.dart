@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import 'announcement_list_screen.dart';
+import 'chairman_video_list_screen.dart';
+import 'exam_portion_list_screen.dart';
+import 'question_key_list_screen.dart';
+import 'answer_key_list_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -48,47 +52,53 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           MenuItemModel(
-            id: 'exams',
+            id: 'chairman_video',
+            title: 'Chairman Video',
+            subtitle: 'Video broadcasts',
+            icon: Icons.videocam_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const ChairmanVideoListScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'exam_portion',
             title: 'Exam Portions',
-            subtitle: 'Coming soon',
+            subtitle: 'Syllabus & portions',
             icon: Icons.description_outlined,
             color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ExamPortionListScreen()),
+            ),
           ),
           MenuItemModel(
-            id: 'videos',
-            title: 'Video Classes',
-            subtitle: 'Coming soon',
-            icon: Icons.play_circle_outline,
+            id: 'question_paper',
+            title: 'Question Papers',
+            subtitle: 'Manage papers',
+            icon: Icons.quiz_outlined,
             color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const QuestionKeyListScreen()),
+            ),
           ),
           MenuItemModel(
-            id: 'reports',
-            title: 'Analytics',
-            subtitle: 'Coming soon',
-            icon: Icons.insert_chart_outlined,
+            id: 'answer_key',
+            title: 'Answer Keys',
+            subtitle: 'Keys & solutions',
+            icon: Icons.fact_check_outlined,
             color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AnswerKeyListScreen()),
+            ),
           ),
         ];
       } else if (isBranchAdmin) {
         return [
-          MenuItemModel(
-            id: 'branch_announcement',
-            title: 'Announcement',
-            subtitle: 'Notices & broadcast',
-            icon: Icons.campaign,
-            color: AppColors.primary,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AnnouncementListScreen()),
-            ),
-          ),
-          MenuItemModel(
-            id: 'staff_overview',
-            title: 'Staff Overview',
-            subtitle: 'Coming soon',
-            icon: Icons.people_outline,
-            color: AppColors.fanta,
-          ),
           MenuItemModel(
             id: 'student_directory',
             title: 'Students',
@@ -107,27 +117,6 @@ class DashboardScreen extends StatelessWidget {
       }
 
       return [
-        MenuItemModel(
-          id: 'classes',
-          title: 'Class Assign',
-          subtitle: 'Coming soon',
-          icon: Icons.calendar_today_outlined,
-          color: AppColors.primary,
-        ),
-        MenuItemModel(
-          id: 'attendance',
-          title: 'Biometric Log',
-          subtitle: 'Coming soon',
-          icon: Icons.fingerprint,
-          color: AppColors.fanta,
-        ),
-        MenuItemModel(
-          id: 'announcements',
-          title: 'Branch Notices',
-          subtitle: 'Coming soon',
-          icon: Icons.notifications_none,
-          color: AppColors.fanta,
-        ),
         MenuItemModel(
           id: 'profile',
           title: 'My Profile',
@@ -153,7 +142,8 @@ class DashboardScreen extends StatelessWidget {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.only(top: 56, bottom: 36, left: 20, right: 20),
+              padding: const EdgeInsets.only(
+                  top: 56, bottom: 36, left: 20, right: 20),
               decoration: const BoxDecoration(
                 color: AppColors.primary,
                 borderRadius: BorderRadius.only(
@@ -189,7 +179,8 @@ class DashboardScreen extends StatelessWidget {
                     child: Image.asset(
                       'assets/icon.png',
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.school, color: AppColors.primary),
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.school, color: AppColors.primary),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -198,7 +189,8 @@ class DashboardScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             color: AppColors.fanta,
                             borderRadius: BorderRadius.circular(12),
@@ -233,29 +225,39 @@ class DashboardScreen extends StatelessWidget {
                       showDialog(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          title: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.bold)),
-                          content: const Text('Are you sure you want to log out from GPCC Portal?'),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          title: const Text('Sign Out',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: const Text(
+                              'Are you sure you want to log out from GPCC Portal?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
-                              child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+                              child: const Text('Cancel',
+                                  style: TextStyle(
+                                      color: AppColors.textSecondary)),
                             ),
                             TextButton(
                               onPressed: () async {
                                 Navigator.pop(ctx);
                                 await auth.logout();
                                 if (context.mounted) {
-                                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                      '/login', (route) => false);
                                 }
                               },
-                              child: const Text('Logout', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+                              child: const Text('Logout',
+                                  style: TextStyle(
+                                      color: AppColors.error,
+                                      fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
                       );
                     },
-                    icon: const Icon(Icons.logout, color: Colors.white, size: 20),
+                    icon:
+                        const Icon(Icons.logout, color: Colors.white, size: 20),
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.white.withOpacity(0.15),
                       padding: const EdgeInsets.all(10),
@@ -284,7 +286,8 @@ class DashboardScreen extends StatelessWidget {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 14,
                       mainAxisSpacing: 14,
@@ -321,7 +324,8 @@ class DashboardScreen extends StatelessWidget {
                                   color: item.color.withOpacity(0.12),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                child: Icon(item.icon, color: item.color, size: 24),
+                                child: Icon(item.icon,
+                                    color: item.color, size: 24),
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

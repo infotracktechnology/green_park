@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../api/api_client.dart';
-import '../models/announcement_model.dart';
+import '../models/chairman_video_model.dart';
 import '../providers/announcement_filter_provider.dart';
 import '../theme/app_theme.dart';
-import 'create_announcement_screen.dart';
-import 'edit_announcement_screen.dart';
+import 'create_chairman_video_screen.dart';
+import 'edit_chairman_video_screen.dart';
 
-class AnnouncementListScreen extends StatefulWidget {
-  const AnnouncementListScreen({super.key});
+class ChairmanVideoListScreen extends StatefulWidget {
+  const ChairmanVideoListScreen({super.key});
 
   @override
-  State<AnnouncementListScreen> createState() => _AnnouncementListScreenState();
+  State<ChairmanVideoListScreen> createState() =>
+      _ChairmanVideoListScreenState();
 }
 
-class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
+class _ChairmanVideoListScreenState extends State<ChairmanVideoListScreen> {
   String _filterType = '';
-  List<AnnouncementModel> _announcements = [];
+  List<ChairmanVideoModel> _videos = [];
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchAnnouncements();
+    _fetchVideos();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final filters =
           Provider.of<AnnouncementFilterProvider>(context, listen: false);
@@ -34,26 +34,25 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     });
   }
 
-  Future<void> _fetchAnnouncements() async {
+  Future<void> _fetchVideos() async {
     setState(() => _loading = true);
     try {
       final dio = ApiClient().dio;
       final endpoint = _filterType.isNotEmpty && _filterType != 'ALL'
-          ? '/admin/announcement?coaching_type=$_filterType'
-          : '/admin/announcement';
+          ? '/admin/chairmanvideo?coaching_type=$_filterType'
+          : '/admin/chairmanvideo';
 
       final res = await dio.get(endpoint);
       if (res.data != null && res.data['status'] == true) {
-        final list = res.data['announcements'];
+        final list = res.data['chairmanvideos'];
         if (list is List) {
           setState(() {
-            _announcements =
-                list.map((e) => AnnouncementModel.fromJson(e)).toList();
+            _videos = list.map((e) => ChairmanVideoModel.fromJson(e)).toList();
           });
         }
       }
     } catch (e) {
-      debugPrint('Fetch announcements error: $e');
+      debugPrint('Fetch chairman videos error: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -70,7 +69,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
   }
 
   String _formatDateTime(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty) return '';
+    if (dateStr == null || dateStr.isEmpty) return '-';
     try {
       final dt = DateTime.parse(dateStr);
       return DateFormat('dd MMM yyyy, hh:mm a').format(dt);
@@ -79,28 +78,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     }
   }
 
-  Future<void> _openAttachment(String url) async {
-    try {
-      final uri = Uri.parse(url);
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open attachment')),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Open attachment error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open attachment')),
-        );
-      }
-    }
-  }
-
-  void _showAnnouncementDetailsModal(
-      BuildContext context, AnnouncementModel item) {
+  void _showVideoDetailsModal(BuildContext context, ChairmanVideoModel item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -118,7 +96,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
               ),
               child: Column(
                 children: [
-                  // Drag Handle
                   const SizedBox(height: 12),
                   Container(
                     width: 40,
@@ -129,8 +106,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Header
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
@@ -144,12 +119,12 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 color: AppColors.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.campaign,
+                              child: const Icon(Icons.play_circle_outline,
                                   color: AppColors.primary, size: 20),
                             ),
                             const SizedBox(width: 10),
                             const Text(
-                              'Announcement Details',
+                              'Chairman Video Details',
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -167,14 +142,11 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                     ),
                   ),
                   const Divider(height: 1, color: AppColors.borderLight),
-
-                  // Body Content
                   Expanded(
                     child: ListView(
                       controller: scrollController,
                       padding: const EdgeInsets.all(20),
                       children: [
-                        // Badges Row
                         Wrap(
                           spacing: 8,
                           runSpacing: 6,
@@ -211,28 +183,9 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 ),
                               ),
                             ),
-                            if (item.isSchedule == 1)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.shade100,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'SCHEDULED',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.amber.shade900,
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
                         const SizedBox(height: 12),
-
-                        // Title
                         SelectableText(
                           item.title,
                           style: const TextStyle(
@@ -243,8 +196,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                           ),
                         ),
                         const SizedBox(height: 6),
-
-                        // Created Date & Schedule Date
                         Row(
                           children: [
                             const Icon(Icons.access_time,
@@ -257,28 +208,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                             ),
                           ],
                         ),
-                        if (item.isSchedule == 1 &&
-                            item.startAt != null &&
-                            item.startAt!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(Icons.schedule,
-                                  size: 14, color: Colors.amber),
-                              const SizedBox(width: 5),
-                              Text(
-                                'Scheduled for: ${_formatDateTime(item.startAt)}',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.amber.shade900),
-                              ),
-                            ],
-                          ),
-                        ],
                         const SizedBox(height: 18),
-
-                        // Target Audience Card
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -340,8 +270,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-
-                        // Message Body Card
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -361,11 +289,11 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                             children: [
                               const Row(
                                 children: [
-                                  Icon(Icons.notes,
+                                  Icon(Icons.videocam_outlined,
                                       size: 16, color: AppColors.fanta),
                                   SizedBox(width: 6),
                                   Text(
-                                    'MESSAGE CONTENT',
+                                    'VIDEO DETAILS',
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w900,
@@ -376,157 +304,16 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              SelectableText(
-                                item.cleanContent.isNotEmpty
-                                    ? item.cleanContent
-                                    : 'No content body provided.',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
-                                  height: 1.5,
-                                ),
-                              ),
+                              _buildInfoRow(
+                                  'Video ID', item.videoId?.toString() ?? '-'),
+                              _buildInfoRow(
+                                  'Start At', _formatDateTime(item.startAt)),
+                              _buildInfoRow(
+                                  'End At', _formatDateTime(item.endAt)),
                             ],
                           ),
                         ),
                         const SizedBox(height: 18),
-
-                        // Attachments Card
-                        if (item.attachments.isNotEmpty) ...[
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppColors.borderLight),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.attachment,
-                                        size: 16, color: AppColors.primary),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'ATTACHMENTS (${item.attachments.length})',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.textPrimary,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: item.attachments.length,
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: 8),
-                                  itemBuilder: (context, idx) {
-                                    final path = item.attachments[idx];
-                                    final fileName =
-                                        AnnouncementModel.getAttachmentFileName(
-                                            path);
-                                    final fullUrl = path.startsWith('http')
-                                        ? path
-                                        : '${ApiClient.baseUrl}/${path.startsWith('/') ? path.substring(1) : path}';
-
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border:
-                                            Border.all(color: AppColors.border),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.description_outlined,
-                                              color: AppColors.primary,
-                                              size: 20),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  fileName,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        AppColors.textPrimary,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                                Text(
-                                                  fullUrl,
-                                                  style: const TextStyle(
-                                                      fontSize: 10,
-                                                      color:
-                                                          AppColors.textMuted),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: () =>
-                                                _openAttachment(fullUrl),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.primary
-                                                    .withOpacity(0.08),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                      Icons.visibility_outlined,
-                                                      size: 13,
-                                                      color: AppColors.primary),
-                                                  SizedBox(width: 3),
-                                                  Text(
-                                                    'View',
-                                                    style: TextStyle(
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors.primary,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                        ],
                       ],
                     ),
                   ),
@@ -589,11 +376,10 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Announcements'),
+        title: const Text('Chairman Videos'),
       ),
       body: Column(
         children: [
-          // Filter Tabs Bar
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -625,7 +411,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                         setState(() {
                           _filterType = type == 'ALL' ? '' : type;
                         });
-                        _fetchAnnouncements();
+                        _fetchVideos();
                       },
                     ),
                   );
@@ -634,24 +420,22 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
             ),
           ),
           const Divider(height: 1, color: AppColors.borderLight),
-
-          // Announcements List
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
                 await Future.wait([
-                  _fetchAnnouncements(),
+                  _fetchVideos(),
                   Provider.of<AnnouncementFilterProvider>(context,
                           listen: false)
                       .fetchMasterData(),
                 ]);
               },
               color: AppColors.fanta,
-              child: _loading && _announcements.isEmpty
+              child: _loading && _videos.isEmpty
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.fanta),
                     )
-                  : _announcements.isEmpty
+                  : _videos.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 100),
@@ -662,12 +446,12 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                   CircleAvatar(
                                     radius: 36,
                                     backgroundColor: Color(0xFFE0F2FE),
-                                    child: Icon(Icons.campaign_outlined,
+                                    child: Icon(Icons.play_circle_outline,
                                         size: 36, color: AppColors.primary),
                                   ),
                                   SizedBox(height: 16),
                                   Text(
-                                    'No Announcements',
+                                    'No Chairman Videos',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -676,7 +460,7 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Tap + to add a new announcement',
+                                    'Tap + to add a new video',
                                     style: TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textMuted),
@@ -688,15 +472,15 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                         )
                       : ListView.separated(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
-                          itemCount: _announcements.length,
+                          itemCount: _videos.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                            final item = _announcements[index];
+                            final item = _videos[index];
 
                             return InkWell(
                               onTap: () =>
-                                  _showAnnouncementDetailsModal(context, item),
+                                  _showVideoDetailsModal(context, item),
                               borderRadius: BorderRadius.circular(20),
                               child: Container(
                                 padding: const EdgeInsets.all(16),
@@ -716,7 +500,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Top Row: Badges + Date
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -725,7 +508,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                           spacing: 6,
                                           runSpacing: 4,
                                           children: [
-                                            // User Type
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -746,7 +528,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                 ),
                                               ),
                                             ),
-                                            // Course
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -767,28 +548,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                 ),
                                               ),
                                             ),
-                                            // Scheduled
-                                            if (item.isSchedule == 1)
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 3),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.amber.shade100,
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                  'SCHEDULED',
-                                                  style: TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        Colors.amber.shade900,
-                                                  ),
-                                                ),
-                                              ),
                                           ],
                                         ),
                                         Text(
@@ -800,8 +559,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: 10),
-
-                                    // Title
                                     Text(
                                       item.title,
                                       style: const TextStyle(
@@ -811,27 +568,18 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-
-                                    // Clean Content Preview
-                                    if (item.cleanContent.isNotEmpty)
-                                      Text(
-                                        item.cleanContent,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                          height: 1.4,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
+                                    Text(
+                                      'Video ID: ${item.videoId ?? '-'}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
                                       ),
-
+                                    ),
                                     const SizedBox(height: 12),
                                     const Divider(
                                         height: 1,
                                         color: AppColors.borderLight),
                                     const SizedBox(height: 10),
-
-                                    // Bottom Row: Summary & Action buttons
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -839,13 +587,13 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                         Expanded(
                                           child: Row(
                                             children: [
-                                              const Icon(Icons.people_outline,
+                                              const Icon(Icons.schedule,
                                                   size: 14,
                                                   color: AppColors.textMuted),
                                               const SizedBox(width: 4),
                                               Expanded(
                                                 child: Text(
-                                                  '${item.coachingType ?? "ALL"} • ${item.category ?? "All Categories"}',
+                                                  '${_formatDateTime(item.startAt)} - ${_formatDateTime(item.endAt)}',
                                                   style: const TextStyle(
                                                       fontSize: 11,
                                                       color:
@@ -855,53 +603,14 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                       TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              if (item
-                                                  .attachments.isNotEmpty) ...[
-                                                const SizedBox(width: 6),
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFFF1F5F9),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      const Icon(
-                                                          Icons.attach_file,
-                                                          size: 11,
-                                                          color: AppColors
-                                                              .primary),
-                                                      const SizedBox(width: 2),
-                                                      Text(
-                                                        '${item.attachments.length}',
-                                                        style: const TextStyle(
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: AppColors
-                                                                .primary),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
                                             ],
                                           ),
                                         ),
                                         Row(
                                           children: [
-                                            // View Details button
                                             InkWell(
                                               onTap: () =>
-                                                  _showAnnouncementDetailsModal(
+                                                  _showVideoDetailsModal(
                                                       context, item),
                                               borderRadius:
                                                   BorderRadius.circular(8),
@@ -940,7 +649,6 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 8),
-                                            // Edit button
                                             InkWell(
                                               onTap: () async {
                                                 final res =
@@ -948,14 +656,11 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (_) =>
-                                                        EditAnnouncementScreen(
-                                                            announcementId:
-                                                                item.id),
+                                                        EditChairmanVideoScreen(
+                                                            videoId: item.id),
                                                   ),
                                                 );
-                                                if (res == true) {
-                                                  _fetchAnnouncements();
-                                                }
+                                                if (res == true) _fetchVideos();
                                               },
                                               borderRadius:
                                                   BorderRadius.circular(8),
@@ -1007,9 +712,10 @@ class _AnnouncementListScreenState extends State<AnnouncementListScreen> {
         onPressed: () async {
           final res = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const CreateAnnouncementScreen()),
+            MaterialPageRoute(
+                builder: (_) => const CreateChairmanVideoScreen()),
           );
-          if (res == true) _fetchAnnouncements();
+          if (res == true) _fetchVideos();
         },
         backgroundColor: AppColors.fanta,
         elevation: 4,

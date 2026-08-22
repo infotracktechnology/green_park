@@ -50,7 +50,10 @@ class AuthProvider with ChangeNotifier {
       );
 
       final data = response.data;
-      if (data is Map<String, dynamic> && (data['status'] == true || data['status'] == 1 || data['token'] != null)) {
+      if (data is Map<String, dynamic> &&
+          (data['status'] == true ||
+              data['status'] == 1 ||
+              data['token'] != null)) {
         final tokenStr = (data['token'] ?? '').toString();
         final userObj = data['user'] is Map<String, dynamic>
             ? data['user'] as Map<String, dynamic>
@@ -67,7 +70,8 @@ class AuthProvider with ChangeNotifier {
         return {'success': true};
       }
 
-      final message = (data is Map ? data['message'] : null) ?? 'Invalid username or password.';
+      final message = (data is Map ? data['message'] : null) ??
+          'Invalid username or password.';
       return {'success': false, 'message': message.toString()};
     } on DioException catch (e) {
       String msg = 'Connection error. Please check your internet connection.';

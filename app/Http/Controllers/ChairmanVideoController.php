@@ -22,7 +22,20 @@ class ChairmanVideoController extends Controller
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
             ->latest()->get();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'chairmanvideos' => $chairmanvideos], 200);
+        }
+
         return view('chairmanvideo.index', compact('chairmanvideos'));
+    }
+
+    public function show(Request $request, Chairmanvideo $chairmanvideo)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'chairmanvideo' => $chairmanvideo]);
+        }
+
+        return redirect()->route('chairmanvideo.index');
     }
 
     public function create()
@@ -61,6 +74,10 @@ class ChairmanVideoController extends Controller
             Log::error('FCM Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
         }
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Chairman video created successfully.', 'data' => $chairmanvideo], 200);
+        }
+
         return redirect()->route('chairmanvideo.index')->with('success', 'Chairman video created successfully.');
     }
 
@@ -71,6 +88,10 @@ class ChairmanVideoController extends Controller
         $section = Student::StudentFilterQuery($chairmanvideo->branch, $chairmanvideo->course, $chairmanvideo->type, $chairmanvideo->category, $chairmanvideo->batch, $chairmanvideo->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
         $students = Student::StudentFilterQuery($chairmanvideo->branch, $chairmanvideo->course, $chairmanvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'chairmanvideo' => $chairmanvideo, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
 
         return view('chairmanvideo.edit', compact('chairmanvideo', 'type', 'section', 'students'));
     }
@@ -95,6 +116,10 @@ class ChairmanVideoController extends Controller
         }
 
         $chairmanvideo->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Video updated successfully!', 'data' => $chairmanvideo], 200);
+        }
 
         return redirect()->route('chairmanvideo.index')->with('success', 'Video updated successfully!');
     }

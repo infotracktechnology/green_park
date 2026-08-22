@@ -8,7 +8,8 @@ class StudentItem {
     if (value is Map<String, dynamic>) {
       return StudentItem(
         id: (value['student_id'] ?? value['id'] ?? idKey ?? '').toString(),
-        name: (value['student_name'] ?? value['name'] ?? idKey ?? '').toString(),
+        name:
+            (value['student_name'] ?? value['name'] ?? idKey ?? '').toString(),
       );
     }
     return StudentItem(

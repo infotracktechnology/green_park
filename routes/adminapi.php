@@ -9,7 +9,7 @@ use App\Models\Staff;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
-use App\Http\Controllers\{HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, ReportController,HomeController};
+use App\Http\Controllers\{HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, ReportController, HomeController};
 
 Route::post('/login', function (Request $request) {
     $user = null;
@@ -53,9 +53,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         $batch = Student::select('batch')->whereNotNull('batch')->where('batch', '!=', '')->distinct()->orderBy('batch')->get()->pluck('batch')->toArray();
 
-        return response()->json(['status' => true,'academicyear' => $academicyear, 'course' => $course, 'branches' => $branches, 'coachingtype' => $coachingtype, 'hostel' => $hostel, 'batch' => $batch]);
+        return response()->json(['status' => true, 'academicyear' => $academicyear, 'course' => $course, 'branches' => $branches, 'coachingtype' => $coachingtype, 'hostel' => $hostel, 'batch' => $batch]);
     });
 
     Route::resource('announcement', AnnouncementController::class);
+    Route::resource('chairmanvideo', ChairmanVideoController::class);
+    Route::resource('examportion', ExamPortionController::class);
+    Route::resource('questionkey', QuestionKeyController::class);
+    Route::resource('answerkey', AnswerkeyController::class);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });
