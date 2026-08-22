@@ -25,7 +25,6 @@ class QuestionKeyController extends Controller
         return view('questionkey.index', compact('questionkeys'));
     }
 
-
     public function create()
     {
         return view('questionkey.create');
@@ -82,8 +81,7 @@ class QuestionKeyController extends Controller
         return redirect()->route('questionkey.index')->with('success', 'Question Key added successfully!');
     }
 
-
-    public function edit(QuestionKey $questionkey)
+    public function edit(Request $request, QuestionKey $questionkey)
     {
         $type = Student::StudentFilterQuery($questionkey->branch, $questionkey->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
@@ -151,7 +149,6 @@ class QuestionKeyController extends Controller
         return redirect()->route('questionkey.index')->with('success', 'Question Key updated successfully!');
     }
 
-
     public function destroy(Request $request, $id = null)
     {
         if ($request->has('ids')) {
@@ -159,7 +156,9 @@ class QuestionKeyController extends Controller
             foreach ($questionkeys as $questionkey) {
                 if (!empty($questionkey->file_path)) {
                     foreach ($questionkey->file_path as $file_path) {
-                        if (file_exists($file_path)) {
+                        if (file_exists(public_path($file_path))) {
+                            unlink(public_path($file_path));
+                        } elseif (file_exists($file_path)) {
                             unlink($file_path);
                         }
                     }

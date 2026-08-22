@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../api/api_client.dart';
 import '../models/master_data_model.dart';
@@ -91,6 +92,30 @@ class _EditQuestionKeyScreenState extends State<EditQuestionKeyScreen> {
       }
     } catch (e) {
       debugPrint('File picker error: $e');
+    }
+  }
+
+  Future<void> _openFile(String path) async {
+    try {
+      final normalized = path.replaceAll('\\', '/');
+      final fullUrl = normalized.startsWith('http')
+          ? normalized
+          : '${ApiClient.baseUrl}/${normalized.startsWith('/') ? normalized.substring(1) : normalized}';
+      final uri = Uri.parse(fullUrl);
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open file')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Open file error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open file')),
+        );
+      }
     }
   }
 
@@ -674,6 +699,10 @@ class _EditQuestionKeyScreenState extends State<EditQuestionKeyScreen> {
                                         color: AppColors.textPrimary),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis)),
+                            IconButton(
+                                icon: const Icon(Icons.visibility_outlined,
+                                    color: AppColors.primary, size: 20),
+                                onPressed: () => _openFile(filePath)),
                             IconButton(
                                 icon: const Icon(Icons.close,
                                     color: AppColors.error, size: 18),
