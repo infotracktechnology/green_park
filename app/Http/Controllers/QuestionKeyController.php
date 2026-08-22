@@ -81,10 +81,6 @@ class QuestionKeyController extends Controller
         return redirect()->route('questionkey.index')->with('success', 'Question Key added successfully!');
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
     public function edit(Request $request, QuestionKey $questionkey)
     {
         $type = Student::StudentFilterQuery($questionkey->branch, $questionkey->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
