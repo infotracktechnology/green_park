@@ -138,7 +138,7 @@
                     <small id="fileName">
                       @if($answerkey->file_path)
                       @foreach ($answerkey->file_path as $file)
-                       <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                       <a href="{{ rtrim(env('APP_URL'), '/') . '/public/' . ltrim($file, '/') }}" target="_blank"> {{ basename($file) }} </a>
                       @endforeach
                       @endif
                     </small>
