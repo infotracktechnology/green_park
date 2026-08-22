@@ -83,7 +83,7 @@ class QuestionKeyController extends Controller
     }
 
 
-    public function edit(QuestionKey $questionkey)
+    public function edit(Request $request, QuestionKey $questionkey)
     {
         $type = Student::StudentFilterQuery($questionkey->branch, $questionkey->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
