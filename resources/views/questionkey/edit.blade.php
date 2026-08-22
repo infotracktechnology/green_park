@@ -218,7 +218,7 @@
   });
 
   document.getElementById('fileInput').addEventListener('change', function() {
-      let fileName = this.files[0] ? this.files[0].name : "{{ basename($file) }}";
+      let fileName = this.files[0] ? this.files[0].name : "";
       document.getElementById('fileName').innerText = fileName;
   });
 </script>
