@@ -82,7 +82,7 @@
                         <td>
                           @if($row->file_path)
                           @foreach($row->file_path as $file)
-                          <a href="{{ env('APP_URL').'/'.$file }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                          <a href="{{ rtrim(env('APP_URL'), '/') . '/public/' . ltrim($file, '/') }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
                           @endforeach
                           @endif
                         </td>
