@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../api/api_client.dart';
 import '../models/master_data_model.dart';
 import '../models/answer_key_model.dart';
@@ -89,6 +90,30 @@ class _EditAnswerKeyScreenState extends State<EditAnswerKeyScreen> {
       }
     } catch (e) {
       debugPrint('File picker error: $e');
+    }
+  }
+
+  Future<void> _openFile(String path) async {
+    try {
+      final normalized = path.replaceAll('\\', '/');
+      final fullUrl = normalized.startsWith('http')
+          ? normalized
+          : '${ApiClient.baseUrl}/${normalized.startsWith('/') ? normalized.substring(1) : normalized}';
+      final uri = Uri.parse(fullUrl);
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open file')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Open file error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open file')),
+        );
+      }
     }
   }
 
@@ -661,11 +686,15 @@ class _EditAnswerKeyScreenState extends State<EditAnswerKeyScreen> {
                                       Expanded(
                                           child: Text(n,
                                               style: const TextStyle(
-                                                  fontSize: 12,
+fontSize: 12,
                                                   fontWeight: FontWeight.w600,
                                                   color: AppColors.textPrimary),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis)),
+                                      IconButton(
+                                          icon: const Icon(Icons.visibility_outlined,
+                                              color: AppColors.primary, size: 20),
+                                          onPressed: () => _openFile(p)),
                                       IconButton(
                                           icon: const Icon(Icons.close,
                                               color: AppColors.error, size: 18),

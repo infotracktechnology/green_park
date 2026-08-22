@@ -79,7 +79,7 @@ class DashboardScreen extends StatelessWidget {
             title: 'Question Papers',
             subtitle: 'Manage papers',
             icon: Icons.quiz_outlined,
-            color: AppColors.fanta,
+            color: AppColors.primary,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const QuestionKeyListScreen()),

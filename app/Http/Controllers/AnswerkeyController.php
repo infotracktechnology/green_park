@@ -13,8 +13,8 @@ class AnswerkeyController extends Controller
     public function index(Request $request)
     {
         $answerkeys = AnswerKey::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
-            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch', 'like', '%' . auth()->user()->branch . '%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type', 'like', '%' . $request->coaching_type . '%'))
             ->latest()->get();
 
         if ($request->wantsJson()) {
@@ -24,11 +24,9 @@ class AnswerkeyController extends Controller
         return view('answerkey.index', compact('answerkeys'));
     }
 
-
     public function create()
     {
-
-        return view('answerkey.create',);
+        return view('answerkey.create');
     }
 
     public function show(Request $request, AnswerKey $answerkey)
@@ -40,10 +38,9 @@ class AnswerkeyController extends Controller
         return redirect()->route('answerkey.index');
     }
 
-
     public function store(Request $request)
     {
-         $data = $request->except(['_token', '_method', 'file']);
+        $data = $request->except(['_token', '_method', 'file']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             if (isset($data[$field])) {
@@ -60,7 +57,7 @@ class AnswerkeyController extends Controller
 
         $file_path = [];
         if ($request->hasFile('file')) {
-            $destinationPath = public_path('answer_key');
+            $destinationPath = public_path('answerkey');
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -69,7 +66,7 @@ class AnswerkeyController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $file_path[] = 'answer_key/' . $fileName;
+                    $file_path[] = 'answerkey/' . $fileName;
                 }
             }
         }
@@ -83,8 +80,7 @@ class AnswerkeyController extends Controller
         return redirect()->route('answerkey.index')->with('success', 'Answer Key added successfully!');
     }
 
-
-    public function edit(AnswerKey $answerkey, Request $request)
+    public function edit(Request $request, AnswerKey $answerkey)
     {
         $type = Student::StudentFilterQuery($answerkey->branch, $answerkey->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
@@ -101,7 +97,7 @@ class AnswerkeyController extends Controller
 
     public function update(Request $request, AnswerKey $answerkey)
     {
-         $data = $request->except(['_token', '_method', 'file']);
+        $data = $request->except(['_token', '_method', 'file']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             if (isset($data[$field])) {
@@ -129,7 +125,7 @@ class AnswerkeyController extends Controller
 
         // Upload and append new files
         if ($request->hasFile('file')) {
-            $destinationPath = public_path('answer_key');
+            $destinationPath = public_path('answerkey');
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -138,7 +134,7 @@ class AnswerkeyController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $file_path[] = 'answer_key/' . $fileName;
+                    $file_path[] = 'answerkey/' . $fileName;
                 }
             }
         }
@@ -152,15 +148,16 @@ class AnswerkeyController extends Controller
         return redirect()->route('answerkey.index')->with('success', 'Answer Key updated successfully!');
     }
 
-
-    public function destroy(Request $request, $id=null)
+    public function destroy(Request $request, $id = null)
     {
-        if($request->has('ids')) {
+        if ($request->has('ids')) {
             $answerkeys = AnswerKey::whereIn('id', $request->ids)->get();
             foreach ($answerkeys as $answerkey) {
-                if(!empty($answerkey->file_path)){
+                if (!empty($answerkey->file_path)) {
                     foreach ($answerkey->file_path as $file_path) {
-                        if (file_exists($file_path)) {
+                        if (file_exists(public_path($file_path))) {
+                            unlink(public_path($file_path));
+                        } elseif (file_exists($file_path)) {
                             unlink($file_path);
                         }
                     }
@@ -170,7 +167,6 @@ class AnswerkeyController extends Controller
         }
         return redirect()->back()->with('success', 'Answer Key deleted successfully!');
     }
-
 
     public function answerkey()
     {

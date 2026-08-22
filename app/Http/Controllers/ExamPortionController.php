@@ -9,7 +9,6 @@ use App\Models\Examportion;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
-
 use Illuminate\Support\Facades\DB;
 
 class ExamPortionController extends Controller
@@ -17,8 +16,8 @@ class ExamPortionController extends Controller
     public function index(Request $request)
     {
         $examportions = Examportion::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
-            ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->when(auth()->user()->branch, fn($q) => $q->where('branch', 'like', '%' . auth()->user()->branch . '%'))
+            ->when($request->coaching_type, fn($q) => $q->where('coaching_type', 'like', '%' . $request->coaching_type . '%'))
             ->latest()->get();
 
         if ($request->wantsJson()) {
@@ -27,9 +26,9 @@ class ExamPortionController extends Controller
 
         return view('examportion.index', compact('examportions'));
     }
+
     public function create()
     {
-
         return view('examportion.create');
     }
 
@@ -41,6 +40,7 @@ class ExamPortionController extends Controller
 
         return redirect()->route('examportion.index');
     }
+
     public function store(Request $request)
     {
         $data = $request->except(['_token', '_method', 'attachment', 'existing_attachment']);
@@ -60,7 +60,7 @@ class ExamPortionController extends Controller
 
         $attachments = [];
         if ($request->hasFile('attachment')) {
-            $destinationPath = public_path('assets/examportion');
+            $destinationPath = public_path('examportions');
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -69,7 +69,7 @@ class ExamPortionController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/examportion/' . $fileName;
+                    $attachments[] = 'examportions/' . $fileName;
                 }
             }
         }
@@ -83,7 +83,7 @@ class ExamPortionController extends Controller
         return to_route('examportion.index')->with('success', 'Examportion created successfully');
     }
 
-    public function edit(Examportion $examportion)
+    public function edit(Request $request, Examportion $examportion)
     {
         $type = Student::StudentFilterQuery($examportion->branch, $examportion->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
@@ -128,7 +128,7 @@ class ExamPortionController extends Controller
 
         // Upload and append new files
         if ($request->hasFile('attachment')) {
-            $destinationPath = public_path('assets/examportion');
+            $destinationPath = public_path('examportions');
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -137,7 +137,7 @@ class ExamPortionController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/examportion/' . $fileName;
+                    $attachments[] = 'examportions/' . $fileName;
                 }
             }
         }
@@ -151,22 +151,23 @@ class ExamPortionController extends Controller
         return redirect()->route('examportion.index')->with('success', 'Examportion updated successfully.');
     }
 
-
-    public function destroy(Request $request, $id=null)
+    public function destroy(Request $request, $id = null)
     {
-       if($request->has('ids')) {
-        $examportions = Examportion::whereIn('id', $request->ids)->get();
-        foreach ($examportions as $examportion) {
-            if(!empty($examportion->attachment)){
-                foreach ($examportion->attachment as $attachment) {
-                    if (file_exists($attachment)) {
-                        unlink($attachment);
+        if ($request->has('ids')) {
+            $examportions = Examportion::whereIn('id', $request->ids)->get();
+            foreach ($examportions as $examportion) {
+                if (!empty($examportion->attachment)) {
+                    foreach ($examportion->attachment as $attachment) {
+                        if (file_exists(public_path($attachment))) {
+                            unlink(public_path($attachment));
+                        } elseif (file_exists($attachment)) {
+                            unlink($attachment);
+                        }
                     }
                 }
+                $examportion->delete();
             }
-            $examportion->delete();
         }
-       }
 
         return redirect()->back()->with('success', 'Examportion deleted successfully.');
     }

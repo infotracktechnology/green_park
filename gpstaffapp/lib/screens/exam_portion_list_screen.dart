@@ -380,9 +380,10 @@ class _ExamPortionListScreenState extends State<ExamPortionListScreen> {
                                     final fileName =
                                         ExamPortionModel.getAttachmentFileName(
                                             path);
-                                    final fullUrl = path.startsWith('http')
-                                        ? path
-                                        : '${ApiClient.baseUrl}/${path.startsWith('/') ? path.substring(1) : path}';
+                                    final cleanPath = path.replaceAll('\\', '/');
+                                    final fullUrl = cleanPath.startsWith('http')
+                                        ? cleanPath
+                                        : '${ApiClient.baseUrl}/${cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath}';
 
                                     return Container(
                                       padding: const EdgeInsets.symmetric(

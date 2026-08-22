@@ -364,9 +364,10 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                     final path = item.files[idx];
                                     final fileName =
                                         QuestionKeyModel.getFileName(path);
-                                    final fullUrl = path.startsWith('http')
-                                        ? path
-                                        : '${ApiClient.baseUrl}/${path.startsWith('/') ? path.substring(1) : path}';
+                                    final cleanPath = path.replaceAll('\\', '/');
+                                    final fullUrl = cleanPath.startsWith('http')
+                                        ? cleanPath
+                                        : '${ApiClient.baseUrl}/${cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath}';
                                     return Container(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 12, vertical: 10),
