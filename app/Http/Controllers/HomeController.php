@@ -83,7 +83,7 @@ class HomeController extends Controller
 
         $exams = Exam::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
             })->orderBy('start_at', 'desc')->take(7)->get();
 
         return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman', 'academic_years', 'active_year', 'exams'));
