@@ -8,6 +8,7 @@ import 'exam_portion_list_screen.dart';
 import 'question_key_list_screen.dart';
 import 'answer_key_list_screen.dart';
 import 'download_list_screen.dart';
+import 'worksheet_list_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -106,6 +107,17 @@ class DashboardScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const DownloadListScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'worksheet',
+            title: 'Worksheets',
+            subtitle: 'Assignments & worksheets',
+            icon: Icons.assignment_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const WorksheetListScreen()),
             ),
           ),
         ];
