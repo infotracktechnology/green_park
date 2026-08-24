@@ -16,40 +16,67 @@ class WorksheetController extends Controller
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
             ->latest()->get();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'worksheets' => $worksheets], 200);
+        }
+
         return view('worksheet.index', compact('worksheets'));
     }
 
     public function create()
     {
-
         return view('worksheet.create');
+    }
+
+    public function show(Request $request, Worksheet $worksheet)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'worksheet' => $worksheet]);
+        }
+
+        return redirect()->route('worksheet.index');
     }
 
     public function store(Request $request)
     {
-        $data = $request->except('file');
-        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        $data = $request->except(['_token', '_method', 'file']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
-        }
-         
-        $file_path = [];
-        if ($request->hasFile('file')) {
-            foreach($request->file('file')as $file){
-                $originalName = $file->getClientOriginalName();
-                $fileName = time().'_'.$originalName;
-                $file->move('worksheet',$fileName);
-                $file_path[] = 'worksheet/'.$fileName;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
             }
         }
-        $data['file_path'] = $file_path ?: null;
-        Worksheet::create($data);
+
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
+        }
+
+        $file_path = [];
+        if ($request->hasFile('file')) {
+            $destinationPath = 'worksheet';
+            foreach ($request->file('file') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time().'_'.$originalName;
+                    $file->move($destinationPath, $fileName);
+                    $file_path[] = 'worksheet/'.$fileName;
+                }
+            }
+        }
+        $data['file_path'] = !empty($file_path) ? array_values($file_path) : null;
+        $worksheet = Worksheet::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Worksheet created successfully.', 'data' => $worksheet], 200);
+        }
 
         return redirect()->route('worksheet.index')->with('success', 'Worksheet created successfully.');
     }
 
-    public function edit(Worksheet $worksheet)
+    public function edit(Request $request, Worksheet $worksheet)
     {
         $type = Student::StudentFilterQuery($worksheet->branch, $worksheet->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
@@ -57,6 +84,9 @@ class WorksheetController extends Controller
 
         $students = Student::StudentFilterQuery($worksheet->branch, $worksheet->course, $worksheet->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'worksheet' => $worksheet, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
 
         return view('worksheet.edit', compact('worksheet', 'type', 'section', 'students'));
     }
@@ -64,24 +94,50 @@ class WorksheetController extends Controller
 
     public function update(Request $request, Worksheet $worksheet)
     {
-        $data = $request->except('file');
-        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        $data = $request->except(['_token', '_method', 'file', 'existing_file_path']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
-        }
-
-        $file_path = [];
-        if ($request->hasFile('file')) {
-            foreach($request->file('file')as $file){
-                $originalName = $file->getClientOriginalName();
-                $fileName = time().'_'.$originalName;
-                $file->move('worksheet',$fileName);
-                $file_path[] = 'worksheet/'.$fileName;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
             }
         }
-        $data['file_path'] = $file_path ?: null;
+
+        $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
+        if ($data['is_schedule'] == 0) {
+            $data['start_at'] = null;
+        }
+
+        // Retain remaining existing files
+        $file_path = [];
+        if ($request->has('existing_file_path')) {
+            $existing = $request->input('existing_file_path');
+            if (is_array($existing)) {
+                $file_path = array_values(array_filter($existing));
+            } elseif (is_string($existing) && !empty($existing)) {
+                $file_path = [$existing];
+            }
+        }
+
+        // Upload and append new files
+        if ($request->hasFile('file')) {
+            $destinationPath = 'worksheet';
+            foreach ($request->file('file') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $fileName = time().'_'.$originalName;
+                    $file->move($destinationPath, $fileName);
+                    $file_path[] = 'worksheet/'.$fileName;
+                }
+            }
+        }
+        $data['file_path'] = !empty($file_path) ? array_values($file_path) : null;
         $worksheet->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Worksheet updated successfully.', 'data' => $worksheet], 200);
+        }
 
         return redirect()->route('worksheet.index')->with('success', 'Worksheet updated successfully.');
     }
