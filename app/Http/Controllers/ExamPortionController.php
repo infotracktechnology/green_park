@@ -60,7 +60,7 @@ class ExamPortionController extends Controller
 
         $attachments = [];
         if ($request->hasFile('attachment')) {
-            $destinationPath = public_path('examportions');
+            $destinationPath = 'examportions';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -128,7 +128,7 @@ class ExamPortionController extends Controller
 
         // Upload and append new files
         if ($request->hasFile('attachment')) {
-            $destinationPath = public_path('examportions');
+            $destinationPath = 'examportions';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -158,8 +158,8 @@ class ExamPortionController extends Controller
             foreach ($examportions as $examportion) {
                 if (!empty($examportion->attachment)) {
                     foreach ($examportion->attachment as $attachment) {
-                        if (file_exists(public_path($attachment))) {
-                            unlink(public_path($attachment));
+                        if (file_exists($attachment)) {
+                            unlink($attachment);
                         } elseif (file_exists($attachment)) {
                             unlink($attachment);
                         }
