@@ -81,7 +81,9 @@
                         </tr>
                       </thead>
                       <tbody>
-                        @foreach($section as $row)
+                        @foreach($section->sortBy(function ($row) {
+                              return (int) preg_replace('/[^0-9]/', '', $row->section);
+                          }) as $row)
                         <tr>
                           <td>{{ $row->section }}</td>
                           <td>{{ $row->batch }}</td>
