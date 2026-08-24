@@ -139,7 +139,7 @@
                   <small id="fileName">
                     @if($questionkey->file_path)
                     @foreach ($questionkey->file_path as $file )
-                      <a href="{{ url('public/' . ltrim($file, '/')) }}" target="_blank"> {{ basename($file) }} </a>
+                      <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
                     @endforeach
                     @endif
                   </small>

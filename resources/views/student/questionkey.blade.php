@@ -39,7 +39,7 @@
                                         <td>
                                             @if($questionkey->file_path)
                                                 @foreach ($questionkey->file_path as $file )
-                                                <a href="{{ rtrim(env('APP_URL'), '/') . '/public/' . ltrim($file, '/') }}" data-action="seen Question Papers - {{ $questionkey->id }}" class="btn btn-primary" download>
+                                                <a href="{{ env('APP_URL').'/'.$file }}" data-action="seen Question Papers - {{ $questionkey->id }}" class="btn btn-primary" download>
                                                     <i class="fas fa-file-download"></i> Download
                                                 </a>   
                                                 @endforeach
