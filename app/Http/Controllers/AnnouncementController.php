@@ -66,7 +66,7 @@ class AnnouncementController extends Controller
         $attachments = [];
 
         if ($request->hasFile('attachment')) {
-            $destinationPath = public_path('assets/attachments');
+            $destinationPath = 'assets/attachments';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -150,7 +150,7 @@ class AnnouncementController extends Controller
 
         // Upload and append new files
         if ($request->hasFile('attachment')) {
-            $destinationPath = public_path('assets/attachments');
+            $destinationPath = 'assets/attachments';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }

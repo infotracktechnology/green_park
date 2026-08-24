@@ -7,6 +7,7 @@ import 'chairman_video_list_screen.dart';
 import 'exam_portion_list_screen.dart';
 import 'question_key_list_screen.dart';
 import 'answer_key_list_screen.dart';
+import 'download_list_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -94,6 +95,17 @@ class DashboardScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AnswerKeyListScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'download',
+            title: 'Downloads',
+            subtitle: 'Study materials & files',
+            icon: Icons.file_download_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DownloadListScreen()),
             ),
           ),
         ];

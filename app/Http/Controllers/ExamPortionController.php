@@ -60,7 +60,7 @@ class ExamPortionController extends Controller
 
         $attachments = [];
         if ($request->hasFile('attachment')) {
-            $destinationPath = 'assets/examportions';
+            $destinationPath = 'assets/examportion';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -69,7 +69,7 @@ class ExamPortionController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/examportions/' . $fileName;
+                    $attachments[] = 'assets/examportion/' . $fileName;
                 }
             }
         }
@@ -128,7 +128,7 @@ class ExamPortionController extends Controller
 
         // Upload and append new files
         if ($request->hasFile('attachment')) {
-            $destinationPath = 'assets/examportions';
+            $destinationPath = 'assets/examportion';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -137,7 +137,7 @@ class ExamPortionController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/examportions/' . $fileName;
+                    $attachments[] = 'assets/examportion/' . $fileName;
                 }
             }
         }

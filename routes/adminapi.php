@@ -61,5 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('examportion', ExamPortionController::class);
     Route::resource('questionkey', QuestionKeyController::class);
     Route::resource('answerkey', AnswerkeyController::class);
+    Route::resource('download', DownloadController::class);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });

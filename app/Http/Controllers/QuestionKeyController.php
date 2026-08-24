@@ -58,7 +58,7 @@ class QuestionKeyController extends Controller
 
         $file_path = [];
         if ($request->hasFile('file')) {
-            $destinationPath = public_path('questionkey');
+            $destinationPath = 'questionkey';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -126,7 +126,7 @@ class QuestionKeyController extends Controller
 
         // Upload and append new files
         if ($request->hasFile('file')) {
-            $destinationPath = public_path('questionkey');
+            $destinationPath = 'questionkey';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -156,8 +156,8 @@ class QuestionKeyController extends Controller
             foreach ($questionkeys as $questionkey) {
                 if (!empty($questionkey->file_path)) {
                     foreach ($questionkey->file_path as $file_path) {
-                        if (file_exists(public_path($file_path))) {
-                            unlink(public_path($file_path));
+                        if (file_exists($file_path)) {
+                            unlink($file_path);
                         } elseif (file_exists($file_path)) {
                             unlink($file_path);
                         }
