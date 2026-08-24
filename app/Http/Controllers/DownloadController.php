@@ -58,7 +58,7 @@ class DownloadController extends Controller
 
         $file_path = [];
         if ($request->hasFile('file')) {
-            $destinationPath = 'Download';
+            $destinationPath = 'download';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -67,7 +67,7 @@ class DownloadController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '_' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $file_path[] = 'Download/' . $fileName;
+                    $file_path[] = 'download/'.$fileName;
                 }
             }
         }
@@ -126,7 +126,7 @@ class DownloadController extends Controller
 
         // Upload and append new files
         if ($request->hasFile('file')) {
-            $destinationPath = 'Download';
+            $destinationPath = 'download';
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0777, true);
             }
@@ -135,7 +135,7 @@ class DownloadController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '_' . $originalName;
                     $file->move($destinationPath, $fileName);
-                    $file_path[] = 'Download/' . $fileName;
+                    $file_path[] = 'download/'.$fileName;
                 }
             }
         }
