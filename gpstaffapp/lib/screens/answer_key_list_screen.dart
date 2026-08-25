@@ -267,17 +267,18 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                 if (item.batch != null &&
                                     item.batch.toString().isNotEmpty)
                                   _buildInfoRow('Batch', item.batchDisplay),
-                                _buildInfoRow('Gender', item.gender ?? 'All'),
                                 if (item.usertype == 'INDIVIDUAL')
                                   _buildInfoRow('Target Student',
                                       item.students?.toString() ?? 'N/A')
-                                else
+                                else ...[
+                                  _buildInfoRow('Gender', item.gender ?? 'All'),
                                   _buildInfoRow(
                                       'Section',
                                       (item.section == null ||
                                               item.section!.isEmpty)
                                           ? 'All Sections'
                                           : item.section!),
+                                ],
                               ]),
                         ),
                         const SizedBox(height: 18),

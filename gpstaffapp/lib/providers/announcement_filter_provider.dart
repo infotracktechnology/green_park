@@ -215,6 +215,11 @@ class AnnouncementFilterProvider with ChangeNotifier {
 
   void setUsertype(String type) {
     _usertype = type;
+    if (_usertype == 'INDIVIDUAL') {
+      _gender = '';
+    } else if (_gender.isEmpty) {
+      _gender = 'All';
+    }
     _updateVisibility();
     if (_usertype == 'INDIVIDUAL') {
       fetchStudents();
@@ -348,6 +353,7 @@ class AnnouncementFilterProvider with ChangeNotifier {
     }
 
     // Clear values for hidden fields as done in JS: if(!show) $el.val('');
+    if (!_showGender) _gender = '';
     if (!_showCategory) _category = [];
     if (!_showBatch) _batch = [];
     if (!_showSection && _usertype != 'INDIVIDUAL') _section = '';

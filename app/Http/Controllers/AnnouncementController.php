@@ -57,6 +57,16 @@ class AnnouncementController extends Controller
             }
         }
 
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
+            }
+        }
+
         $data['is_schedule'] = $request->has('is_schedule') ? 1 : 0;
         if ($data['is_schedule'] == 0) {
             $data['start_at'] = null;
@@ -127,6 +137,16 @@ class AnnouncementController extends Controller
                 $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
             } else {
                 $data[$field] = null;
+            }
+        }
+
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
             }
         }
 

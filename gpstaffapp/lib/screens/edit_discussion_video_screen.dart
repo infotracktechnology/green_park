@@ -330,8 +330,6 @@ class _EditDiscussionVideoScreenState extends State<EditDiscussionVideoScreen> {
         'branch': filters.branches,
         'coaching_type': filters.coachingTypes,
         'category': filters.category,
-        'batch': filters.batch,
-        'gender': filters.gender,
         'day': day,
         'date': DateFormat('yyyy-MM-dd').format(_selectedDate),
         'subject': _selectedSubject,
@@ -340,10 +338,15 @@ class _EditDiscussionVideoScreenState extends State<EditDiscussionVideoScreen> {
         'video_id': videoId,
         'start_at': DateFormat('yyyy-MM-dd HH:mm:00').format(_startAt!),
         'end_at': DateFormat('yyyy-MM-dd HH:mm:00').format(_endAt!),
-        if (filters.usertype == 'INDIVIDUAL')
-          'students': filters.student
-        else
+        if (filters.usertype == 'INDIVIDUAL') ...{
+          'students': filters.student,
+          'gender': null,
+          'section': null,
+        } else ...{
+          'gender': filters.gender.isNotEmpty ? filters.gender : 'All',
           'section': filters.section,
+          'students': null,
+        },
       };
 
       final dio = ApiClient().dio;

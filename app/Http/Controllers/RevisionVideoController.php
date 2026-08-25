@@ -51,6 +51,16 @@ class RevisionVideoController extends Controller
             }
         }
 
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
+            }
+        }
+
         if ($request->hasFile('file')) {
             $revisionvideos = [];
             $file = $request->file('file');
@@ -131,6 +141,16 @@ class RevisionVideoController extends Controller
                 $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
             } else {
                 $data[$field] = null;
+            }
+        }
+
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
             }
         }
 

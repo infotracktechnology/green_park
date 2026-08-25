@@ -252,20 +252,18 @@ class _ChairmanVideoListScreenState extends State<ChairmanVideoListScreen> {
                                   item.category.toString().isNotEmpty)
                                 _buildInfoRow(
                                     'Category (H/D)', item.categoryDisplay),
-                              if (item.batch != null &&
-                                  item.batch.toString().isNotEmpty)
-                                _buildInfoRow('Batch', item.batchDisplay),
-                              _buildInfoRow('Gender', item.gender ?? 'All'),
                               if (item.usertype == 'INDIVIDUAL')
                                 _buildInfoRow('Target Student',
                                     item.students?.toString() ?? 'N/A')
-                              else
+                              else ...[
+                                _buildInfoRow('Gender', item.gender ?? 'All'),
                                 _buildInfoRow(
                                     'Section',
                                     (item.section == null ||
                                             item.section!.isEmpty)
                                         ? 'All Sections'
                                         : item.section!),
+                              ],
                             ],
                           ),
                         ),

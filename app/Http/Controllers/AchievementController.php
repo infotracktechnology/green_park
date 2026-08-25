@@ -62,6 +62,16 @@ class AchievementController extends Controller
             }
         }
 
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
+            }
+        }
+
         // Video Upload
         if ($request->hasFile('video')) {
             $videoFile = $request->file('video');
@@ -120,6 +130,16 @@ class AchievementController extends Controller
                 $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
             } else {
                 $data[$field] = null;
+            }
+        }
+
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
             }
         }
  

@@ -253,15 +253,19 @@ class _EditRevisionVideoScreenState extends State<EditRevisionVideoScreen> {
         'coaching_type': filters.coachingTypes,
         'category': filters.category,
         'batch': filters.batch,
-        'gender': filters.gender,
         'subject': _selectedSubject,
         'chapter': chapter,
         'video_id': videoId,
         'expire_at': DateFormat('yyyy-MM-dd HH:mm:00').format(_expireAt!),
-        if (filters.usertype == 'INDIVIDUAL')
-          'students': filters.student
-        else
+        if (filters.usertype == 'INDIVIDUAL') ...{
+          'students': filters.student,
+          'gender': null,
+          'section': null,
+        } else ...{
+          'gender': filters.gender.isNotEmpty ? filters.gender : 'All',
           'section': filters.section,
+          'students': null,
+        },
       };
 
       final dio = ApiClient().dio;

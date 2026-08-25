@@ -218,11 +218,10 @@ class _CreateRevisionVideoScreenState extends State<CreateRevisionVideoScreen> {
         formData.fields.add(MapEntry('batch[]', bat));
       }
 
-      formData.fields.add(MapEntry('gender', filters.gender));
-
       if (filters.usertype == 'INDIVIDUAL') {
         formData.fields.add(MapEntry('students', filters.student));
       } else {
+        formData.fields.add(MapEntry('gender', filters.gender.isNotEmpty ? filters.gender : 'All'));
         formData.fields.add(MapEntry('section', filters.section));
       }
 

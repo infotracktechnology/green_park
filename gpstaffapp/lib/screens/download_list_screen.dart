@@ -242,9 +242,14 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                         _detailRow('Coaching Type', item.coachingTypeDisplay),
                         _detailRow('Category', item.categoryDisplay),
                         _detailRow('Batch', item.batchDisplay),
-                        _detailRow('Gender', item.gender ?? 'All'),
-                        if ((item.section ?? '').isNotEmpty)
-                          _detailRow('Section', item.section!),
+                        if (item.usertype == 'INDIVIDUAL')
+                          _detailRow('Target Student',
+                              item.students?.toString() ?? 'N/A')
+                        else ...[
+                          _detailRow('Gender', item.gender ?? 'All'),
+                          if ((item.section ?? '').isNotEmpty)
+                            _detailRow('Section', item.section!),
+                        ],
                         if (item.isSchedule == 1)
                           _detailRow(
                               'Scheduled At', _formatDateTime(item.startAt)),

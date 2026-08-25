@@ -51,6 +51,16 @@ class ChairmanVideoController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
+            }
+        }
+
         $data['start_at'] = $request->filled('start_at') ? $request->start_at : null;
         $data['end_at'] = $request->filled('end_at') ? $request->end_at : null;
 
@@ -101,6 +111,16 @@ class ChairmanVideoController extends Controller
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+        }
+
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
+            }
         }
 
         $data['start_at'] = $request->filled('start_at') ? $request->start_at : null;
