@@ -4,11 +4,15 @@ import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import 'announcement_list_screen.dart';
 import 'chairman_video_list_screen.dart';
+import 'class_video_list_screen.dart';
+import 'discussion_video_list_screen.dart';
+import 'revision_video_list_screen.dart';
 import 'exam_portion_list_screen.dart';
 import 'question_key_list_screen.dart';
 import 'answer_key_list_screen.dart';
 import 'download_list_screen.dart';
 import 'worksheet_list_screen.dart';
+import 'achievement_list_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -66,11 +70,34 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           MenuItemModel(
+            id: 'class_video',
+            title: 'Class Video',
+            subtitle: 'Daily class lessons',
+            icon: Icons.video_library_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ClassVideoListScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'revision_video',
+            title: 'Revision Video',
+            subtitle: 'Revision lectures',
+            icon: Icons.replay_circle_filled_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const RevisionVideoListScreen()),
+            ),
+          ),
+          MenuItemModel(
             id: 'exam_portion',
             title: 'Exam Portions',
             subtitle: 'Syllabus & portions',
             icon: Icons.description_outlined,
-            color: AppColors.fanta,
+            color: AppColors.primary,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const ExamPortionListScreen()),
@@ -81,7 +108,7 @@ class DashboardScreen extends StatelessWidget {
             title: 'Question Papers',
             subtitle: 'Manage papers',
             icon: Icons.quiz_outlined,
-            color: AppColors.primary,
+            color: AppColors.fanta,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const QuestionKeyListScreen()),
@@ -99,11 +126,23 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           MenuItemModel(
+            id: 'discussion_video',
+            title: 'Discussion Video',
+            subtitle: 'Video discussions',
+            icon: Icons.forum_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const DiscussionVideoListScreen()),
+            ),
+          ),
+          MenuItemModel(
             id: 'download',
             title: 'Downloads',
             subtitle: 'Study materials & files',
             icon: Icons.file_download_outlined,
-            color: AppColors.fanta,
+            color: AppColors.primary,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const DownloadListScreen()),
@@ -114,10 +153,21 @@ class DashboardScreen extends StatelessWidget {
             title: 'Worksheets',
             subtitle: 'Assignments & worksheets',
             icon: Icons.assignment_outlined,
-            color: AppColors.primary,
+            color: AppColors.fanta,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const WorksheetListScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'achievement',
+            title: 'MBBS/BDS Counselling',
+            subtitle: 'Achievements & notices',
+            icon: Icons.campaign_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AchievementListScreen()),
             ),
           ),
         ];

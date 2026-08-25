@@ -248,7 +248,8 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                         if (item.isSchedule == 1)
                           _detailRow(
                               'Scheduled At', _formatDateTime(item.startAt)),
-                        _detailRow('Created At', _formatDateTime(item.createdAt)),
+                        _detailRow(
+                            'Created At', _formatDateTime(item.createdAt)),
                         const SizedBox(height: 20),
                         if (item.filePaths.isNotEmpty) ...[
                           const Text(
@@ -265,7 +266,8 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                             (file) => Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: InkWell(
-                                onTap: () => _openAttachment(_absoluteFileUrl(file)),
+                                onTap: () =>
+                                    _openAttachment(_absoluteFileUrl(file)),
                                 borderRadius: BorderRadius.circular(14),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -274,7 +276,8 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                                     color: AppColors.primary.withOpacity(0.04),
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                        color: AppColors.primary.withOpacity(0.2)),
+                                        color:
+                                            AppColors.primary.withOpacity(0.2)),
                                   ),
                                   child: Row(
                                     children: [
@@ -283,7 +286,8 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
-                                          DownloadModel.getAttachmentFileName(file),
+                                          DownloadModel.getAttachmentFileName(
+                                              file),
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -319,13 +323,14 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
     final filterProvider = Provider.of<AnnouncementFilterProvider>(context);
     final coachingTypes = [
       'ALL',
-      ...(filterProvider.master?.coachingTypes ?? [
-        'OFFLINE',
-        'ONLINE',
-        'ONLINE LIVE',
-        'ONLINE RECORDED',
-        'TEST BATCH',
-      ]),
+      ...(filterProvider.master?.coachingTypes ??
+          [
+            'OFFLINE',
+            'ONLINE',
+            'ONLINE LIVE',
+            'ONLINE RECORDED',
+            'TEST BATCH',
+          ]),
     ];
 
     return Scaffold(
@@ -333,10 +338,12 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
       appBar: AppBar(
         title: const Text('Downloads'),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: () {
-            filterProvider.fetchMasterData();
-            _fetchDownloads();
-          }),
+          IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                filterProvider.fetchMasterData();
+                _fetchDownloads();
+              }),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -364,8 +371,8 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: coachingTypes.map((type) {
-                  final isSelected =
-                      _filterType == type || (_filterType.isEmpty && type == 'ALL');
+                  final isSelected = _filterType == type ||
+                      (_filterType.isEmpty && type == 'ALL');
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: Material(
@@ -385,8 +392,9 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color:
-                                  isSelected ? AppColors.primary : AppColors.border,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.border,
                             ),
                           ),
                           child: Text(
@@ -394,8 +402,9 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color:
-                                  isSelected ? Colors.white : AppColors.textPrimary,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -437,8 +446,10 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                         child: ListView.separated(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
                           itemCount: _downloads.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) => _buildCard(_downloads[index]),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, index) =>
+                              _buildCard(_downloads[index]),
                         ),
                       ),
           ),

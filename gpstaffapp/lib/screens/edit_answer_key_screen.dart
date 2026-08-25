@@ -686,14 +686,16 @@ class _EditAnswerKeyScreenState extends State<EditAnswerKeyScreen> {
                                       Expanded(
                                           child: Text(n,
                                               style: const TextStyle(
-fontSize: 12,
+                                                  fontSize: 12,
                                                   fontWeight: FontWeight.w600,
                                                   color: AppColors.textPrimary),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis)),
                                       IconButton(
-                                          icon: const Icon(Icons.visibility_outlined,
-                                              color: AppColors.primary, size: 20),
+                                          icon: const Icon(
+                                              Icons.visibility_outlined,
+                                              color: AppColors.primary,
+                                              size: 20),
                                           onPressed: () => _openFile(p)),
                                       IconButton(
                                           icon: const Icon(Icons.close,

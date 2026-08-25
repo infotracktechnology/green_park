@@ -19,9 +19,20 @@ class ClassVideoController extends Controller
             ->when($request->course, fn($q) => $q->where('course','like','%'.$request->course.'%'))
             ->latest()->get();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'classvideos' => $classvideos]);
+        }
+
         return view('classvideo.index', compact('classvideos'));
     }
 
+    public function show(Request $request, ClassVideo $classvideo)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'classvideo' => $classvideo]);
+        }
+        return redirect()->route('classvideo.index');
+    }
 
     public function create()
     {
@@ -30,19 +41,33 @@ class ClassVideoController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->all();
+        $data = $request->except(['_token', '_method']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
-        ClassVideo::create($data);
+        $classvideo = ClassVideo::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Class video created successfully.', 'data' => $classvideo], 200);
+        }
+
         return redirect()->route('classvideo.index')->with('success', 'Video created successfully.');
     }
 
-    public function destroy(ClassVideo $classvideo)
+    public function destroy(Request $request, ClassVideo $classvideo)
     {
         $classvideo->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Video deleted successfully!']);
+        }
+
         return redirect()->route('classvideo.index')->with('success', 'Video deleted successfully!');
     }
 
@@ -57,8 +82,7 @@ class ClassVideoController extends Controller
         return response()->json(['success' => true, 'message' => 'Videos deleted successfully.']);
     }
 
-
-    public function edit(ClassVideo $classvideo)
+    public function edit(Request $request, ClassVideo $classvideo)
     {
         $type = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
@@ -66,18 +90,31 @@ class ClassVideoController extends Controller
 
         $students = Student::StudentFilterQuery($classvideo->branch, $classvideo->course, $classvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'classvideo' => $classvideo, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
+
         return view('classvideo.edit', compact('classvideo', 'type', 'section', 'students'));
     }
 
     public function update(Request $request, ClassVideo $classvideo)
     {
-        $data = $request->all();
+        $data = $request->except(['_token', '_method']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $classvideo->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Class video updated successfully.', 'data' => $classvideo], 200);
+        }
+
         return redirect()->route('classvideo.index')->with('success', 'Video updated successfully.');
     }
 

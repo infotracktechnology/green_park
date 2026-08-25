@@ -63,5 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('answerkey', AnswerkeyController::class);
     Route::resource('download', DownloadController::class);
     Route::resource('worksheet', WorksheetController::class);
+    Route::resource('classvideo', ClassVideoController::class);
+    Route::resource('discussionvideo', DiscussionVideoController::class);
+    Route::resource('revisionvideo', RevisionVideoController::class);
+    Route::resource('achievement', AchievementController::class);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });

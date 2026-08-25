@@ -380,7 +380,8 @@ class _ExamPortionListScreenState extends State<ExamPortionListScreen> {
                                     final fileName =
                                         ExamPortionModel.getAttachmentFileName(
                                             path);
-                                    final cleanPath = path.replaceAll('\\', '/');
+                                    final cleanPath =
+                                        path.replaceAll('\\', '/');
                                     final fullUrl = cleanPath.startsWith('http')
                                         ? cleanPath
                                         : '${ApiClient.baseUrl}/${cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath}';

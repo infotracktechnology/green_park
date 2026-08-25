@@ -16,9 +16,22 @@ class RevisionVideoController extends Controller
         $revisionvideos = RevisionVideo::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->when($request->course, fn($q) => $q->where('course','like','%'.$request->course.'%'))
             ->latest()->get();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'revisionvideos' => $revisionvideos]);
+        }
+
         return view('revisionvideo.index', compact('revisionvideos'));
+    }
+
+    public function show(Request $request, RevisionVideo $revisionvideo)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'revisionvideo' => $revisionvideo]);
+        }
+        return redirect()->route('revisionvideo.index');
     }
 
     public function create()
@@ -28,51 +41,74 @@ class RevisionVideoController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->except('file', '_token');
-        $revisionvideos = [];
+        $data = $request->except('file', '_token', '_method');
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
-        }
-        $file = $request->file('file');
-        $csvData = array_map('str_getcsv', file($file->getRealPath()));
-
-        if (empty($csvData)) {
-            return back()->with('error', 'CSV file is empty.');
-        }
-
-        $header = array_map('trim', array_shift($csvData));
-
-        foreach ($csvData as $row) {
-            $row = array_map('trim', $row);
-            $record = array_combine($header, $row);
-            if (empty($record['subject']) || empty($record['video_id'])) {
-                return back()->with('error', 'Subject and Video ID fields are required.');
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
             }
-            
-            $revisionvideos[] = array_merge($data, [
-                'subject' => $record['subject'],
-                'video_id' => $record['video_id'],
-                'period' => $record['period'] ?? '0',
-                'chapter' => $record['chapter'] ?? 'Unknown',
-                'day' => $record['day'] ?? '',
-                'date' => $this->parseDate($record['date'] ?? '')
-            ]);
         }
 
-        RevisionVideo::insert($revisionvideos);
-        return redirect()->route('revisionvideo.index')->with('success', 'Class videos uploaded successfully.');
+        if ($request->hasFile('file')) {
+            $revisionvideos = [];
+            $file = $request->file('file');
+            $csvData = array_map('str_getcsv', file($file->getRealPath()));
+
+            if (empty($csvData)) {
+                return back()->with('error', 'CSV file is empty.');
+            }
+
+            $header = array_map('trim', array_shift($csvData));
+
+            foreach ($csvData as $row) {
+                $row = array_map('trim', $row);
+                $record = array_combine($header, $row);
+                if (empty($record['subject']) || empty($record['video_id'])) {
+                    return back()->with('error', 'Subject and Video ID fields are required.');
+                }
+                
+                $revisionvideos[] = array_merge($data, [
+                    'subject' => $record['subject'],
+                    'video_id' => $record['video_id'],
+                    'period' => $record['period'] ?? '0',
+                    'chapter' => $record['chapter'] ?? 'Unknown',
+                    'day' => $record['day'] ?? '',
+                    'date' => $this->parseDate($record['date'] ?? '')
+                ]);
+            }
+
+            RevisionVideo::insert($revisionvideos);
+
+            if ($request->wantsJson()) {
+                return response()->json(['status' => true, 'message' => 'Revision videos uploaded successfully.'], 200);
+            }
+
+            return redirect()->route('revisionvideo.index')->with('success', 'Class videos uploaded successfully.');
+        }
+
+        $revisionvideo = RevisionVideo::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Revision video created successfully.', 'data' => $revisionvideo], 200);
+        }
+
+        return redirect()->route('revisionvideo.index')->with('success', 'Revision video created successfully.');
     }
 
-    public function destroy(RevisionVideo $revisionvideo)
+    public function destroy(Request $request, RevisionVideo $revisionvideo)
     {
         $revisionvideo->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Revision Video deleted successfully!']);
+        }
+
         return redirect()->route('revisionvideo.index')->with('success', 'Revision Video deleted successfully!');
     }
 
-
-
-    public function edit(RevisionVideo $revisionvideo)
+    public function edit(Request $request, RevisionVideo $revisionvideo)
     {
         $type = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
@@ -80,17 +116,30 @@ class RevisionVideoController extends Controller
 
         $students = Student::StudentFilterQuery($revisionvideo->branch, $revisionvideo->course, $revisionvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
         
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'revisionvideo' => $revisionvideo, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
+
         return view('revisionvideo.edit', compact('revisionvideo', 'type', 'section', 'students'));
     }
 
     public function update(Request $request, RevisionVideo $revisionvideo) {
-        $data = $request->all();
+        $data = $request->except(['_token', '_method']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $revisionvideo->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Revision video updated successfully.', 'data' => $revisionvideo], 200);
+        }
+
         return redirect()->route('revisionvideo.index')->with('success', 'Video updated successfully.');
     }
 

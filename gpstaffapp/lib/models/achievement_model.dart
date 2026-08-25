@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class AnnouncementModel {
+class AchievementModel {
   final dynamic id;
   final String? academicYear;
   final String usertype;
@@ -12,15 +12,16 @@ class AnnouncementModel {
   final String? gender;
   final String? section;
   final dynamic students;
-  final String title;
+  final dynamic filecategory;
+  final String? video;
+  final List<String> images;
+  final String? pdf;
+  final String? link;
   final String? content;
-  final int isSchedule;
-  final String? startAt;
-  final List<String> attachments;
   final String? createdAt;
   final String? updatedAt;
 
-  AnnouncementModel({
+  AchievementModel({
     required this.id,
     this.academicYear,
     this.usertype = 'GROUP',
@@ -32,43 +33,39 @@ class AnnouncementModel {
     this.gender,
     this.section,
     this.students,
-    required this.title,
+    this.filecategory,
+    this.video,
+    this.images = const [],
+    this.pdf,
+    this.link,
     this.content,
-    this.isSchedule = 0,
-    this.startAt,
-    this.attachments = const [],
     this.createdAt,
     this.updatedAt,
   });
 
-  factory AnnouncementModel.fromJson(Map<String, dynamic> json) {
-    List<String> parsedAttachments = [];
-    if (json['attachment'] != null) {
-      if (json['attachment'] is List) {
-        parsedAttachments =
-            (json['attachment'] as List).map((e) => e.toString()).toList();
-      } else if (json['attachment'] is String) {
+  factory AchievementModel.fromJson(Map<String, dynamic> json) {
+    List<String> parsedImages = [];
+    if (json['images'] != null) {
+      if (json['images'] is List) {
+        parsedImages =
+            (json['images'] as List).map((e) => e.toString()).toList();
+      } else if (json['images'] is String) {
         try {
-          final decoded = jsonDecode(json['attachment']);
+          final decoded = jsonDecode(json['images']);
           if (decoded is List) {
-            parsedAttachments = decoded.map((e) => e.toString()).toList();
+            parsedImages = decoded.map((e) => e.toString()).toList();
           } else {
-            parsedAttachments = [json['attachment'].toString()];
+            parsedImages = [json['images'].toString()];
           }
         } catch (_) {
-          if (json['attachment'].toString().isNotEmpty) {
-            parsedAttachments = [json['attachment'].toString()];
+          if (json['images'].toString().isNotEmpty) {
+            parsedImages = [json['images'].toString()];
           }
         }
       }
     }
 
-    int sched = 0;
-    if (json['is_schedule'] != null) {
-      sched = int.tryParse(json['is_schedule'].toString()) ?? 0;
-    }
-
-    return AnnouncementModel(
+    return AchievementModel(
       id: json['id'] ?? '',
       academicYear: json['academic_year']?.toString(),
       usertype: json['usertype']?.toString() ?? 'GROUP',
@@ -80,19 +77,15 @@ class AnnouncementModel {
       gender: json['gender']?.toString() ?? 'All',
       section: json['section']?.toString(),
       students: json['students'],
-      title: (json['title'] ?? '').toString(),
-      content: json['content']?.toString(),
-      isSchedule: sched,
-      startAt: json['start_at']?.toString(),
-      attachments: parsedAttachments,
+      filecategory: json['filecategory'],
+      video: json['video']?.toString(),
+      images: parsedImages,
+      pdf: json['pdf']?.toString(),
+      link: json['link']?.toString(),
+      content: (json['content'] ?? '').toString(),
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),
     );
-  }
-
-  String get cleanContent {
-    if (content == null) return '';
-    return content!.replaceAll(RegExp(r'<[^>]*>'), '').trim();
   }
 
   String get branchDisplay {
@@ -121,7 +114,9 @@ class AnnouncementModel {
     return batch.toString();
   }
 
-  static String getAttachmentFileName(String path) {
-    return path.split('/').last;
+  String get fileCategoryDisplay {
+    if (filecategory == null || filecategory.toString().isEmpty) return 'None';
+    if (filecategory is List) return (filecategory as List).join(', ');
+    return filecategory.toString();
   }
 }

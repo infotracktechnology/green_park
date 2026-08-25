@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../api/api_client.dart';
-import '../models/question_key_model.dart';
+import '../models/discussion_video_model.dart';
 import '../providers/announcement_filter_provider.dart';
 import '../theme/app_theme.dart';
-import 'create_question_key_screen.dart';
-import 'edit_question_key_screen.dart';
+import 'create_discussion_video_screen.dart';
+import 'edit_discussion_video_screen.dart';
 
-class QuestionKeyListScreen extends StatefulWidget {
-  const QuestionKeyListScreen({super.key});
+class DiscussionVideoListScreen extends StatefulWidget {
+  const DiscussionVideoListScreen({super.key});
 
   @override
-  State<QuestionKeyListScreen> createState() => _QuestionKeyListScreenState();
+  State<DiscussionVideoListScreen> createState() =>
+      _DiscussionVideoListScreenState();
 }
 
-class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
+class _DiscussionVideoListScreenState extends State<DiscussionVideoListScreen> {
   String _filterType = '';
-  List<QuestionKeyModel> _items = [];
+  List<DiscussionVideoModel> _videos = [];
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchItems();
+    _fetchVideos();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final filters =
           Provider.of<AnnouncementFilterProvider>(context, listen: false);
@@ -34,25 +34,26 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
     });
   }
 
-  Future<void> _fetchItems() async {
+  Future<void> _fetchVideos() async {
     setState(() => _loading = true);
     try {
       final dio = ApiClient().dio;
       final endpoint = _filterType.isNotEmpty && _filterType != 'ALL'
-          ? '/admin/questionkey?coaching_type=$_filterType'
-          : '/admin/questionkey';
+          ? '/admin/discussionvideo?coaching_type=$_filterType'
+          : '/admin/discussionvideo';
 
       final res = await dio.get(endpoint);
       if (res.data != null && res.data['status'] == true) {
-        final list = res.data['questionkeys'];
+        final list = res.data['discussionvideos'];
         if (list is List) {
           setState(() {
-            _items = list.map((e) => QuestionKeyModel.fromJson(e)).toList();
+            _videos =
+                list.map((e) => DiscussionVideoModel.fromJson(e)).toList();
           });
         }
       }
     } catch (e) {
-      debugPrint('Fetch question keys error: $e');
+      debugPrint('Fetch discussion videos error: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -69,7 +70,7 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
   }
 
   String _formatDateTime(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty) return '';
+    if (dateStr == null || dateStr.isEmpty) return '-';
     try {
       final dt = DateTime.parse(dateStr);
       return DateFormat('dd MMM yyyy, hh:mm a').format(dt);
@@ -78,27 +79,7 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
     }
   }
 
-  Future<void> _openAttachment(String url) async {
-    try {
-      final uri = Uri.parse(url);
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open attachment')),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Open attachment error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open attachment')),
-        );
-      }
-    }
-  }
-
-  void _showDetailsModal(BuildContext context, QuestionKeyModel item) {
+  void _showVideoDetailsModal(BuildContext context, DiscussionVideoModel item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -139,12 +120,12 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                 color: AppColors.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.quiz_outlined,
+                              child: const Icon(Icons.forum_outlined,
                                   color: AppColors.primary, size: 20),
                             ),
                             const SizedBox(width: 10),
                             const Text(
-                              'Question Paper Details',
+                              'Discussion Video Details',
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -203,20 +184,38 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                 ),
                               ),
                             ),
-                            if (item.isSchedule == 1)
+                            if (item.subject != null &&
+                                item.subject!.isNotEmpty)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.amber.shade100,
+                                  color: AppColors.primary.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  'SCHEDULED',
-                                  style: TextStyle(
+                                  item.subject!,
+                                  style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.amber.shade900,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            if (item.part != null && item.part!.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.fanta.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  item.part!,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.fanta,
                                   ),
                                 ),
                               ),
@@ -245,25 +244,6 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                             ),
                           ],
                         ),
-                        if (item.isSchedule == 1 &&
-                            item.startAt != null &&
-                            item.startAt!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(Icons.schedule,
-                                  size: 14, color: Colors.amber),
-                              const SizedBox(width: 5),
-                              Text(
-                                'Scheduled for: ${_formatDateTime(item.startAt)}',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.amber.shade900),
-                              ),
-                            ],
-                          ),
-                        ],
                         const SizedBox(height: 18),
                         Container(
                           padding: const EdgeInsets.all(16),
@@ -326,141 +306,54 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        if (item.files.isNotEmpty) ...[
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppColors.borderLight),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.attachment,
-                                        size: 16, color: AppColors.primary),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'ATTACHMENTS (${item.files.length})',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.textPrimary,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: item.files.length,
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: 8),
-                                  itemBuilder: (context, idx) {
-                                    final path = item.files[idx];
-                                    final fileName =
-                                        QuestionKeyModel.getFileName(path);
-                                    final cleanPath =
-                                        path.replaceAll('\\', '/');
-                                    final fullUrl = cleanPath.startsWith('http')
-                                        ? cleanPath
-                                        : '${ApiClient.baseUrl}/${cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath}';
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border:
-                                            Border.all(color: AppColors.border),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.description_outlined,
-                                              color: AppColors.primary,
-                                              size: 20),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  fileName,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        AppColors.textPrimary,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                                Text(
-                                                  fullUrl,
-                                                  style: const TextStyle(
-                                                      fontSize: 10,
-                                                      color:
-                                                          AppColors.textMuted),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: () =>
-                                                _openAttachment(fullUrl),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.primary
-                                                    .withOpacity(0.08),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                      Icons.visibility_outlined,
-                                                      size: 13,
-                                                      color: AppColors.primary),
-                                                  SizedBox(width: 3),
-                                                  Text(
-                                                    'View',
-                                                    style: TextStyle(
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors.primary,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.borderLight),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.02),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 18),
-                        ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Row(
+                                children: [
+                                  Icon(Icons.forum_outlined,
+                                      size: 16, color: AppColors.fanta),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'DISCUSSION DETAILS',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.textPrimary,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              _buildInfoRow('Subject', item.subject ?? '-'),
+                              _buildInfoRow('Part', item.part ?? '-'),
+                              _buildInfoRow('Day', item.day ?? '-'),
+                              _buildInfoRow('Date', _formatDate(item.date)),
+                              _buildInfoRow(
+                                  'Video ID', item.videoId?.toString() ?? '-'),
+                              _buildInfoRow(
+                                  'Start At', _formatDateTime(item.startAt)),
+                              _buildInfoRow(
+                                  'End At', _formatDateTime(item.endAt)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
                       ],
                     ),
                   ),
@@ -523,7 +416,7 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Question Papers'),
+        title: const Text('Discussion Videos'),
       ),
       body: Column(
         children: [
@@ -558,7 +451,7 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                         setState(() {
                           _filterType = type == 'ALL' ? '' : type;
                         });
-                        _fetchItems();
+                        _fetchVideos();
                       },
                     ),
                   );
@@ -571,18 +464,18 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
             child: RefreshIndicator(
               onRefresh: () async {
                 await Future.wait([
-                  _fetchItems(),
+                  _fetchVideos(),
                   Provider.of<AnnouncementFilterProvider>(context,
                           listen: false)
                       .fetchMasterData(),
                 ]);
               },
               color: AppColors.fanta,
-              child: _loading && _items.isEmpty
+              child: _loading && _videos.isEmpty
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.fanta),
                     )
-                  : _items.isEmpty
+                  : _videos.isEmpty
                       ? ListView(
                           children: const [
                             SizedBox(height: 100),
@@ -593,12 +486,12 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                   CircleAvatar(
                                     radius: 36,
                                     backgroundColor: Color(0xFFE0F2FE),
-                                    child: Icon(Icons.quiz_outlined,
+                                    child: Icon(Icons.forum_outlined,
                                         size: 36, color: AppColors.primary),
                                   ),
                                   SizedBox(height: 16),
                                   Text(
-                                    'No Question Papers',
+                                    'No Discussion Videos',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -607,7 +500,7 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Tap + to add a new question paper',
+                                    'Tap + to add a new discussion video',
                                     style: TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textMuted),
@@ -619,13 +512,15 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                         )
                       : ListView.separated(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
-                          itemCount: _items.length,
+                          itemCount: _videos.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                            final item = _items[index];
+                            final item = _videos[index];
+
                             return InkWell(
-                              onTap: () => _showDetailsModal(context, item),
+                              onTap: () =>
+                                  _showVideoDetailsModal(context, item),
                               borderRadius: BorderRadius.circular(20),
                               child: Container(
                                 padding: const EdgeInsets.all(16),
@@ -649,11 +544,52 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Expanded(
-                                          child: Wrap(
-                                            spacing: 6,
-                                            runSpacing: 4,
-                                            children: [
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 4,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 3),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.primary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                item.usertype,
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.primary,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 3),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.fanta
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                item.course ?? 'All',
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.fanta,
+                                                ),
+                                              ),
+                                            ),
+                                            if (item.subject != null &&
+                                                item.subject!.isNotEmpty)
                                               Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(
@@ -661,12 +597,12 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                                         vertical: 3),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.primary
-                                                      .withOpacity(0.1),
+                                                      .withOpacity(0.08),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
-                                                  item.usertype,
+                                                  item.subject!,
                                                   style: const TextStyle(
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.bold,
@@ -674,52 +610,7 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                                   ),
                                                 ),
                                               ),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 3),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.fanta
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                  item.course ?? 'All',
-                                                  style: const TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppColors.fanta,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (item.isSchedule == 1)
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 3),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        Colors.amber.shade100,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                  ),
-                                                  child: Text(
-                                                    'SCHEDULED',
-                                                    style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color:
-                                                          Colors.amber.shade900,
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
+                                          ],
                                         ),
                                         Text(
                                           _formatDate(item.createdAt),
@@ -738,6 +629,31 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        if (item.part != null &&
+                                            item.part!.isNotEmpty) ...[
+                                          Text(
+                                            item.part!,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                          const Text(' • ',
+                                              style: TextStyle(
+                                                  color: AppColors.textMuted)),
+                                        ],
+                                        Text(
+                                          'Video ID: ${item.videoId ?? '-'}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     const SizedBox(height: 12),
                                     const Divider(
                                         height: 1,
@@ -750,13 +666,13 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                         Expanded(
                                           child: Row(
                                             children: [
-                                              const Icon(Icons.people_outline,
+                                              const Icon(Icons.schedule,
                                                   size: 14,
                                                   color: AppColors.textMuted),
                                               const SizedBox(width: 4),
                                               Expanded(
                                                 child: Text(
-                                                  '${item.coachingType ?? "ALL"} • ${item.category ?? "All Categories"}',
+                                                  '${_formatDateTime(item.startAt)} - ${_formatDateTime(item.endAt)}',
                                                   style: const TextStyle(
                                                       fontSize: 11,
                                                       color:
@@ -766,51 +682,15 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                                       TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              if (item.files.isNotEmpty) ...[
-                                                const SizedBox(width: 6),
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFFF1F5F9),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      const Icon(
-                                                          Icons.attach_file,
-                                                          size: 11,
-                                                          color: AppColors
-                                                              .primary),
-                                                      const SizedBox(width: 2),
-                                                      Text(
-                                                        '${item.files.length}',
-                                                        style: const TextStyle(
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: AppColors
-                                                                .primary),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
                                             ],
                                           ),
                                         ),
                                         Row(
                                           children: [
                                             InkWell(
-                                              onTap: () => _showDetailsModal(
-                                                  context, item),
+                                              onTap: () =>
+                                                  _showVideoDetailsModal(
+                                                      context, item),
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                               child: Container(
@@ -825,8 +705,6 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: const Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
                                                   children: [
                                                     Icon(
                                                         Icons
@@ -857,11 +735,11 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (_) =>
-                                                        EditQuestionKeyScreen(
-                                                            keyId: item.id),
+                                                        EditDiscussionVideoScreen(
+                                                            videoId: item.id),
                                                   ),
                                                 );
-                                                if (res == true) _fetchItems();
+                                                if (res == true) _fetchVideos();
                                               },
                                               borderRadius:
                                                   BorderRadius.circular(8),
@@ -877,8 +755,6 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: const Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
                                                   children: [
                                                     Icon(Icons.edit_outlined,
                                                         size: 13,
@@ -915,9 +791,10 @@ class _QuestionKeyListScreenState extends State<QuestionKeyListScreen> {
         onPressed: () async {
           final res = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const CreateQuestionKeyScreen()),
+            MaterialPageRoute(
+                builder: (_) => const CreateDiscussionVideoScreen()),
           );
-          if (res == true) _fetchItems();
+          if (res == true) _fetchVideos();
         },
         backgroundColor: AppColors.fanta,
         elevation: 4,

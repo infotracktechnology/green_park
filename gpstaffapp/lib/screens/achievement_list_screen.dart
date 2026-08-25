@@ -3,22 +3,22 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_client.dart';
-import '../models/answer_key_model.dart';
+import '../models/achievement_model.dart';
 import '../providers/announcement_filter_provider.dart';
 import '../theme/app_theme.dart';
-import 'create_answer_key_screen.dart';
-import 'edit_answer_key_screen.dart';
+import 'create_achievement_screen.dart';
+import 'edit_achievement_screen.dart';
 
-class AnswerKeyListScreen extends StatefulWidget {
-  const AnswerKeyListScreen({super.key});
+class AchievementListScreen extends StatefulWidget {
+  const AchievementListScreen({super.key});
 
   @override
-  State<AnswerKeyListScreen> createState() => _AnswerKeyListScreenState();
+  State<AchievementListScreen> createState() => _AchievementListScreenState();
 }
 
-class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
+class _AchievementListScreenState extends State<AchievementListScreen> {
   String _filterType = '';
-  List<AnswerKeyModel> _items = [];
+  List<AchievementModel> _items = [];
   bool _loading = false;
 
   @override
@@ -39,19 +39,19 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
     try {
       final dio = ApiClient().dio;
       final endpoint = _filterType.isNotEmpty && _filterType != 'ALL'
-          ? '/admin/answerkey?coaching_type=$_filterType'
-          : '/admin/answerkey';
+          ? '/admin/achievement?coaching_type=$_filterType'
+          : '/admin/achievement';
       final res = await dio.get(endpoint);
       if (res.data != null && res.data['status'] == true) {
-        final list = res.data['answerkeys'];
+        final list = res.data['achievements'];
         if (list is List) {
           setState(() {
-            _items = list.map((e) => AnswerKeyModel.fromJson(e)).toList();
+            _items = list.map((e) => AchievementModel.fromJson(e)).toList();
           });
         }
       }
     } catch (e) {
-      debugPrint('Fetch answer keys error: $e');
+      debugPrint('Fetch achievements error: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -77,33 +77,66 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
     }
   }
 
-  Future<void> _openAttachment(String url) async {
+  String _cleanHtml(String? html) {
+    if (html == null) return '';
+    return html
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  Future<void> _openUrl(String url) async {
     try {
       final uri = Uri.parse(url);
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Could not open attachment')));
+              const SnackBar(content: Text('Could not open link')));
         }
       }
     } catch (e) {
-      debugPrint('Open attachment error: $e');
+      debugPrint('Open link error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open attachment')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Could not open link')));
       }
     }
   }
 
-  void _showDetailsModal(BuildContext context, AnswerKeyModel item) {
+  Future<void> _openFile(String path) async {
+    try {
+      final normalized = path.replaceAll('\\', '/');
+      final fullUrl = normalized.startsWith('http')
+          ? normalized
+          : '${ApiClient.baseUrl}/${normalized.startsWith('/') ? normalized.substring(1) : normalized}';
+      final uri = Uri.parse(fullUrl);
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Could not open file')));
+        }
+      }
+    } catch (e) {
+      debugPrint('Open file error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Could not open file')));
+      }
+    }
+  }
+
+  void _showDetailsModal(BuildContext context, AchievementModel item) {
+    final cleanContent = _cleanHtml(item.content);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return DraggableScrollableSheet(
-          initialChildSize: 0.75,
-          minChildSize: 0.4,
+          initialChildSize: 0.8,
+          minChildSize: 0.5,
           maxChildSize: 0.95,
           builder: (_, scrollController) {
             return Container(
@@ -132,12 +165,12 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                               decoration: BoxDecoration(
                                   color: AppColors.primary.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(10)),
-                              child: const Icon(Icons.fact_check_outlined,
+                              child: const Icon(Icons.campaign_outlined,
                                   color: AppColors.primary, size: 20)),
                           const SizedBox(width: 10),
-                          const Text('Answer Key Details',
+                          const Text('MBBS/BDS Counselling Details',
                               style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textPrimary))
                         ]),
@@ -180,27 +213,18 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.fanta))),
-                            if (item.isSchedule == 1)
-                              Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                      color: Colors.amber.shade100,
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Text('SCHEDULED',
-                                      style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.amber.shade900))),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        SelectableText(item.title,
-                            style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                                height: 1.3)),
+                        // Content
+                        SelectableText(
+                          cleanContent.isNotEmpty ? cleanContent : 'No content',
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                              height: 1.4),
+                        ),
                         const SizedBox(height: 6),
                         Row(children: [
                           const Icon(Icons.access_time,
@@ -210,22 +234,6 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                               style: const TextStyle(
                                   fontSize: 12, color: AppColors.textMuted))
                         ]),
-                        if (item.isSchedule == 1 &&
-                            item.startAt != null &&
-                            item.startAt!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Row(children: [
-                            const Icon(Icons.schedule,
-                                size: 14, color: Colors.amber),
-                            const SizedBox(width: 5),
-                            Text(
-                                'Scheduled for: ${_formatDateTime(item.startAt)}',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.amber.shade900))
-                          ])
-                        ],
                         const SizedBox(height: 18),
                         Container(
                           padding: const EdgeInsets.all(16),
@@ -250,11 +258,7 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                 const SizedBox(height: 12),
                                 _buildInfoRow('Academic Year',
                                     item.academicYear ?? 'N/A'),
-                                _buildInfoRow(
-                                    'User Type',
-                                    item.usertype == 'INDIVIDUAL'
-                                        ? 'Individual Student'
-                                        : 'Group Broadcast'),
+                                _buildInfoRow('User Type', item.usertype),
                                 _buildInfoRow(
                                     'Course', item.course ?? 'All Courses'),
                                 _buildInfoRow('Branches', item.branchDisplay),
@@ -281,7 +285,8 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                               ]),
                         ),
                         const SizedBox(height: 18),
-                        if (item.files.isNotEmpty) ...[
+                        // File categories and attachments
+                        if (item.fileCategoryDisplay != 'None') ...[
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -296,7 +301,7 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                   const Icon(Icons.attachment,
                                       size: 16, color: AppColors.primary),
                                   const SizedBox(width: 6),
-                                  Text('ATTACHMENTS (${item.files.length})',
+                                  Text('FILES (${item.fileCategoryDisplay})',
                                       style: const TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w900,
@@ -304,98 +309,18 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                           letterSpacing: 0.5))
                                 ]),
                                 const SizedBox(height: 10),
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: item.files.length,
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: 8),
-                                  itemBuilder: (context, idx) {
-                                    final path = item.files[idx];
-                                    final fileName =
-                                        AnswerKeyModel.getFileName(path);
-                                    final cleanPath =
-                                        path.replaceAll('\\', '/');
-                                    final fullUrl = cleanPath.startsWith('http')
-                                        ? cleanPath
-                                        : '${ApiClient.baseUrl}/${cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath}';
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                              color: AppColors.border)),
-                                      child: Row(children: [
-                                        const Icon(Icons.description_outlined,
-                                            color: AppColors.primary, size: 20),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                              Text(fileName,
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors
-                                                          .textPrimary),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                              Text(fullUrl,
-                                                  style: const TextStyle(
-                                                      fontSize: 10,
-                                                      color:
-                                                          AppColors.textMuted),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis)
-                                            ])),
-                                        InkWell(
-                                            onTap: () =>
-                                                _openAttachment(fullUrl),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4),
-                                                decoration: BoxDecoration(
-                                                    color: AppColors.primary
-                                                        .withOpacity(0.08),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8)),
-                                                child: const Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Icon(
-                                                          Icons
-                                                              .visibility_outlined,
-                                                          size: 13,
-                                                          color: AppColors
-                                                              .primary),
-                                                      SizedBox(width: 3),
-                                                      Text('View',
-                                                          style: TextStyle(
-                                                              fontSize: 11,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color: AppColors
-                                                                  .primary))
-                                                    ]))),
-                                      ]),
-                                    );
-                                  },
-                                ),
+                                if (item.video != null &&
+                                    item.video!.isNotEmpty)
+                                  _buildFileTile(
+                                      'Video', item.video!, Icons.video_file),
+                                if (item.images.isNotEmpty)
+                                  ...item.images.map((img) => _buildFileTile(
+                                      'Image', img, Icons.image)),
+                                if (item.pdf != null && item.pdf!.isNotEmpty)
+                                  _buildFileTile(
+                                      'PDF', item.pdf!, Icons.picture_as_pdf),
+                                if (item.link != null && item.link!.isNotEmpty)
+                                  _buildLinkTile(item.link!),
                               ],
                             ),
                           ),
@@ -435,6 +360,97 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
         ]));
   }
 
+  Widget _buildFileTile(String label, String path, IconData icon) {
+    final fileName = path.replaceAll('\\', '/').split('/').last;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.border)),
+        child: Row(children: [
+          Icon(icon, color: AppColors.primary, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(label,
+                    style: const TextStyle(
+                        fontSize: 10, color: AppColors.textMuted)),
+                Text(fileName,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+              ])),
+          InkWell(
+              onTap: () => _openFile(path),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(Icons.visibility_outlined,
+                        size: 13, color: AppColors.primary),
+                    SizedBox(width: 3),
+                    Text('View',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary))
+                  ]))),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildLinkTile(String link) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border)),
+      child: Row(children: [
+        const Icon(Icons.link, color: AppColors.primary, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+            child: Text(link,
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis)),
+        InkWell(
+            onTap: () => _openUrl(link),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.open_in_new, size: 13, color: AppColors.primary),
+                  SizedBox(width: 3),
+                  Text('Open',
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary))
+                ]))),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final filterProvider = Provider.of<AnnouncementFilterProvider>(context);
@@ -447,7 +463,7 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
     ];
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Answer Keys')),
+      appBar: AppBar(title: const Text('MBBS/BDS Counselling')),
       body: Column(children: [
         Container(
             color: Colors.white,
@@ -509,16 +525,16 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                               CircleAvatar(
                                   radius: 36,
                                   backgroundColor: Color(0xFFE0F2FE),
-                                  child: Icon(Icons.fact_check_outlined,
+                                  child: Icon(Icons.campaign_outlined,
                                       size: 36, color: AppColors.primary)),
                               SizedBox(height: 16),
-                              Text('No Answer Keys',
+                              Text('No Entries Found',
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textPrimary)),
                               SizedBox(height: 4),
-                              Text('Tap + to add a new answer key',
+                              Text('Tap + to add MBBS/BDS counselling info',
                                   style: TextStyle(
                                       fontSize: 12, color: AppColors.textMuted))
                             ]))
@@ -529,6 +545,8 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final item = _items[index];
+                          final cleanContent = _cleanHtml(item.content);
+
                           return InkWell(
                             onTap: () => _showDetailsModal(context, item),
                             borderRadius: BorderRadius.circular(20),
@@ -596,27 +614,6 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                                                 FontWeight.bold,
                                                             color: AppColors
                                                                 .fanta))),
-                                                if (item.isSchedule == 1)
-                                                  Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 3),
-                                                      decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .amber.shade100,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(6)),
-                                                      child: Text('SCHEDULED',
-                                                          style: TextStyle(
-                                                              fontSize: 10,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color: Colors
-                                                                  .amber
-                                                                  .shade900)))
                                               ])),
                                           Text(_formatDate(item.createdAt),
                                               style: const TextStyle(
@@ -624,11 +621,16 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                                   color: AppColors.textMuted))
                                         ]),
                                     const SizedBox(height: 10),
-                                    Text(item.title,
+                                    Text(
+                                        cleanContent.isNotEmpty
+                                            ? cleanContent
+                                            : 'No content',
                                         style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.textPrimary)),
+                                            color: AppColors.textPrimary),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis),
                                     const SizedBox(height: 12),
                                     const Divider(
                                         height: 1,
@@ -646,7 +648,7 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                             const SizedBox(width: 4),
                                             Expanded(
                                                 child: Text(
-                                                    '${item.coachingType ?? "ALL"} • ${item.category ?? "All Categories"}',
+                                                    '${item.coachingTypeDisplay} • ${item.categoryDisplay}',
                                                     style: const TextStyle(
                                                         fontSize: 11,
                                                         color: AppColors
@@ -654,40 +656,28 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis)),
-                                            if (item.files.isNotEmpty) ...[
+                                            if (item.fileCategoryDisplay !=
+                                                'None') ...[
                                               const SizedBox(width: 6),
                                               Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 6,
+                                                          vertical: 2),
                                                   decoration: BoxDecoration(
-                                                      color: const Color(
-                                                          0xFFF1F5F9),
+                                                      color:
+                                                          const Color(0xFFF1F5F9),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               6)),
-                                                  child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        const Icon(
-                                                            Icons.attach_file,
-                                                            size: 11,
-                                                            color: AppColors
-                                                                .primary),
-                                                        const SizedBox(
-                                                            width: 2),
-                                                        Text(
-                                                            '${item.files.length}',
-                                                            style: const TextStyle(
-                                                                fontSize: 10,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: AppColors
-                                                                    .primary))
-                                                      ]))
+                                                  child: Text(
+                                                      item.fileCategoryDisplay,
+                                                      style: const TextStyle(
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: AppColors
+                                                              .primary)))
                                             ]
                                           ])),
                                           Row(children: [
@@ -734,7 +724,7 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
                                                       context,
                                                       MaterialPageRoute(
                                                           builder: (_) =>
-                                                              EditAnswerKeyScreen(
+                                                              EditAchievementScreen(
                                                                   keyId: item
                                                                       .id)));
                                                   if (res == true) {
@@ -790,7 +780,7 @@ class _AnswerKeyListScreenState extends State<AnswerKeyListScreen> {
             final res = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const CreateAnswerKeyScreen()));
+                    builder: (_) => const CreateAchievementScreen()));
             if (res == true) _fetchItems();
           },
           backgroundColor: AppColors.fanta,

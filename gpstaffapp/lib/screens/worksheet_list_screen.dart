@@ -268,7 +268,8 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
                         if (item.isSchedule == 1)
                           _detailRow(
                               'Scheduled At', _formatDateTime(item.startAt)),
-                        _detailRow('Created At', _formatDateTime(item.createdAt)),
+                        _detailRow(
+                            'Created At', _formatDateTime(item.createdAt)),
                         const SizedBox(height: 20),
                         if (item.filePaths.isNotEmpty) ...[
                           const Text(
@@ -285,7 +286,8 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
                             (file) => Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: InkWell(
-                                onTap: () => _openAttachment(_absoluteFileUrl(file)),
+                                onTap: () =>
+                                    _openAttachment(_absoluteFileUrl(file)),
                                 borderRadius: BorderRadius.circular(14),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -294,7 +296,8 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
                                     color: AppColors.primary.withOpacity(0.04),
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                        color: AppColors.primary.withOpacity(0.2)),
+                                        color:
+                                            AppColors.primary.withOpacity(0.2)),
                                   ),
                                   child: Row(
                                     children: [
@@ -303,7 +306,8 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
-                                          WorksheetModel.getAttachmentFileName(file),
+                                          WorksheetModel.getAttachmentFileName(
+                                              file),
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -339,13 +343,14 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
     final filterProvider = Provider.of<AnnouncementFilterProvider>(context);
     final coachingTypes = [
       'ALL',
-      ...(filterProvider.master?.coachingTypes ?? [
-        'OFFLINE',
-        'ONLINE',
-        'ONLINE LIVE',
-        'ONLINE RECORDED',
-        'TEST BATCH',
-      ]),
+      ...(filterProvider.master?.coachingTypes ??
+          [
+            'OFFLINE',
+            'ONLINE',
+            'ONLINE LIVE',
+            'ONLINE RECORDED',
+            'TEST BATCH',
+          ]),
     ];
 
     return Scaffold(
@@ -353,10 +358,12 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
       appBar: AppBar(
         title: const Text('Worksheets'),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: () {
-            filterProvider.fetchMasterData();
-            _fetchWorksheets();
-          }),
+          IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                filterProvider.fetchMasterData();
+                _fetchWorksheets();
+              }),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -384,8 +391,8 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: coachingTypes.map((type) {
-                  final isSelected =
-                      _filterType == type || (_filterType.isEmpty && type == 'ALL');
+                  final isSelected = _filterType == type ||
+                      (_filterType.isEmpty && type == 'ALL');
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: Material(
@@ -405,8 +412,9 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color:
-                                  isSelected ? AppColors.primary : AppColors.border,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.border,
                             ),
                           ),
                           child: Text(
@@ -414,8 +422,9 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color:
-                                  isSelected ? Colors.white : AppColors.textPrimary,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -457,8 +466,10 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
                         child: ListView.separated(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
                           itemCount: _worksheets.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) => _buildCard(_worksheets[index]),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, index) =>
+                              _buildCard(_worksheets[index]),
                         ),
                       ),
           ),

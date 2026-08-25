@@ -178,8 +178,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
 
       if (pickedTime != null && mounted) {
         setState(() {
-          _startAt = DateTime(pickedDate.year, pickedDate.month,
-              pickedDate.day, pickedTime.hour, pickedTime.minute);
+          _startAt = DateTime(pickedDate.year, pickedDate.month, pickedDate.day,
+              pickedTime.hour, pickedTime.minute);
         });
       }
     }
@@ -199,7 +199,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
       return;
     }
     if (filters.branches.isEmpty) {
-      _showErrorDialog('Validation Error', 'Please select at least one branch.');
+      _showErrorDialog(
+          'Validation Error', 'Please select at least one branch.');
       return;
     }
     if (filters.usertype == 'INDIVIDUAL' && filters.student.isEmpty) {
@@ -271,10 +272,10 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
       }
 
       final res = await ApiClient().dio.post(
-        '/admin/worksheet/${widget.worksheetId}',
-        data: formData,
-        options: Options(contentType: 'multipart/form-data'),
-      );
+            '/admin/worksheet/${widget.worksheetId}',
+            data: formData,
+            options: Options(contentType: 'multipart/form-data'),
+          );
 
       if (mounted) {
         if (res.data != null && res.data['status'] == true) {
@@ -356,7 +357,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
               CircularProgressIndicator(color: AppColors.fanta),
               SizedBox(height: 12),
               Text('Loading worksheet details...',
-                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  style:
+                      TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             ],
           ),
         ),
@@ -482,8 +484,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
           value: value.isEmpty ? null : value,
           isExpanded: true,
           hint: const Text('Select', style: TextStyle(fontSize: 14)),
-          icon: const Icon(Icons.keyboard_arrow_down,
-              color: AppColors.textMuted),
+          icon:
+              const Icon(Icons.keyboard_arrow_down, color: AppColors.textMuted),
           dropdownColor: Colors.white,
           items: items,
           onChanged: (v) => onChanged(v),
@@ -492,8 +494,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
     );
   }
 
-  Widget _userTypeButton(
-      AnnouncementFilterProvider filters, String type, IconData icon, String text) {
+  Widget _userTypeButton(AnnouncementFilterProvider filters, String type,
+      IconData icon, String text) {
     final isSelected = filters.usertype == type;
     return InkWell(
       onTap: () => filters.setUsertype(type),
@@ -503,7 +505,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? AppColors.primary : AppColors.border),
+          border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -516,7 +519,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.white : AppColors.textSecondary)),
+                    color:
+                        isSelected ? Colors.white : AppColors.textSecondary)),
           ],
         ),
       ),
@@ -535,12 +539,16 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(filters.academicYear.isNotEmpty ? filters.academicYear : 'Active Year',
+                Text(
+                    filters.academicYear.isNotEmpty
+                        ? filters.academicYear
+                        : 'Active Year',
                     style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary)),
-                const Icon(Icons.lock_outline, size: 18, color: AppColors.textMuted),
+                const Icon(Icons.lock_outline,
+                    size: 18, color: AppColors.textMuted),
               ],
             ),
           ),
@@ -548,9 +556,13 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
           _label('USER TYPE *'),
           Row(
             children: [
-              Expanded(child: _userTypeButton(filters, 'GROUP', Icons.people, 'Group Broadcast')),
+              Expanded(
+                  child: _userTypeButton(
+                      filters, 'GROUP', Icons.people, 'Group Broadcast')),
               const SizedBox(width: 10),
-              Expanded(child: _userTypeButton(filters, 'INDIVIDUAL', Icons.person, 'Individual')),
+              Expanded(
+                  child: _userTypeButton(
+                      filters, 'INDIVIDUAL', Icons.person, 'Individual')),
             ],
           ),
           const SizedBox(height: 16),
@@ -558,7 +570,9 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
           _dropdown(
             value: filters.course,
             items: (filters.master?.courses ?? [])
-                .map((c) => DropdownMenuItem(value: c, child: Text(c, style: const TextStyle(fontSize: 14))))
+                .map((c) => DropdownMenuItem(
+                    value: c,
+                    child: Text(c, style: const TextStyle(fontSize: 14))))
                 .toList(),
             onChanged: (v) => v != null ? filters.setCourse(v) : null,
           ),
@@ -620,12 +634,15 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
               selectedSection: filters.section,
               onSelectSection: (sec) => filters.setSection(sec),
             )
-          else if (filters.showSection && filters.sectionOptions.isNotEmpty) ...[
+          else if (filters.showSection &&
+              filters.sectionOptions.isNotEmpty) ...[
             _label('SECTION'),
             _dropdown(
               value: filters.section,
               items: filters.sectionOptions
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(fontSize: 14))))
+                  .map((s) => DropdownMenuItem(
+                      value: s,
+                      child: Text(s, style: const TextStyle(fontSize: 14))))
                   .toList(),
               onChanged: (v) => filters.setSection(v ?? ''),
             ),
@@ -652,7 +669,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
                 color: AppColors.textPrimary),
             decoration: InputDecoration(
               hintText: 'Enter worksheet title',
-              hintStyle: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+              hintStyle:
+                  const TextStyle(fontSize: 13, color: AppColors.textMuted),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
               contentPadding:
@@ -813,7 +831,8 @@ class _EditWorksheetScreenState extends State<EditWorksheetScreen> {
                     IconButton(
                       icon: const Icon(Icons.close,
                           color: AppColors.error, size: 18),
-                      onPressed: () => setState(() => _newFiles.removeAt(index)),
+                      onPressed: () =>
+                          setState(() => _newFiles.removeAt(index)),
                     ),
                   ],
                 ),

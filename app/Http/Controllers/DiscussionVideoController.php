@@ -13,37 +13,54 @@ class DiscussionVideoController extends Controller
 
     public function index(Request $request)
     {
-
         $discussionvideos = DiscussionVideo::where('academic_year', $this->academic_year)
             ->when(auth()->user()->branch, fn($q) => $q->where('branch','like','%'.auth()->user()->branch.'%'))
             ->when($request->coaching_type, fn($q) => $q->where('coaching_type','like','%'.$request->coaching_type.'%'))
+            ->when($request->course, fn($q) => $q->where('course','like','%'.$request->course.'%'))
             ->latest()->get();
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'discussionvideos' => $discussionvideos]);
+        }
 
         return view('discussionvideo.index', compact('discussionvideos'));
     }
 
-
+    public function show(Request $request, DiscussionVideo $discussionvideo)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'discussionvideo' => $discussionvideo]);
+        }
+        return redirect()->route('discussionvideo.index');
+    }
 
     public function create()
     {
         return view('discussionvideo.create');
     }
 
-
     public function store(Request $request)
     {
-        $data = $request->all();
+        $data = $request->except(['_token', '_method']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
-        DiscussionVideo::create($data);
+        $discussionvideo = DiscussionVideo::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Discussion video created successfully!', 'data' => $discussionvideo], 200);
+        }
 
         return redirect()->route('discussionvideo.index')->with('success', 'Discussion video created successfully!');
     }
 
-    public function edit(DiscussionVideo $discussionvideo)
+    public function edit(Request $request, DiscussionVideo $discussionvideo)
     {
         $type = Student::StudentFilterQuery($discussionvideo->branch, $discussionvideo->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
@@ -51,26 +68,41 @@ class DiscussionVideoController extends Controller
 
         $students = Student::StudentFilterQuery($discussionvideo->branch, $discussionvideo->course, $discussionvideo->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'discussionvideo' => $discussionvideo, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
+
         return view('discussionvideo.edit', compact('discussionvideo', 'type', 'section', 'students'));
     }
 
     public function update(Request $request, DiscussionVideo $discussionvideo)
     {
-        $data = $request->all();
+        $data = $request->except(['_token', '_method']);
 
         foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
-            $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
         }
 
         $discussionvideo->update($data);
 
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Discussion video updated successfully!', 'data' => $discussionvideo], 200);
+        }
+
         return redirect()->route('discussionvideo.index')->with('success', 'Discussion video updated successfully!');
     }
 
-
-    public function destroy(DiscussionVideo $discussionvideo)
+    public function destroy(Request $request, DiscussionVideo $discussionvideo)
     {
         $discussionvideo->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Discussion video deleted successfully!']);
+        }
 
         return redirect()->route('discussionvideo.index')->with('success', 'Discussion video deleted successfully!');
     }
