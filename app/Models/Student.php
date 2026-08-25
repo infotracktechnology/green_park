@@ -175,7 +175,7 @@ class Student extends Authenticatable
                     })
                     ->whereIn('gender', [$this->gender, 'All'])
                     ->whereRaw("date(start_at) = ?", [date('Y-m-d')]);
-            })->first();
+            })->latest('id')->first();
     }
 
 

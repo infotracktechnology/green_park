@@ -367,7 +367,7 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
               }),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.push(
             context,
@@ -375,10 +375,10 @@ class _WorksheetListScreenState extends State<WorksheetListScreen> {
           );
           if (result == true) _fetchWorksheets();
         },
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Add',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: AppColors.fanta,
+        elevation: 4,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
       body: Column(
         children: [
