@@ -22,7 +22,7 @@
         
         table {
             border-collapse: collapse;
-            margin: 0px;
+            margin: 0 auto; 
             width: 100%;
         }
         
@@ -36,7 +36,13 @@
      
         .student-info {
             font-size: 14px;
-            margin: 10px 0px;
+            margin: 10px auto; 
+            width: 90%; 
+        }
+
+        .answers-wrapper-table {
+            margin: 0 auto !important;
+            width: auto;
         }
     </style>
 </head>
@@ -44,6 +50,7 @@
     <h2>GREEN PARK COACHING CENTRE, NAMAKKAL</h2>
     <h4>CHECK THE ANSWERS THAT YOU MARKED</h4>
     
+    <!-- Student Info Table (Centered) -->
     <table class="student-info">
         <tr>
             <td width="50%">Student Name: <?php echo auth()->user()->student_name; ?></td>
@@ -54,21 +61,21 @@
             <td width="50%">User Name: <?php echo auth()->user()->user_name; ?></td>
         </tr>
         <tr>
-            <td width="50%">Test ID: <?php echo $exam->testid; ?></td>
-            <td width="50%">Q Type: <?php echo $exam->subject_name; ?></td>
+            <td width="50%">Test ID: {{ $testId }}</td>
+            <td width="50%">Question Order: <?php echo $exam->subject_name; ?></td>
         </tr>
     </table>
     
-    <table style="width: 100%;">
+    <table class="answers-wrapper-table">
         <tr>
         @foreach($answers as $answer)
-        <td style="padding: 0px 10px;vertical-align: top;">
-            <table class="table" style="width: {{ 25 * count($answers) }}%;">
+        <td style="padding: 0px 10px; vertical-align: top; text-align: center;">
+            <table class="table" style="width: {{ 25 * count($answers) }}%; margin: 0 auto;">
                 <tr>
-                    <th>QNo</th>
-                    <th>Key</th>
-                    <th>Ans</th>
-                    <th>Res</th>
+                    <th width="40px">QNo</th>
+                    <th width="40px">Key</th>
+                    <th width="40px">Ans</th>
+                    <th width="40px">Res</th>
                 </tr>
                 @foreach($answer as $key=>$item)
                 <tr>
@@ -88,9 +95,9 @@
                 </tr>
                 @endforeach
             </table>
-           </td>
+        </td>
         @endforeach
-    </tr>
+        </tr>
     </table>
 </body>
-</htm
+</html>
