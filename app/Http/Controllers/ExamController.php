@@ -380,6 +380,8 @@ class ExamController extends Controller
 
     public function offlineUpload(Request $request, ImportController $import)
     {
+        ini_set('max_execution_time', 7200);
+        ini_set('max_input_time', 7200);
         $request->validate([
             'offline' => 'required|mimes:csv,txt|max:4096',
         ]);
@@ -585,7 +587,7 @@ class ExamController extends Controller
     {
         DB::table('key_log')->where('id', $id)->delete();
         DB::table('exam_answer')->where('test_id', $test_id)->where('academic_year', $this->academic_year)->where('mode', 'OMR')->delete();
-        return redirect()->route('exam.offline.index')->with('success', 'Answer key log deleted successfully.');
+        return redirect()->route('exam.offline.index', ['type' => 'OFFLINE'])->with('success', 'Answer key log deleted successfully.');
     }
 
 
