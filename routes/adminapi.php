@@ -78,9 +78,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('student', StudentController::class);
     Route::post('student/{student}', [StudentController::class, 'update']);
     Route::get('biometric/report', [StaffProfileController::class, 'biometric_report']);
-    Route::get('report/examination_log', [ReportController::class, 'ExaminationLogReport']);
-    Route::get('report/attendance', [ReportController::class, 'AttendanceReport']);
-    Route::get('report/hostel_attendance', [ReportController::class, 'HostelAttendance']);
-    Route::get('/examination_log/students', [ReportController::class, 'ExaminationLogStudents']);
+    Route::get('attendance_report', [ReportController::class, 'AttendanceReport']);
+    Route::get('examination_log', [ReportController::class, 'ExaminationLogReport']);
+    Route::get('hostel_attendance', [ReportController::class, 'HostelAttendance']);
+    Route::get('examination_log/students', [ReportController::class, 'ExaminationLogStudents']);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });

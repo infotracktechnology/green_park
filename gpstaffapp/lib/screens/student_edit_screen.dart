@@ -407,269 +407,189 @@ class _StudentEditScreenState extends State<StudentEditScreen> {
                   validator: (v) =>
                       v == null || v.trim().isEmpty ? 'Name is required' : null,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 _buildPasswordField(),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDatePickerField(
-                        label: 'Admission Date',
-                        date: _admissionDate,
-                        onTap: _pickAdmissionDate,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Campus / Branch',
-                        value: _selectedCampus,
-                        items: branches.map((b) {
-                          return DropdownMenuItem<String>(
-                            value: b.id.toString(),
-                            child: Text(b.name, overflow: TextOverflow.ellipsis),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedCampus = val),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDatePickerField(
+                  label: 'Admission Date',
+                  date: _admissionDate,
+                  onTap: _pickAdmissionDate,
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Course',
-                        value: _selectedCourse,
-                        items: courses.map((c) {
-                          return DropdownMenuItem<String>(
-                            value: c,
-                            child: Text(c, overflow: TextOverflow.ellipsis),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedCourse = val),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Coaching Type',
-                        value: _selectedCoachingType,
-                        items: _coachingTypeOptions.map((c) {
-                          return DropdownMenuItem<String>(
-                            value: c,
-                            child: Text(c, overflow: TextOverflow.ellipsis),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedCoachingType = val),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Campus / Branch',
+                  value: _selectedCampus,
+                  items: branches.map((b) {
+                    return DropdownMenuItem<String>(
+                      value: b.id.toString(),
+                      child: Text(b.name, overflow: TextOverflow.ellipsis),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedCampus = val),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Hostel / Dayscholar',
-                        value: _selectedHostelDayscholar,
-                        items: _hostelOptions.map((h) {
-                          return DropdownMenuItem<String>(
-                            value: h,
-                            child: Text(h),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedHostelDayscholar = val),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'AC / Non AC',
-                        value: _selectedAcNonac,
-                        items: _acOptions.map((a) {
-                          return DropdownMenuItem<String>(
-                            value: a,
-                            child: Text(a),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedAcNonac = val),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Course',
+                  value: _selectedCourse,
+                  items: courses.map((c) {
+                    return DropdownMenuItem<String>(
+                      value: c,
+                      child: Text(c, overflow: TextOverflow.ellipsis),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedCourse = val),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Section',
-                        controller: _sectionController,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Batch',
-                        controller: _batchController,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Coaching Type',
+                  value: _selectedCoachingType,
+                  items: _coachingTypeOptions.map((c) {
+                    return DropdownMenuItem<String>(
+                      value: c,
+                      child: Text(c, overflow: TextOverflow.ellipsis),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedCoachingType = val),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Gender',
-                        value: _selectedGender,
-                        items: _genderOptions.map((g) {
-                          return DropdownMenuItem<String>(
-                            value: g,
-                            child: Text(g),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedGender = val),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildDatePickerField(
-                        label: 'Date of Birth',
-                        date: _dob,
-                        onTap: _pickDob,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Hostel / Dayscholar',
+                  value: _selectedHostelDayscholar,
+                  items: _hostelOptions.map((h) {
+                    return DropdownMenuItem<String>(
+                      value: h,
+                      child: Text(h),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedHostelDayscholar = val),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Age',
-                        controller: _ageController,
-                        readOnly: true,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Aadhar Card No',
-                        controller: _aadharController,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'AC / Non AC',
+                  value: _selectedAcNonac,
+                  items: _acOptions.map((a) {
+                    return DropdownMenuItem<String>(
+                      value: a,
+                      child: Text(a),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedAcNonac = val),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Nationality',
-                        controller: _nationalityController,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Religion',
-                        controller: _religionController,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Section',
+                  controller: _sectionController,
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Community',
-                        value: _selectedCommunity,
-                        items: _communityOptions.map((c) {
-                          return DropdownMenuItem<String>(
-                            value: c,
-                            child: Text(c),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedCommunity = val),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Caste',
-                        controller: _casteController,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Batch',
+                  controller: _batchController,
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Blood Group',
-                        value: _selectedBloodGroup,
-                        items: _bloodGroupOptions.map((b) {
-                          return DropdownMenuItem<String>(
-                            value: b,
-                            child: Text(b),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedBloodGroup = val),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildDropdownField<String>(
-                        label: 'Institution Bill Type',
-                        value: _selectedBillType,
-                        items: _billTypeOptions.map((b) {
-                          return DropdownMenuItem<String>(
-                            value: b,
-                            child: Text(b, overflow: TextOverflow.ellipsis),
-                          );
-                        }).toList(),
-                        onChanged: (val) =>
-                            setState(() => _selectedBillType = val),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Gender',
+                  value: _selectedGender,
+                  items: _genderOptions.map((g) {
+                    return DropdownMenuItem<String>(
+                      value: g,
+                      child: Text(g),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedGender = val),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Microsoft Teams ID',
-                        controller: _teamsIdController,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Teams Password',
-                        controller: _teamsPasswordController,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildDatePickerField(
+                  label: 'Date of Birth',
+                  date: _dob,
+                  onTap: _pickDob,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Age',
+                  controller: _ageController,
+                  readOnly: true,
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Aadhar Card No',
+                  controller: _aadharController,
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Nationality',
+                  controller: _nationalityController,
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Religion',
+                  controller: _religionController,
+                ),
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Community',
+                  value: _selectedCommunity,
+                  items: _communityOptions.map((c) {
+                    return DropdownMenuItem<String>(
+                      value: c,
+                      child: Text(c),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedCommunity = val),
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Caste',
+                  controller: _casteController,
+                ),
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Blood Group',
+                  value: _selectedBloodGroup,
+                  items: _bloodGroupOptions.map((b) {
+                    return DropdownMenuItem<String>(
+                      value: b,
+                      child: Text(b),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedBloodGroup = val),
+                ),
+                const SizedBox(height: 14),
+                _buildDropdownField<String>(
+                  label: 'Institution Bill Type',
+                  value: _selectedBillType,
+                  items: _billTypeOptions.map((b) {
+                    return DropdownMenuItem<String>(
+                      value: b,
+                      child: Text(b, overflow: TextOverflow.ellipsis),
+                    );
+                  }).toList(),
+                  onChanged: (val) =>
+                      setState(() => _selectedBillType = val),
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Microsoft Teams ID',
+                  controller: _teamsIdController,
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Teams Password',
+                  controller: _teamsPasswordController,
+                ),
+                const SizedBox(height: 14),
                 _buildTextField(
                   label: 'Description / Remarks',
                   controller: _descriptionController,
-                  maxLines: 2,
+                  maxLines: 3,
                 ),
               ]),
 
@@ -678,48 +598,32 @@ class _StudentEditScreenState extends State<StudentEditScreen> {
               // Section 2: Contact & Phone Numbers
               _buildSectionHeader('Contact & Phone Numbers', Icons.phone_outlined),
               _buildCardContainer([
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Student WhatsApp No / Phone 1',
-                        controller: _studentWhatsappController,
-                        keyboardType: TextInputType.phone,
-                        prefixIcon: Icons.phone_android,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Secondary Phone No (ph_no2)',
-                        controller: _phNo2Controller,
-                        keyboardType: TextInputType.phone,
-                        prefixIcon: Icons.phone_iphone,
-                      ),
-                    ),
-                  ],
+                _buildTextField(
+                  label: 'Student WhatsApp No / Phone 1',
+                  controller: _studentWhatsappController,
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icons.phone_android,
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Father Mobile No',
-                        controller: _fatherPhNoController,
-                        keyboardType: TextInputType.phone,
-                        prefixIcon: Icons.phone,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Mother Mobile No',
-                        controller: _motherPhNoController,
-                        keyboardType: TextInputType.phone,
-                        prefixIcon: Icons.phone,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Secondary Phone No (ph_no2)',
+                  controller: _phNo2Controller,
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icons.phone_iphone,
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Father Mobile No',
+                  controller: _fatherPhNoController,
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icons.phone,
+                ),
+                const SizedBox(height: 14),
+                _buildTextField(
+                  label: 'Mother Mobile No',
+                  controller: _motherPhNoController,
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icons.phone,
                 ),
               ]),
 

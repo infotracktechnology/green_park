@@ -244,21 +244,45 @@ class ReportController extends Controller
 
     public function AttendanceReport(Request $request)
     {
-        $courses = Student::select('course')->where('academic_year', $this->academic_year)->distinct()->orderBy('course')->get();
+        $courses = Student::select('course')->where('academic_year', $this->academic_year)->whereNotNull('course')->where('course', '!=', '')->distinct()->orderBy('course')->get();
 
-        $sections = Attendance::select('section')->where('academic_year', $this->academic_year)->distinct()->orderBy('section')->get();
+        $sections = Attendance::select('section')->where('academic_year', $this->academic_year)->whereNotNull('section')->where('section', '!=', '')->distinct()->orderBy('section')->get();
 
-        $attendances = [];
-        if ($request->has('branch_id')) {
-            $studentIds = Student::where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE'])->when($request->filled('course'), function ($q) use ($request) { $q->where('course', $request->course); }) ->when($request->filled('section'), function ($q) use ($request) { $q->where('section', $request->section); })->pluck('student_id');
+        $attendances = collect([]);
+        if ($request->has('branch_id') && $request->filled('branch_id')) {
+            $studentIds = Student::where('academic_year', $this->academic_year)
+                ->where('campus', $request->branch_id)
+                ->when($request->filled('course'), function ($q) use ($request) {
+                    $q->where('course', $request->course);
+                })
+                ->when($request->filled('section'), function ($q) use ($request) {
+                    $q->where('section', $request->section);
+                })
+                ->pluck('student_id');
 
-           $attendances = Attendance::where('branch_id', $request->branch_id)->where('academic_year', $this->academic_year)->where('attendance_date', $request->date)->whereIn('student_id', $studentIds)->get()->groupBy('section');
+            $attendanceQuery = Attendance::where('branch_id', $request->branch_id)
+                ->where('academic_year', $this->academic_year);
 
-            $attendances = $attendances->map(function ($attendance, $section) use ($request) {
+            if ($request->filled('date')) {
+                $attendanceQuery->where('attendance_date', $request->date);
+            }
+            if ($studentIds->isNotEmpty()) {
+                $attendanceQuery->whereIn('student_id', $studentIds);
+            }
+
+            $attendancesGrouped = $attendanceQuery->get()->groupBy('section');
+
+            $attendances = $attendancesGrouped->map(function ($attendance, $section) use ($request) {
                 $present = $attendance->where('status', 'P')->unique('student_id')->count();
                 $absent = $attendance->where('status', 'A')->unique('student_id')->count();
 
-                $studentQuery = Student::where('section', $section)->where('academic_year', $this->academic_year)->where('campus', $request->branch_id)->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE'])->whereDate('admission_date', '<=', $request->date);
+                $studentQuery = Student::where('section', $section)
+                    ->where('academic_year', $this->academic_year)
+                    ->where('campus', $request->branch_id);
+
+                if ($request->filled('date')) {
+                    $studentQuery->whereDate('admission_date', '<=', $request->date);
+                }
 
                 if ($request->filled('course')) {
                     $studentQuery->where('course', $request->course);
@@ -266,21 +290,30 @@ class ReportController extends Controller
 
                 $boys = (clone $studentQuery)->where('gender', 'Male')->count();
                 $girls = (clone $studentQuery)->where('gender', 'Female')->count();
-                
+
                 $studentNames = Student::whereIn('student_id', $attendance->where('status', 'P')->pluck('student_id')->unique())->pluck('student_name');
 
-                $absentStudentNames = Student::whereIn('student_id',$attendance->where('status', 'A')->pluck('student_id')->unique())->pluck('student_name');
+                $absentStudentNames = Student::whereIn('student_id', $attendance->where('status', 'A')->pluck('student_id')->unique())->pluck('student_name');
 
-                return ['section' => $section,'boys' => $boys,'girls' => $girls,'total' => $boys + $girls,'present' => $present,'absent' => $absent,'present_students' => json_encode($studentNames->values()),'absent_students' => json_encode($absentStudentNames->values())];
+                return [
+                    'section' => $section,
+                    'boys' => $boys,
+                    'girls' => $girls,
+                    'total' => $boys + $girls,
+                    'present' => $present,
+                    'absent' => $absent,
+                    'present_students' => $studentNames->values()->toArray(),
+                    'absent_students' => $absentStudentNames->values()->toArray()
+                ];
             });
         }
 
         if ($request->wantsJson() || $request->is('api/*')) {
-            $attendancesList = $attendances->values()->map(function ($item) {
-                if (is_string($item['present_students'])) {
+            $attendancesList = collect($attendances)->values()->map(function ($item) {
+                if (is_string($item['present_students'] ?? null)) {
                     $item['present_students'] = json_decode($item['present_students'], true) ?? [];
                 }
-                if (is_string($item['absent_students'])) {
+                if (is_string($item['absent_students'] ?? null)) {
                     $item['absent_students'] = json_decode($item['absent_students'], true) ?? [];
                 }
                 return $item;
@@ -294,7 +327,7 @@ class ReportController extends Controller
             ], 200);
         }
 
-        return view('report.attendancereport', compact('attendances','sections','courses'));
+        return view('report.attendancereport', compact('attendances', 'sections', 'courses'));
     }
 
     public function MonthlyAttendanceReport(Request $request)
