@@ -244,7 +244,7 @@ class StaffProfileController extends Controller
     {
         $staffs = [];
         $user = auth()->user();
-        $branchId = ($user && $user->type != 'admin') ? $user->branch : $request->branch_id;
+        $branchId = ($user && $user->type != 'Admin') ? $user->branch : $request->branch_id;
 
         if ($branchId && $request->filled('date')) {
             $date = Carbon::parse($request->date);

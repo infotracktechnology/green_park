@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
                 $user = auth()->user();
                 
                 $course = ['NEET', 'JEE', 'XI-OB', 'XII-OB','XII-CBSE','XII-SB'];
-                $branches = Branch::when($user && $user->type != 'admin' && $user->branch, fn($q) => $q->where('id', $user->branch))->get();
+                $branches = Branch::when($user && $user->type != 'Admin' && $user->branch, fn($q) => $q->where('id', $user->branch))->get();
                 $coachingtype = ['OFFLINE', 'ONLINE', 'ONLINE LIVE', 'ONLINE RECORDED', 'TEST BATCH'];
                 $hostel = ['DAYSCHOLAR', 'HOSTEL'];
                 $batch = Student::select('batch')->whereNotNull('batch')->where('batch', '!=', '')->distinct()->orderBy('batch')->get()->pluck('batch')->toArray();

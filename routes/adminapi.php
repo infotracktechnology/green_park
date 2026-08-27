@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $academicyear = AcademicYear::where('active', 1)->first();
         $course = ['NEET', 'JEE', 'XI-OB', 'XII-OB', 'XII-CBSE', 'XII-SB'];
 
-        $branches = Branch::when($user && $user->type != 'admin' && $user->branch, fn($q) => $q->where('id', $user->branch))->get();
+        $branches = Branch::when($user && $user->type != 'Admin' && $user->branch, fn($q) => $q->where('id', $user->branch))->get();
         $coachingtype = ['OFFLINE', 'ONLINE', 'ONLINE LIVE', 'ONLINE RECORDED', 'TEST BATCH'];
         $hostel = ['DAYSCHOLAR', 'HOSTEL'];
 
