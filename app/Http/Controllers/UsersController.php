@@ -92,16 +92,38 @@ class UsersController extends Controller
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 
-    public function BranchSwitch(User $user, Request $request) 
+    public function BranchSwitch(?User $user, Request $request) 
     {
+        $user = ($user && $user->exists) ? $user : auth()->user();
+
         if ($request->isMethod('POST')) {
             $user->branch = $request->branch;
             $user->save();
+
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Branch switched successfully',
+                    'active_branch' => $user->branch,
+                    'user' => $user
+                ], 200);
+            }
+
             return redirect()->route('admin.home')->with('success', 'Branch switched successfully');
         }
 
-        $branchIds = explode(',', $user->branch_ids);
+        $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
         $branches_list = Branch::whereIn('id', $branchIds)->get();
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => true,
+                'user' => $user,
+                'active_branch' => $user->branch,
+                'branches_list' => $branches_list
+            ], 200);
+        }
+
         return view('users.branch_switch', compact('user', 'branches_list'));
     }
 

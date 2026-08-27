@@ -13,6 +13,8 @@ import 'answer_key_list_screen.dart';
 import 'download_list_screen.dart';
 import 'worksheet_list_screen.dart';
 import 'achievement_list_screen.dart';
+import 'biometric_report_screen.dart';
+import 'branch_switch_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -170,22 +172,58 @@ class DashboardScreen extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const AchievementListScreen()),
             ),
           ),
+          MenuItemModel(
+            id: 'biometric_report',
+            title: 'Biometric Report',
+            subtitle: 'Daily staff attendance',
+            icon: Icons.fingerprint,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const BiometricReportScreen()),
+            ),
+          ),
         ];
       } else if (isBranchAdmin) {
         return [
+          MenuItemModel(
+            id: 'biometric_report',
+            title: 'Biometric Report',
+            subtitle: 'Staff daily attendance',
+            icon: Icons.fingerprint,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const BiometricReportScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'branch_switch',
+            title: 'Switch Branch',
+            subtitle: 'Change active campus',
+            icon: Icons.swap_horiz_rounded,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const BranchSwitchScreen()),
+            ),
+          ),
           MenuItemModel(
             id: 'student_directory',
             title: 'Students',
             subtitle: 'Coming soon',
             icon: Icons.school_outlined,
-            color: AppColors.fanta,
+            color: AppColors.primary,
           ),
           MenuItemModel(
             id: 'branch_reports',
             title: 'Branch Reports',
             subtitle: 'Coming soon',
             icon: Icons.bar_chart,
-            color: AppColors.primary,
+            color: AppColors.fanta,
           ),
         ];
       }
@@ -293,6 +331,24 @@ class DashboardScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  // Branch Switch Quick Action
+                  if (isBranchAdmin || (user?.branchIds != null && user!.branchIds!.isNotEmpty)) ...[
+                    IconButton(
+                      tooltip: 'Switch Branch',
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const BranchSwitchScreen()),
+                      ),
+                      icon: const Icon(Icons.swap_horiz,
+                          color: Colors.white, size: 20),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.15),
+                        padding: const EdgeInsets.all(10),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
                   // Logout Button
                   IconButton(
                     onPressed: () {

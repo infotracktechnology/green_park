@@ -3,6 +3,7 @@ class UserModel {
   final String username;
   final String? type;
   final dynamic branch;
+  final String? branchIds;
   final String? email;
   final String? mobile;
   final Map<String, dynamic>? rawJson;
@@ -12,6 +13,7 @@ class UserModel {
     required this.username,
     this.type,
     this.branch,
+    this.branchIds,
     this.email,
     this.mobile,
     this.rawJson,
@@ -25,6 +27,7 @@ class UserModel {
               .toString(),
       type: json['type']?.toString() ?? json['role']?.toString() ?? 'staff',
       branch: json['branch'],
+      branchIds: json['branch_ids']?.toString(),
       email: json['email']?.toString(),
       mobile: json['mobile']?.toString(),
       rawJson: json,
@@ -38,6 +41,7 @@ class UserModel {
       'username': username,
       'type': type,
       'branch': branch,
+      'branch_ids': branchIds,
       'email': email,
       'mobile': mobile,
     };

@@ -9,7 +9,7 @@ use App\Models\Staff;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
-use App\Http\Controllers\{HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, ReportController, HomeController};
+use App\Http\Controllers\{HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, ReportController, HomeController,UsersController};
 
 Route::post('/login', function (Request $request) {
     $user = null;
@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $academicyear = AcademicYear::where('active', 1)->first();
         $course = ['NEET', 'JEE', 'XI-OB', 'XII-OB', 'XII-CBSE', 'XII-SB'];
 
-        $branches = Branch::when($user && $user->branch, fn($q) => $q->where('id', $user->branch))->get();
+        $branches = Branch::when($user && $user->type != 'admin' && $user->branch, fn($q) => $q->where('id', $user->branch))->get();
         $coachingtype = ['OFFLINE', 'ONLINE', 'ONLINE LIVE', 'ONLINE RECORDED', 'TEST BATCH'];
         $hostel = ['DAYSCHOLAR', 'HOSTEL'];
 
@@ -56,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['status' => true, 'academicyear' => $academicyear, 'course' => $course, 'branches' => $branches, 'coachingtype' => $coachingtype, 'hostel' => $hostel, 'batch' => $batch]);
     });
 
+    Route::match(['get', 'post'], 'users/branchswitch/{user?}', [UsersController::class, 'BranchSwitch']);
     Route::resource('announcement', AnnouncementController::class);
     Route::resource('chairmanvideo', ChairmanVideoController::class);
     Route::resource('examportion', ExamPortionController::class);
@@ -67,5 +68,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('discussionvideo', DiscussionVideoController::class);
     Route::resource('revisionvideo', RevisionVideoController::class);
     Route::resource('achievement', AchievementController::class);
+    Route::get('biometric/report', [StaffProfileController::class, 'biometric_report']);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });

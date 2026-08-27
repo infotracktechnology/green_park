@@ -27,7 +27,7 @@
                     <select name="branch_id" id="branch" class="form-control form-control-sm" required>
                       <option value="">Select Branch</option>
                       @foreach ($branches as $branch)
-                      <option value="{{ $branch->id }}" @selected($branch->id == request('branch_id'))>
+                      <option value="{{ $branch->id }}" @selected($branch->id == request('branch_id', auth()->user()->branch ?? ($branches->first()?->id)))>
                         {{ $branch->name }}
                       </option>
                       @endforeach

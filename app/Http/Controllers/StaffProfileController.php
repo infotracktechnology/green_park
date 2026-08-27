@@ -240,18 +240,28 @@ class StaffProfileController extends Controller
 
         return redirect()->back()->with('error', 'Staff not found!');
     }
-  public function biometric_report(Request $request){
-    $staffs = [];
+    public function biometric_report(Request $request)
+    {
+        $staffs = [];
+        $user = auth()->user();
+        $branchId = ($user && $user->type != 'admin') ? $user->branch : $request->branch_id;
 
-    if ($request->filled(['date', 'branch_id'])) {
-        $date = Carbon::parse($request->date);
-        $suffix = $date->format('n_Y');
-        
-        if(!DB::connection('epushserver')->getSchemaBuilder()->hasTable("DeviceLogs_$suffix")){
-               return to_route('biometric.report')->with('error', "Biometric data not available for ".$date->format('F Y'));
-        }
-    
-        $staffs = Staff::where('branch_id', $request->branch_id)->get()->map(function ($staff) use ($date, $suffix) {
+        if ($branchId && $request->filled('date')) {
+            $date = Carbon::parse($request->date);
+            $suffix = $date->format('n_Y');
+
+            if (!DB::connection('epushserver')->getSchemaBuilder()->hasTable("DeviceLogs_$suffix")) {
+                if ($request->wantsJson() || $request->is('api/*')) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Biometric data not available for " . $date->format('F Y'),
+                        'staffs' => []
+                    ], 200);
+                }
+                return to_route('biometric.report')->with('error', "Biometric data not available for " . $date->format('F Y'));
+            }
+
+            $staffs = Staff::where('branch_id', $branchId)->get()->map(function ($staff) use ($date, $suffix) {
                 $logs = DB::connection('epushserver')->table("DeviceLogs_$suffix")->where('UserId', $staff->biometric_no)->whereDate('LogDate', $date)->selectRaw("TIME(LogDate) as log_time, LogDate")->get();
 
                 $firstIn = $logs->first()?->log_time ?? '-';
@@ -259,27 +269,46 @@ class StaffProfileController extends Controller
                 $timeLogs = $logs->pluck('log_time')->implode(', ');
 
                 $session1 = $session2 = 'A';
-                $hours=0;
-                $day=0.0;
+                $hours = 0;
+                $day = 0.0;
 
                 if ($logs->isNotEmpty()) {
-                $session1 = strtotime($firstIn) <= strtotime($staff?->shift?->session1_endtime) ? 'P' : 'A';
-                $day = $session1 == 'P' ? 0.5 : 0;
-                if($lastOut != '-'){
-                     $session2 = strtotime($lastOut) >= strtotime($staff?->shift?->session2_endtime) ? 'P' : 'A';
-                     $hours =  Carbon::parse($firstIn)->diffInHours(Carbon::parse($lastOut));
-                }
-                else
-                {
-                    $session2 = strtotime($firstIn) >= strtotime($staff?->shift?->session2_endtime) ? 'P' : 'A';
-                }
-                $day = ($session1 == 'P' ? 0.5 : 0) + ($session2 == 'P' ? 0.5 : 0);
+                    $session1 = strtotime($firstIn) <= strtotime($staff?->shift?->session1_endtime) ? 'P' : 'A';
+                    $day = $session1 == 'P' ? 0.5 : 0;
+                    if ($lastOut != '-') {
+                        $session2 = strtotime($lastOut) >= strtotime($staff?->shift?->session2_endtime) ? 'P' : 'A';
+                        $hours = Carbon::parse($firstIn)->diffInHours(Carbon::parse($lastOut));
+                    } else {
+                        $session2 = strtotime($firstIn) >= strtotime($staff?->shift?->session2_endtime) ? 'P' : 'A';
+                    }
+                    $day = ($session1 == 'P' ? 0.5 : 0) + ($session2 == 'P' ? 0.5 : 0);
                 }
 
-                return ['branch' => $staff->branch->name,'department' => $staff->department,'school_initial'=> $staff->school_initial,'name' => $staff->name,'biometric_no' => $staff->biometric_no,'first_in' => $firstIn,'last_out' => $lastOut,'session1' => $session1,'session2' => $session2,'time_logs' => $timeLogs ?: '-','date' => $date->format('d/m/Y'),'hours'=>$hours,'day'=>$day];
+                return [
+                    'branch' => $staff->branch?->name ?? '',
+                    'department' => $staff->department,
+                    'school_initial' => $staff->school_initial,
+                    'name' => $staff->name,
+                    'biometric_no' => $staff->biometric_no,
+                    'first_in' => $firstIn,
+                    'last_out' => $lastOut,
+                    'session1' => $session1,
+                    'session2' => $session2,
+                    'time_logs' => $timeLogs ?: '-',
+                    'date' => $date->format('d/m/Y'),
+                    'hours' => $hours,
+                    'day' => $day,
+                ];
             });
-    }
+        }
 
-    return view('staff.biometric_report', compact('staffs'));
-}
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => true,
+                'staffs' => $staffs
+            ], 200);
+        }
+
+        return view('staff.biometric_report', compact('staffs'));
+    }
 }

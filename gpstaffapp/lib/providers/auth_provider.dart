@@ -84,6 +84,44 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> switchBranch(dynamic branchId) async {
+    try {
+      final dio = ApiClient().dio;
+      final response = await dio.post(
+        '/admin/branchswitch',
+        data: {'branch': branchId},
+      );
+
+      final data = response.data;
+      if (data != null && data['status'] == true) {
+        if (_user != null) {
+          final updatedUserMap =
+              Map<String, dynamic>.from(_user!.rawJson ?? _user!.toJson());
+          updatedUserMap['branch'] = branchId;
+          _user = UserModel.fromJson(updatedUserMap);
+
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('@user', jsonEncode(updatedUserMap));
+          notifyListeners();
+        }
+        return {'success': true, 'message': data['message'] ?? 'Branch switched'};
+      }
+
+      return {
+        'success': false,
+        'message': data?['message'] ?? 'Failed to switch branch'
+      };
+    } on DioException catch (e) {
+      String msg = 'Failed to switch branch';
+      if (e.response?.data != null && e.response?.data is Map) {
+        msg = e.response?.data['message']?.toString() ?? msg;
+      }
+      return {'success': false, 'message': msg};
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
   Future<void> logout() async {
     try {
       final prefs = await SharedPreferences.getInstance();

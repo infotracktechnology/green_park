@@ -86,7 +86,7 @@ $mockTest = $user->GetMockTest();
 $isOffline = in_array($user->coaching_type, ['OFFLINE', 'ONLINE LIVE']);
 
 $isExamActive = $exam && $exam->start_at <= now() && $exam->end_at >= now();
-  $isExamUpcoming = $exam && $exam->start_at > now();
+$isExamUpcoming = $exam && $exam->start_at > now();
 
   $upcomingTestTime = null;
   $upcomingTestName = '';
@@ -148,7 +148,7 @@ $isExamActive = $exam && $exam->start_at <= now() && $exam->end_at >= now();
               <h2 class="mb-2 font-weight-bold text-uppercase">
                 <span class="pulse-icon text-danger mr-2">🔴</span> Live Exam Active
               </h2>
-              <h5 class="mb-4 text-light">{{ $exam->name ?? 'Online Assessment' }}</h5>
+              <h5 class="mb-4 text-light">Online Assessment</h5>
 
               <!-- Alpine Timer Component -->
               <div x-data="dashboardTimer('{{ $exam->end_at->toIso8601String() }}')" x-init="initTimer()" class="mb-4">
@@ -171,7 +171,7 @@ $isExamActive = $exam && $exam->start_at <= now() && $exam->end_at >= now();
           <div class="card" style="background: #343a40; border-radius: 15px; border-left: 5px solid #17a2b8; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
             <div class="card-body text-center text-white py-4">
               <h4 class="mb-2"><i class="fas fa-clock text-info mr-2"></i> Upcoming Exam</h4>
-              <h6 class="mb-4 text-light">{{ $exam->name ?? 'Online Assessment' }}</h6>
+              <h6 class="mb-4 text-light">Online Assessment</h6>
 
               <div x-data="dashboardTimer('{{ $exam->start_at->toIso8601String() }}')" x-init="initTimer()" class="mb-2">
                 <p class="mb-1 text-uppercase text-muted" style="font-size: 13px; letter-spacing: 1px;">Starts In</p>
