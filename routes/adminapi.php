@@ -75,6 +75,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('discussionvideo', DiscussionVideoController::class);
     Route::resource('revisionvideo', RevisionVideoController::class);
     Route::resource('achievement', AchievementController::class);
+    Route::resource('student', StudentController::class);
+    Route::post('student/{student}', [StudentController::class, 'update']);
     Route::get('biometric/report', [StaffProfileController::class, 'biometric_report']);
     Route::get('report/examination_log', [ReportController::class, 'ExaminationLogReport']);
     Route::get('report/attendance', [ReportController::class, 'AttendanceReport']);

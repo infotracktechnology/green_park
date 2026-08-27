@@ -18,6 +18,7 @@ import 'branch_switch_screen.dart';
 import 'examination_log_screen.dart';
 import 'attendance_report_screen.dart';
 import 'hostel_attendance_report_screen.dart';
+import 'student_list_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -223,6 +224,18 @@ class DashboardScreen extends StatelessWidget {
                   builder: (_) => const HostelAttendanceReportScreen()),
             ),
           ),
+          MenuItemModel(
+            id: 'student_management',
+            title: 'Students',
+            subtitle: 'View & edit student details',
+            icon: Icons.school_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const StudentListScreen()),
+            ),
+          ),
         ];
       } else if (isBranchAdmin) {
         return [
@@ -253,9 +266,14 @@ class DashboardScreen extends StatelessWidget {
           MenuItemModel(
             id: 'student_directory',
             title: 'Students',
-            subtitle: 'Coming soon',
+            subtitle: 'View student details',
             icon: Icons.school_outlined,
             color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const StudentListScreen(canEdit: false)),
+            ),
           ),
           MenuItemModel(
             id: 'branch_reports',
