@@ -43,11 +43,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/masterdata', function (Request $request) {
         $user = auth()->user();
+        $userType = strtolower(trim($user->type ?? ''));
+        $isAdmin = ($userType === 'admin');
 
         $academicyear = AcademicYear::where('active', 1)->first();
         $course = ['NEET', 'JEE', 'XI-OB', 'XII-OB', 'XII-CBSE', 'XII-SB'];
 
-        $branches = Branch::when($user && $user->type != 'Admin' && $user->branch, fn($q) => $q->where('id', $user->branch))->get();
+        $branches = Branch::when(!$isAdmin, function ($q) use ($user) {
+            if ($user && $user->branch) {
+                $q->where('id', $user->branch);
+            }
+        })->get();
+
         $coachingtype = ['OFFLINE', 'ONLINE', 'ONLINE LIVE', 'ONLINE RECORDED', 'TEST BATCH'];
         $hostel = ['DAYSCHOLAR', 'HOSTEL'];
 
@@ -56,7 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['status' => true, 'academicyear' => $academicyear, 'course' => $course, 'branches' => $branches, 'coachingtype' => $coachingtype, 'hostel' => $hostel, 'batch' => $batch]);
     });
 
-    Route::match(['get', 'post'], 'users/branchswitch/{user?}', [UsersController::class, 'BranchSwitch']);
+    Route::match(['get', 'post'], 'branchswitch', [UsersController::class, 'BranchSwitch']);
     Route::resource('announcement', AnnouncementController::class);
     Route::resource('chairmanvideo', ChairmanVideoController::class);
     Route::resource('examportion', ExamPortionController::class);
@@ -69,11 +76,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('revisionvideo', RevisionVideoController::class);
     Route::resource('achievement', AchievementController::class);
     Route::get('biometric/report', [StaffProfileController::class, 'biometric_report']);
-    Route::get('examination_log', [ReportController::class, 'ExaminationLogReport']);
     Route::get('report/examination_log', [ReportController::class, 'ExaminationLogReport']);
-    Route::get('attendance_report', [ReportController::class, 'AttendanceReport']);
     Route::get('report/attendance', [ReportController::class, 'AttendanceReport']);
-    Route::get('hostel_attendance', [ReportController::class, 'HostelAttendance']);
     Route::get('report/hostel_attendance', [ReportController::class, 'HostelAttendance']);
     Route::get('/examination_log/students', [ReportController::class, 'ExaminationLogStudents']);
     Route::get('/filter', [HomeController::class, 'Filter']);

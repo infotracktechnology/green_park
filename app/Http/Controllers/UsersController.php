@@ -112,8 +112,16 @@ class UsersController extends Controller
             return redirect()->route('admin.home')->with('success', 'Branch switched successfully');
         }
 
-        $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
-        $branches_list = Branch::whereIn('id', $branchIds)->get();
+        $userType = strtolower(trim($user->type ?? ''));
+        if ($userType === 'admin') {
+            $branches_list = Branch::all();
+        } else {
+            $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
+            if (empty($branchIds) && $user->branch) {
+                $branchIds = [$user->branch];
+            }
+            $branches_list = Branch::whereIn('id', $branchIds)->get();
+        }
 
         if ($request->wantsJson() || $request->is('api/*')) {
             return response()->json([

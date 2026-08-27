@@ -5,6 +5,7 @@ import '../api/api_client.dart';
 import '../models/biometric_report_model.dart';
 import '../models/master_data_model.dart';
 import '../providers/announcement_filter_provider.dart';
+import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 
 class BiometricReportScreen extends StatefulWidget {
@@ -36,6 +37,9 @@ class _BiometricReportScreenState extends State<BiometricReportScreen> {
   Future<void> _initializeData() async {
     final filterProvider =
         Provider.of<AnnouncementFilterProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final currentBranch = auth.user?.branch;
+
     if (filterProvider.master == null) {
       await filterProvider.fetchMasterData();
     }
@@ -43,8 +47,13 @@ class _BiometricReportScreenState extends State<BiometricReportScreen> {
     if (mounted) {
       setState(() {
         _branches = filterProvider.master?.branches ?? [];
-        if (_branches.isNotEmpty && _selectedBranchId == null) {
-          _selectedBranchId = _branches.first.id.toString();
+        if (_branches.isNotEmpty) {
+          if (currentBranch != null &&
+              _branches.any((b) => b.id.toString() == currentBranch.toString())) {
+            _selectedBranchId = currentBranch.toString();
+          } else {
+            _selectedBranchId = _branches.first.id.toString();
+          }
         }
       });
 
