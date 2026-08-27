@@ -616,7 +616,7 @@ class ExamController extends Controller
     public function deleteAnswerKey($id, $test_id)
     {
         DB::table('key_log')->where('id', $id)->delete();
-        return redirect()->route('exam.answerkey')->with('success', 'Answer key log deleted successfully.');
+        return redirect()->route('exam.answerkey', ['type' => 'OFFLINE'])->with('success', 'Answer key log deleted successfully.');
     }
 
     public function deleteOfflineKey($id, $test_id)
@@ -648,6 +648,9 @@ class ExamController extends Controller
         if ($request->isMethod('POST')) {
             foreach ($request->publish as $name => $publish) {
                 $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
+                if (!$exam) {
+                    continue;
+                }
                 $files = $exam->markrange_file ?? [];
                 if ($request->hasFile("batch.$name")) {
                     foreach ($request->file("batch.$name") as $batch => $file) {
@@ -656,10 +659,13 @@ class ExamController extends Controller
                         $files[$batch] = "assets/markrange/$filename";
                     }
                 }
-                $update = Exam::where('name', $name)->where('academic_year', $this->academic_year)->update(['publish' => $publish, 'markrange_file' => $files]);
+                $exam->update(['publish' => $publish,'markrange_file' => $files ]);
+                if ($publish === 'Yes') {
+                    $this->MovePervious($exam);
+                }
             }
-            $this->MovePervious("OFFLINE");
-            return back()->with('success', 'Exams Publish Updated Successfully.');
+            return back()->with('success','Exams Publish Updated Successfully.'
+            );
         }
 
         return view('exam.offlinepublish', compact('exams'));
@@ -706,7 +712,7 @@ class ExamController extends Controller
             }
             $exam->update(['publish' => $publish, 'markrange_file' => $files,]);
 
-            if ($publish) {
+            if ($publish === 'Yes') {
                 $this->MovePervious($exam);
             }
         }
