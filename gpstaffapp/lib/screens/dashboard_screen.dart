@@ -15,6 +15,9 @@ import 'worksheet_list_screen.dart';
 import 'achievement_list_screen.dart';
 import 'biometric_report_screen.dart';
 import 'branch_switch_screen.dart';
+import 'examination_log_screen.dart';
+import 'attendance_report_screen.dart';
+import 'hostel_attendance_report_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -184,21 +187,45 @@ class DashboardScreen extends StatelessWidget {
                   builder: (_) => const BiometricReportScreen()),
             ),
           ),
-        ];
-      } else if (isBranchAdmin) {
-        return [
           MenuItemModel(
-            id: 'biometric_report',
-            title: 'Biometric Report',
-            subtitle: 'Staff daily attendance',
-            icon: Icons.fingerprint,
+            id: 'examination_log',
+            title: 'Exam Log Report',
+            subtitle: 'Live exam attendance & stats',
+            icon: Icons.assignment_turned_in_outlined,
             color: AppColors.primary,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => const BiometricReportScreen()),
+                  builder: (_) => const ExaminationLogScreen()),
             ),
           ),
+          MenuItemModel(
+            id: 'attendance_report',
+            title: 'Attendance Report',
+            subtitle: 'Daily student attendance',
+            icon: Icons.fact_check_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const AttendanceReportScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'hostel_attendance_report',
+            title: 'Hostel Attendance',
+            subtitle: 'Section & room wise logs',
+            icon: Icons.hotel_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const HostelAttendanceReportScreen()),
+            ),
+          ),
+        ];
+      } else if (isBranchAdmin) {
+        return [
           MenuItemModel(
             id: 'branch_switch',
             title: 'Switch Branch',
@@ -212,18 +239,30 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           MenuItemModel(
+            id: 'biometric_report',
+            title: 'Biometric Report',
+            subtitle: 'Staff daily attendance',
+            icon: Icons.fingerprint,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const BiometricReportScreen()),
+            ),
+          ),
+          MenuItemModel(
             id: 'student_directory',
             title: 'Students',
             subtitle: 'Coming soon',
             icon: Icons.school_outlined,
-            color: AppColors.primary,
+            color: AppColors.fanta,
           ),
           MenuItemModel(
             id: 'branch_reports',
             title: 'Branch Reports',
             subtitle: 'Coming soon',
             icon: Icons.bar_chart,
-            color: AppColors.fanta,
+            color: AppColors.primary,
           ),
         ];
       }

@@ -146,6 +146,17 @@ class ReportController extends Controller
             }
         }
 
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => true,
+                'category' => $category,
+                'exams' => $exams,
+                'stats' => $stats,
+                'studentDetails' => $studentDetails,
+                'test_name' => $test_name
+            ], 200);
+        }
+
         return view('report.examination_log_report', compact('category', 'exams', 'stats', 'students', 'test_name', 'studentDetails'));
     }
 
@@ -262,6 +273,25 @@ class ReportController extends Controller
 
                 return ['section' => $section,'boys' => $boys,'girls' => $girls,'total' => $boys + $girls,'present' => $present,'absent' => $absent,'present_students' => json_encode($studentNames->values()),'absent_students' => json_encode($absentStudentNames->values())];
             });
+        }
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            $attendancesList = $attendances->values()->map(function ($item) {
+                if (is_string($item['present_students'])) {
+                    $item['present_students'] = json_decode($item['present_students'], true) ?? [];
+                }
+                if (is_string($item['absent_students'])) {
+                    $item['absent_students'] = json_decode($item['absent_students'], true) ?? [];
+                }
+                return $item;
+            });
+
+            return response()->json([
+                'status' => true,
+                'courses' => $courses->pluck('course'),
+                'sections' => $sections->pluck('section'),
+                'attendances' => $attendancesList
+            ], 200);
         }
 
         return view('report.attendancereport', compact('attendances','sections','courses'));
@@ -882,6 +912,40 @@ class ReportController extends Controller
                     });
             }
         }
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            $records = [];
+            foreach ($attendance as $key => $logs) {
+                $student = $logs->first()?->student;
+                $morning = $logs->firstWhere('timing', 'Morning');
+                $evening = $logs->firstWhere('timing', 'Evening');
+                $logDate = $logs->first()?->attendance_date;
+
+                $records[] = [
+                    'student_id' => $student?->student_id ?? ($logs->first()?->student_id ?? '-'),
+                    'student_name' => $student?->student_name ?? '-',
+                    'course' => $student?->course ?? '-',
+                    'coaching_type' => $student?->coaching_type ?? '-',
+                    'section' => $logs->first()?->section ?? '-',
+                    'room_no' => $logs->first()?->room_no ?? '-',
+                    'date' => $logDate ? \Carbon\Carbon::parse($logDate)->format('d-m-Y') : '',
+                    'raw_date' => $logDate,
+                    'morning' => $morning?->status ?? '-',
+                    'evening' => $evening?->status ?? '-',
+                ];
+            }
+
+            return response()->json([
+                'status' => true,
+                'branches' => $branches,
+                'hostels' => $hostels,
+                'sections' => $section,
+                'rooms' => $rooms,
+                'records' => $records,
+                'active_tab' => $active_tab
+            ], 200);
+        }
+
         return view('report.hostelattendance', compact('branches', 'hostels', 'section', 'rooms', 'attendance', 'active_tab'));
     }
         public function HostelList(Request $request)
