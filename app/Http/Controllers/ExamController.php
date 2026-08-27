@@ -380,42 +380,71 @@ class ExamController extends Controller
 
     public function offlineUpload(Request $request, ImportController $import)
     {
-        ini_set('max_execution_time', 7200);
-        ini_set('max_input_time', 7200);
+        ini_set('max_execution_time', 900); 
         $request->validate([
             'offline' => 'required|mimes:csv,txt|max:4096',
         ]);
 
         try {
             $answers = $import->parseCSV($request->file('offline')->getRealPath());
-            $examtype = '';
 
             if (empty($answers) || !isset($answers[0]['exam_name'], $answers[0]['student_id'], $answers[0]['qorder'])) {
                 return back()->with('error', 'File is not in the template format.');
             }
 
             $exam = Exam::where('academic_year', $this->academic_year)->where('name', $answers[0]['exam_name'])->first();
-            if (empty($exam)) return back()->with('error', 'No such Exam exists.');
+
+            if (empty($exam)) {
+                return back()->with('error', 'No such Exam exists.');
+            }
+
+            $testNames = array_unique(array_column($answers, 'exam_name'));
+            $studentIds = array_unique(array_column($answers, 'student_id'));
+
+            DB::beginTransaction();
+
+            foreach (array_chunk($studentIds, 1000) as $chunkStudentIds) {
+                DB::table('exam_answer')->whereIn('testname', $testNames)->whereIn('student_id', $chunkStudentIds)->delete();
+            }
+
+            $records = [];
+            $chunkSize = 1000;
+            $now = now();
 
             foreach ($answers as $answer) {
-                $examtype = $exam->examtype;
-                $exists = ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->exists();
-
-                if ($exists) {
-                    ExamAnswer::where('testname', $answer['exam_name'])->where('student_id', $answer['student_id'])->delete();
-                }
-
-                $record = [];
                 $qno = 1;
-                foreach (explode(',', $answer['qorder']) as $col) {
-                    $subjectkey = strtolower($col);
-                    $subtotal = (int) ($exam->{"{$subjectkey}_questions"} ?? 0);
+                $subjects = explode(',', $answer['qorder']);
+
+                foreach ($subjects as $col) {
+                    $subjectKey = strtolower($col);
+                    $subtotal = (int) ($exam->{"{$subjectKey}_questions"} ?? 0);
+
                     for ($i = 1; $i <= $subtotal; $i++) {
-                        $record[] = ['academic_year' => $this->academic_year, 'test_id' => $answer['test_id'], 'testname' => $exam->name, 'student_id' => $answer['student_id'], 'subject' => strtoupper($col), 'q_no' => $qno, 'answer' => $answer["q$qno"] ?? null, 'mode' => 'OMR'];
+                        $records[] = [
+                            'academic_year' => $this->academic_year,
+                            'test_id'       => $answer['test_id'],
+                            'testname'      => $exam->name,
+                            'student_id'    => $answer['student_id'],
+                            'subject'       => strtoupper($col),
+                            'q_no'          => $qno,
+                            'answer'        => $answer["q{$qno}"] ?? null,
+                            'mode'          => 'OMR',
+                            'created_at'    => $now,
+                            'updated_at'    => $now,
+                        ];
                         $qno++;
+
+                        if (count($records) >= $chunkSize) {
+                            DB::table('exam_answer')->insert($records);
+                            $records = [];
+                        }
                     }
                 }
-                $exam_answer = DB::table('exam_answer')->insert($record);
+            }
+
+            if (!empty($records)) {
+                DB::table('exam_answer')->insert($records);
+                $records = [];
             }
 
             $file = $request->file('offline');
@@ -423,18 +452,25 @@ class ExamController extends Controller
             $file->move('answer_key', $filename);
 
             DB::table('key_log')->insert([
-                'file_name' => $filename,
-                'upload_time' => now(),
-                'examtype' => $examtype,
-                'test_name' => implode(',', array_unique(array_column($answers, 'exam_name'))),
-                'path' => 'answer_key/' . $filename,
-                'test_id' => implode(',', array_unique(array_column($answers, 'test_id'))),
-                'no_rows' => count($answers),
-                'type' => 'offline_key',
+                'file_name'   => $filename,
+                'upload_time' => $now,
+                'examtype'    => $exam->examtype,
+                'test_name'   => implode(',', $testNames),
+                'path'        => 'answer_key/' . $filename,
+                'test_id'     => implode(',', array_unique(array_column($answers, 'test_id'))),
+                'no_rows'     => count($answers),
+                'type'        => 'offline_key',
+                'created_at'  => $now,
+                'updated_at'  => $now,
             ]);
-            return back()->with('success', 'Offline file uploaded successfully.');
+
+            DB::commit();
+
+         return back()->with('success', 'Offline file uploaded successfully');
+
         } catch (\Exception $e) {
-            return back()->with('error', "OMR Upload Failed:" . $e->getMessage());
+            DB::rollBack();
+            return back()->with('error', "OMR Upload Failed: " . $e->getMessage());
         }
     }
 
