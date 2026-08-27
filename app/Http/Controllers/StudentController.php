@@ -23,18 +23,70 @@ class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        $students = [];
+        $user = auth()->user();
 
+        $query = Student::with('branch')
+            ->when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))
+            ->when($user && $user->branch, function ($q) use ($user) {
+                $q->where('campus', $user->branch);
+            })
+            ->when($request->filled('branch_id') || $request->filled('campus'), function ($q) use ($request) {
+                $branch = $request->branch_id ?? $request->campus;
+                $q->where('campus', $branch);
+            })
+            ->when($request->filled('course'), function ($q) use ($request) {
+                $q->where('course', $request->course);
+            })
+            ->when($request->filled('coaching_type'), function ($q) use ($request) {
+                $q->where('coaching_type', $request->coaching_type);
+            })
+            ->when($request->filled('batch'), function ($q) use ($request) {
+                $q->where('batch', $request->batch);
+            })
+            ->when($request->filled('section'), function ($q) use ($request) {
+                $q->where('section', $request->section);
+            })
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($query) use ($search) {
+                    $query->where('student_id', 'like', "%{$search}%")
+                        ->orWhere('student_name', 'like', "%{$search}%")
+                        ->orWhere('user_name', 'like', "%{$search}%")
+                        ->orWhere('father_ph_no', 'like', "%{$search}%")
+                        ->orWhere('mother_ph_no', 'like', "%{$search}%")
+                        ->orWhere('batch', 'like', "%{$search}%")
+                        ->orWhere('section', 'like', "%{$search}%");
+                });
+            });
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            $perPage = $request->input('per_page', 20);
+            $students = $query->paginate($perPage);
+            return response()->json([
+                'status' => true,
+                'students' => $students
+            ], 200);
+        }
+
+        $students = [];
         if ($request->filled('course') || $request->filled('search')) {
-            $students = Student::when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))->when($request->filled('course'), function ($q) use ($request) { $q->where('course', $request->course); })
-                ->when($request->filled('search'), function ($q) use ($request) { $search = $request->search;$q->where(function ($query) use ($search) { $query->where('student_id', 'like', "%{$search}%")->orWhere('student_name', 'like', "%{$search}%")->orWhere('user_name', 'like', "%{$search}%")->orWhere('father_ph_no', 'like', "%{$search}%")->orWhere('mother_ph_no', 'like', "%{$search}%")->orWhere('batch', 'like', "%{$search}%")->orWhere('section', 'like', "%{$search}%"); });
-                })
-                ->get();
+            $students = $query->get();
         }
 
         return view('student.index', compact('students'));
     }
 
+    public function show(Student $student, Request $request)
+    {
+        $student->load('branch');
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => true,
+                'student' => $student
+            ], 200);
+        }
+        return redirect()->route('student.edit', $student->id);
+    }
 
     public function create(Request $request)
     {
@@ -61,6 +113,17 @@ class StudentController extends Controller
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
 
+        if ($request->wantsJson() || $request->is('api/*')) {
+            $Student->load('branch');
+            return response()->json([
+                'status' => true,
+                'student' => $Student,
+                'districts' => $districts,
+                'states' => $states,
+                'pincodes' => $pincodes
+            ], 200);
+        }
+
         return view('student.edit', compact('districts', 'states', 'pincodes', 'Student'));
     }
 
@@ -68,11 +131,25 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         $data = $request->all();
-        $data['hostel_dayscholar'] = $data['hostel_dayscholar'] ?? null;
-        $data['ac_nonac'] = $data['ac_nonac'] ?? null;
-        $data['password']  = ($request->password);
+        if ($request->has('hostel_dayscholar')) {
+            $data['hostel_dayscholar'] = $request->hostel_dayscholar ?: null;
+        }
+        if ($request->has('ac_nonac')) {
+            $data['ac_nonac'] = $request->ac_nonac ?: null;
+        }
+        if ($request->has('password')) {
+            $data['password'] = $request->password;
+        }
 
         $student->update($data);
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Student details updated successfully',
+                'student' => $student->fresh()->load('branch')
+            ], 200);
+        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true]);
