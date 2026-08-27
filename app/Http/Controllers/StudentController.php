@@ -182,12 +182,12 @@ class StudentController extends Controller
         $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(mark)*4)total,subject")->where('test_id', $testid)->where('student_id', $sid)->groupBy('subject')->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")->get();
         return view('student.mark_subject', compact('subjects'));
     }
-    function mark_download(Request $request, $testid)
+    function mark_download(Request $request, $name)
     {
         $sid = auth()->user()->student_id;
-        $answers = ExamAnswer::where('test_id', $testid)->where('student_id', $sid)->orderBy('q_no')->get();
+        $answers = ExamAnswer::where('testname', $name)->where('student_id', $sid)->orderBy('q_no')->get();
         $answers = $answers->chunk(45);
-        $exam = Exam::where('testid', $testid)->where('academic_year', $this->academic_year)->first();
+        $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
         $pdf = Pdf::loadView('pdf.marksheet', compact('answers', 'exam'));
         return $pdf->download("$exam->name - $sid.pdf");
     }

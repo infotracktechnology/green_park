@@ -52,7 +52,7 @@
                         </td>
                         @endif
 
-                        <td><a href="{{ route('student.mark_download', $test['test_id']) }}" class="btn btn-primary">Download</a></td>
+                        <td><a href="{{ route('student.mark_download', $test['name']) }}" class="btn btn-primary">Download</a></td>
                       </tr>
                       @endforeach
                     </tbody>
