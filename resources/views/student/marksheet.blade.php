@@ -83,36 +83,37 @@
                 </form>
               </div>
 
-
               @if($subjectexam->isNotEmpty())
               <div class="col-md-12">
                 <div class="table-responsive">
                   <table class="table">
                     <?php
                     $first = $subjectexam->first();
-                     $subjects = [
+                    $isSingleSubject = ($first->r + $first->w + $first->l) > 0;
+                    $subjects = [
                       'PHYSICS'   => ['tot' => 'phy_tot', 'r' => 'phy_r', 'w' => 'phy_w', 'l' => 'phy_l'],
                       'CHEMISTRY' => ['tot' => 'che_tot', 'r' => 'che_r', 'w' => 'che_w', 'l' => 'che_l'],
                       'BOTANY'    => ['tot' => 'bot_tot', 'r' => 'bot_r', 'w' => 'bot_w', 'l' => 'bot_l'],
                       'ZOOLOGY'   => ['tot' => 'zoo_tot', 'r' => 'zoo_r', 'w' => 'zoo_w', 'l' => 'zoo_l'],
                       'BIOLOGY'   => ['tot' => 'bio_tot', 'r' => 'bio_r', 'w' => 'bio_w', 'l' => 'bio_l'],
-                     ];
+                    ];
                     ?>
                     <thead>
                       <tr>
                         <th>#</th>
                         <th>EXAM DATE</th>
                         <th>EXAM NAME</th>
-                        @if($first->r+$first->w+$first->l)
-                        <th>{{ \Str::between($first->category, '(',')') }}</th>
-                        <th>TOTAL</th>
+                        {{-- If single subject: only show TOTAL --}}
+                        @if($isSingleSubject)
+                          <th>TOTAL</th>
                         @else
-                        @foreach($subjects as $name => $cols)
-                        @if($first->{$cols['r']}+$first->{$cols['w']}+$first->{$cols['l']})
-                        <th>{{ $name }}</th>
-                        @endif
-                        @endforeach
-                        <th>TOTAL</th>
+                          {{-- Multi-subject: show each subject and TOTAL --}}
+                          @foreach($subjects as $name => $cols)
+                            @if($first->{$cols['r']} + $first->{$cols['w']} + $first->{$cols['l']})
+                              <th>{{ $name }}</th>
+                            @endif
+                          @endforeach
+                          <th>TOTAL</th>
                         @endif
                       </tr>
                     </thead>
@@ -123,18 +124,19 @@
                         <td>{{ $key + 1 }}</td>
                         <td>{{ $row->exdate }}</td>
                         <td>{{ $row->subject }}</td>
-                        @if($row->r+$row->w+$row->l)
-                        <td>{{ $row->tot }} / {{ ($row->r + $row->w + $row->l) * 4 }}</td>
-                        <td>{{ $row->tot }} / {{ $row->totmark }}</td>
+                        {{-- If single subject: show only total mark --}}
+                        @if($isSingleSubject)
+                          <td>{{ $row->tot }} / {{ $row->totmark }}</td>
                         @else
-                        @foreach($subjects as $cols)
-                        @if($row->{$cols['r']}+$row->{$cols['w']}+$row->{$cols['l']})
-                        <td>
-                          {{ $row->{$cols['tot']} }} / {{ ($row->{$cols['r']} + $row->{$cols['w']} + $row->{$cols['l']}) * 4 }}
-                        </td>
-                        @endif
-                        @endforeach
-                        <td>{{ $row->nettot }} / {{ $row->totmark }}</td>
+                          {{-- Multi-subject: show marks for each subject and net total --}}
+                          @foreach($subjects as $cols)
+                            @if($row->{$cols['r']} + $row->{$cols['w']} + $row->{$cols['l']})
+                              <td>
+                                {{ $row->{$cols['tot']} }} / {{ ($row->{$cols['r']} + $row->{$cols['w']} + $row->{$cols['l']}) * 4 }}
+                              </td>
+                            @endif
+                          @endforeach
+                          <td>{{ $row->nettot }} / {{ $row->totmark }}</td>
                         @endif
                       </tr>
                       @endforeach
