@@ -824,6 +824,122 @@ class ReportController extends Controller
 
         return response(CsvServiceProvider::export($csvData), 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="Overall_Marks_Analysis.csv"']);
     }
+    public function RangeReport(Request $request)
+    {
+      $test_name = $request->test_name;
+
+    if (!$test_name) {
+        return back()->with('error', 'Please select exam name.');
+    }
+
+    $results = DB::table('exam_answer as ea')
+        ->join('student as s', 's.student_id', '=', 'ea.student_id')
+        ->where('ea.testname', $test_name)
+        ->where('ea.academic_year', $this->academic_year)
+        ->select('ea.student_id','s.student_name')
+        ->selectRaw('SUM(COALESCE(ea.mark, 0)) as total_mark')
+        ->groupBy('ea.student_id','s.student_name')
+        ->orderByDesc('total_mark')
+        ->get();
+        
+        $coachingTypes = $results
+        ->pluck('coaching_type')
+        ->filter()
+        ->map(function ($type) {
+            return strtoupper(trim($type));
+        })
+        ->unique()
+        ->implode(' / ');
+        
+        $firstMark = $results->max(function ($student) {
+            return (float) $student->total_mark;
+        });
+
+        $rangeMarks = $request->input('range_mark', []);
+        $rangeMarks = collect($rangeMarks)->filter(function ($mark) {
+            return is_numeric($mark);
+            })
+        ->map(function ($mark) {
+            return (float) $mark;
+        })->unique()->sortDesc()->values();
+
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->first();
+
+        if (!$exam) {
+            return back()->with('error', 'Exam not found.');
+        }
+
+        $totalMark = (int) $exam->total_questions * 4;
+
+                $rangeReport = collect();
+                    foreach ($rangeMarks as $range) {
+                        $count = $results
+                            ->filter(function ($student) use ($range) {
+                                return (float) $student->total_mark >= $range;
+                            })->count();
+
+                if ($range == $totalMark) {
+                $rangeText = $range . ' / ' . $totalMark;
+            } else {
+                $rangeText = $range . ' AND ABOVE';
+            }
+
+            $rangeReport->push([
+                'range' => $rangeText,
+                'count' => $count,
+            ]);
+    }
+
+    $pdf = Pdf::loadView('pdf.range_report', ['test_name'   => $test_name,'firstMark'   => $firstMark,'rangeReport' => $rangeReport,'totalMark'   => $totalMark, 'coachingTypes' => $coachingTypes ]);
+
+    return $pdf->download('Range_Report_' . $test_name . '.pdf');    
+    }
+    public function Dump_Report(Request $request)
+    {
+
+        $tests = Exam::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($query) { $query->where('branch_id','like','%' . auth()->user()->branch . '%'); })->select('name')->distinct()->orderBy('name')->get();
+
+        $test_name = $request->test_name ?? null;
+        $test_ids = '';
+        $results = collect();
+        $subjects = [];
+        $marks = collect();
+
+        if ($test_name) {
+            $exam = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->first();
+
+            if ($exam) {
+                $subjects = array_filter( array_map('trim',explode(',', $exam->subject_name ?? '')) );
+                $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->pluck('testid')->implode(',');
+
+                $results = DB::table('exam_answer as ea')->join('student as s','s.student_id','=','ea.student_id')
+                    ->leftJoin('branch as b','b.id','=','s.campus')
+                    ->where('ea.testname', $test_name)
+                    ->where('ea.academic_year', $this->academic_year)
+                    ->select('ea.test_id','ea.student_id','ea.mode as stmode','s.student_name','s.gender','s.coaching_type','s.section','s.coaching_type',
+                    DB::raw("SUBSTRING_INDEX(b.name, ',', 1) as campus"))
+                    ->selectRaw('SUM(COALESCE(ea.mark, 0)) as mark')
+                    ->groupBy('ea.test_id','ea.student_id','ea.mode','s.student_name','s.gender','s.coaching_type','s.section','b.name')
+                    ->orderByDesc('mark')
+                    ->orderBy('s.student_name')
+                    ->get();
+                 $testIdArray = array_filter(
+                    array_map('trim', explode(',', $test_ids))
+                );
+
+               
+
+                if (!empty($testIdArray)) {
+                $marks = DB::table('exam_answer')->where('academic_year', $this->academic_year)->where('testname', $test_name)->select('student_id', 'subject')->selectRaw('SUM(mark = 4) as r')->selectRaw('SUM(mark = -1) as w')->selectRaw('SUM(mark = 0) as l')->selectRaw('SUM(mark) as tot')->groupBy('student_id', 'subject')->get()
+                    ->keyBy(function ($row) {
+                        return $row->student_id . '|' . strtoupper(trim($row->subject));
+                    });
+                }   
+            }
+        }
+        return view('exam.dump_report', compact( 'tests','test_name','test_ids','results','subjects','marks'));
+    }
+    
     public function RoomAllocation(Request $request)
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
