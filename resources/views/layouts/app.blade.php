@@ -194,6 +194,7 @@
                 </li>
 
                 <li><a href="{{ route('report.exam_analyisis') }}" class="nav-link">Analyisis Report</a></li>
+                <li><a href="{{ route('report.dump') }}">Chairman Report</a></li>
                 <li><a href="{{ route('exam.previousexamupload') }}" class="nav-link">Pervious Exam Upload</a></li>
                 <li><a href="{{ route('exam.perviousexamresult') }}" class="nav-link">Pervious Exam Results</a></li>
                 <li><a href="{{ route('mocktest.index') }}" class="nav-link">Mock Test (Schedule)</a></li>
