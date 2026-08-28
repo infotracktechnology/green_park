@@ -97,6 +97,21 @@
                       'ZOOLOGY'   => ['tot' => 'zoo_tot', 'r' => 'zoo_r', 'w' => 'zoo_w', 'l' => 'zoo_l'],
                       'BIOLOGY'   => ['tot' => 'bio_tot', 'r' => 'bio_r', 'w' => 'bio_w', 'l' => 'bio_l'],
                     ];
+                    $availableSubjects = [];
+
+                    foreach ($subjects as $name => $cols) {
+                        $exists = $subjectexam->contains(function ($exam) use ($cols) {
+                            return (
+                                (int) $exam->{$cols['r']} +
+                                (int) $exam->{$cols['w']} +
+                                (int) $exam->{$cols['l']}
+                            ) > 0;
+                        });
+
+                        if ($exists) {
+                            $availableSubjects[$name] = $cols;
+                        }
+                    }
                     ?>
                     <thead>
                       <tr>
@@ -108,10 +123,8 @@
                           <th>TOTAL</th>
                         @else
                           {{-- Multi-subject: show each subject and TOTAL --}}
-                          @foreach($subjects as $name => $cols)
-                            @if($first->{$cols['r']} + $first->{$cols['w']} + $first->{$cols['l']})
+                          @foreach($availableSubjects as $name => $cols)
                               <th>{{ $name }}</th>
-                            @endif
                           @endforeach
                           <th>TOTAL</th>
                         @endif
@@ -129,13 +142,22 @@
                           <td>{{ $row->tot }} / {{ $row->totmark }}</td>
                         @else
                           {{-- Multi-subject: show marks for each subject and net total --}}
-                          @foreach($subjects as $cols)
-                            @if($row->{$cols['r']} + $row->{$cols['w']} + $row->{$cols['l']})
+                          @foreach($availableSubjects as $cols)
+                          @php
+                              $attempted = 
+                                  $row->{$cols['r']} +
+                                  $row->{$cols['w']} +
+                                  $row->{$cols['l']};
+                          @endphp
+
+                          @if($attempted > 0)
                               <td>
-                                {{ $row->{$cols['tot']} }} / {{ ($row->{$cols['r']} + $row->{$cols['w']} + $row->{$cols['l']}) * 4 }}
+                                  {{ $row->{$cols['tot']} }} / {{ $attempted * 4 }}
                               </td>
-                            @endif
-                          @endforeach
+                          @else
+                              <td>-</td>
+                          @endif
+                      @endforeach
                           <td>{{ $row->nettot }} / {{ $row->totmark }}</td>
                         @endif
                       </tr>
