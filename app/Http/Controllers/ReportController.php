@@ -836,9 +836,9 @@ class ReportController extends Controller
         ->join('student as s', 's.student_id', '=', 'ea.student_id')
         ->where('ea.testname', $test_name)
         ->where('ea.academic_year', $this->academic_year)
-        ->select('ea.student_id','s.student_name')
+        ->select('ea.student_id','s.student_name','s.coaching_type')
         ->selectRaw('SUM(COALESCE(ea.mark, 0)) as total_mark')
-        ->groupBy('ea.student_id','s.student_name')
+        ->groupBy('ea.student_id','s.student_name','s.coaching_type')
         ->orderByDesc('total_mark')
         ->get();
         
