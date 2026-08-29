@@ -108,7 +108,7 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/perviousexamresult/{student_id}/{subject}', function (Request $request, $student_id, $subject) {
-        $subjectexam = ExamSubjectReport::where("subject", "like", "%$subject%")->where("stuid", $student_id)->whereNotIn('subject', function ($query) use ($student_id) {
+        $subjectexam = ExamSubjectReport::where("category", "like", "%$subject%")->where("stuid", $student_id)->whereNotIn('subject', function ($query) use ($student_id) {
             $query->select('testname')->from('exam_answer')->where('student_id', $student_id);
         })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
         return response()->json(['results' => $subjectexam]);
