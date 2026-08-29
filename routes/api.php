@@ -117,7 +117,7 @@ Route::group(['prefix' => 'v2'], function () {
     Route::get('/marksheet/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
         $student = Student::where('student_id', $student_id)->select('student_name', 'user_name', 'academic_year')->first();
         $exam = Exam::where(['testid' => $testid, 'academic_year' => $student->academic_year])->first();
-        $answers = ExamAnswer::where(['test_id' => $testid, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
+        $answers = ExamAnswer::where(['testname' => $exam->name, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
             return [
                 'q_no' => $answer->q_no,
                 'answer_key' => $answer->answer_key,
