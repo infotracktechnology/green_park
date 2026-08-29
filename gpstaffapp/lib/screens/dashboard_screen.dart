@@ -18,6 +18,7 @@ import 'branch_switch_screen.dart';
 import 'examination_log_screen.dart';
 import 'attendance_report_screen.dart';
 import 'hostel_attendance_report_screen.dart';
+import 'individual_student_report_screen.dart';
 import 'student_list_screen.dart';
 
 class MenuItemModel {
@@ -222,6 +223,18 @@ class DashboardScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (_) => const HostelAttendanceReportScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'individual_student_report',
+            title: 'Student Report',
+            subtitle: 'Individual marks PDF',
+            icon: Icons.picture_as_pdf_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const IndividualStudentReportScreen()),
             ),
           ),
           MenuItemModel(
