@@ -1388,11 +1388,34 @@ class ReportController extends Controller
         }
     public function individualStudentReport(Request $request)
     {
+        $isApi = $request->is('api/*') || $request->wantsJson();
+
+        // API: GET students list (with search support)
+        if ($isApi && $request->isMethod('get') && !$request->filled('student_id')) {
+            $query = Student::select('student_id', 'student_name', 'course', 'campus', 'section')
+                ->where('academic_year', $this->academic_year ?? AcademicYear::where('active', 1)->value('academic_year'))
+                ->when(auth()->user() && auth()->user()->branch, fn($q) => $q->where('campus', auth()->user()->branch))
+                ->when($request->filled('search'), function ($q) use ($request) {
+                    $s = $request->search;
+                    $q->where(function ($qq) use ($s) {
+                        $qq->where('student_id', 'like', "%{$s}%")
+                           ->orWhere('student_name', 'like', "%{$s}%");
+                    });
+                })
+                ->orderBy('student_name')
+                ->limit($request->input('limit', 50))
+                ->get();
+            return response()->json(['status' => true, 'students' => $query], 200);
+        }
+
         $students = Student::select('student_id', 'student_name')->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
 
         if ($request->isMethod('post')) {
-            $student = Student::where('student_id', $request->student_id)->first();
+            $student = Student::with('branch')->where('student_id', $request->student_id)->first();
             if (!$student) {
+                if ($isApi) {
+                    return response()->json(['status' => false, 'message' => 'Student not found'], 404);
+                }
                 return back()->with('error', 'Student not found');
             }
             $allExams = ExamSubjectReport::select('category','subject','exdate','sec')->where('sec', $student->section)->groupBy( 'category', 'subject', 'exdate', 'sec')->orderBy('category')->orderBy('created_at', 'asc')->get();
@@ -1424,9 +1447,36 @@ class ReportController extends Controller
                 'bio'   => round($marks->avg('bio_tot')),
                 'total' => round($marks->avg('nettot')),
             ];
+
+            if ($isApi) {
+                // JSON preview for app: ?preview=1 or format=json
+                if ($request->input('preview') == '1' || $request->input('format') == 'json' || $request->wantsJson()) {
+                    // If explicitly asking for pdf download via ?download=pdf, fall through to pdf
+                    if ($request->input('download') !== 'pdf') {
+                        return response()->json([
+                            'status' => true,
+                            'student' => $student,
+                            'report' => $report,
+                            'average' => $average,
+                            'marks_count' => $marks->count(),
+                        ], 200);
+                    }
+                }
+                // PDF binary for app download
+                $pdf = PDF::loadView('pdf.individualstudentreport', compact('student', 'marks', 'average', 'report') );
+                $output = $pdf->output();
+                return response($output, 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="'.$student->student_id.'_IndividualStudentReport.pdf"',
+                ]);
+            }
+
             $pdf = PDF::loadView('pdf.individualstudentreport', compact('student', 'marks', 'average', 'report') );
 
             return $pdf->download( $student->student_id . '_IndividualStudentReport.pdf');
+        }
+        if ($isApi) {
+            return response()->json(['status' => true, 'students' => $students], 200);
         }
         return view('report.individualstudent', compact('students'));
     }   

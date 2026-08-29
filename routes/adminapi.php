@@ -82,5 +82,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('examination_log', [ReportController::class, 'ExaminationLogReport']);
     Route::get('hostel_attendance', [ReportController::class, 'HostelAttendance']);
     Route::get('examination_log/students', [ReportController::class, 'ExaminationLogStudents']);
+    Route::match(['get','post'], 'individual_student_report', [ReportController::class, 'individualStudentReport']);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });
