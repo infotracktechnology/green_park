@@ -18,11 +18,9 @@ class AttendanceReportScreen extends StatefulWidget {
 class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
   DateTime _selectedDate = DateTime.now();
   String? _selectedBranchId;
-  String _selectedCourse = '';
   String _selectedSection = '';
 
   List<BranchItem> _branches = [];
-  List<String> _courses = [];
   List<String> _sections = [];
   List<AttendanceSectionItemModel> _attendances = [];
 
@@ -89,9 +87,6 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
         'date': formattedDate,
       };
 
-      if (_selectedCourse.isNotEmpty) {
-        queryParams['course'] = _selectedCourse;
-      }
       if (_selectedSection.isNotEmpty) {
         queryParams['section'] = _selectedSection;
       }
@@ -105,9 +100,6 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
         final model = AttendanceReportResponseModel.fromJson(response.data);
         setState(() {
           _attendances = model.attendances;
-          if (model.courses.isNotEmpty) {
-            _courses = model.courses;
-          }
           if (model.sections.isNotEmpty) {
             _sections = model.sections;
           }
@@ -365,110 +357,52 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Course & Section Filters
-            Row(
+            // Section Filter
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'COURSE',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedCourse,
-                            items: [
-                              const DropdownMenuItem(
-                                value: '',
-                                child: Text('All Courses',
-                                    style: TextStyle(fontSize: 13)),
-                              ),
-                              ..._courses.map((c) => DropdownMenuItem(
-                                    value: c,
-                                    child: Text(c,
-                                        style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600)),
-                                  )),
-                            ],
-                            onChanged: (val) {
-                              if (val != null) {
-                                setState(() => _selectedCourse = val);
-                                _fetchReport();
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                const Text(
+                  'SECTION',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textSecondary,
+                    letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'SECTION',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary,
-                          letterSpacing: 0.5,
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _selectedSection,
+                      items: [
+                        const DropdownMenuItem(
+                          value: '',
+                          child: Text('All Sections',
+                              style: TextStyle(fontSize: 13)),
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedSection,
-                            items: [
-                              const DropdownMenuItem(
-                                value: '',
-                                child: Text('All Sections',
-                                    style: TextStyle(fontSize: 13)),
-                              ),
-                              ..._sections.map((s) => DropdownMenuItem(
-                                    value: s,
-                                    child: Text(s,
-                                        style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600)),
-                                  )),
-                            ],
-                            onChanged: (val) {
-                              if (val != null) {
-                                setState(() => _selectedSection = val);
-                                _fetchReport();
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                        ..._sections.map((s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(s,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600)),
+                            )),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() => _selectedSection = val);
+                          _fetchReport();
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],
