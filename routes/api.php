@@ -114,10 +114,15 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json(['results' => $subjectexam]);
     });
 
-    Route::get('/marksheet/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
+    Route::get('/marksheet/{student_id}/{testname}', function (Request $request, $student_id, $testname) {
         $student = Student::where('student_id', $student_id)->select('student_name', 'user_name', 'academic_year')->first();
+
+        $exam = Exam::where(['name' => $testname, 'academic_year' => $student->academic_year])->first();
+        $answers = ExamAnswer::where(['testname' => $exam->name, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
+
         $exam = Exam::where(['testid' => $testid, 'academic_year' => $student->academic_year])->first();
         $answers = ExamAnswer::where(['test_id' => $testid, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
+
             return [
                 'q_no' => $answer->q_no,
                 'answer_key' => $answer->answer_key,
@@ -126,7 +131,7 @@ Route::group(['prefix' => 'v2'], function () {
             ];
         })->chunk(45);
 
-        return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'test_id' => $testid, 'student' => $student]);
+        return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'testname' => $testname, 'student' => $student]);
     });
 
     Route::get('/mark_subject/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
