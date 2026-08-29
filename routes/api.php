@@ -116,14 +116,10 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::get('/marksheet/{student_id}/{testname}', function (Request $request, $student_id, $testname) {
 
-    $student = Student::where('student_id', $student_id)->select('student_name', 'user_name', 'academic_year')->first();
-    
+        $student = Student::where('student_id', $student_id)->first();
+
         $exam = Exam::where(['name' => $testname, 'academic_year' => $student->academic_year])->first();
         $answers = ExamAnswer::where(['testname' => $exam->name, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
-
-            $exam = Exam::where(['testid' => $testid, 'academic_year' => $student->academic_year])->first();
-            $answers = ExamAnswer::where(['test_id' => $testid, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
-
                 return [
                     'q_no' => $answer->q_no,
                     'answer_key' => $answer->answer_key,
@@ -134,7 +130,7 @@ Route::group(['prefix' => 'v2'], function () {
 
             return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'testname' => $testname, 'student' => $student]);
         });
-    });
+ 
 
     Route::get('/mark_subject/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
         $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject")->where('test_id', $testid)->where('student_id', $student_id)->groupBy('subject')->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")->get();
