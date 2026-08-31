@@ -279,30 +279,6 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           MenuItemModel(
-            id: 'take_attendance',
-            title: 'Take Attendance',
-            subtitle: 'Record section attendance',
-            icon: Icons.how_to_reg_outlined,
-            color: Colors.teal,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const StudentAttendanceEntryScreen()),
-            ),
-          ),
-          MenuItemModel(
-            id: 'attendance_report',
-            title: 'Attendance Report',
-            subtitle: 'Daily student attendance',
-            icon: Icons.fact_check_outlined,
-            color: AppColors.fanta,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const AttendanceReportScreen()),
-            ),
-          ),
-          MenuItemModel(
             id: 'student_directory',
             title: 'Students',
             subtitle: 'View student details',
@@ -340,18 +316,6 @@ class DashboardScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (_) => const StudentAttendanceEntryScreen()),
-          ),
-        ),
-        MenuItemModel(
-          id: 'student_attendance_report',
-          title: 'Attendance Report',
-          subtitle: 'Daily student attendance logs',
-          icon: Icons.fact_check_outlined,
-          color: AppColors.fanta,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => const AttendanceReportScreen()),
           ),
         ),
       ];

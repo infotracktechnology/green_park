@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -512,6 +513,13 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
   }
 
   Widget _buildAssignmentsCard(StaffProfileModel p) {
+    final classSections = _formatSections(p.classAssign);
+    final subAssignment = _formatSubjectAssign(p.subAssign);
+
+    if (classSections.isEmpty && subAssignment.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -538,13 +546,64 @@ class _StaffProfileScreenState extends State<StaffProfileScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          if (p.classAssign != null)
-            _buildInfoRow('Class Assignment', p.classAssign.toString()),
-          if (p.subAssign != null)
-            _buildInfoRow('Subject Assignment', p.subAssign.toString()),
+          if (classSections.isNotEmpty)
+            _buildInfoRow('Class Assignment', classSections),
+          if (subAssignment.isNotEmpty)
+            _buildInfoRow('Subject Assignment', subAssignment),
         ],
       ),
     );
+  }
+
+  String _formatSections(dynamic assign) {
+    if (assign == null) return '';
+    if (assign is String) {
+      final trimmed = assign.trim();
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        try {
+          final decoded = jsonDecode(trimmed);
+          return _formatSections(decoded);
+        } catch (_) {}
+      }
+      return trimmed;
+    }
+    if (assign is List) {
+      return assign
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty)
+          .join(', ');
+    }
+    if (assign is Map) {
+      final sections = assign['sections'] ?? assign['section'];
+      return _formatSections(sections);
+    }
+    return assign.toString();
+  }
+
+  String _formatSubjectAssign(dynamic assign) {
+    if (assign == null) return '';
+    if (assign is String) {
+      final trimmed = assign.trim();
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        try {
+          final decoded = jsonDecode(trimmed);
+          return _formatSubjectAssign(decoded);
+        } catch (_) {}
+      }
+      return trimmed;
+    }
+    if (assign is Map) {
+      final subject = assign['subject']?.toString();
+      final sections = _formatSections(assign['sections'] ?? assign['section']);
+      if (subject != null && subject.isNotEmpty && sections.isNotEmpty) {
+        return '$subject ($sections)';
+      } else if (subject != null && subject.isNotEmpty) {
+        return subject;
+      } else if (sections.isNotEmpty) {
+        return sections;
+      }
+    }
+    return _formatSections(assign);
   }
 
   Widget _buildInfoRow(
