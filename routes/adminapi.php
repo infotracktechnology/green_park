@@ -9,7 +9,7 @@ use App\Models\Staff;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
-use App\Http\Controllers\{HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, ReportController, HomeController,UsersController};
+use App\Http\Controllers\{StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, ReportController, HomeController, UsersController, HolidayController};
 
 Route::post('/login', function (Request $request) {
     $user = null;
@@ -77,11 +77,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('achievement', AchievementController::class);
     Route::resource('student', StudentController::class);
     Route::post('student/{student}', [StudentController::class, 'update']);
+    Route::get('staff/profile', [StaffProfileController::class, 'profile']);
+    Route::resource('staff', StaffProfileController::class);
     Route::get('biometric/report', [StaffProfileController::class, 'biometric_report']);
     Route::get('attendance_report', [ReportController::class, 'AttendanceReport']);
     Route::get('examination_log', [ReportController::class, 'ExaminationLogReport']);
     Route::get('hostel_attendance', [ReportController::class, 'HostelAttendance']);
     Route::get('examination_log/students', [ReportController::class, 'ExaminationLogStudents']);
     Route::match(['get','post'], 'individual_student_report', [ReportController::class, 'individualStudentReport']);
+    Route::get('student_attendance', [HolidayController::class, 'attendance']);
+    Route::post('student_attendance', [HolidayController::class, 'attendance_store']);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });
+

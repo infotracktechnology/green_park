@@ -20,6 +20,8 @@ import 'attendance_report_screen.dart';
 import 'hostel_attendance_report_screen.dart';
 import 'individual_student_report_screen.dart';
 import 'student_list_screen.dart';
+import 'staff_profile_screen.dart';
+import 'student_attendance_entry_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -179,7 +181,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           MenuItemModel(
             id: 'biometric_report',
-            title: 'Biometric Report',
+            title: 'Staff Attendance',
             subtitle: 'Daily staff attendance',
             icon: Icons.fingerprint,
             color: AppColors.fanta,
@@ -199,6 +201,18 @@ class DashboardScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (_) => const ExaminationLogScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'take_attendance',
+            title: 'Take Attendance',
+            subtitle: 'Record section attendance',
+            icon: Icons.how_to_reg_outlined,
+            color: Colors.teal,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const StudentAttendanceEntryScreen()),
             ),
           ),
           MenuItemModel(
@@ -227,7 +241,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           MenuItemModel(
             id: 'individual_student_report',
-            title: 'Student Report',
+            title: 'Individual Report',
             subtitle: 'Individual marks PDF',
             icon: Icons.picture_as_pdf_outlined,
             color: AppColors.primary,
@@ -253,20 +267,8 @@ class DashboardScreen extends StatelessWidget {
       } else if (isBranchAdmin) {
         return [
           MenuItemModel(
-            id: 'branch_switch',
-            title: 'Switch Branch',
-            subtitle: 'Change active campus',
-            icon: Icons.swap_horiz_rounded,
-            color: AppColors.fanta,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const BranchSwitchScreen()),
-            ),
-          ),
-          MenuItemModel(
             id: 'biometric_report',
-            title: 'Biometric Report',
+            title: 'Staff Attendance',
             subtitle: 'Staff daily attendance',
             icon: Icons.fingerprint,
             color: AppColors.primary,
@@ -274,6 +276,30 @@ class DashboardScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (_) => const BiometricReportScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'take_attendance',
+            title: 'Take Attendance',
+            subtitle: 'Record section attendance',
+            icon: Icons.how_to_reg_outlined,
+            color: Colors.teal,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const StudentAttendanceEntryScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'attendance_report',
+            title: 'Attendance Report',
+            subtitle: 'Daily student attendance',
+            icon: Icons.fact_check_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const AttendanceReportScreen()),
             ),
           ),
           MenuItemModel(
@@ -288,13 +314,6 @@ class DashboardScreen extends StatelessWidget {
                   builder: (_) => const StudentListScreen(canEdit: false)),
             ),
           ),
-          MenuItemModel(
-            id: 'branch_reports',
-            title: 'Branch Reports',
-            subtitle: 'Coming soon',
-            icon: Icons.bar_chart,
-            color: AppColors.primary,
-          ),
         ];
       }
 
@@ -302,9 +321,38 @@ class DashboardScreen extends StatelessWidget {
         MenuItemModel(
           id: 'profile',
           title: 'My Profile',
-          subtitle: 'Coming soon',
+          subtitle: 'View staff details',
           icon: Icons.account_circle_outlined,
           color: AppColors.primary,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const StaffProfileScreen()),
+          ),
+        ),
+        MenuItemModel(
+          id: 'take_attendance',
+          title: 'Take Attendance',
+          subtitle: 'Handling class attendance',
+          icon: Icons.how_to_reg_outlined,
+          color: Colors.teal,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const StudentAttendanceEntryScreen()),
+          ),
+        ),
+        MenuItemModel(
+          id: 'student_attendance_report',
+          title: 'Attendance Report',
+          subtitle: 'Daily student attendance logs',
+          icon: Icons.fact_check_outlined,
+          color: AppColors.fanta,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const AttendanceReportScreen()),
+          ),
         ),
       ];
     }

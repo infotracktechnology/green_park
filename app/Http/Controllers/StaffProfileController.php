@@ -15,17 +15,76 @@ class StaffProfileController extends Controller
 {
 
     public function index(Request $request)
-{
-    $branches = Branch::all();
+    {
+        $branches = Branch::all();
 
-    $staff = Staff::with('branch')
-    ->when(auth()->user()->branch, function ($query) {
-        $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
-    })
-    ->get();
+        $staff = Staff::with('branch')
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+            })
+            ->get();
 
-    return view('staff.index', compact('staff', 'branches'));
-}
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => true,
+                'staffs' => $staff
+            ], 200);
+        }
+
+        return view('staff.index', compact('staff', 'branches'));
+    }
+
+    public function profile(Request $request)
+    {
+        $user = auth()->user();
+        $staff = null;
+
+        if ($user instanceof Staff) {
+            $staff = $user->load('branch', 'shift');
+        } elseif ($user && isset($user->staff_id) && $user->staff_id) {
+            $staff = Staff::with('branch', 'shift')->find($user->staff_id);
+        } elseif ($request->filled('staff_id')) {
+            $staff = Staff::with('branch', 'shift')->find($request->staff_id);
+        } elseif ($user && isset($user->username)) {
+            $staff = Staff::with('branch', 'shift')->where('username', $user->username)->orWhere('biometric_no', $user->username)->first();
+        }
+
+        if (!$staff && $user) {
+            $staff = Staff::with('branch', 'shift')->find($user->id);
+        }
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            if (!$staff) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Staff profile not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'staff' => $staff
+            ], 200);
+        }
+
+        if (!$staff) {
+            return redirect()->back()->with('error', 'Staff profile not found');
+        }
+
+        return view('staff.profile', compact('staff'));
+    }
+
+    public function show(Staff $staff, Request $request)
+    {
+        $staff->load('branch', 'shift');
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => true,
+                'staff' => $staff
+            ], 200);
+        }
+        return redirect()->route('staff.edit', $staff->id);
+    }
 
     public function create(Request $request)
     {
