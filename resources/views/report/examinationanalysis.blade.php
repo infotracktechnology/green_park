@@ -166,7 +166,7 @@
 
     });
 
-$('#testcategory').change(() => window.location = `{{ route('report.exam_analyisis') }}?testcategory=${$('#testcategory').val()}`);
+$('#testcategory').change(() => window.location = `{{ route('report.exam_analyisis', [], false) }}?testcategory=${$('#testcategory').val()}`);
 
 </script>
 @endsection
