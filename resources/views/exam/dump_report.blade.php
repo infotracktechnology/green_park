@@ -84,24 +84,34 @@
                                         'TEST BATCH'
                                     ]);
                                 });
+                                 
                             @endphp
 
                                 <table  id="export">
                                  <thead>
                                   <tr role="row">
                                    <th rowspan="2">S.NO</th>
-                                   <th rowspan="2">SID</th>
+                                   <th rowspan="2">SID</th> 
+                                   @if($allOffline)                                  
+                                   <th rowspan="2">Batch</th>
+                                   @endif
+                                   @if(!$allOffline)
                                    <th rowspan="2">Mode</th>
-                                   <th rowspan="2">Name</th>
+                                   @endif
+                                   <th rowspan="2"> Student Name</th>
                                    <th rowspan="2">Sex</th>
                                    @if(!$hideCampus)
                                     <th rowspan="2">Campus</th>
                                    @endif
+                                   @if (!$allOffline)
                                    <th rowspan="2">C Type</th>
+                                   @else
+                                   <th rowspan="2">SEC</th>
+                                    @endif
                                    @foreach ($subjects as $subject)
                                    <th colspan="4">{{ $subject }}</th>
                                    @endforeach
-                                   <th rowspan="2">Net Total</th>
+                                   <th rowspan="2">Total <br> {{ $totalMarks }}</th>
                                   </tr>
                                   <tr>
                                     @foreach ($subjects as $subject)
@@ -118,7 +128,11 @@
                                        <td>{{ $loop->iteration }}</td>
                                        {{-- <td>{{ $result->test_id }}</td> --}}
                                        <td>{{ $result->student_id }}</td>
-                                       <td class="{{ strtoupper($result->stmode) === 'OMR' ? 'omr-mode' : '' }}"> {{ $result->stmode }} </td>
+                                       @if($allOffline)
+                                       <td>{{ $result->batch }}</td>
+                                       @else
+                                       <td class="{{ ($result->stmode) === 'OMR' ? 'omr-mode' : '-' }}"> {{ $result->stmode }} </td>
+                                       @endif
                                        <td>{{ $result->student_name }}</td>
                                        <td>{{ $result->gender }}</td>
                                         @if(!$hideCampus)
@@ -134,7 +148,7 @@
                                             <td>{{ $mark->l ?? 0 }}</td>
                                             <td>{{ $mark->tot ?? 0 }}</td>
                                         @endforeach
-                                       <td>{{ $result->mark }}</td>
+                                       <td>{{ $result->mark }} </td>
                                  </tbody>
                                  @endforeach
                                 </table>
@@ -164,8 +178,10 @@
 function exportTable() {
     const { jsPDF } = window.jspdf;
 
+    const subjectCount = {{ count($subjects) }};
+
     const doc = new jsPDF({
-        orientation: 'landscape',
+        orientation: subjectCount === 1 ? 'portrait' : 'landscape',
         unit: 'mm',
         format: 'a4'
     });
@@ -186,36 +202,55 @@ function exportTable() {
         });
     @endphp
 
+    const examName = @json($test_name ?? '');
+    const course = @json($course ?? '');
     const coachingTypes = @json($coachingTypes);
-    const testName = @json($test_name);
+    const testName = @json($test_name ?? '');
     const hideCampus = {{ $hideCampus ? 'true' : 'false' }};
+    const allOffline = {{ $allOffline ? 'true' : 'false' }};
+    const totalMarks = @json($totalMarks ?? '');
 
     // 1. HEADER BOX
-    const startX = 6;
-    const startY = 6;
-    const boxWidth = 285;
-    const boxHeight = 17;
+   const pageWidth = doc.internal.pageSize.getWidth();
+const pageHeight = doc.internal.pageSize.getHeight();
 
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.5);
-    doc.rect(startX, startY, boxWidth, boxHeight);
+const startX = 6;
+const startY = 6;
+const boxWidth = pageWidth - 12;
+const boxHeight = 17;
+const centerX = pageWidth / 2;
 
-    doc.line(startX, startY + 8.5, startX + boxWidth, startY + 8.5);
+doc.setDrawColor(0, 0, 0);
+doc.setLineWidth(0.5);
+
+doc.rect(startX, startY, boxWidth, boxHeight);
+
+doc.line(
+    startX,
+    startY + 8.5,
+    startX + boxWidth,
+    startY + 8.5
+);
 
     doc.setFont('times', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(0, 0, 0);
-    doc.text('GREEN PARK COACHING CENTRE, NAMAKKAL', 148.5, startY + 6, { align: 'center' });
+    doc.text(
+    'GREEN PARK COACHING CENTRE, NAMAKKAL',
+    centerX,
+    startY + 6,
+    { align: 'center' }
+);
 
     doc.setFontSize(10.5);
     const midY = startY + 14.5;
     
     doc.setTextColor(220, 20, 20); 
     const typeText = coachingTypes ? coachingTypes + ' ' : '';
-    const mainText = ' - ' + testName + ' - MARKS';
+    const mainText = (typeText ? '- ' : '') + testName + ' - MARKS';
     
     const totalTitleWidth = doc.getTextWidth(typeText + mainText);
-    const startTitleX = 148.5 - (totalTitleWidth / 2);
+    const startTitleX = centerX - (totalTitleWidth / 2);
     
     doc.text(typeText, startTitleX, midY);
     
@@ -223,11 +258,10 @@ function exportTable() {
     doc.text(mainText, startTitleX + doc.getTextWidth(typeText), midY);
 
     // 2. TABLE HEADERS
-    
     let headRow1 = [
         { content: 'S.NO', rowSpan: 2, styles: { fillColor: [238, 236, 225] } },
         { content: 'SID', rowSpan: 2, styles: { fillColor: [238, 236, 225] } },
-        { content: 'MODE', rowSpan: 2, styles: { fillColor: [238, 236, 225] } },
+        { content: allOffline ? 'BATCH' : 'MODE', rowSpan: 2, styles: { fillColor: [238, 236, 225] } },
         { content: 'STUDENT NAME', rowSpan: 2, styles: { fillColor: [238, 236, 225] } },
         { content: 'SEX', rowSpan: 2, styles: { fillColor: [238, 236, 225] } }
     ];
@@ -239,9 +273,9 @@ function exportTable() {
             styles: { fillColor: [238, 236, 225] }
         });
     }
-
+    
     headRow1.push({
-        content: 'C TYPE',
+        content: allOffline ? 'SEC' : 'C TYPE',
         rowSpan: 2,
         styles: { fillColor: [238, 236, 225] }
     });
@@ -259,7 +293,7 @@ function exportTable() {
     @endforeach
 
     headRow1.push({
-        content: 'NET\nTOTAL',
+        content: 'TOTAL\n' + totalMarks,
         rowSpan: 2,
         styles: { fillColor: [238, 236, 225] }
     });
@@ -275,64 +309,74 @@ function exportTable() {
     @endforeach
 
     // 3. TABLE BODY DATA
-
     let body = [];
 
     @foreach($results as $result)
+        @php
+            $modeOrBatch = $allOffline
+                ? ($result->batch ?? '') 
+                : ($result->stmode ?? '');
+            
+            $genderVal = strtoupper(trim($result->gender ?? ''));
+            $genderDisplay = ($genderVal === 'FEMALE' || $genderVal === 'F') ? 'F' : (($genderVal === 'MALE' || $genderVal === 'M') ? 'M' : $genderVal);
+        @endphp
+
         body.push([
             {{ $loop->iteration }},
-            @json($result->student_id),
-            @json($result->stmode),
-            @json($result->student_name),
-            @json(strtoupper($result->gender) === 'FEMALE' ? 'F' : 'M')
-
+            @json($result->student_id ?? ''),
+            { 
+                content: @json($modeOrBatch), 
+                isOmr: @json(strtoupper(trim($modeOrBatch)) === 'OMR') 
+            },
+            { content: @json($result->student_name ?? ''), isName: true },
+            @json($genderDisplay),
             @if(!$hideCampus)
-                , @json($result->campus)
+                { content: @json($result->campus ?? ''), isCampus: true },
             @endif
-            , @json($result->section)
-
+            @json($result->section ?? ''),
             @foreach($subjects as $subject)
                 @php
                     $key = $result->student_id . '|' . strtoupper(trim($subject));
                     $mark = $marks->get($key);
                 @endphp
-                , {{ $mark->r ?? 0 }}
-                , {{ $mark->w ?? 0 }}
-                , {{ $mark->l ?? 0 }}
-                , { content: {{ $mark->tot ?? 0 }}, isTot: true }
+                {{ $mark->r ?? 0 }},
+                {{ $mark->w ?? 0 }},
+                {{ $mark->l ?? 0 }},
+                { content: {{ $mark->tot ?? 0 }}, isTot: true },
             @endforeach
-
-            , { content: {{ $result->mark ?? 0 }}, isNet: true }
+            { content: {{ $result->mark ?? 0 }}, isNet: true }
         ]);
     @endforeach
 
-    // 4. COLUMN STYLES (colStyles Definition)
-
+    // 4. COLUMN STYLES
     let colStyles = {
-        0: { cellWidth: 10, halign: 'center' },  
-        1: { cellWidth: 16, halign: 'center' },  
-        2: { cellWidth: 14, halign: 'center' },  
-        3: { cellWidth: hideCampus ? 55 : 44, halign: 'left' },    
-        4: { cellWidth: 9,  halign: 'center' }   
+        0: { cellWidth: 8,  halign: 'center' },  // S.NO
+        1: { cellWidth: 15, halign: 'center' },  // SID
+        2: { cellWidth: 13, halign: 'center' },  // MODE/BATCH
+        3: { cellWidth: hideCampus ? 48 : 38, halign: 'left' },3: {
+        cellWidth: subjectCount > 1
+            ? (hideCampus ? 60 : 58)
+            : (hideCampus ? 48 : 38),
+        halign: 'left'
+    },
+        4: { cellWidth: 8,  halign: 'center' }   // SEX
     };
 
-    let colIndex = 5;
+    let colIdx = 5;
     if (!hideCampus) {
-        colStyles[colIndex] = { cellWidth: 20, halign: 'left' }; 
-        colIndex++;
+        colStyles[colIdx] = { cellWidth: 18, halign: 'left' }; // CAMPUS
+        colIdx++;
     }
+    colStyles[colIdx] = { cellWidth: 12, halign: 'center' }; // SEC / C TYPE
 
-    colStyles[colIndex] = { cellWidth: 14, halign: 'center' };  
-
-    //  AUTOTABLE GENERATION
-
+    // 5. AUTOTABLE GENERATION
     doc.autoTable({
         head: [headRow1, headRow2],
         body: body,
         startY: 25,
         theme: 'grid',
         margin: {
-            top: 25,
+            // top: 25,
             left: 6,
             right: 6,
             bottom: 8
@@ -340,20 +384,20 @@ function exportTable() {
         styles: {
             font: 'helvetica',
             fontStyle: 'bold',          
-            fontSize: 10.5,             
-            minCellHeight: 6.5,         
+            fontSize: 8.5,             
+            minCellHeight: 6,         
             textColor: [0, 0, 0],
             lineColor: [0, 0, 0],
-            lineWidth: 0.3,
-            cellPadding: { top: 1, bottom: 1, left: 1, right: 1 },
+            lineWidth: 0.25,
+            cellPadding: { top: 1, bottom: 1, left: 0.5, right: 0.5 },
             halign: 'center',
             valign: 'middle'
         },
         headStyles: {
             textColor: [0, 0, 0],
             lineColor: [0, 0, 0],
-            lineWidth: 0.3,
-            fontSize: 8.5,
+            lineWidth: 0.25,
+            fontSize: 7.5,
             fontStyle: 'bold',
             valign: 'middle',
             halign: 'center'
@@ -361,39 +405,33 @@ function exportTable() {
         bodyStyles: {
             font: 'helvetica',
             fontStyle: 'bold',
-            fontSize: 10.5,
-            minCellHeight: 6.5,
+            fontSize: 8.5,
+            minCellHeight: 6,
             textColor: [0, 0, 0],
             valign: 'middle'
         },
         columnStyles: colStyles,
 
-        //  COLORS & CUSTOM CELL STYLING
+        // COLORS & CELL STYLING
         didParseCell: function(data) {
             if (data.section !== 'body') return;
 
             const raw = data.cell.raw;
 
-            // Student Name & Campus Left Align
-            if (data.column.index === 3 || (!hideCampus && data.column.index === 5)) {
+            if (raw && (raw.isName || raw.isCampus)) {
                 data.cell.styles.halign = 'left';
             }
 
-            // OMR Mode (#fde088)
-            if (typeof raw === 'string' && raw.trim().toUpperCase() === 'OMR') {
+            if (raw && raw.isOmr) {
                 data.cell.styles.fillColor = [253, 224, 136];
             }
 
-            // TOT Column (#d9edf7)
             if (raw && raw.isTot) {
                 data.cell.styles.fillColor = [217, 237, 247];
-                data.cell.text = [String(raw.content)];
             }
 
-            // NET TOTAL (#f9f9d8)
             if (raw && raw.isNet) {
                 data.cell.styles.fillColor = [249, 249, 216];
-                data.cell.text = [String(raw.content)];
             }
         },
 
@@ -406,7 +444,7 @@ function exportTable() {
         }
     });
 
-    doc.save('test_dump_report.pdf');
+    doc.save( examName + " -Chairman\'s Report.pdf");
 }
 
 $('#exportpdf').click(function(e) {
