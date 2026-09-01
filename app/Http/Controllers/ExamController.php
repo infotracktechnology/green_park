@@ -630,8 +630,8 @@ class ExamController extends Controller
     public function OfflinePublish(Request $request)
     {
         $exams = [];
-        if ($request->start_date && $request->end_date) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'OFFLINE')->groupBy('name')->get();
+        if ($request->start_date && $request->end_date && $request->course) {
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->where('course', $request->course)->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'OFFLINE')->groupBy('name')->get();
         }
 
         if ($request->delete && $request->batch) {
@@ -664,6 +664,7 @@ class ExamController extends Controller
                     $this->MovePervious($exam);
                 }
             }
+            $this->ClearOldExamAnswers("OFFLINE", $request->course, 4);
             return back()->with('success','Exams Publish Updated Successfully.'
             );
         }
@@ -717,7 +718,7 @@ class ExamController extends Controller
             }
         }
 
-        $this->ClearOldExamAnswers("ONLINE", $request->course);
+        $this->ClearOldExamAnswers("ONLINE", $request->course, 3);
         return back()->with('success', 'Exams Publish Updated Successfully.');
     }
 
@@ -755,10 +756,10 @@ class ExamController extends Controller
         }
     }
 
-    public function ClearOldExamAnswers($type, $course)
+    public function ClearOldExamAnswers($type, $course, $limit)
     {
 
-        $sub = Exam::select('name')->where('course', $course)->where('examtype', $type)->groupBy('name')->orderByRaw('max(id) desc')->limit(3);
+        $sub = Exam::select('name')->where('course', $course)->where('examtype', $type)->groupBy('name')->orderByRaw('max(id) desc')->limit($limit);
         $exams = Exam::leftJoinSub($sub, 't', function ($join) {
             $join->on('exam.name', '=', 't.name');
         })->whereNull('t.name')->where('examtype', $type)->where('course', $course)->select('exam.*')->get();

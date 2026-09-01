@@ -46,6 +46,16 @@
                     <input type="date" value="{{ request('end_date', date('Y-m-d')) }}" name="end_date" class="form-control form-control-sm" required>
                   </div>
 
+                  <div class="form-group col-lg-3">
+                    <label>Course</label>
+                    <select name="course" id="course" class="form-control form-control-sm" >
+                      <option value="">Select Course</option>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}" @selected(request('course') == $row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
                   <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
                     <button type="submit" class="btn btn-primary btn-block">Submit</button>
@@ -55,6 +65,7 @@
 
               <form method="post" id="myForm" action="{{ route('exam.offlinepublish') }}" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="course" value="{{ request('course') }}">
                 <div class="row">
                   <div class="col-lg-12">
                     <div class="table-responsive m-t-10">
@@ -78,7 +89,6 @@
                             <td>{{ $exam->name }}</td>
                             <td>{{ $exam->testcategory }}</td>
                             <td>{{ $exam->total_questions }}</td>
-
                             @foreach($batch as $row)
                             <td>
                               @if(isset($exam->markrange_file[$row]))
