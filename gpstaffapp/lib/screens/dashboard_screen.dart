@@ -287,8 +287,7 @@ class DashboardScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) =>
-                      const StaffLeaveScreen(isApprovalMode: true)),
+                  builder: (_) =>  const StaffLeaveScreen(isApprovalMode: true)),
             ),
           ),
         ];
@@ -355,8 +354,7 @@ class DashboardScreen extends StatelessWidget {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) =>
-                    const StaffLeaveScreen(isApprovalMode: false)),
+                builder: (_) => const StaffLeaveScreen(isApprovalMode: false)),
           ),
         ),
       ];
