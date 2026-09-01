@@ -66,6 +66,9 @@
                       <tr role="row">
                         <th>#</th>
                         <th>Test ID</th>
+                        @if($examtype !== 'ONLINE')
+                        <th>Batch</th>
+                        @endif
                         <th>Branch </th>
                         <th>course</th>
                         <th>Coaching Type</th>
@@ -73,11 +76,13 @@
                         <th>Test Name</th>
                         <th>Subject</th>
                         <th>Total Questions</th>
+                        @if($examtype == 'ONLINE')
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th>status</th>
                         {{-- <th>Test attend</th> --}}
                         <th>Perview</th>
+                        @endif
                         <th>Edit</th>
                       </tr>
                     </thead>
@@ -87,6 +92,9 @@
                       <tr>
                         <td><input type="checkbox" name="ids[]" value="{{ $test->id }}"></td>
                         <td>{{ $test->testid }}</td>
+                        @if($examtype !== 'ONLINE')
+                        <td>{{ $test->batch }}</td>
+                        @endif
                         <td>{{ $test->branchNames() }}</td>
                         <td>{{ $test->course }}</td>
                         <td>{{ $test->coaching_type }}</td>
@@ -94,6 +102,7 @@
                         <td>{{ $test->name }}</td>
                         <td>{{ $test->subject_name }}</td>
                         <td>{{ $test->total_questions }}</td>
+                        @if($examtype == 'ONLINE')
                         <td>{{ $test->start_at }}</td>
                         <td>{{ $test->end_at }}</td>
                         <td>
@@ -104,6 +113,7 @@
                         <td>
                           <a href="{{ route('exam.instruction', $test->id) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a>
                         </td>
+                        @endif
                         <td>
                           <a href="{{ route('exam.edit', $test->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                         </td>
