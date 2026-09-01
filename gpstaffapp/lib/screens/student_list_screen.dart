@@ -34,6 +34,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
   String? _selectedBranchId;
   String _selectedCourse = '';
   String _selectedCoachingType = '';
+  String _selectedSection = '';
 
   @override
   void initState() {
@@ -100,6 +101,9 @@ class _StudentListScreenState extends State<StudentListScreen> {
       }
       if (_selectedCoachingType.isNotEmpty) {
         queryParams['coaching_type'] = _selectedCoachingType;
+      }
+      if (_selectedSection.isNotEmpty) {
+        queryParams['section'] = _selectedSection;
       }
 
       final response = await dio.get(
@@ -193,6 +197,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
     final branches = filterProvider.master?.branches ?? [];
     final courses = filterProvider.master?.courses ?? [];
     final coachingTypes = filterProvider.master?.coachingTypes ?? [];
+    final sections = filterProvider.master?.sections ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -224,7 +229,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
         child: Column(
           children: [
             // Top Search & Filter Container
-            _buildSearchAndFilters(branches, courses, coachingTypes),
+            _buildSearchAndFilters(branches, courses, coachingTypes, sections),
 
             // Student List
             Expanded(
@@ -240,7 +245,14 @@ class _StudentListScreenState extends State<StudentListScreen> {
     List<BranchItem> branches,
     List<String> courses,
     List<String> coachingTypes,
+    List<String> sections,
   ) {
+    final hasActiveFilters = (_selectedBranchId != null && _selectedBranchId!.isNotEmpty) ||
+        _selectedCourse.isNotEmpty ||
+        _selectedCoachingType.isNotEmpty ||
+        _selectedSection.isNotEmpty ||
+        _searchController.text.isNotEmpty;
+
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.primary,
@@ -299,7 +311,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
           ),
           const SizedBox(height: 10),
 
-          // Filters Row
+          // Filters Row 1: Campus & Course
           Row(
             children: [
               // Branch Filter
@@ -342,8 +354,13 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   },
                 ),
               ),
-              const SizedBox(width: 8),
+            ],
+          ),
+          const SizedBox(height: 8),
 
+          // Filters Row 2: Type & Section
+          Row(
+            children: [
               // Coaching Type Filter
               Expanded(
                 child: _buildFilterDropdown<String>(
@@ -362,8 +379,69 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   },
                 ),
               ),
+              const SizedBox(width: 8),
+
+              // Section Filter
+              Expanded(
+                child: _buildFilterDropdown<String>(
+                  value: _selectedSection,
+                  hint: 'Section',
+                  items: [
+                    const DropdownMenuItem(value: '', child: Text('All Section')),
+                    ...sections.map((s) => DropdownMenuItem(
+                          value: s,
+                          child: Text(s, overflow: TextOverflow.ellipsis),
+                        )),
+                  ],
+                  onChanged: (val) {
+                    setState(() => _selectedSection = val ?? '');
+                    _fetchStudents(page: 1);
+                  },
+                ),
+              ),
             ],
           ),
+
+          if (hasActiveFilters) ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () {
+                  _searchController.clear();
+                  setState(() {
+                    _selectedBranchId = null;
+                    _selectedCourse = '';
+                    _selectedCoachingType = '';
+                    _selectedSection = '';
+                  });
+                  _fetchStudents(page: 1);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.clear_all, size: 14, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text(
+                        'Reset Filters',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

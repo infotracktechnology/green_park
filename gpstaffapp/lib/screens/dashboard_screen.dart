@@ -22,6 +22,9 @@ import 'individual_student_report_screen.dart';
 import 'student_list_screen.dart';
 import 'staff_profile_screen.dart';
 import 'student_attendance_entry_screen.dart';
+import 'chairman_report_screen.dart';
+import 'admin_dashboard_overview_screen.dart';
+import 'staff_leave_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -55,6 +58,18 @@ class DashboardScreen extends StatelessWidget {
     List<MenuItemModel> getMenus() {
       if (isAdmin) {
         return [
+          MenuItemModel(
+            id: 'admin_dashboard_overview',
+            title: 'Dashboard',
+            subtitle: 'Overall strength & live metrics',
+            icon: Icons.dashboard_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const AdminDashboardOverviewScreen()),
+            ),
+          ),
           MenuItemModel(
             id: 'announcement',
             title: 'Announcement',
@@ -180,6 +195,18 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           MenuItemModel(
+            id: 'student_management',
+            title: 'Students',
+            subtitle: 'View & edit student details',
+            icon: Icons.school_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const StudentListScreen()),
+            ),
+          ),
+          MenuItemModel(
             id: 'biometric_report',
             title: 'Staff Attendance',
             subtitle: 'Daily staff attendance',
@@ -201,18 +228,6 @@ class DashboardScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (_) => const ExaminationLogScreen()),
-            ),
-          ),
-          MenuItemModel(
-            id: 'take_attendance',
-            title: 'Take Attendance',
-            subtitle: 'Record section attendance',
-            icon: Icons.how_to_reg_outlined,
-            color: Colors.teal,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const StudentAttendanceEntryScreen()),
             ),
           ),
           MenuItemModel(
@@ -244,7 +259,7 @@ class DashboardScreen extends StatelessWidget {
             title: 'Individual Report',
             subtitle: 'Individual marks PDF',
             icon: Icons.picture_as_pdf_outlined,
-            color: AppColors.primary,
+            color: AppColors.fanta,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -252,15 +267,28 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           MenuItemModel(
-            id: 'student_management',
-            title: 'Students',
-            subtitle: 'View & edit student details',
-            icon: Icons.school_outlined,
+            id: 'chairman_report',
+            title: "Chairman's Report",
+            subtitle: 'Exam ranks & subject marks',
+            icon: Icons.leaderboard_outlined,
+            color: AppColors.primary,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const ChairmanReportScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'leave_approval',
+            title: 'Leave Approval',
+            subtitle: 'Review & approve leaves',
+            icon: Icons.event_available_outlined,
             color: AppColors.fanta,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => const StudentListScreen()),
+                  builder: (_) =>
+                      const StaffLeaveScreen(isApprovalMode: true)),
             ),
           ),
         ];
@@ -311,11 +339,24 @@ class DashboardScreen extends StatelessWidget {
           title: 'Take Attendance',
           subtitle: 'Handling class attendance',
           icon: Icons.how_to_reg_outlined,
-          color: Colors.teal,
+          color: AppColors.fanta,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (_) => const StudentAttendanceEntryScreen()),
+          ),
+        ),
+        MenuItemModel(
+          id: 'leave_request',
+          title: 'Leave Request',
+          subtitle: 'Apply, edit & delete leaves',
+          icon: Icons.event_note_outlined,
+          color: AppColors.primary,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) =>
+                    const StaffLeaveScreen(isApprovalMode: false)),
           ),
         ),
       ];

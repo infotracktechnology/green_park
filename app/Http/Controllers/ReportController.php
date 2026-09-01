@@ -896,7 +896,6 @@ class ReportController extends Controller
     }
     public function Dump_Report(Request $request)
     {
-
         $tests = Exam::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($query) { $query->where('branch_id','like','%' . auth()->user()->branch . '%'); })->select('name')->distinct()->orderBy('name')->get();
 
         $test_name = $request->test_name ?? null;
@@ -906,7 +905,6 @@ class ReportController extends Controller
         $marks = collect();
         $totalMarks = 0;
         $allOffline = false;
-        
 
         if ($test_name) {
             $exam = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->first();
@@ -915,42 +913,81 @@ class ReportController extends Controller
                 $examCoachingType = ($exam->coaching_type ?? '');
 
                 $allOffline = ($examCoachingType === 'OFFLINE');
-                $subjects = array_filter( array_map('trim',explode(',', $exam->subject_name ?? '')) );
+                $subjects = array_values(array_filter(array_map('trim', explode(',', $exam->subject_name ?? ''))));
                 $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->pluck('testid')->implode(',');
 
                 $results = DB::table('exam_answer as ea')->join('student as s','s.student_id','=','ea.student_id')
                     ->leftJoin('branch as b','b.id','=','s.campus')
                     ->where('ea.testname', $test_name)
                     ->where('ea.academic_year', $this->academic_year)
-                    ->select('ea.test_id','ea.student_id','ea.mode as stmode','s.student_name','s.gender','s.coaching_type','s.section','s.coaching_type','s.batch',
+                    ->select('ea.test_id','ea.student_id','ea.mode as stmode','s.student_name','s.gender','s.coaching_type','s.section','s.batch',
                     DB::raw("SUBSTRING_INDEX(b.campus, ',', 1) as campus"))
                     ->selectRaw('SUM(COALESCE(ea.mark, 0)) as mark')
                     ->groupBy('ea.test_id','ea.student_id','ea.mode','s.student_name','s.gender','s.coaching_type','s.section','b.campus','s.batch')
                     ->orderByDesc('mark')
                     ->orderBy('s.student_name')
                     ->get();
-                 $testIdArray = array_filter(
+                $testIdArray = array_filter(
                     array_map('trim', explode(',', $test_ids))
                 );
 
-               
-
                 if (!empty($testIdArray)) {
                     $totalQuestions = DB::table('exam_answer')
-                    ->where('academic_year', $this->academic_year)
-                    ->where('testname', $test_name)
-                    ->distinct('q_no')
-                    ->count('q_no');
+                        ->where('academic_year', $this->academic_year)
+                        ->where('testname', $test_name)
+                        ->distinct('q_no')
+                        ->count('q_no');
 
-                $totalMarks = $totalQuestions * 4;
+                    $totalMarks = $totalQuestions * 4;
 
-                $marks = DB::table('exam_answer')->where('academic_year', $this->academic_year)->where('testname', $test_name)->select('student_id', 'subject')->selectRaw('SUM(mark = 4) as r')->selectRaw('SUM(mark = -1) as w')->selectRaw('SUM(mark = 0) as l')->selectRaw('SUM(mark) as tot')->groupBy('student_id', 'subject')->get()
-                    ->keyBy(function ($row) {
-                        return $row->student_id . '|' . strtoupper(trim($row->subject));
-                    });
+                    $marks = DB::table('exam_answer')->where('academic_year', $this->academic_year)->where('testname', $test_name)->select('student_id', 'subject')->selectRaw('SUM(mark = 4) as r')->selectRaw('SUM(mark = -1) as w')->selectRaw('SUM(mark = 0) as l')->selectRaw('SUM(mark) as tot')->groupBy('student_id', 'subject')->get()
+                        ->keyBy(function ($row) {
+                            return $row->student_id . '|' . strtoupper(trim($row->subject));
+                        });
                 }   
             }
         }
+
+        if ($request->wantsJson() || $request->is('admin/*') || $request->ajax()) {
+            $formattedResults = $results->map(function ($result, $index) use ($subjects, $marks) {
+                $subjectMarks = [];
+                foreach ($subjects as $subject) {
+                    $key = $result->student_id . '|' . strtoupper(trim($subject));
+                    $mark = $marks->get($key);
+                    $subjectMarks[$subject] = [
+                        'r' => (int) ($mark->r ?? 0),
+                        'w' => (int) ($mark->w ?? 0),
+                        'l' => (int) ($mark->l ?? 0),
+                        'tot' => (int) ($mark->tot ?? 0),
+                    ];
+                }
+
+                return [
+                    's_no' => $index + 1,
+                    'student_id' => $result->student_id,
+                    'student_name' => $result->student_name,
+                    'gender' => $result->gender,
+                    'campus' => $result->campus,
+                    'section' => $result->section,
+                    'batch' => $result->batch,
+                    'stmode' => $result->stmode,
+                    'coaching_type' => $result->coaching_type,
+                    'mark' => (int) $result->mark,
+                    'subject_marks' => $subjectMarks,
+                ];
+            });
+
+            return response()->json([
+                'status' => true,
+                'tests' => $tests->pluck('name')->filter()->values(),
+                'test_name' => $test_name,
+                'all_offline' => $allOffline,
+                'total_marks' => $totalMarks,
+                'subjects' => $subjects,
+                'results' => $formattedResults,
+            ]);
+        }
+
         return view('exam.dump_report', compact( 'tests','test_name','test_ids','results','subjects','marks', 'totalMarks', 'allOffline'));
     }
     

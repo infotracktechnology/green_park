@@ -27,6 +27,7 @@ class MasterDataModel {
   final List<String> coachingTypes;
   final List<String> hostels;
   final List<String> batches;
+  final List<String> sections;
 
   MasterDataModel({
     required this.activeAcademicYear,
@@ -35,6 +36,7 @@ class MasterDataModel {
     required this.coachingTypes,
     required this.hostels,
     required this.batches,
+    this.sections = const [],
   });
 
   factory MasterDataModel.fromJson(Map<String, dynamic> json) {
@@ -75,6 +77,14 @@ class MasterDataModel {
       batchesList = (json['batch'] as List).map((e) => e.toString()).toList();
     }
 
+    List<String> sectionsList = [];
+    if (json['section'] is List) {
+      sectionsList = (json['section'] as List).map((e) => e.toString()).toList();
+    } else if (json['sections'] is List) {
+      sectionsList =
+          (json['sections'] as List).map((e) => e.toString()).toList();
+    }
+
     return MasterDataModel(
       activeAcademicYear: academicYear,
       courses: coursesList,
@@ -82,6 +92,7 @@ class MasterDataModel {
       coachingTypes: coachingTypesList,
       hostels: hostelsList,
       batches: batchesList,
+      sections: sectionsList,
     );
   }
 }

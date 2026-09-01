@@ -89,6 +89,166 @@ class HomeController extends Controller
         return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman', 'academic_years', 'active_year', 'exams'));
     }
 
+    public function dashboardOverview(Request $request)
+    {
+        $branchId = auth()->user()->branch;
+        $today = date('Y-m-d');
+        $active_year = $this->academic_year;
+
+        $data = Branch::with(['student' => function ($query) {
+            $query->where('academic_year', $this->academic_year);
+        }, 'attendance' => function ($query) use ($today) {
+            $query->where('attendance_date', $today)
+                ->whereIn('student_id', function ($q) {
+                    $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
+                });
+        }])->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
+
+        $data->each(function ($branch) use ($today) {
+            $todayLogins = $branch->student->filter(function ($student) use ($today) {
+                return $student->last_login
+                    && date('Y-m-d', strtotime($student->last_login)) === $today;
+            });
+            $branch->login_web = $todayLogins->where('device', 'Web')->count();
+            $branch->login_android = $todayLogins->where('device', 'Android')->count();
+            $branch->login_ios = $todayLogins->where('device', 'Ios')->count();
+            $branch->login_total = $todayLogins->count();
+        });
+
+        $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
+
+        $boys = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'MALE')->count();
+        $girls = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'FEMALE')->count();
+        $total = $students->count();
+
+        $present = Attendance::when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))
+            ->where('status', 'P')
+            ->where('attendance_date', $today)
+            ->whereIn('student_id', function ($q) {
+                $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
+            })
+            ->distinct('student_id')
+            ->count();
+
+        // Branch Breakdown
+        $branchWise = $data->map(function ($b) use ($today) {
+            $bStudents = $b->student;
+            $bPresent = $b->attendance->where('attendance_date', $today)->where('status', 'P')->unique('student_id')->count();
+            return [
+                'id' => $b->id,
+                'name' => $b->name,
+                'total' => $bStudents->count(),
+                'offline' => $bStudents->where('coaching_type', 'OFFLINE')->count(),
+                'online' => $bStudents->where('coaching_type', '!=', 'OFFLINE')->count(),
+                'boys' => $bStudents->filter(fn($s) => strtoupper(trim($s->gender)) == 'MALE')->count(),
+                'girls' => $bStudents->filter(fn($s) => strtoupper(trim($s->gender)) == 'FEMALE')->count(),
+                'present' => $bPresent,
+                'absent' => max(0, $bStudents->count() - $bPresent),
+                'login_web' => $b->login_web ?? 0,
+                'login_android' => $b->login_android ?? 0,
+                'login_ios' => $b->login_ios ?? 0,
+                'login_total' => $b->login_total ?? 0,
+                'sections' => $bStudents->groupBy('section')->map(function ($secStudents, $secName) use ($b, $today) {
+                    $secPresent = $b->attendance->where('attendance_date', $today)->where('status', 'P')->where('section', $secName)->unique('student_id')->count();
+                    return [
+                        'section' => $secName ?: 'Unassigned',
+                        'total' => $secStudents->count(),
+                        'offline' => $secStudents->where('coaching_type', 'OFFLINE')->count(),
+                        'online' => $secStudents->where('coaching_type', '!=', 'OFFLINE')->count(),
+                        'present' => $secPresent,
+                        'absent' => max(0, $secStudents->count() - $secPresent),
+                    ];
+                })->values(),
+            ];
+        })->values();
+
+        // Course Breakdown
+        $courseWise = $students->groupBy(function ($s) {
+            return $s->course ?: 'Unassigned';
+        })->map(function ($group, $course) {
+            return [
+                'course' => $course,
+                'total' => $group->count(),
+                'boys' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'MALE')->count(),
+                'girls' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'FEMALE')->count(),
+                'offline' => $group->filter(fn($s) => strtoupper(trim($s->coaching_type)) == 'OFFLINE')->count(),
+                'online' => $group->filter(fn($s) => strtoupper(trim($s->coaching_type)) != 'OFFLINE')->count(),
+            ];
+        })->sortByDesc('total')->values();
+
+        // Coaching Type Breakdown
+        $coachingTypeWise = $students->groupBy(function ($s) {
+            return $s->coaching_type ?: 'Unassigned';
+        })->map(function ($group, $type) {
+            return [
+                'coaching_type' => $type,
+                'total' => $group->count(),
+                'boys' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'MALE')->count(),
+                'girls' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'FEMALE')->count(),
+            ];
+        })->sortByDesc('total')->values();
+
+        // Section Breakdown (Overall)
+        $sectionWise = $students->groupBy(function ($s) {
+            return $s->section ?: 'Unassigned';
+        })->map(function ($group, $sec) {
+            return [
+                'section' => $sec,
+                'total' => $group->count(),
+                'offline' => $group->filter(fn($s) => strtoupper(trim($s->coaching_type)) == 'OFFLINE')->count(),
+                'online' => $group->filter(fn($s) => strtoupper(trim($s->coaching_type)) != 'OFFLINE')->count(),
+                'boys' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'MALE')->count(),
+                'girls' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'FEMALE')->count(),
+            ];
+        })->sortBy('section')->values();
+
+        // Batch Breakdown
+        $batchWise = $students->groupBy(function ($s) {
+            return $s->batch ?: 'Unassigned';
+        })->map(function ($group, $batch) {
+            return [
+                'batch' => $batch,
+                'total' => $group->count(),
+                'boys' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'MALE')->count(),
+                'girls' => $group->filter(fn($s) => strtoupper(trim($s->gender)) == 'FEMALE')->count(),
+                'offline' => $group->filter(fn($s) => strtoupper(trim($s->coaching_type)) == 'OFFLINE')->count(),
+                'online' => $group->filter(fn($s) => strtoupper(trim($s->coaching_type)) != 'OFFLINE')->count(),
+            ];
+        })->sortBy('batch')->values();
+
+        // Total Logins Today
+        $loginTotal = $data->sum('login_total');
+        $loginWeb = $data->sum('login_web');
+        $loginAndroid = $data->sum('login_android');
+        $loginIos = $data->sum('login_ios');
+
+        return response()->json([
+            'status' => true,
+            'academic_year' => $active_year,
+            'overview' => [
+                'total_students' => $total,
+                'boys' => $boys,
+                'girls' => $girls,
+                'present_today' => $present,
+                'absent_today' => max(0, $total - $present),
+                'attendance_percentage' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                'boys_percentage' => $total > 0 ? round(($boys / $total) * 100, 1) : 0,
+                'girls_percentage' => $total > 0 ? round(($girls / $total) * 100, 1) : 0,
+                'login_today' => [
+                    'total' => $loginTotal,
+                    'web' => $loginWeb,
+                    'android' => $loginAndroid,
+                    'ios' => $loginIos,
+                ],
+            ],
+            'branch_wise' => $branchWise,
+            'course_wise' => $courseWise,
+            'coaching_type_wise' => $coachingTypeWise,
+            'section_wise' => $sectionWise,
+            'batch_wise' => $batchWise,
+        ]);
+    }
+
 
     public function parent_concern(Request $request)
     {

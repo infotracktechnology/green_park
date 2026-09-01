@@ -60,7 +60,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
         $batch = Student::select('batch')->whereNotNull('batch')->where('batch', '!=', '')->distinct()->orderBy('batch')->get()->pluck('batch')->toArray();
 
-        return response()->json(['status' => true, 'academicyear' => $academicyear, 'course' => $course, 'branches' => $branches, 'coachingtype' => $coachingtype, 'hostel' => $hostel, 'batch' => $batch]);
+        $section = Student::when($academicyear, fn($q) => $q->where('academic_year', $academicyear->academic_year))
+            ->whereNotNull('section')->where('section', '!=', '')->distinct()->orderBy('section')->pluck('section')->toArray();
+
+        return response()->json([
+            'status' => true,
+            'academicyear' => $academicyear,
+            'course' => $course,
+            'branches' => $branches,
+            'coachingtype' => $coachingtype,
+            'hostel' => $hostel,
+            'batch' => $batch,
+            'section' => $section,
+        ]);
     });
 
     Route::match(['get', 'post'], 'branchswitch', [UsersController::class, 'BranchSwitch']);
@@ -85,8 +97,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('hostel_attendance', [ReportController::class, 'HostelAttendance']);
     Route::get('examination_log/students', [ReportController::class, 'ExaminationLogStudents']);
     Route::match(['get','post'], 'individual_student_report', [ReportController::class, 'individualStudentReport']);
+    Route::match(['get','post'], 'chairman_report', [ReportController::class, 'Dump_Report']);
     Route::get('student_attendance', [HolidayController::class, 'attendance']);
     Route::post('student_attendance', [HolidayController::class, 'attendance_store']);
+    Route::get('dashboard_overview', [HomeController::class, 'dashboardOverview']);
+    Route::get('staff_leave', [StaffProfileController::class, 'leave_list']);
+    Route::post('staff_leave/apply', [StaffProfileController::class, 'leave_apply']);
+    Route::post('staff_leave/update/{id}', [StaffProfileController::class, 'leave_update']);
+    Route::post('staff_leave/approval', [StaffProfileController::class, 'leave_approval']);
+    Route::delete('staff_leave/{id}', [StaffProfileController::class, 'leave_cancel']);
     Route::get('/filter', [HomeController::class, 'Filter']);
 });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Staff;
+use App\Models\StaffLeave;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\WorkShift;
@@ -369,5 +370,252 @@ class StaffProfileController extends Controller
         }
 
         return view('staff.biometric_report', compact('staffs'));
+    }
+
+    public function leave_list(Request $request)
+    {
+        $user = auth()->user();
+        $branchId = $user->branch ?? null;
+        $staff = null;
+
+        if ($user instanceof Staff) {
+            $staff = $user;
+        } elseif ($user && isset($user->staff_id) && $user->staff_id) {
+            $staff = Staff::find($user->staff_id);
+        } elseif ($request->filled('staff_id')) {
+            $staff = Staff::find($request->staff_id);
+        } elseif ($user && isset($user->username)) {
+            $staff = Staff::where('username', $user->username)->orWhere('biometric_no', $user->username)->first();
+        }
+        if (!$staff && $user) {
+            $staff = Staff::find($user->id);
+        }
+
+        $isApprover = ($user->type ?? '') === 'admin' || ($user->type ?? '') === 'branch admin' || $request->boolean('view_all');
+
+        $query = StaffLeave::with(['staff.branch', 'branch', 'approver'])
+            ->orderBy('created_at', 'desc');
+
+        if (!$isApprover && $staff) {
+            $query->where('staff_id', $staff->id);
+        } elseif ($isApprover && $branchId) {
+            $branches = explode(',', $branchId);
+            $query->where(function ($q) use ($branches) {
+                $q->whereIn('branch_id', $branches)
+                  ->orWhereHas('staff', fn($sq) => $sq->whereIn('branch_id', $branches));
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'All') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('leave_type') && $request->leave_type !== 'All') {
+            $query->where('leave_type', $request->leave_type);
+        }
+
+        if ($request->filled('month')) {
+            $query->whereMonth('from_date', date('m', strtotime($request->month)))
+                  ->whereYear('from_date', date('Y', strtotime($request->month)));
+        }
+
+        $leaves = $query->get()->map(function ($leave) {
+            return [
+                'id' => $leave->id,
+                'staff_id' => $leave->staff_id,
+                'staff_name' => $leave->staff?->name ?? 'Staff',
+                'biometric_no' => $leave->staff?->biometric_no ?? '-',
+                'department' => $leave->staff?->department ?? '-',
+                'designation' => $leave->staff?->designation ?? '-',
+                'branch_name' => $leave->branch?->name ?? $leave->staff?->branch?->name ?? '-',
+                'leave_type' => $leave->leave_type,
+                'from_date' => $leave->from_date ? Carbon::parse($leave->from_date)->format('Y-m-d') : null,
+                'to_date' => $leave->to_date ? Carbon::parse($leave->to_date)->format('Y-m-d') : null,
+                'from_date_formatted' => $leave->from_date ? Carbon::parse($leave->from_date)->format('d M Y') : '-',
+                'to_date_formatted' => $leave->to_date ? Carbon::parse($leave->to_date)->format('d M Y') : '-',
+                'days' => (float)$leave->days,
+                'session' => $leave->session ?? 'Full Day',
+                'reason' => $leave->reason,
+                'status' => $leave->status,
+                'approved_by' => $leave->approver?->name ?? '-',
+                'approved_at' => $leave->approved_at ? Carbon::parse($leave->approved_at)->format('d M Y H:i') : null,
+                'rejection_reason' => $leave->rejection_reason,
+                'created_at' => $leave->created_at ? Carbon::parse($leave->created_at)->format('d M Y H:i') : '-',
+            ];
+        });
+
+        // Summary counts
+        $pendingCount = $leaves->where('status', 'Pending')->count();
+        $approvedCount = $leaves->where('status', 'Approved')->count();
+        $rejectedCount = $leaves->where('status', 'Rejected')->count();
+        $totalDays = $leaves->where('status', 'Approved')->sum('days');
+
+        $leaveTypes = [
+            'Casual Leave (CL)',
+            'Sick Leave (SL)',
+            'Permission',
+            'On Duty (OD)',
+            'Unpaid Leave',
+            'Maternity Leave',
+            'Special Leave',
+            'Other'
+        ];
+
+        $sessions = [
+            'Full Day',
+            'Forenoon (FN)',
+            'Afternoon (AN)'
+        ];
+
+        return response()->json([
+            'status' => true,
+            'is_approver' => $isApprover,
+            'current_staff' => $staff ? [
+                'id' => $staff->id,
+                'name' => $staff->name,
+                'biometric_no' => $staff->biometric_no,
+                'department' => $staff->department,
+                'branch_id' => $staff->branch_id,
+            ] : null,
+            'summary' => [
+                'total_requests' => $leaves->count(),
+                'pending' => $pendingCount,
+                'approved' => $approvedCount,
+                'rejected' => $rejectedCount,
+                'total_approved_days' => round($totalDays, 1),
+            ],
+            'leave_types' => $leaveTypes,
+            'sessions' => $sessions,
+            'leaves' => $leaves,
+        ], 200);
+    }
+
+    public function leave_apply(Request $request)
+    {
+        $user = auth()->user();
+        $staff = null;
+
+        if ($user instanceof Staff) {
+            $staff = $user;
+        } elseif ($user && isset($user->staff_id) && $user->staff_id) {
+            $staff = Staff::find($user->staff_id);
+        }
+
+        if (!$staff && $user) {
+            $staff = Staff::find($user->id);
+        }
+
+        if (!$staff) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Staff profile not identified. Please provide staff_id.',
+            ], 400);
+        }
+
+        $fromDate = Carbon::parse($request->from_date);
+        $toDate = Carbon::parse($request->to_date);
+        $session = $request->input('session', 'Full Day');
+
+        // Calculate days
+        if ($fromDate->equalTo($toDate) && in_array($session, ['Forenoon (FN)', 'Afternoon (AN)'])) {
+            $days = 0.5;
+        } else {
+            $days = (float)($fromDate->diffInDays($toDate) + 1);
+        }
+
+        $leave = StaffLeave::create([
+            'staff_id' => $staff->id,
+            'branch_id' => $staff->branch_id,
+            'leave_type' => $request->leave_type,
+            'from_date' => $fromDate->format('Y-m-d'),
+            'to_date' => $toDate->format('Y-m-d'),
+            'days' => $days,
+            'session' => $session,
+            'reason' => $request->reason,
+            'status' => 'Pending',
+            'academic_year' => $this->academic_year,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Leave application submitted successfully.',
+            'leave' => $leave,
+        ], 201);
+    }
+
+    public function leave_update(Request $request, $id)
+    {
+        $leave = StaffLeave::findOrFail($id);
+
+        if ($leave->status !== 'Pending') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Only pending leave applications can be edited.',
+            ], 400);
+        }
+
+        $fromDate = Carbon::parse($request->from_date);
+        $toDate = Carbon::parse($request->to_date);
+        $session = $request->input('session', 'Full Day');
+
+        // Calculate days
+        if ($fromDate->equalTo($toDate) && in_array($session, ['Forenoon (FN)', 'Afternoon (AN)'])) {
+            $days = 0.5;
+        } else {
+            $days = (float)($fromDate->diffInDays($toDate) + 1);
+        }
+
+        $leave->update([
+            'leave_type' => $request->leave_type,
+            'from_date' => $fromDate->format('Y-m-d'),
+            'to_date' => $toDate->format('Y-m-d'),
+            'days' => $days,
+            'session' => $session,
+            'reason' => $request->reason,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Leave application updated successfully.',
+            'leave' => $leave,
+        ], 200);
+    }
+
+    public function leave_approval(Request $request)
+    {
+
+        $leave = StaffLeave::findOrFail($request->id);
+
+        $leave->update([
+            'status' => $request->status,
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+            'rejection_reason' => $request->status === 'Rejected' ? $request->rejection_reason : null,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => "Leave application has been {$request->status}.",
+            'leave' => $leave,
+        ], 200);
+    }
+
+    public function leave_cancel(Request $request, $id)
+    {
+        $leave = StaffLeave::findOrFail($id);
+
+        if ($leave->status !== 'Pending') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Only pending leave applications can be cancelled/deleted.',
+            ], 400);
+        }
+
+        $leave->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Leave application deleted successfully.',
+        ], 200);
     }
 }
