@@ -1,5 +1,5 @@
 name: gpstaffapp
-description: "A new Flutter project."
+description: "GPCC Staff — the staff portal app for GPCC Namakkal."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.1+2
+version: 1.0.0+1
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -59,9 +59,13 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icon.png"
-  min_sdk_android: 21
+  min_sdk_android: 24
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icon.png"
+  # Inset copy of the crest: the adaptive mask crops the outer ring, so a
+  # full-bleed foreground would have its edges clipped by the launcher.
+  adaptive_icon_foreground: "assets/adaptive-icon.png"
+  # The crest is transparent; the App Store rejects icons with an alpha channel.
+  remove_alpha_ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -75,6 +79,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/logo1.png
     - assets/icon.png
     - assets/adaptive-icon.png
     - assets/splash-icon.png

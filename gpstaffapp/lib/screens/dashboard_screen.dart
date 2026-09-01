@@ -371,7 +371,7 @@ class DashboardScreen extends StatelessWidget {
                       ],
                     ),
                     child: Image.asset(
-                      'assets/icon.png',
+                      'assets/logo1.png',
                       fit: BoxFit.contain,
                       errorBuilder: (_, __, ___) =>
                           const Icon(Icons.school, color: AppColors.primary),

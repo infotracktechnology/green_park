@@ -896,7 +896,7 @@ class _StudentAttendanceEntryScreenState
           // Attendance Toggle Buttons
           if (hasMorning) ...[
             _buildTimingToggle(
-              label: 'M',
+              //label: 'M',
               status: s.morningStatus,
               onToggle: (newStatus) {
                 setState(() => s.morningStatus = newStatus);
@@ -906,7 +906,7 @@ class _StudentAttendanceEntryScreenState
           if (hasMorning && hasAfternoon) const SizedBox(width: 6),
           if (hasAfternoon) ...[
             _buildTimingToggle(
-              label: 'A',
+              //label: 'A',
               status: s.afternoonStatus,
               onToggle: (newStatus) {
                 setState(() => s.afternoonStatus = newStatus);
@@ -919,7 +919,6 @@ class _StudentAttendanceEntryScreenState
   }
 
   Widget _buildTimingToggle({
-    required String label,
     required String status,
     required Function(String) onToggle,
   }) {
@@ -937,17 +936,17 @@ class _StudentAttendanceEntryScreenState
         mainAxisSize: MainAxisSize.min,
         children: [
           // Label indicator (M / A)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 6),
+          //   child: Text(
+          //     label,
+          //     style: const TextStyle(
+          //       fontSize: 10,
+          //       fontWeight: FontWeight.bold,
+          //       color: AppColors.textSecondary,
+          //     ),
+          //   ),
+          // ),
           // Present Button
           InkWell(
             onTap: () => onToggle('P'),

@@ -3,11 +3,6 @@ allprojects {
         google()
         mavenCentral()
     }
-    configurations.all {
-        resolutionStrategy {
-            force 'androidx.core:core:1.9.0'
-        }
-    }
 }
 
 rootProject.buildDir = '../build'
@@ -15,6 +10,18 @@ subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
+    // Force every Android module (incl. plugins that build native code via CMake
+    // without pinning an NDK) to use the installed NDK that matches
+    // flutter.ndkVersion. NDK r27+ links shared libs with 16 KB page alignment by
+    // default, required for Google Play / Android 15+.
+    // Registered before evaluationDependsOn so it runs before evaluation.
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android {
+                ndkVersion = "28.2.13676358"
+            }
+        }
+    }
     project.evaluationDependsOn(':app')
 }
 

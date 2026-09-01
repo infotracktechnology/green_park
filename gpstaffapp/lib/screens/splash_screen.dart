@@ -142,10 +142,10 @@ class _SplashScreenState extends State<SplashScreen>
                             ],
                           ),
                           child: Image.asset(
-                            'assets/icon.png',
+                            'assets/logo1.png',
                             fit: BoxFit.contain,
                             errorBuilder: (_, __, ___) => Image.asset(
-                              'assets/splash-icon.png',
+                              'assets/splash-logo.png',
                               fit: BoxFit.contain,
                               errorBuilder: (_, __, ___) => const Icon(
                                 Icons.school,
