@@ -90,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('student', StudentController::class);
     Route::post('student/{student}', [StudentController::class, 'update']);
     Route::get('staff/profile', [StaffProfileController::class, 'profile']);
+    Route::get('staff/my_biometric_report', [StaffProfileController::class, 'individual_biometric_report']);
     Route::resource('staff', StaffProfileController::class);
     Route::get('biometric/report', [StaffProfileController::class, 'biometric_report']);
     Route::get('attendance_report', [ReportController::class, 'AttendanceReport']);

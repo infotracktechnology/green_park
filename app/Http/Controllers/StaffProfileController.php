@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ImportController;
 use Carbon\Carbon;
+
 class StaffProfileController extends Controller
 {
 
@@ -139,7 +140,7 @@ class StaffProfileController extends Controller
     public function edit(Request $request, Staff $staff)
     {
 
-      
+
         $districts = DB::table('district_list')->where('State', $staff->state)->select('District')->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $workshift = WorkShift::all();
@@ -191,14 +192,14 @@ class StaffProfileController extends Controller
                 Storage::delete($certificate);
             }
         }
-        $staff->update(['deleted_at' => date('Y-m-d H:i:s'),'remarks' => $request->remarks]);
+        $staff->update(['deleted_at' => date('Y-m-d H:i:s'), 'remarks' => $request->remarks]);
         return redirect()->route('staff.index')->with('success', 'Staff Inactived successfully');
     }
 
-     public function RestoreStaff(Request $request)
+    public function RestoreStaff(Request $request)
     {
         $staffs = Staff::onlyTrashed()->get();
-        if($request->isMethod('post')){
+        if ($request->isMethod('post')) {
             $restore = Staff::withTrashed()->find($request->id)->update(['deleted_at' => null, 'remarks' => null]);
             return redirect()->back()->with('success', 'Staff Reactivated successfully.');
         }
@@ -228,7 +229,7 @@ class StaffProfileController extends Controller
 
     public function export(Request $request)
     {
-        $staffs = Staff::selectRaw("staff.id,staff.name,branch.name as branch,school_initial,staff_type,hostel_dayscholar,gender,dob,age,marital_status,blood_group,department,qualifications,nationality,religion,community,caste,staff.mob_no,alternate_mob_no,aadhaar_no,staff.email,staff.address_line_1,staff.address_line_2,staff.state,staff.city,staff.pincode,photo,biometric_no,father_name,mother_name,spouse_name,spouse_ph_no,spouse_occupation,father_ph_no,date_of_joining,designation,experience,class_handling_type,paper_correction,handeling_class,previous_school")->join('branch', 'staff.branch_id', '=', 'branch.id', )->get()->toArray();
+        $staffs = Staff::selectRaw("staff.id,staff.name,branch.name as branch,school_initial,staff_type,hostel_dayscholar,gender,dob,age,marital_status,blood_group,department,qualifications,nationality,religion,community,caste,staff.mob_no,alternate_mob_no,aadhaar_no,staff.email,staff.address_line_1,staff.address_line_2,staff.state,staff.city,staff.pincode,photo,biometric_no,father_name,mother_name,spouse_name,spouse_ph_no,spouse_occupation,father_ph_no,date_of_joining,designation,experience,class_handling_type,paper_correction,handeling_class,previous_school")->join('branch', 'staff.branch_id', '=', 'branch.id',)->get()->toArray();
         $file = fopen('staff_export.csv', 'w');
         $headers = array_keys($staffs[0]);
         fputcsv($file, $headers);
@@ -372,6 +373,147 @@ class StaffProfileController extends Controller
         return view('staff.biometric_report', compact('staffs'));
     }
 
+    public function individual_biometric_report(Request $request)
+    {
+        $user = auth()->user();
+        $staff = null;
+
+        if ($user instanceof Staff) {
+            $staff = $user->load('branch', 'shift');
+        }
+        if (!$staff && $user) {
+            $staff = Staff::with('branch', 'shift')->find($user->id);
+        }
+
+        if (!$staff) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Staff profile not identified. Please login again.'
+            ], 404);
+        }
+
+        $monthStr = $request->input('month', date('Y-m'));
+        $monthDate = Carbon::parse($monthStr);
+        $suffix = $monthDate->format('n_Y');
+
+        if (!DB::connection('epushserver')->getSchemaBuilder()->hasTable("DeviceLogs_$suffix")) {
+            return response()->json([
+                'status' => true,
+                'message' => "Biometric logs not available for " . $monthDate->format('F Y'),
+                'staff' => [
+                    'name' => $staff->name,
+                    'biometric_no' => $staff->biometric_no,
+                    'department' => $staff->department,
+                    'designation' => $staff->designation,
+                    'branch' => $staff->branch?->name,
+                ],
+                'summary' => [
+                    'month' => $monthDate->format('F Y'),
+                    'month_key' => $monthDate->format('Y-m'),
+                    'total_days_evaluated' => 0,
+                    'present_days' => 0,
+                    'half_days' => 0,
+                    'absent_days' => 0,
+                    'total_present_count' => 0,
+                    'total_hours' => 0,
+                ],
+                'logs' => []
+            ], 200);
+        }
+
+        $allLogs = DB::connection('epushserver')
+            ->table("DeviceLogs_$suffix")
+            ->where('UserId', $staff->biometric_no)
+            ->selectRaw("DATE(LogDate) as log_date, TIME(LogDate) as log_time, LogDate")
+            ->orderBy('LogDate', 'asc')
+            ->get()
+            ->groupBy('log_date');
+
+        $startOfMonth = $monthDate->copy()->startOfMonth();
+        $endOfMonth = $monthDate->isCurrentMonth() ? Carbon::now() : $monthDate->copy()->endOfMonth();
+
+        $dailyReport = [];
+        $presentDays = 0;
+        $halfDays = 0;
+        $absentDays = 0;
+        $totalHours = 0;
+
+        for ($d = $startOfMonth->copy(); $d->lte($endOfMonth); $d->addDay()) {
+            $dateKey = $d->format('Y-m-d');
+            $dayLogs = $allLogs->get($dateKey, collect());
+
+            $firstIn = $dayLogs->first()?->log_time ?? '-';
+            $lastOut = $dayLogs->count() > 1 ? $dayLogs->last()->log_time : '-';
+            $timeLogs = $dayLogs->pluck('log_time')->implode(', ');
+
+            $session1 = $session2 = 'A';
+            $hours = 0;
+            $day = 0.0;
+
+            if ($dayLogs->isNotEmpty()) {
+                $session1 = strtotime($firstIn) <= strtotime($staff?->shift?->session1_endtime ?? '13:00:00') ? 'P' : 'A';
+                $day = $session1 == 'P' ? 0.5 : 0;
+                if ($lastOut != '-') {
+                    $session2 = strtotime($lastOut) >= strtotime($staff?->shift?->session2_endtime ?? '17:00:00') ? 'P' : 'A';
+                    $hours = round(Carbon::parse($firstIn)->diffInMinutes(Carbon::parse($lastOut)) / 60, 1);
+                } else {
+                    $session2 = strtotime($firstIn) >= strtotime($staff?->shift?->session2_endtime ?? '17:00:00') ? 'P' : 'A';
+                }
+                $day = ($session1 == 'P' ? 0.5 : 0) + ($session2 == 'P' ? 0.5 : 0);
+            }
+
+            if ($day == 1.0) {
+                $presentDays++;
+            } elseif ($day == 0.5) {
+                $halfDays++;
+            } else {
+                $absentDays++;
+            }
+            $totalHours += $hours;
+
+            $statusText = $day == 1.0 ? 'Present' : ($day == 0.5 ? 'Half Day' : 'Absent');
+
+            $dailyReport[] = [
+                'date' => $d->format('Y-m-d'),
+                'date_formatted' => $d->format('d M Y'),
+                'day_name' => $d->format('D'),
+                'is_today' => $d->isToday(),
+                'first_in' => $firstIn,
+                'last_out' => $lastOut,
+                'session1' => $session1,
+                'session2' => $session2,
+                'hours' => $hours,
+                'day' => $day,
+                'status' => $statusText,
+                'time_logs' => $timeLogs ?: '-',
+            ];
+        }
+
+        $dailyReport = array_reverse($dailyReport);
+
+        return response()->json([
+            'status' => true,
+            'staff' => [
+                'name' => $staff->name,
+                'biometric_no' => $staff->biometric_no,
+                'department' => $staff->department,
+                'designation' => $staff->designation,
+                'branch' => $staff->branch?->name,
+            ],
+            'summary' => [
+                'month' => $monthDate->format('F Y'),
+                'month_key' => $monthDate->format('Y-m'),
+                'total_days_evaluated' => count($dailyReport),
+                'present_days' => $presentDays,
+                'half_days' => $halfDays,
+                'absent_days' => $absentDays,
+                'total_present_count' => $presentDays + ($halfDays * 0.5),
+                'total_hours' => round($totalHours, 1),
+            ],
+            'logs' => $dailyReport,
+        ], 200);
+    }
+
     public function leave_list(Request $request)
     {
         $user = auth()->user();
@@ -380,18 +522,13 @@ class StaffProfileController extends Controller
 
         if ($user instanceof Staff) {
             $staff = $user;
-        } elseif ($user && isset($user->staff_id) && $user->staff_id) {
-            $staff = Staff::find($user->staff_id);
-        } elseif ($request->filled('staff_id')) {
-            $staff = Staff::find($request->staff_id);
-        } elseif ($user && isset($user->username)) {
-            $staff = Staff::where('username', $user->username)->orWhere('biometric_no', $user->username)->first();
         }
+
         if (!$staff && $user) {
             $staff = Staff::find($user->id);
         }
 
-        $isApprover = ($user->type ?? '') === 'admin' || ($user->type ?? '') === 'branch admin' || $request->boolean('view_all');
+        $isApprover = ($user->type ?? '') === 'Admin' || ($user->type ?? '') === 'Branch Admin' || $request->boolean('view_all');
 
         $query = StaffLeave::with(['staff.branch', 'branch', 'approver'])
             ->orderBy('created_at', 'desc');
@@ -402,7 +539,7 @@ class StaffProfileController extends Controller
             $branches = explode(',', $branchId);
             $query->where(function ($q) use ($branches) {
                 $q->whereIn('branch_id', $branches)
-                  ->orWhereHas('staff', fn($sq) => $sq->whereIn('branch_id', $branches));
+                    ->orWhereHas('staff', fn($sq) => $sq->whereIn('branch_id', $branches));
             });
         }
 
@@ -416,7 +553,7 @@ class StaffProfileController extends Controller
 
         if ($request->filled('month')) {
             $query->whereMonth('from_date', date('m', strtotime($request->month)))
-                  ->whereYear('from_date', date('Y', strtotime($request->month)));
+                ->whereYear('from_date', date('Y', strtotime($request->month)));
         }
 
         $leaves = $query->get()->map(function ($leave) {

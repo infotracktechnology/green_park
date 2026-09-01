@@ -25,6 +25,7 @@ import 'student_attendance_entry_screen.dart';
 import 'chairman_report_screen.dart';
 import 'admin_dashboard_overview_screen.dart';
 import 'staff_leave_screen.dart';
+import 'individual_biometric_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -343,6 +344,18 @@ class DashboardScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (_) => const StudentAttendanceEntryScreen()),
+          ),
+        ),
+        MenuItemModel(
+          id: 'my_biometric_attendance',
+          title: 'Biometric Attendance',
+          subtitle: 'My monthly punch logs',
+          icon: Icons.fingerprint,
+          color: AppColors.primary,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const IndividualBiometricScreen()),
           ),
         ),
         MenuItemModel(
