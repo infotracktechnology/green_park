@@ -45,7 +45,9 @@
    
                   <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
-                    <button type="submit" class="btn m-t-25 btn-primary">Download PDF</button>
+                    
+                  <button class="btn btn-primary mt-4"> Download Report </button>
+                  
                   </div>
 
                   </div>    
@@ -68,13 +70,6 @@
     $('.select2').select2({
         width: '100%'
     });
-
-    document.getElementById('myForm').addEventListener('submit', function () {
-        setTimeout(function () {
-            window.location.reload();
-        }, 2000);
-    });
-
 
 </script>
 @endsection
