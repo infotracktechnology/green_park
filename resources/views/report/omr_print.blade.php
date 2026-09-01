@@ -23,10 +23,10 @@
     <div class="title">Q Type: {{ $answer->pluck('subject')->unique()->implode(',') }}</div>
      <table style="width: 100%;">
     <tr>
-    <?php $cols = $answer->chunk($answer->count()/4); ?>
+    <?php $cols = $answer->chunk(36); ?>
       @foreach($cols as $col)
       <td style="padding: 0px 10px;vertical-align: top;">
-      <table class="table"  style="width: {{ 25 * count($cols) }}%;">
+      <table class="table" style="width: 100%;">
         <thead>
           <tr>
             <th>Q</th>

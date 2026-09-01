@@ -4,47 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Range Report</title>
-
-    <style>
+    <style type="text/css">
         @page {
             size: A4 portrait;
-            margin: 10mm;
+            margin: 8mm; /* Clean page margin */
         }
 
         * {
             box-sizing: border-box;
+            -webkit-box-sizing: border-box;
         }
 
         body {
             margin: 0;
-            padding: 8px;
-            
+            padding: 0;
+            font-family: 'DejaVu Sans', sans-serif;
             color: #000;
             background-color: #fff;
         }
 
-        .outer-border {
-            border: 2.5px solid #000;
-            padding: 4px;
-            min-height: 250mm;
-        }
+       
 
-        .inner-border {
-            border: 1.5px solid #000;
-            padding: 20px 25px;
-            min-height: calc(250mm - 12px);
-        }
-
+        /* Banner Container */
         .banner-container {
             width: 100%;
             text-align: center;
-            border: 2px solid #000;
-            margin-bottom: 20px;
+            border: 1.5px solid #000;
+            margin-bottom: 16px;
+            line-height: 0;
         }
 
         .banner-container img {
             width: 100%;
-            height: auto;
+            height: 150px;
             display: block;
         }
 
@@ -54,6 +46,7 @@
             font-size: 20px;
             font-weight: bold;
             letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
         .red-text {
@@ -62,68 +55,77 @@
 
         .test-title {
             text-align: center;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
-            margin-top: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .content-wrap {
+            width: 88%;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* First Mark Section */
         .first-mark-container {
-            width: 85%;
-            margin: 0 auto 8px auto;
+            width: 100%;
             text-align: right;
+            margin-bottom: 8px;
         }
 
         .first-mark {
-            font-size: 19px;
-            font-weight: 900;
+            font-size: 16px;
+            font-weight: bold;
             letter-spacing: 0.5px;
         }
 
         /* Table Styling */
         table {
-            width: 85%;
-            margin: 0 auto;
+            width: 100%;
+            table-layout: fixed; 
             border-collapse: collapse;
-            border: 1.5px solid #3c6e94;
+            border: 1.5px solid rgb(0, 0, 0);
+            page-break-inside: avoid;
         }
 
         th {
             background-color: #f5cdb4;
             color: #000;
-            font-size: 16px;
-            font-weight: 900;
-            padding: 10px 6px;
-            border: 1px solid #3c6e94;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 9px 5px;
+            border: 1px solid black;
             text-align: center;
-            line-height: 1.2;
+            vertical-align: middle;
+            line-height: 1.3;
         }
 
         td {
             text-align: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            padding: 9px 8px;
-            border: 1px solid #3c6e94;
+            padding: 8px 6px;
+            border: 1px solid #000000;
+            vertical-align: middle;
         }
 
-        .sno {
+        .col-sno {
+            width: 16%;
             color: #124378;
-            width: 15%;
         }
 
-        .range {
+        .col-range {
+            width: 52%;
             color: #124378;
-            width: 53%;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
-        .count {
-            color: #0070c0;
-            font-size: 18px;
+        .col-count {
             width: 32%;
+            color: #0070c0;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -133,6 +135,7 @@
     <div class="outer-border">
         <div class="inner-border">
 
+            <!-- Banner Header -->
             <div class="banner-container">
                 @php
                     $imgPath = public_path('assets/img/image.png');
@@ -140,10 +143,12 @@
                         $imgPath = base_path('assets/img/image.png');
                     }
                 @endphp
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($imgPath)) }}" alt="Header">
+                @if(file_exists($imgPath))
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents($imgPath)) }}" alt="Header">
+                @endif
             </div>
 
-
+            <!-- Report Headings -->
             <div class="report-type">
                 <span class="red-text">{{ $coachingTypes }}</span> RANGE REPORT
             </div>
@@ -152,36 +157,39 @@
                 {{ $test_name }}
             </div>
 
-            <div class="first-mark-container">
-                <span class="first-mark">
-                    FIRST MARK: {{ $firstMark }}
-                </span>
-            </div>
+            <!-- Content Area (Table + First Mark aligned together) -->
+            <div class="content-wrap">
+                <div class="first-mark-container">
+                    <span class="first-mark">
+                        FIRST MARK: {{ $firstMark }}
+                    </span>
+                </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">SNO</th>
-                        <th style="width: 53%;">MARKS RANGE</th>
-                        <th style="width: 32%;">NO: OF<br>STUDENTS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($rangeReport as $index => $row)
+                <table>
+                    <thead>
                         <tr>
-                            <td class="sno">
-                                {{ $index + 1 }}
-                            </td>
-                            <td class="range">
-                                {{ $row['range'] }}
-                            </td>
-                            <td class="count">
-                                {{ $row['count'] }}
-                            </td>
+                            <th class="col-sno">SNO</th>
+                            <th class="col-range">MARKS RANGE</th>
+                            <th class="col-count">NO: OF<br>STUDENTS</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($rangeReport as $index => $row)
+                            <tr>
+                                <td class="col-sno">
+                                    {{ $index + 1 }}
+                                </td>
+                                <td class="col-range">
+                                    {{ $row['range'] }}
+                                </td>
+                                <td class="col-count">
+                                    {{ $row['count'] }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
         </div>
     </div>

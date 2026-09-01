@@ -904,11 +904,17 @@ class ReportController extends Controller
         $results = collect();
         $subjects = [];
         $marks = collect();
+        $totalMarks = 0;
+        $allOffline = false;
+        
 
         if ($test_name) {
             $exam = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->first();
 
             if ($exam) {
+                $examCoachingType = ($exam->coaching_type ?? '');
+
+                $allOffline = ($examCoachingType === 'OFFLINE');
                 $subjects = array_filter( array_map('trim',explode(',', $exam->subject_name ?? '')) );
                 $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->pluck('testid')->implode(',');
 
@@ -916,10 +922,10 @@ class ReportController extends Controller
                     ->leftJoin('branch as b','b.id','=','s.campus')
                     ->where('ea.testname', $test_name)
                     ->where('ea.academic_year', $this->academic_year)
-                    ->select('ea.test_id','ea.student_id','ea.mode as stmode','s.student_name','s.gender','s.coaching_type','s.section','s.coaching_type',
-                    DB::raw("SUBSTRING_INDEX(b.name, ',', 1) as campus"))
+                    ->select('ea.test_id','ea.student_id','ea.mode as stmode','s.student_name','s.gender','s.coaching_type','s.section','s.coaching_type','s.batch',
+                    DB::raw("SUBSTRING_INDEX(b.campus, ',', 1) as campus"))
                     ->selectRaw('SUM(COALESCE(ea.mark, 0)) as mark')
-                    ->groupBy('ea.test_id','ea.student_id','ea.mode','s.student_name','s.gender','s.coaching_type','s.section','b.name')
+                    ->groupBy('ea.test_id','ea.student_id','ea.mode','s.student_name','s.gender','s.coaching_type','s.section','b.campus','s.batch')
                     ->orderByDesc('mark')
                     ->orderBy('s.student_name')
                     ->get();
@@ -930,6 +936,14 @@ class ReportController extends Controller
                
 
                 if (!empty($testIdArray)) {
+                    $totalQuestions = DB::table('exam_answer')
+                    ->where('academic_year', $this->academic_year)
+                    ->where('testname', $test_name)
+                    ->distinct('q_no')
+                    ->count('q_no');
+
+                $totalMarks = $totalQuestions * 4;
+
                 $marks = DB::table('exam_answer')->where('academic_year', $this->academic_year)->where('testname', $test_name)->select('student_id', 'subject')->selectRaw('SUM(mark = 4) as r')->selectRaw('SUM(mark = -1) as w')->selectRaw('SUM(mark = 0) as l')->selectRaw('SUM(mark) as tot')->groupBy('student_id', 'subject')->get()
                     ->keyBy(function ($row) {
                         return $row->student_id . '|' . strtoupper(trim($row->subject));
@@ -937,7 +951,7 @@ class ReportController extends Controller
                 }   
             }
         }
-        return view('exam.dump_report', compact( 'tests','test_name','test_ids','results','subjects','marks'));
+        return view('exam.dump_report', compact( 'tests','test_name','test_ids','results','subjects','marks', 'totalMarks', 'allOffline'));
     }
     
     public function RoomAllocation(Request $request)
@@ -1411,14 +1425,62 @@ class ReportController extends Controller
         $students = Student::select('student_id', 'student_name')->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
 
         if ($request->isMethod('post')) {
-            $student = Student::with('branch')->where('student_id', $request->student_id)->first();
+            $student = Student::where('student_id', $request->student_id)->first();
             if (!$student) {
                 if ($isApi) {
                     return response()->json(['status' => false, 'message' => 'Student not found'], 404);
                 }
                 return back()->with('error', 'Student not found');
             }
-            $allExams = ExamSubjectReport::select('category','subject','exdate','sec')->where('sec', $student->section)->groupBy( 'category', 'subject', 'exdate', 'sec')->orderBy('category')->orderBy('created_at', 'asc')->get();
+            $allExams = ExamSubjectReport::select(
+        'category',
+        'subject',
+        'exdate',
+        'sec'
+    )
+    ->where('sec', $student->section)
+    ->groupBy('category', 'subject', 'exdate', 'sec')
+    ->get()
+    ->sortBy(function ($exam) {
+
+        $category = $exam->category;
+
+        // Main category order
+        if (str_starts_with($category, 'CUMULATIVE TEST')) {
+            $groupOrder = 1;
+        } elseif (str_starts_with($category, 'GRAND TEST')) {
+            $groupOrder = 2;
+        } elseif (str_starts_with($category, 'WEEKEND TEST')) {
+            $groupOrder = 3;
+        } elseif (str_starts_with($category, 'UNIT TEST')) {
+            $groupOrder = 4;
+        } else {
+            $groupOrder = 99;
+        }
+
+        // Subject order
+        if (str_contains($category, 'PHY')) {
+            $subjectOrder = 1;
+        } elseif (str_contains($category, 'CHE')) {
+            $subjectOrder = 2;
+        } elseif (str_contains($category, 'BOT')) {
+            $subjectOrder = 3;
+        } elseif (str_contains($category, 'ZOO')) {
+            $subjectOrder = 4;
+        } elseif (str_contains($category, 'BIO')) {
+            $subjectOrder = 5;
+        } else {
+            $subjectOrder = 0;
+        }
+
+        // Plain CUMULATIVE TEST first
+        if ($category === 'CUMULATIVE TEST') {
+            $subjectOrder = 0;
+        }
+        $date = \Carbon\Carbon::createFromFormat('d-m-Y', $exam->exdate);
+        return [($groupOrder * 100) + $subjectOrder,$date->timestamp];
+    })
+    ->values();
 
         $marks = ExamSubjectReport::where('stuid', $request->student_id)->get();
 
@@ -1427,17 +1489,31 @@ class ReportController extends Controller
         foreach ($allExams as $exam) {
             $mark = $marks->firstWhere('subject', $exam->subject);
 
-        $report->push((object)[
-            'category' => $exam->category,
-            'subject'  => $exam->subject,
-            'exdate'   => $exam->exdate,
-            'phy_tot'  => $mark->phy_tot ?? null,
-            'che_tot'  => $mark->che_tot ?? null,
-            'bot_tot'  => $mark->bot_tot ?? null,
-            'zoo_tot'  => $mark->zoo_tot ?? null,
-            'bio_tot'  => $mark->bio_tot ?? null,
-            'nettot'   => $mark->nettot ?? null,
-        ]);
+            $subjectFields = ['phy', 'che', 'bot', 'zoo', 'bio'];
+            $subjectData = [];
+
+            foreach ($subjectFields as $key) {
+                $subjectData[$key . '_r'] = $mark->{$key . '_r'} ?? 0;
+                $subjectData[$key . '_w'] = $mark->{$key . '_w'} ?? 0;
+                $subjectData[$key . '_l'] = $mark->{$key . '_l'} ?? 0;
+            }
+
+            $data = [
+                'category' => $exam->category,
+                'subject'  => $exam->subject,
+                'exdate'   => $exam->exdate,
+                'phy_tot' => $mark->phy_tot ?? null,
+                'che_tot' => $mark->che_tot ?? null,
+                'bot_tot' => $mark->bot_tot ?? null,
+                'zoo_tot' => $mark->zoo_tot ?? null,
+                'bio_tot' => $mark->bio_tot ?? null,
+                'nettot'  => $mark->nettot ?? null,
+                'totmark' => $mark->totmark ?? 0,
+            ];
+
+            $data = array_merge($data, $subjectData);
+
+            $report->push((object) $data);
         }
             $average = [
                 'phy'   => round($marks->avg('phy_tot')),

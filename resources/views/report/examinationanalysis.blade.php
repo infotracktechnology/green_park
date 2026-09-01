@@ -107,7 +107,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                    <button type="submit" id="rangeSubmit" class="btn btn-primary ">Submit</button>
+                    <button  class="btn btn-primary"> submit</button>
                 </div>
             </form>
             <iframe name="rangeDownloadFrame" id="rangeDownloadFrame" style="display:none;"></iframe>

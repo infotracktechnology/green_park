@@ -100,8 +100,8 @@
                         <td>{{ $row['boys'] }}</td>
                         <td>{{ $row['girls'] }}</td>
                         <td>{{ $row['total'] }}</td>
-                        <td> <a href="javascript:void(0)" class="badge badge-success text-white view-students" data-type="Present" data-students='{{ $row["present_students"] }}'>{{ $row['present'] }}</a></td>
-                        <td> <a href="javascript:void(0)" class="badge badge-danger text-white view-students" data-type="Absent" data-students='{{ $row["absent_students"] }}'>{{ $row['absent'] }} </a></td>
+                        <td> <a href="javascript:void(0)" class="badge badge-success text-white view-students" data-type="Present" data-students='@json($row["present_students"])'>{{ $row['present'] }}</a></td>
+                        <td> <a href="javascript:void(0)" class="badge badge-danger text-white view-students" data-type="Absent" data-students='@json($row["absent_students"])'>{{ $row['absent'] }} </a></td>
                         <td>{{ round($row['present'] * 100 / $row['total'], 2) }}</td>
                         <td>{{ round($row['absent'] * 100 / $row['total'], 2) }}</td>
                       </tr>
