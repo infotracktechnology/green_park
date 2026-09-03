@@ -516,7 +516,9 @@ class ReportController extends Controller
 
     public function BatchList(Request $request)
     {
-        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,hostel_dayscholar,batch,section,COUNT(*) as strength,b.id")->where('section', '!=', '')->where('hostel_dayscholar', '!=', '')->where('academic_year', $this->academic_year)->groupBy('b.name', 'hostel_dayscholar', 'batch', 'section')->orderBy('b.id')->get();
+        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')
+            ->selectRaw(" b.name as campus, UPPER(TRIM(hostel_dayscholar)) as hostel_dayscholar, UPPER(TRIM(gender)) as gender, batch,section,COUNT(*) as strength,b.id")->where('section', '!=', '')->where('hostel_dayscholar', '!=', '')->where('academic_year', $this->academic_year)->groupBy('b.name','hostel_dayscholar','gender','batch','section')->orderBy('b.id')->orderByRaw("FIELD( CONCAT(UPPER(TRIM(hostel_dayscholar)),'-',UPPER(TRIM(gender)) ),'DAYSCHOLAR-MALE','HOSTEL-MALE','DAYSCHOLAR-FEMALE','HOSTEL-FEMALE')")->orderBy('batch')->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")->get();
+
         return view('report.batchlist', compact('report'));
     }
     public function SectionList(Request $request)
