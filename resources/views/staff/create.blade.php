@@ -109,6 +109,7 @@
                 <option value="Botany">Botany</option>
                 <option value="Zoology">Zoology</option>
                 <option value="Mathematics">Mathematics</option>
+                <option value="Coordinator">Co-Ordinator</option>
                 <option value="Others">Others</option>
             </select>
         </div>
