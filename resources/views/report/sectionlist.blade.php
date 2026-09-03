@@ -58,56 +58,122 @@
                 </div>
               </div>
               @if(request('branch') && request('course'))
-              <div class="row">
-                <div class="col-md-8">
-                  @foreach($grouped as $key => $section)
-                  <div class="table-responsive mt-3">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th colspan="5" class="text-center fw-bold">{{ $key }}</th>
-                        </tr>
-                        <tr>
-                          <th>SECTION</th>
-                          <th>BATCH</th>
-                          @if($section[0]->hostel_dayscholar == 'HOSTEL')
-                          <th>AC</th>
-                          <th>NON AC</th>
-                          @else
-                          <th>CBSE</th>
-                          <th>SB</th>
-                          @endif
-                          <th>TOTAL</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @foreach($section->sortBy(function ($row) {
-                              return (int) preg_replace('/[^0-9]/', '', $row->section);
-                          }) as $row)
-                        <tr>
-                          <td>{{ $row->section }}</td>
-                          <td>{{ $row->batch }}</td>
-                          @if($row->hostel_dayscholar == 'HOSTEL')
-                          <td>{{ $row->ac }}</td>
-                          <td>{{ $row->nonac }}</td>
-                          @else
-                          <td>{{ $row->cbse }}</td>
-                          <td>{{ $row->sb }}</td>
-                          @endif
-                          <td>{{ $row->total }}</td>
-                        </tr>
-                        @endforeach
-                      </tbody>
-                      <tfoot>
-                        <tr class="bg-secondary fw-bold">
-                          <td colspan="4">NET TOTAL</td>
-                          <td>{{ $section->sum('total') }}</td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                  @endforeach
-                </div>
+<div class="row">
+    <div class="col-md-8">
+
+      @if($offline->isNotEmpty())  
+      <h4 class="mt-3">OFFLINE</h4>
+        @foreach($offline as $key => $section)
+        
+        <div class="table-responsive mt-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th colspan="5" class="text-center fw-bold">{{ $key }}</th>
+                    </tr>
+                    <tr>
+                        <th>SECTION</th>
+                        <th>BATCH</th>
+
+                        @if($section[0]->hostel_dayscholar == 'HOSTEL')
+                            <th>AC</th>
+                            <th>NON AC</th>
+                        @else
+                            <th>CBSE</th>
+                            <th>SB</th>
+                        @endif
+
+                        <th>TOTAL</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach($section as $row)
+                    <tr>
+                        <td>{{ $row->section }}</td>
+                        <td>{{ $row->batch }}</td>
+
+                        @if($row->hostel_dayscholar == 'HOSTEL')
+                            <td>{{ $row->ac }}</td>
+                            <td>{{ $row->nonac }}</td>
+                        @else
+                            <td>{{ $row->cbse }}</td>
+                            <td>{{ $row->sb }}</td>
+                        @endif
+
+                        <td>{{ $row->total }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+
+                <tfoot>
+                    <tr class="bg-secondary fw-bold">
+                        <td colspan="4">NET TOTAL</td>
+                        <td>{{ $section->sum('total') }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        @endforeach
+        @endif
+        @if($online->isNotEmpty())
+      <h4 class="mt-4">ONLINE</h4>
+        @foreach($online as $key => $section)
+        
+        <div class="table-responsive mt-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th colspan="5" class="text-center fw-bold">{{ $key }}</th>
+                    </tr>
+                    <tr>
+                        <th>SECTION</th>
+                        <th>BATCH</th>
+
+                        @if($section[0]->hostel_dayscholar == 'HOSTEL')
+                            <th>AC</th>
+                            <th>NON AC</th>
+                        @else
+                            <th>CBSE</th>
+                            <th>SB</th>
+                        @endif
+
+                        <th>TOTAL</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach($section as $row)
+                    <tr>
+                        <td>{{ $row->section }}</td>
+                        <td>{{ $row->batch }}</td>
+
+                        @if($row->hostel_dayscholar == 'HOSTEL')
+                            <td>{{ $row->ac }}</td>
+                            <td>{{ $row->nonac }}</td>
+                        @else
+                            <td>{{ $row->cbse }}</td>
+                            <td>{{ $row->sb }}</td>
+                        @endif
+
+                        <td>{{ $row->total }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+
+                <tfoot>
+                    <tr class="bg-secondary fw-bold">
+                        <td colspan="4">NET TOTAL</td>
+                        <td>{{ $section->sum('total') }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        @endforeach
+
+        @endif
+
+    </div>
                 <div class="col-md-4">
                   <form method="post" class="no-loader" action="{{ route('report.sectionlist') }}" enctype="multipart/form-data">
                     @csrf
