@@ -67,6 +67,7 @@
                   <thead>
 
                     <tr role="row">
+                      <th>S. No</th>
                       <th>Student ID</th>
                       <th>Student Name</th>
                       <th>Course</th>
@@ -90,6 +91,7 @@
                   <tbody>
                     @foreach ($students as $student)
                     <tr>
+                      <td>{{$loop->iteration}}</td>
                       <td>{{$student->student_id}}</td>
                       <td>{{$student->student_name}}</td>
                       <td>{{$student->course}}</td>
