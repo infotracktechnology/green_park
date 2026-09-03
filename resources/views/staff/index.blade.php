@@ -77,7 +77,7 @@
                         <td>{{ $member->mob_no }}</td>
                         <td>{{ $member->gender }}</td>
                         <td>{{ $member->username }}</td>
-                        <td>{{ $member->password1 }}</td>
+                        <td>{{ $member->password }}</td>
 
 
                         <td>
