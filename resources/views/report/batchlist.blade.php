@@ -4,12 +4,17 @@
 @section('css')
 <style>
   thead th{
+
     background-color: #56ade8 !important;
      color: #222 !important;
   }
   table th,table td {
   border: 1px solid #222 !important;
   height: 0px !important;
+  }
+  thead th {
+    height: 40px !important;
+    text-align: center;
   }
 </style>
 @endsection
@@ -29,12 +34,13 @@
                 <div class="col-md-12">
                 <div class="table-responsive">
                   <table class="table">
-                    <thead>
+                    <thead class="thead">
                       <tr>
                         <th>Campus</th>
                         <th>HOS / DAY</th>
                         <th colspan="2">Batch - A</th>
                         <th colspan="2">Batch - B</th>
+                        <th rowspan="2">TOTAL</th>
                       </tr>
                       <tr>
                         <th></th>
@@ -46,36 +52,64 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <?php
-                      $grouped = $report->groupBy(['campus','hostel_dayscholar']);
-                      ?>
+                    @php
+                        $grouped = $report->groupBy('campus');
+                    @endphp
 
-                      @foreach($grouped as $campus => $campusData)
-                      @foreach($campusData as $hosDay => $rows)
-                      @php
-                      $batchA = $rows->where('batch','A');
-                      $batchB = $rows->where('batch','B');
-                      $max = max($batchA->count(), $batchB->count());
+                    @foreach($grouped as $campus => $campusData)
+                        @php
+                          $types = [
+                              'DAYSCHOLAR-MALE'   => 'DAY BOYS',
+                              'HOSTEL-MALE'       => 'HOSTEL BOYS',
+                              'DAYSCHOLAR-FEMALE' => 'DAY GIRLS',
+                              'HOSTEL-FEMALE'     => 'HOSTEL GIRLS',
+                          ];
+
+                          $groups = [];
+                          foreach ($types as $type => $label) {
+                              [$hosDay, $gender] = explode('-', $type);
+                              $rows = $campusData->where('hostel_dayscholar', $hosDay)->where('gender', $gender);
+                              $batchA = $rows->where('batch', 'A')->values();
+                              $batchB = $rows->where('batch', 'B')->values();
+                              $max = max($batchA->count(), $batchB->count());
+
+                              if ($max > 0) {
+                                  $groups[] = ['label'  => $label, 'batchA' => $batchA, 'batchB' => $batchB,'max'    => $max, ];
+                              }
+                          }
+
+                      $campusRowCount = collect($groups)->sum('max');
+                      $campusTotal = $campusData ->whereIn('batch', ['A', 'B'])->sum('strength');
+                      $campusPrinted = false;
+                      $totalPrinted = false;
                       @endphp
 
-                      <tr>
-                        <td {{ $max ? "rowspan={$max}" : "" }}>{{ $campus }}</td>
-                        <td {{ $max ? "rowspan={$max}" : "" }}>{{ $hosDay }}</td>
-                        <td>{{ $batchA[0]->section ?? '-' }}</td>
-                        <td>{{ $batchA[0]->strength ?? '-' }}</td>
-                        <td>{{ $batchB[0]->section ?? '-' }}</td>
-                        <td>{{ $batchB[0]->strength ?? '-' }}</td>
-                      </tr>
+                        @foreach($groups as $group)
+                            @for($i = 0; $i < $group['max']; $i++) <tr>
+                                    @if(!$campusPrinted)
+                                        <td rowspan="{{ $campusRowCount }}"> {{ $campus }} </td>
+                                        @php
+                                          $campusPrinted = true;
+                                        @endphp
+                                    @endif
+                                    @if($i == 0)
+                                        <td rowspan="{{ $group['max'] }}"> {{ $group['label'] }}</td>
+                                    @endif
+                                    <td> {{ $group['batchA'][$i]->section ?? '-' }}</td>
+                                    <td> {{ $group['batchA'][$i]->strength ?? '-' }}</td>
+                                    <td> {{ $group['batchB'][$i]->section ?? '-' }}</td>
+                                    <td>{{ $group['batchB'][$i]->strength ?? '-' }} </td>
 
-                      @for($i=1;$i<$max;$i++) <tr>
-                        <td>{{ $batchA[$i]->section ?? '-' }}</td>
-                        <td>{{ $batchA[$i]->strength ?? '-' }}</td>
-                        <td>{{ $batchB[$i]->section ?? '-' }}</td>
-                        <td>{{ $batchB[$i]->strength ?? '-' }}</td>
-                        </tr>
-                        @endfor
+                                    @if(!$totalPrinted)
+                                        <td rowspan="{{ $campusRowCount }}"> {{ $campusTotal }}</td>
+                                        @php
+                                            $totalPrinted = true;
+                                        @endphp
+                                    @endif
+                                </tr>
+                            @endfor
                         @endforeach
-                        @endforeach
+                    @endforeach
                     </tbody>
                     <tfoot>
                     <?php
@@ -84,11 +118,12 @@
                     $grand  = $totalA + $totalB;
                     ?>
                       <tr class="bg-secondary fw-bold">
-                        <th colspan="2">TOTAL = {{ $grand }}</th>
+                        <th colspan="2">TOTAL </th>
                         <th></th>
                         <th>{{ $totalA }}</th>
                         <th></th>
                         <th>{{ $totalB }}</th>
+                        <th>{{ $grand }}</th>
                       </tr>
                     </tfoot>
                   </table>

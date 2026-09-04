@@ -516,14 +516,27 @@ class ReportController extends Controller
 
     public function BatchList(Request $request)
     {
-        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,hostel_dayscholar,batch,section,COUNT(*) as strength,b.id")->where('section', '!=', '')->where('hostel_dayscholar', '!=', '')->where('academic_year', $this->academic_year)->groupBy('b.name', 'hostel_dayscholar', 'batch', 'section')->orderBy('b.id')->get();
+        $report = Student::join('branch as b', 'student.campus', '=', 'b.id')
+            ->selectRaw(" b.name as campus, UPPER(TRIM(hostel_dayscholar)) as hostel_dayscholar, UPPER(TRIM(gender)) as gender, batch,section,COUNT(*) as strength,b.id")->where('section', '!=', '')->where('hostel_dayscholar', '!=', '')->where('academic_year', $this->academic_year)->groupBy('b.name','hostel_dayscholar','gender','batch','section')->orderBy('b.id')->orderByRaw("FIELD( CONCAT(UPPER(TRIM(hostel_dayscholar)),'-',UPPER(TRIM(gender)) ),'DAYSCHOLAR-MALE','HOSTEL-MALE','DAYSCHOLAR-FEMALE','HOSTEL-FEMALE')")->orderBy('batch')->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")->get();
+
         return view('report.batchlist', compact('report'));
     }
     public function SectionList(Request $request)
     {
         $branch = $request->branch ?? 0;
         $course = $request->course ?? 0;
-        $data = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,batch,section,COUNT(*) as total,b.id,concat(gender,'-',hostel_dayscholar)gender,sum(ac_nonac='AC')ac,sum(ac_nonac='NON AC')nonac,sum(board_of_study_XII_std='SB')sb,sum(board_of_study_XII_std='CBSE')cbse,hostel_dayscholar")->where('academic_year', $this->academic_year)->where('b.id', $branch)->where('course', $course)->groupBy('section')->orderBy('hostel_dayscholar')->get();
+        $data = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,batch,section,COUNT(*) as total,b.id,concat(gender,'-',hostel_dayscholar)gender,sum(ac_nonac='AC')ac,sum(ac_nonac='NON AC')nonac,sum(board_of_study_XII_std='SB')sb,sum(board_of_study_XII_std='CBSE')cbse,hostel_dayscholar, coaching_type")->where('academic_year', $this->academic_year)->where('b.id', $branch)->where('course', $course)->groupBy('section', 
+        'coaching_type')->orderBy('hostel_dayscholar')->orderByRaw("FIELD(gender, 'Male', 'Female')")->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")->get();
+
+        $offline = $data->where('coaching_type', 'OFFLINE')->groupBy('gender');
+        $online = $data->whereIn('coaching_type', [
+        'ONLINE',
+        'ONLINE LIVE',
+        'ONLINE RECORDED',
+        'TEST BATCH'
+    ])
+    ->groupBy('gender');
+
         $grouped = $data->groupBy(['gender']);
 
         if ($request->isMethod('post')) {
@@ -534,7 +547,7 @@ class ReportController extends Controller
             return $pdf->download("$section-$request->view.pdf");
         }
 
-        return view('report.sectionlist', compact('grouped'));
+        return view('report.sectionlist', compact('grouped', 'offline', 'online'));
     }
     public function ExaminationAnalysis(Request $request)
     {

@@ -333,9 +333,10 @@
                     <option value="PG.ASST" {{ $staff->designation == 'PG.ASST' ? 'selected' : '' }}>PG.ASST</option>
                     <option value="PET" {{ $staff->designation == 'PET' ? 'selected' : '' }}>PET</option>
                     <option value="SS" {{ $staff->designation == 'SS' ? 'selected' : '' }}>SS</option>
-                    <option value="Others" {{ $staff->designation == 'Others' ? 'selected' : '' }}>Others</option>
                     <option value="Neet Faculty" {{ $staff->designation == 'Neet Faculty' ? 'selected' : '' }}>Neet Faculty</option>
                     <option value="Foundation Faculty" {{ $staff->designation == 'Foundation Faculty' ? 'selected' : '' }}>Foundation Faculty</option>
+                    <option value="Coordinator" {{ $staff->designation == 'Coordinator' ? 'selected' : '' }}>Co-Ordinator</option>
+                    <option value="Others" {{ $staff->designation == 'Others' ? 'selected' : '' }}>Others</option>
                   </select>
                 </div>
 
