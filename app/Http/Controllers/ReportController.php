@@ -948,7 +948,7 @@ class ReportController extends Controller
             }
         }
 
-        if ($request->wantsJson() || $request->is('admin/*') || $request->ajax()) {
+        if ($request->wantsJson()) {
             $formattedResults = $results->map(function ($result, $index) use ($subjects, $marks) {
                 $subjectMarks = [];
                 foreach ($subjects as $subject) {

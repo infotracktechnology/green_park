@@ -363,7 +363,7 @@ class DashboardScreen extends StatelessWidget {
           title: 'Leave Request',
           subtitle: 'Apply, edit & delete leaves',
           icon: Icons.event_note_outlined,
-          color: AppColors.primary,
+          color: AppColors.fanta,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(

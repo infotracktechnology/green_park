@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:dio/dio.dart';
 import '../api/api_client.dart';
 import '../models/student_attendance_entry_model.dart';
 import '../theme/app_theme.dart';
@@ -181,10 +182,14 @@ class _StudentAttendanceEntryScreenState
       }
     } catch (e) {
       debugPrint('Error saving attendance: $e');
+      String msg = 'Error saving attendance. Please try again.';
+      if (e is DioException && e.response?.data is Map) {
+        msg = e.response?.data['message']?.toString() ?? msg;
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error saving attendance. Please try again.'),
+          SnackBar(
+            content: Text(msg),
             backgroundColor: AppColors.error,
           ),
         );

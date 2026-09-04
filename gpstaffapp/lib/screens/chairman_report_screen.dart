@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api/api_client.dart';
 import '../models/chairman_report_model.dart';
+import '../services/chairman_report_pdf_service.dart';
 import '../theme/app_theme.dart';
 
 class ChairmanReportScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _ChairmanReportScreenState extends State<ChairmanReportScreen> {
 
   bool _loadingTests = true;
   bool _loadingReport = false;
+  bool _generatingPdf = false;
   String? _errorMessage;
 
   String _searchQuery = '';
@@ -112,6 +114,39 @@ class _ChairmanReportScreenState extends State<ChairmanReportScreen> {
     }
   }
 
+  Future<void> _exportPdf() async {
+    if (_reportData == null || _reportData!.results.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No report data available to export.')),
+      );
+      return;
+    }
+
+    setState(() => _generatingPdf = true);
+    try {
+      final filtered = _filteredResults;
+      // If the user has applied campus/section/search filters, export filtered results.
+      // Otherwise, export the complete test results.
+      final isFiltered = _searchQuery.isNotEmpty ||
+          (_selectedCampus != null && _selectedCampus != 'All') ||
+          (_selectedSection != null && _selectedSection != 'All');
+
+      await ChairmanReportPdfService.generateAndOpenPdf(
+        report: _reportData!,
+        studentsToInclude: isFiltered ? filtered : _reportData!.results,
+      );
+    } catch (e) {
+      debugPrint('Error exporting chairman report PDF: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate PDF: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _generatingPdf = false);
+    }
+  }
+
   List<ChairmanStudentResultModel> get _filteredResults {
     if (_reportData == null) return [];
 
@@ -170,6 +205,23 @@ class _ChairmanReportScreenState extends State<ChairmanReportScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          if (_reportData != null && _reportData!.results.isNotEmpty)
+            IconButton(
+              icon: _generatingPdf
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.picture_as_pdf_outlined),
+              tooltip: 'Export PDF',
+              onPressed: _generatingPdf ? null : _exportPdf,
+            ),
+        ],
       ),
       body: _loadingTests
           ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
@@ -590,6 +642,10 @@ class _ChairmanReportScreenState extends State<ChairmanReportScreen> {
 
   Widget _buildResultsHeader() {
     final count = _filteredResults.length;
+    final hasFilters = _searchQuery.isNotEmpty ||
+        (_selectedCampus != null && _selectedCampus != 'All') ||
+        (_selectedSection != null && _selectedSection != 'All');
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -601,27 +657,70 @@ class _ChairmanReportScreenState extends State<ChairmanReportScreen> {
             color: AppColors.textPrimary,
           ),
         ),
-        if (_searchQuery.isNotEmpty ||
-            (_selectedCampus != null && _selectedCampus != 'All') ||
-            (_selectedSection != null && _selectedSection != 'All'))
-          GestureDetector(
-            onTap: () {
-              _searchController.clear();
-              setState(() {
-                _searchQuery = '';
-                _selectedCampus = null;
-                _selectedSection = null;
-              });
-            },
-            child: const Text(
-              'Reset Filters',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.fanta,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (hasFilters) ...[
+              GestureDetector(
+                onTap: () {
+                  _searchController.clear();
+                  setState(() {
+                    _searchQuery = '';
+                    _selectedCampus = null;
+                    _selectedSection = null;
+                  });
+                },
+                child: const Text(
+                  'Reset',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.fanta,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
+            InkWell(
+              onTap: _generatingPdf ? null : _exportPdf,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.25)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_generatingPdf)
+                      const SizedBox(
+                        width: 13,
+                        height: 13,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    else
+                      const Icon(Icons.picture_as_pdf_outlined,
+                          size: 15, color: AppColors.primary),
+                    const SizedBox(width: 5),
+                    Text(
+                      _generatingPdf ? 'Exporting...' : 'Export PDF',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
+        ),
       ],
     );
   }
