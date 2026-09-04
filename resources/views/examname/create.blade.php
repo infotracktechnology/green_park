@@ -108,11 +108,11 @@
                   </div>
 
 
-                  <div class="form-group col-lg-4">
+                  {{-- <div class="form-group col-lg-4">
                     <label>Students</label>
                     <select name="students" id="students" class="form-control form-control-sm select2" required>
                     </select>
-                  </div>
+                  </div> --}}
 
                  <div class="form-group col-lg-2">
                     <label>Test Category </label>
@@ -143,7 +143,19 @@
                     <label>Exam Date</label>
                     <input type="date" value="{{ date('Y-m-d') }}" name="exam_date" class="form-control form-control-sm">
                   </div>
+
+                  <div class="form-group col-lg-2">
+                    <label>Total Questions</label>
+                    <input type="number" name="total_questions" class="form-control form-control-sm" required>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <label>Total Marks</label>
+                    <input type="number" name="total_marks" class="form-control form-control-sm" required>
+                  </div>
+                  
                 </div>
+
+                 
       </div>
 
       <div class="card-footer">
