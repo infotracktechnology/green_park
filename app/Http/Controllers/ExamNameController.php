@@ -12,9 +12,29 @@ class ExamNameController extends Controller
 {
     public function index(Request $request)
     {
-        $examNames = ExamName::all();
+            
+    $coachingTypes = ExamName::whereNotNull('coaching_type')->pluck('coaching_type')->flatMap(fn($item) => explode(',', $item))->map(fn($item) => trim($item))->unique()->values();
 
-        return view('examname.index', compact('examNames'));
+    $courses = ExamName::whereNotNull('course')->pluck('course')->unique()->values();
+
+    $batches = ExamName::whereNotNull('batch')->pluck('batch')->flatMap(fn($item) => explode(',', $item))->map(fn($item) => trim($item))->unique()->values();
+
+    $query = ExamName::query();
+
+    if ($request->filled('coaching_type')) {
+        $query->where('coaching_type', 'LIKE', '%' . $request->coaching_type . '%');
+    }
+
+    if ($request->filled('course')) {
+        $query->where('course', $request->course);
+    }
+
+    if ($request->filled('batch')) {
+        $query->where('batch', 'LIKE', '%' . $request->batch . '%');
+    }
+        $examNames = $query->get();
+
+        return view('examname.index', compact('examNames', 'coachingTypes', 'courses', 'batches'));
     }
 
     public function create(Request $request)
