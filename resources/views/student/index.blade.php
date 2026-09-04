@@ -172,6 +172,15 @@
 <script>
   const table = $('#myTable').DataTable({
     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+     "drawCallback": function () {
+        var api = this.api();
+
+        api.column(0, { search: 'applied', order: 'applied' })
+            .nodes()
+            .each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+    }
   });
 
   $(document).on('click', '.inactive', function() {
