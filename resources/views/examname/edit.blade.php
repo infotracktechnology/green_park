@@ -160,7 +160,15 @@
                     <input type="date" value="{{ $examname->exam_date }}" name="exam_date" class="form-control form-control-sm">
                   </div>
 
-
+                   <div class="form-group col-lg-2">
+                    <label>Total Questions</label>
+                    <input type="number" name="total_questions" class="form-control form-control-sm" required>
+                  </div>
+                  <div class="form-group col-lg-2">
+                    <label>Total Marks</label>
+                    <input type="number" name="total_marks" class="form-control form-control-sm" required>
+                  </div>
+                  
                   {{-- <div class="form-group col-lg-4">
                     <label>Start Datetime</label>
                     <input type="text" id="start_at" value="{{ $examname->start_at }}" name="start_at" class="datetime-picker form-control form-control-sm">
