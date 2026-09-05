@@ -94,32 +94,36 @@ class HostelController extends Controller
         $hostel->update($request->only(['branch_id','name','type','room_type']));
 
         if ($request->has('rooms')) {
-            foreach ($request->rooms as $row) {
-                for ($i = 1; $i <= $row['no_of_cots']; $i++) {
-                    $cart_no = $row['cot_type'].$i;
-                    $room  = HostelRoom::where('hostel_id', $id)->where('room_no', $row['room_no'])->where('cart_no', $cart_no)->first();
-                    if ($room) {
-                        $room->update([
-                            'floor' => $room['floor'],
-                            'room_no' => $room['room_no'],
-                            'no_of_cots' => $room['no_of_cots'],
-                            'cot_type' => $room['cot_type'],
-                            'cart_no' => $cart_no,
-                        ]);
-                    } else {
-                        $hostel->rooms()->create([
-                            'floor' => $row['floor'],
-                            'room_no' => $row['room_no'],
-                            'no_of_cots' => $row['no_of_cots'],
-                            'cot_type' => $row['cot_type'],
-                            'cart_no' => $cart_no,
-                        ]);
-                    }
+        foreach ($request->rooms as $row) {
+            $cotCount = (int) $row['no_of_cots'];
+            for ($i = 1; $i <= $cotCount; $i++) {
+                $cart_no = $row['cot_type'] . $i;
+                $room = HostelRoom::where('hostel_id', $id)->where('room_no', $row['room_no'])->where('cart_no', $cart_no)->first();
+                if ($room) {
+                    $room->update([
+                        'floor'      => $row['floor'],
+                        'room_no'    => $row['room_no'],
+                        'no_of_cots' => $cotCount,   
+                        'cot_type'   => $row['cot_type'],
+                        'cart_no'    => $cart_no,
+                    ]);
+                } else {
+                    $hostel->rooms()->create([
+                        'floor'      => $row['floor'],
+                        'room_no'    => $row['room_no'],
+                        'no_of_cots' => $cotCount,
+                        'cot_type'   => $row['cot_type'],
+                        'cart_no'    => $cart_no,
+                    ]);
                 }
             }
+            HostelRoom::where('hostel_id', $id)->where('room_no', $row['room_no'])->where('cot_type', $row['cot_type'])->whereRaw('CAST(SUBSTRING(cart_no, 3) AS UNSIGNED) > ?', [$cotCount])->delete();
         }
 
-        return redirect()->route('hostel.index')->with('success', 'Hostel and Room details updated successfully.');
+    }
+        
+
+    return redirect()->route('hostel.index')->with('success', 'Hostel and Room details updated successfully.');
     }
 
 
