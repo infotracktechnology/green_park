@@ -83,9 +83,11 @@
                                     <th>Exam Name</th>
                                     <th>Course</th>
                                     <th>Batch</th>
-                                    <th>Section</th>
+                                    {{-- <th>Section</th> --}}
                                     <th>Coaching Type</th>
-                                    <th>Branch</th>
+                                    <th>Total Questions</th>
+                                    <th>Total Marks</th>
+                                    {{-- <th>Branch</th> --}}
                                     {{-- <th>Academic Year</th> --}}
                                     <th>Action</th>
                                     <th>Delete</th>
@@ -101,9 +103,11 @@
                                        <td>{{ $examName->name }}</td>
                                        <td>{{ $examName->course }}</td>
                                        <td>{{ $examName->batch }}</td>
-                                       <td>{{ $examName->section }}</td>
+                                       {{-- <td>{{ $examName->section }}</td> --}}
                                        <td>{{ $examName->coaching_type }}</td>
-                                       <td>{{ $examName->branchNames() }}</td>
+                                       <td>{{ $examName->total_questions }}</td>
+                                       <td>{{ $examName->total_marks }}</td>
+                                       {{-- <td>{{ $examName->branchNames() }}</td> --}}
                                        {{-- <td>{{ $examName->academic_year }}</td> --}}
                                        <td>
                                           <a href="{{ route('examname.edit', $examName->id) }}" class="btn btn-warning text-white btn-sm">
