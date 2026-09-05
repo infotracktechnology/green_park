@@ -85,7 +85,7 @@
         <th width="6%" class="text-center">S.NO</th>
         <th width="14%" class="text-center" style="font-size: 8px;">OMR ROLL<br>NO</th>
         <th width="27%" class="text-left">STUDENT NAME</th>
-        <th width="27%" class="text-center">&nbsp;</th> 
+        <th width="27%" class="text-center">FATHER NAME</th> 
         <th width="13%" class="text-center">&nbsp;</th> 
         <th width="13%" class="text-center">&nbsp;</th> 
       </tr>

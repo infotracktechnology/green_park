@@ -55,7 +55,7 @@
                                 <th>Floor</th>
                                 <th>Room</th>
                                 <th>No Of Cots</th>
-                                <th>Cart Nos</th>
+                                <th>Cots Nos</th>
                                 <th>Delete</th>
                                 </tr>
                         
