@@ -135,8 +135,7 @@ class ExamPortionController extends Controller
             $data['start_at'] = null;
         }
 
-        // Retain remaining existing attachments
-        $attachments = [];
+        $attachments = $examportion->attachment ?? [];
         if ($request->has('existing_attachment')) {
             $existing = $request->input('existing_attachment');
             if (is_array($existing)) {
