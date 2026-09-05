@@ -66,7 +66,7 @@ class QuestionKeyController extends Controller
             $data['start_at'] = null;
         }
 
-        $file_path = [];
+        $file_path =  [];
         if ($request->hasFile('file')) {
             $destinationPath = 'questionkey';
             if (!file_exists($destinationPath)) {
@@ -134,7 +134,7 @@ class QuestionKeyController extends Controller
         }
 
         // Retain remaining existing files
-        $file_path = [];
+        $file_path = $questionkey->file_path ?? [];
         if ($request->has('existing_file')) {
             $existing = $request->input('existing_file');
             if (is_array($existing)) {
