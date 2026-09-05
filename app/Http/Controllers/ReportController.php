@@ -275,10 +275,69 @@ class ReportController extends Controller
             $attendances = $attendancesGrouped->map(function ($attendance, $section) use ($request) {
                 $present = $attendance->where('status', 'P')->unique('student_id')->count();
                 $absent = $attendance->where('status', 'A')->unique('student_id')->count();
+    
+
+                    $studentAttendance = $attendance->groupBy('student_id');
+
+                    $morningPresent = 0;
+                    $morningAbsent = 0;
+                    $afternoonPresent = 0;
+                    $afternoonAbsent = 0;
+                    $present = 0;
+                    $absent = 0;
+
+                    $morningPresentStudentIds = [];
+                    $morningAbsentStudentIds = [];
+                    $afternoonPresentStudentIds = [];
+                    $afternoonAbsentStudentIds = [];
+                    $presentStudentIds = [];
+                    $absentStudentIds = [];
+
+                    foreach ($studentAttendance as $studentId => $records) {
+                        $morning = $records->where('timing', 'Morning')->first();
+                        $afternoon = $records->where('timing', 'Afternoon')->first();
+
+                        if ($morning && $morning->status == 'P') {
+                            $morningPresent++;
+                            $morningPresentStudentIds[] = $studentId;
+                        }
+
+                        if ($morning && $morning->status == 'A') {
+                            $morningAbsent++;
+                            $morningAbsentStudentIds[] = $studentId;
+                        }
+                        if ($afternoon && $afternoon->status == 'P') {
+                            $afternoonPresent++;
+                            $afternoonPresentStudentIds[] = $studentId;
+                        }
+
+                        if ($afternoon && $afternoon->status == 'A') {
+                            $afternoonAbsent++;
+                            $afternoonAbsentStudentIds[] = $studentId;
+                        }
+                        if (
+                            ($morning && $morning->status == 'P') ||
+                            ($afternoon && $afternoon->status == 'P')
+                        ) {
+                            $present++;
+                            $presentStudentIds[] = $studentId;
+                        }
+                        elseif (
+                            $morning &&
+                            $afternoon &&
+                            $morning->status == 'A' &&
+                            $afternoon->status == 'A'
+                        ) {
+                            $absent++;
+                            $absentStudentIds[] = $studentId;
+                        }
+                    }
+                    
 
                 $studentQuery = Student::where('section', $section)
                     ->where('academic_year', $this->academic_year)
-                    ->where('campus', $request->branch_id);
+                    ->where('campus', $request->branch_id)
+                    ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE']);
 
                 if ($request->filled('date')) {
                     $studentQuery->whereDate('admission_date', '<=', $request->date);
@@ -291,19 +350,30 @@ class ReportController extends Controller
                 $boys = (clone $studentQuery)->where('gender', 'Male')->count();
                 $girls = (clone $studentQuery)->where('gender', 'Female')->count();
 
-                $studentNames = Student::whereIn('student_id', $attendance->where('status', 'P')->pluck('student_id')->unique())->pluck('student_name');
-
-                $absentStudentNames = Student::whereIn('student_id', $attendance->where('status', 'A')->pluck('student_id')->unique())->pluck('student_name');
+                $studentNames = Student::whereIn('student_id', $presentStudentIds)->pluck('student_name');
+                $absentStudentNames = Student::whereIn('student_id', $absentStudentIds)->pluck('student_name');
+                $morningPresentStudents = Student::whereIn('student_id', $morningPresentStudentIds)->pluck('student_name');
+                $morningAbsentStudents = Student::whereIn('student_id', $morningAbsentStudentIds)->pluck('student_name');
+                $afternoonPresentStudents = Student::whereIn('student_id', $afternoonPresentStudentIds)->pluck('student_name');
+                $afternoonAbsentStudents = Student::whereIn('student_id', $afternoonAbsentStudentIds)->pluck('student_name');
 
                 return [
                     'section' => $section,
                     'boys' => $boys,
                     'girls' => $girls,
                     'total' => $boys + $girls,
+                    'morning_present' => $morningPresent,
+                    'morning_absent' => $morningAbsent,
+                    'afternoon_present' => $afternoonPresent,
+                    'afternoon_absent' => $afternoonAbsent,
                     'present' => $present,
                     'absent' => $absent,
                     'present_students' => $studentNames->values()->toArray(),
-                    'absent_students' => $absentStudentNames->values()->toArray()
+                    'absent_students' => $absentStudentNames->values()->toArray(),
+                    'morning_present_students' => $morningPresentStudents->values()->toArray(),
+                    'morning_absent_students' => $morningAbsentStudents->values()->toArray(),
+                    'afternoon_present_students' => $afternoonPresentStudents->values()->toArray(),
+                    'afternoon_absent_students' => $afternoonAbsentStudents->values()->toArray(),
                 ];
             });
         }
@@ -1178,6 +1248,7 @@ class ReportController extends Controller
                 ->where('section', '!=', '')
                 ->whereNotNull('section')
                 ->distinct()
+                ->orderByRaw(" CAST( SUBSTRING( section, LENGTH(REGEXP_SUBSTR(section, '^[^0-9]*')) + 1 ) AS UNSIGNED ) ASC ")
                 ->pluck('section');
         }
 
