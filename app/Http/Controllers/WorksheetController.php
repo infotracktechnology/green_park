@@ -130,7 +130,10 @@ class WorksheetController extends Controller
         }
 
         // Retain remaining existing files
-        $file_path = [];
+        $file_path = $worksheet->file_path ?? [];
+        if (!is_array($file_path)) {
+            $file_path = [$file_path];
+        }
         if ($request->has('existing_file_path')) {
             $existing = $request->input('existing_file_path');
             if (is_array($existing)) {
