@@ -37,7 +37,7 @@
       height: 18px; 
     }
     .main-table th {
-      background-color: #E2E2E2 !important;
+      background-color: #c9d0d3 !important;
       text-align: center;
       font-weight: bold;
     }
@@ -90,11 +90,11 @@
       <tr>
         <th width="5%" class="text-center">S.<br>NO</th>
         <th width="32%" class="text-left bold">STUDENT NAME</th>
-        @for($col = 1; $col <= 10; $col++)
+        @for($col = 1; $col <= 14; $col++)
           <th width="3.8%">&nbsp;</th>
         @endfor
-        <th width="12%" class="text-center" style="font-size: 8px;">TOTAL<br>AMOUNT</th>
-        <th width="13%" class="text-center">SIGN</th>
+        {{-- <th width="12%" class="text-center" style="font-size: 8px;">TOTAL<br>AMOUNT</th>
+        <th width="13%" class="text-center">SIGN</th> --}}
       </tr>
     </thead>
     <tbody>
@@ -106,12 +106,9 @@
           {{ $student->student_name }}
         </td>
         
-        @for($col = 1; $col <= 10; $col++)
+        @for($col = 1; $col <= 14; $col++)
           <td></td>
         @endfor
-        
-        <td></td> 
-        <td></td> 
       </tr>
       @endforeach
 
@@ -120,11 +117,10 @@
         <tr>
           <td class="text-center bold">{{ $rowNum }}</td>
           <td>&nbsp;</td>
-          @for($col = 1; $col <= 10; $col++)
+          @for($col = 1; $col <= 14; $col++)
             <td></td>
           @endfor
-          <td></td>
-          <td></td>
+       
         </tr>
         @endfor
       @endif

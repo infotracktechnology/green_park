@@ -87,8 +87,8 @@
                         <table class="table table-striped">
                           <thead>
                             <tr>
-                              <th>#</th>
-                              <th>Available Sections</th>
+                              <th>S.No</th>
+                              <th>Sections</th>
                             </tr>
                           </thead>
                           <tbody>
