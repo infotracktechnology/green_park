@@ -133,7 +133,7 @@ class AnswerkeyController extends Controller
         }
 
         // Retain remaining existing files
-        $file_path = [];
+        $file_path = $answerkey->file_path ?? [];
         if ($request->has('existing_file')) {
             $existing = $request->input('existing_file');
             if (is_array($existing)) {
