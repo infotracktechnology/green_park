@@ -629,9 +629,11 @@ class ExamController extends Controller
 
     public function OfflinePublish(Request $request)
     {
+        $types = Student::select('batch')->where('academic_year', $this->academic_year)->where('coaching_type', 'OFFLINE')->whereNotNull('batch')->whereRaw("TRIM(batch) != ''")->distinct()->orderBy('batch')->get()->pluck('batch');
+
         $exams = [];
         if ($request->start_date && $request->end_date && $request->course) {
-            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->where('course', $request->course)->selectRaw("group_concat(testid) as testid,name,testcategory,total_questions,publish,markrange_file")->where('examtype', 'OFFLINE')->groupBy('name')->get();
+            $exams = Exam::whereBetween('exam_date', [$request->start_date, $request->end_date])->where('course', $request->course)->selectRaw("group_concat(testid) as testid,name,course,testcategory,total_questions,publish,markrange_file")->where('examtype', 'OFFLINE')->groupBy('name')->get();
         }
 
         if ($request->delete && $request->batch) {
@@ -669,7 +671,7 @@ class ExamController extends Controller
             );
         }
 
-        return view('exam.offlinepublish', compact('exams'));
+        return view('exam.offlinepublish', compact('exams', 'types'));
     }
 
     public function OnlinePublish(Request $request)

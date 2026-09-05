@@ -65,7 +65,7 @@
 
               <form method="post" id="myForm" action="{{ route('exam.offlinepublish') }}" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" name="course" value="{{ request('course') }}">
+                {{-- <input type="hidden" name="course" value="{{ request('course') }}"> --}}
                 <div class="row">
                   <div class="col-lg-12">
                     <div class="table-responsive m-t-10">
@@ -76,8 +76,8 @@
                             <th>Test Name</th>
                             <th>Test Category</th>
                             <th>Total Questions</th>
-                            @foreach($batch as $row)
-                            <th>Mark Range(BATCH {{ $row }})</th>
+                            @foreach($types as $type)
+                            <th>Mark Range BATCH ({{ $type }})</th>
                             @endforeach
                             <th>Publish</th>
                           </tr>
@@ -89,13 +89,14 @@
                             <td>{{ $exam->name }}</td>
                             <td>{{ $exam->testcategory }}</td>
                             <td>{{ $exam->total_questions }}</td>
-                            @foreach($batch as $row)
+                            <input type="hidden" name="course" value="{{ $exam->course }}" />
+                            @foreach($types as $type )
                             <td>
-                              @if(isset($exam->markrange_file[$row]))
-                              <a href="{{ env('APP_URL').$exam->markrange_file[$row] }}" download>{{ basename($exam->markrange_file[$row]) }}</a><br>
-                              <a class="btn btn-danger text-white" href="{{ route('exam.offlinepublish',['delete'=>$exam->name,'batch'=>$row])}}"><i class="fas fa-trash"></i></a>
+                              @if(isset($exam->markrange_file[$type]))
+                              <a href="{{ env('APP_URL').$exam->markrange_file[$type] }}" download>{{ basename($exam->markrange_file[$type]) }}</a><br>
+                              <a class="btn btn-danger text-white" href="{{ route('exam.offlinepublish',['delete'=>$exam->name,'batch'=>$type])}}"><i class="fas fa-trash"></i></a>
                               @else
-                              <input type="file" name="batch[{{ $exam->name }}][{{ $row }}]" accept="application/pdf" class="form-control form-control-sm">
+                              <input type="file" name="batch[{{ $exam->name }}][{{ $type }}]" accept="application/pdf" class="form-control form-control-sm">
                               @endif
                             </td>
                             @endforeach
