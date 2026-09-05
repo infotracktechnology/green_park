@@ -388,24 +388,49 @@ public function RoomTransfer(Request $request)
     {
         $register = InOutRegister::with(['hostel', 'student'])->latest()->get();
 
+        if ($request->filled('delete_id')) {
+            $entry = InOutRegister::find($request->delete_id);
+            if ($entry) {
+                $entry->delete();
+            }
+            return back()->with('success','Register entry deleted successfully');
+        }
+
+        if ($request->filled('edit_id')) {
+            $entry = InOutRegister::find($request->edit_id);
+            if ($entry) {
+                $entry->update([
+                    'hostel_id'    => $request->hostel_id,
+                    'student_id'   => $request->student_id,
+                    'room_no'      => $request->room_no,
+                    'datetime_out' => $request->datetime_out,
+                    'reason'       => $request->reason,
+                ]);
+            }
+            return back()->with( 'success','Register Outer entry updated successfully');
+        }
+
+        if ($request->filled('update')) {
+            $entry = InOutRegister::find($request->update);
+            if ($entry) {
+                $entry->update(['datetime_in' => $request->datetime_in ]);
+            }
+            return back()->with('success','Register In entry updated successfully'
+            );
+        }
         if ($request->isMethod('post')) {
-            $data = $request->except(['_token', 'branch']);
-            $outer = InOutRegister::create($data);
-            return back()->with('success', "Register Outer entry added successfully");
+            $data = $request->except(['_token','branch','delete_id','edit_id']);
+            InOutRegister::create($data);
+            return back()->with('success','Register Outer entry added successfully'
+            );
         }
-
-        if ($request->update) {
-            $update = InOutRegister::find($request->update)->update(['datetime_in' => $request->datetime_in]);
-            return back()->with('success', "Register In entry updated successfully");
-        }
-
         if ($request->ajax()) {
             if ($request->has('room')) {
                 $students = Student::where('hostel_id', $request->hostel)->where('room_no', $request->room)->get();
                 return response()->json($students);
             }
             if ($request->has('hostel')) {
-                $rooms = HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no');
+                $rooms = HostelRoom::where('hostel_id', $request->hostel)->pluck('room_no');
                 return response()->json($rooms);
             }
             if ($request->has('branch')) {
@@ -413,7 +438,6 @@ public function RoomTransfer(Request $request)
                 return response()->json($hostels);
             }
         }
-
         return view('hostel.inoutregister', compact('register'));
     }
      public function HostelCourier(Request $request)

@@ -42,8 +42,11 @@
                           <th>Name</th>
                           <th>Date & Time Leaving (Out)</th>
                           <th>Purpose/Reason</th>
-                          <th>Contact No</th>
+                          {{-- <th>Contact No</th> --}}
+                          <th>Return Entry (Out)</th>
                           <th>Return Entry (In)</th>
+                          <th>Action</th>
+                          <th>Delete</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -56,8 +59,26 @@
                           <td>{{ $row->student?->student_name }}</td>
                           <td>{{ $row->datetime_out->format('d/m/Y h:i A') }}</td>
                           <td>{{ $row->reason }}</td>
-                          <td>{{ $row->contact_out }}</td>
+                          {{-- <td>{{ $row->contact_out }}</td> --}}
+                          <td>{{ $row->datetime_in ? $row->datetime_in->format('d/m/Y h:i A') : 'Not Returned' }}</td>
                           <td><button class="btn btn-primary inentry" data-row="{{ json_encode($row) }}">In Entry</button></td>
+                             <td>
+                                <button type="button" class="btn btn-warning text-white editentry" data-row="{{ json_encode($row) }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                          </td>
+                          <td>
+                            <form method="POST"
+                                  action="{{ route('hostel.inoutregister') }}"
+                                  style="display:inline-block;"
+                                  onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                                @csrf
+                                <input type="hidden" name="delete_id" value="{{ $row->id }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
                         </tr>
                         @endforeach
                       </tbody>
@@ -168,6 +189,66 @@
   </div>
 </div>
 
+<div id="EditEntry" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Out Entry</h5>
+                <button type="button" class="close" data-dismiss="modal"> &times; </button>
+            </div>
+            <form method="post" action="{{ route('hostel.inoutregister') }}">
+                @csrf
+                <input type="hidden" name="edit_id" id="edit_id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label>Branch</label>
+                            <select class="select2" id="edit_branchid" name="branch" required>
+                                <option value="">Choose Branch</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}">
+                                        {{ $branch->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label>Hostel</label>
+                            <select class="select2" id="edit_hostel" name="hostel_id" required>
+                                <option value="">Choose Hostel</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label>Room No</label>
+                            <select class="select2" id="edit_room" name="room_no" required>
+                                <option value="">Choose Room</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label>Student</label>
+                            <select class="select2" id="edit_student" name="student_id" required>
+                                <option value="">Choose Student</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label>Datetime Leaving (Out)</label>
+                            <input type="text" name="datetime_out" id="edit_datetime_out" class="datetime-picker form-control form-control-sm" required>
+                        </div>
+                        <div class="form-group col-lg-12">
+                            <label>Purpose/Reason</label>
+                            <textarea name="reason" id="edit_reason" rows="3" class="form-control form-control-sm" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"> Cancel</button>
+                    <button type="submit" class="btn btn-primary"> Update </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('js')
@@ -232,6 +313,63 @@
     $('#InEntry').modal('show');
     $('#InEntry').find('input[name="update"]').val(row.id);
    });
+
+   $('.editentry').click(function () {
+    var row = $(this).data('row');
+    console.log(row);
+    $('#edit_id').val(row.id);
+    $('#edit_reason').val(row.reason);
+    if (row.datetime_out) {
+        var datetime = row.datetime_out;
+        if (datetime.includes('T')) {
+            datetime = datetime.substring(0, 16).replace('T', ' ');
+        }
+        $('#edit_datetime_out').val(datetime);
+    }
+    var branchId = row.branch_id;
+    if (!branchId && row.hostel) {
+        branchId = row.hostel.branch_id;
+    }
+    $('#edit_branchid').val(branchId).trigger('change');
+
+    Hostelfetch({branch: branchId}).then((data) => {
+        $('#edit_hostel').empty();
+        $('#edit_hostel').append(`<option value="">Choose Hostel</option>` );
+        $.each(data, (key, value) => {
+            $('#edit_hostel').append( `<option value="${value.id}"> ${value.name} </option>` );
+        });
+
+        $('#edit_hostel') .val(row.hostel_id) .trigger('change');
+        Hostelfetch({hostel: row.hostel_id}).then((rooms) => {
+
+            $('#edit_room').empty();
+            $('#edit_room').append(
+                `<option value="">Choose Room</option>`
+            );
+            $.each(rooms, (key, value) => {
+                $('#edit_room').append(`<option value="${value}"> ${value} </option>`);
+            });
+            $('#edit_room') .val(row.room_no) .trigger('change');
+
+            Hostelfetch({ room: row.room_no, hostel: row.hostel_id}).then((students) => {
+                $('#edit_student').empty();
+                $('#edit_student').append(
+                    `<option value="">Choose Student</option>`
+                );
+                $.each(students, (key, value) => {
+                    $('#edit_student').append(
+                        `<option value="${value.student_id}">
+                            ${value.student_id} - ${value.student_name}
+                        </option>`
+                    );
+                });
+                $('#edit_student').val(row.student_id).trigger('change');
+            });
+        });
+    });
+    $('#EditEntry').modal('show');
+});
+
 
 </script>
 @endsection
