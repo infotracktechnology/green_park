@@ -70,55 +70,79 @@
                 <div class="table-responsive">
                   <table class="table table-striped" id="attendance-table">
                     <thead>
-                      <tr>
-                        <th>S.NO</th>
-                        <th>Section Name</th>
-                        <th>Boys</th>
-                        <th>Girls</th>
-                        <th>Total</th>
-                        <th>Present</th>
-                        <th>Absent</th>
-                        <th>Present (%)</th>
-                        <th>Absent (%)</th>
-                      </tr>
+                        <tr>
+                            <th rowspan="2">S.NO</th>
+                            <th rowspan="2">Section Name</th>
+                            <th rowspan="2">Boys</th>
+                            <th rowspan="2">Girls</th>
+                            <th rowspan="2">Total</th>
+
+                            <th colspan="2" class="text-center">Morning</th>
+                            <th colspan="2" class="text-center">Afternoon</th>
+                            {{-- <th colspan="2" class="text-center">Overall</th> --}}
+                        </tr>
+
+                        <tr>
+                            <th>Present</th>
+                            <th>Absent</th>
+
+                            <th>Present</th>
+                            <th>Absent</th>
+
+                            {{-- <th>Present</th>
+                            <th>Absent</th> --}}
+                        </tr>
                     </thead>
                     <tbody>
                       <?php
-                       $boys_total=$girls_total=$total=$present=$absent = 0;
-                       ?>
+                          $boys_total = $girls_total = $total = 0;
+                          $morning_present = $morning_absent = 0;
+                          $afternoon_present = $afternoon_absent = 0;
+                          $present = $absent = 0;
+                      ?>
                       @foreach($attendances as $row)
-                      <?php
-                        $boys_total += $row['boys'];
-                        $girls_total += $row['girls'];
-                        $total += $row['total'];
-                        $present += $row['present'];
-                        $absent += $row['absent'];
-                    ?>
-                      <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $row['section'] }}</td>
-                        <td>{{ $row['boys'] }}</td>
-                        <td>{{ $row['girls'] }}</td>
-                        <td>{{ $row['total'] }}</td>
-                        <td> <a href="javascript:void(0)" class="badge badge-success text-white view-students" data-type="Present" data-students='@json($row["present_students"])'>{{ $row['present'] }}</a></td>
-                        <td> <a href="javascript:void(0)" class="badge badge-danger text-white view-students" data-type="Absent" data-students='@json($row["absent_students"])'>{{ $row['absent'] }} </a></td>
-                        <td>{{ round($row['present'] * 100 / $row['total'], 2) }}</td>
-                        <td>{{ round($row['absent'] * 100 / $row['total'], 2) }}</td>
-                      </tr>
+                          <?php
+                              $boys_total += $row['boys'];
+                              $girls_total += $row['girls'];
+                              $total += $row['total'];
+                              $morning_present += $row['morning_present'];
+                              $morning_absent += $row['morning_absent'];
+                              $afternoon_present += $row['afternoon_present'];
+                              $afternoon_absent += $row['afternoon_absent'];
+                              $present += $row['present'];
+                              $absent += $row['absent'];
+                          ?>
+
+                          <tr>
+                              <td>{{ $loop->iteration }}</td>
+                              <td>{{ $row['section'] }}</td>
+                              <td>{{ $row['boys'] }}</td>
+                              <td>{{ $row['girls'] }}</td>
+                              <td>{{ $row['total'] }}</td>
+                              <td><a href="javascript:void(0)" class="badge badge-success text-white view-students"data-type="Morning Present"data-students='@json($row["morning_present_students"])'> {{ $row['morning_present'] }} </a> </td>
+                              <td><a href="javascript:void(0)" class="badge badge-danger text-white view-students"data-type="Morning Absent"data-students='@json($row["morning_absent_students"])'> {{ $row['morning_absent'] }} </a> </td>
+                              <td><a href="javascript:void(0)" class="badge badge-success text-white view-students"data-type="Afternoon Present"data-students='@json($row["afternoon_present_students"])'> {{ $row['afternoon_present'] }} </a> </td>
+                              <td><a href="javascript:void(0)" class="badge badge-danger text-white view-students"data-type="Afternoon Absent"data-students='@json($row["afternoon_absent_students"])'> {{ $row['afternoon_absent'] }} </a> </td>
+                              {{-- <td><a href="javascript:void(0)" class="badge badge-danger text-white view-students"data-type="Absent"data-students='@json($row["absent_students"])'> {{ $row['absent'] }} </a> </td>
+                              <td><a href="javascript:void(0)" class="badge badge-success text-white view-students"data-type="Present"data-students='@json($row["present_students"])'> {{ $row['present'] }} </a> </td> --}}
+                          </tr>
+
                       @endforeach
-                    </tbody>
+                  </tbody>
                     <tfoot>
                       <tr>
-                        <td colspan="2" class="font-16 fw-bold text-center">Total</td>
-                        <td>{{ $boys_total }}</td>
-                        <td>{{ $girls_total }}</td>
-                        <td>{{ $total }}</td>
-                        <td>{{ $present }}</td>
-                        <td>{{ $absent }}</td>
-                        <td>{{ round($present * 100 / $total, 2) }}</td>
-                        <td>{{ round($absent * 100 / $total, 2) }}</td>
+                          <td colspan="2" class="font-16 fw-bold text-center">Total</td>
+                          <td>{{ $boys_total }}</td>
+                          <td>{{ $girls_total }}</td>
+                          <td>{{ $total }}</td>
+                          <td>{{ $morning_present }}</td>
+                          <td>{{ $morning_absent }}</td>
+                          <td>{{ $afternoon_present }}</td>
+                          <td>{{ $afternoon_absent }}</td>
+                          {{-- <td>{{ $present }}</td>
+                          <td>{{ $absent }}</td> --}}
                       </tr>
-                    </tfoot>
+                  </tfoot>
                   </table>
                 </div>
                 @endif
