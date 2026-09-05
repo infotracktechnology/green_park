@@ -34,16 +34,6 @@
                         <div class="row align-items-end">
                            
                            <div class="col-md-3 col-sm-12 mb-2">
-                              <label class="form-label font-weight-bold">Coaching Type</label>
-                              <select name="coaching_type" class="form-control select2">
-                                 <option value="">Select Coaching Type</option>
-                                 @foreach ($coachingTypes as $type)
-                                    <option value="{{ $type }}" @selected(request('coaching_type') == $type)>{{ $type }}</option>
-                                 @endforeach
-                              </select>
-                           </div>
-
-                           <div class="col-md-3 col-sm-12 mb-2">
                               <label class="form-label font-weight-bold">Course</label>
                               <select name="course" class="form-control select2">
                                  <option value="">Select Course</option>
@@ -52,6 +42,16 @@
                                  @endforeach
                               </select>
                            </div>
+
+                           <div class="col-md-3 col-sm-12 mb-2">
+                              <label class="form-label font-weight-bold">Coaching Type</label>
+                              <select name="coaching_type" class="form-control select2">
+                                 <option value="">Select Coaching Type</option>
+                                 @foreach ($coachingTypes as $type)
+                                    <option value="{{ $type }}" @selected(request('coaching_type') == $type)>{{ $type }}</option>
+                                 @endforeach
+                              </select>
+                           </div>                           
 
                            <div class="col-md-3 col-sm-12 mb-2">
                               <label class="form-label font-weight-bold">Batch</label>
