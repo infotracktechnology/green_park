@@ -245,7 +245,39 @@ class StudentController extends Controller
             return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total, 'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark, 'markrange' => $markrange];
         });
 
-        $category = ExamSubjectReport::where([['stuid', $sid], ['category', '!=', '']])->pluck('category')->unique();
+        $category = ExamSubjectReport::where([
+                ['stuid', $sid],
+                ['category', '!=', '']
+            ])
+            ->pluck('category')
+            ->unique()
+            ->sortBy(function ($category) {
+            if (str_starts_with($category, 'CUMULATIVE TEST')) {
+                $groupOrder = 1;
+            } elseif (str_starts_with($category, 'GRAND TEST')) {
+                $groupOrder = 2;
+            } elseif (str_starts_with($category, 'WEEKEND TEST')) {
+                $groupOrder = 3;
+            } elseif (str_starts_with($category, 'UNIT TEST')) {
+                $groupOrder = 4;
+            } else {
+                $groupOrder = 99;
+            }
+                if (str_contains($category, 'PHY')) {
+                    $subjectOrder = 1;
+                } elseif (str_contains($category, 'CHE')) {
+                    $subjectOrder = 2;
+                } elseif (str_contains($category, 'BOT')) {
+                    $subjectOrder = 3;
+                } elseif (str_contains($category, 'ZOO')) {
+                    $subjectOrder = 4;
+                } else {
+                    $subjectOrder = 0;
+                }
+
+                return [$groupOrder, $subjectOrder];
+            })
+            ->values();
         $subjectexam = collect();
         if ($request->exam) {
             $subjectexam = ExamSubjectReport::where("category", $request->exam)->where("stuid", $sid)->whereNotIn('subject', function ($query) use ($sid) { $query->select('testname')->from('exam_answer')->where('student_id', $sid); })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
