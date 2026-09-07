@@ -259,6 +259,12 @@
                                 <option value="">Choose Room</option>
                             </select>
                         </div>
+                        <div class="form-group col-lg-6">
+                            <label>Section</label>
+                            <select class="select2" id="sections" name="sections" required>
+                                <option value="">Choose Section</option>
+                            </select>
+                        </div>
                         {{-- <div class="form-group col-lg-6">
                             <label>Student</label>
                             <select class="select2" id="edit_student" name="student_id" required>
@@ -355,7 +361,7 @@
               $('#edit_room').html(` <option value="">Choose Room</option> `).trigger('change.select2');
               $('#edit_sections').html(` <option value="">Choose Section</option> `).trigger('change.select2');
           }
-      }).fail(function () {
+      }).fail(function () {ection
           console.log('Student details fetch failed');
       });
   }
