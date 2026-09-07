@@ -386,7 +386,7 @@ public function RoomTransfer(Request $request)
 
     public function InOutRegister(Request $request)
     {
-        $register = InOutRegister::with(['hostel', 'student'])->latest()->get();
+        $register = InOutRegister::with(['hostel', 'student'])->when(auth()->user()->branch, function ($q) { $q->whereHas('student', function ($studentQuery) { $studentQuery->where( 'campus', 'like', '%' . auth()->user()->branch . '%'); }); })->latest()->get();
 
         if ($request->filled('delete_id')) {
             $entry = InOutRegister::find($request->delete_id);
@@ -396,19 +396,25 @@ public function RoomTransfer(Request $request)
             return back()->with('success','Register entry deleted successfully');
         }
 
-        if ($request->filled('edit_id')) {
-            $entry = InOutRegister::find($request->edit_id);
-            if ($entry) {
-                $entry->update([
-                    'hostel_id'    => $request->hostel_id,
-                    'student_id'   => $request->student_id,
-                    'room_no'      => $request->room_no,
-                    'datetime_out' => $request->datetime_out,
-                    'reason'       => $request->reason,
-                ]);
+       if ($request->filled('edit_id')) {
+        $entry = InOutRegister::find($request->edit_id);
+        if ($entry) {
+            $student = Student::where('student_id', $request->student_id)->where('hostel_dayscholar', 'HOSTEL')->where('academic_year', $this->academic_year)->first();
+
+            if (!$student) {
+                return back()->with('error', 'Student not found');
             }
-            return back()->with( 'success','Register Outer entry updated successfully');
+            $entry->update([
+                'hostel_id'    => $student->hostel_id,
+                'student_id'   => $student->student_id,
+                'room_no'      => $student->room_no,
+                'sections'     => $student->section,
+                'datetime_out' => $request->datetime_out,
+                'reason'       => $request->reason,
+            ]);
         }
+        return back()->with('success','Register Outer entry updated successfully');
+    }
 
         if ($request->filled('update')) {
             $entry = InOutRegister::find($request->update);
@@ -424,21 +430,33 @@ public function RoomTransfer(Request $request)
             return back()->with('success','Register Outer entry added successfully'
             );
         }
-        if ($request->ajax()) {
-            if ($request->has('room')) {
-                $students = Student::where('hostel_id', $request->hostel)->where('room_no', $request->room)->get();
-                return response()->json($students);
+        if ($request->ajax() && $request->has('student')) {
+
+            $student = Student::where('student_id', $request->student)->where('hostel_dayscholar', 'HOSTEL')->where('academic_year', $this->academic_year)->first();
+
+            if (!$student) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Student not found'
+                ]);
             }
-            if ($request->has('hostel')) {
-                $rooms = HostelRoom::where('hostel_id', $request->hostel)->pluck('room_no');
-                return response()->json($rooms);
-            }
-            if ($request->has('branch')) {
-                $hostels = Hostel::where('branch_id', $request->branch)->get();
-                return response()->json($hostels);
-            }
+
+            $hostel = Hostel::find($student->hostel_id);
+
+            return response()->json([
+                'success'     => true,
+                'branch_id'   => $hostel?->branch_id,
+                'hostel_id'   => $student->hostel_id,
+                'hostel_name' => $hostel?->name ?? 'N/A',
+                'room_no'     => $student->room_no,
+                'sections'    => $student->section,
+            ]);
         }
-        return view('hostel.inoutregister', compact('register'));
+
+        $students = Student::where('academic_year', $this->academic_year)->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))->whereNotNull('hostel_id')->whereNotNull('room_no')->orderBy('student_name')->get();
+        $branches = Branch::all();
+
+        return view('hostel.inoutregister', compact('register','students','branches'));
     }
      public function HostelCourier(Request $request)
      {

@@ -40,6 +40,7 @@
                           <th>Room No</th>
                           <th>Student ID</th>
                           <th>Name</th>
+                          <th>Section</th>
                           <th>Date & Time Leaving (Out)</th>
                           <th>Purpose/Reason</th>
                           {{-- <th>Contact No</th> --}}
@@ -57,6 +58,7 @@
                           <td>{{ $row->room_no }}</td>
                           <td>{{ $row->student_id }}</td>
                           <td>{{ $row->student?->student_name }}</td>
+                          <td>{{ $row->sections }}</td>
                           <td>{{ $row->datetime_out->format('d/m/Y h:i A') }}</td>
                           <td>{{ $row->reason }}</td>
                           {{-- <td>{{ $row->contact_out }}</td> --}}
@@ -134,6 +136,19 @@
         @csrf
         <div class="modal-body">
           <div class="row">
+
+          <div class="form-group col-lg-6">
+            <label>Student</label>
+            <select class="select2" id="student" name="student_id" required>
+              <option value="">Choose Student</option>
+              @foreach ($students as $student)
+                  <option value="{{ $student->student_id }}">
+                      {{ $student->student_id }} - {{ $student->student_name }}
+                  </option>
+              @endforeach
+            </select>
+          </div>
+
           <div class="form-group col-lg-6">
             <label>Branch</label>
             <select class="select2" id="branchid"  name="branch" required>
@@ -159,14 +174,20 @@
           </div>
 
           <div class="form-group col-lg-6">
+              <label>Section</label>
+              <select class="select2" id="sections" name="sections" required>
+                  <option value="">Choose Section</option>
+              </select>
+          </div>
+
+          {{-- <div class="form-group col-lg-6">
             <label>Student</label>
             <select class="select2" id="student" name="student_id" required>
               <option value="">Choose Student</option>
             </select>
-          </div>
+          </div> --}}
 
           <div class="form-group col-lg-6">
-            <label>Datetime Leaving (Out)</label>
             <input type="text" name="datetime_out" value="{{ date('Y-m-d H:i') }}" class="datetime-picker form-control form-control-sm" required>
           </div>          
 
@@ -201,6 +222,20 @@
                 <input type="hidden" name="edit_id" id="edit_id">
                 <div class="modal-body">
                     <div class="row">
+
+                       <div class="form-group col-lg-6">
+                            <label>Student</label>
+                            <select class="select2" id="edit_student" name="student_id" required>
+                                <option value="">Choose Student</option>
+                                @foreach ($students as $student)
+                                    <option value="{{ $student->student_id }}">
+                                        {{ $student->student_id }} - {{ $student->student_name }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+                        </div>
+
                         <div class="form-group col-lg-6">
                             <label>Branch</label>
                             <select class="select2" id="edit_branchid" name="branch" required>
@@ -224,12 +259,12 @@
                                 <option value="">Choose Room</option>
                             </select>
                         </div>
-                        <div class="form-group col-lg-6">
+                        {{-- <div class="form-group col-lg-6">
                             <label>Student</label>
                             <select class="select2" id="edit_student" name="student_id" required>
                                 <option value="">Choose Student</option>
                             </select>
-                        </div>
+                        </div> --}}
                         <div class="form-group col-lg-6">
                             <label>Datetime Leaving (Out)</label>
                             <input type="text" name="datetime_out" id="edit_datetime_out" class="datetime-picker form-control form-control-sm" required>
@@ -273,103 +308,62 @@
      ]
   });
 
-   const Hostelfetch = (params) => $.get('{{ route("hostel.inoutregister") }}', params);
-   const hostel = $('#hostel');
-   const room = $('#room');
-   const student= $('#student');
-
-   $("#branchid").change(function(){
-      Hostelfetch({branch: $(this).val()}).then((data) => {
-        hostel.empty();
-        hostel.append(`<option value="">Choose Hostel</option>`);
-        $.each(data, (key, value) => {
-          hostel.append(`<option value="${value.id}">${value.name}</option>`);
-        });
+   const StudentFetch = (params) => $.get('{{ route("hostel.inoutregister") }}', params);
+  $("#student").change(function () {
+      let studentId = $(this).val();
+      if (!studentId) {
+          return;
+      }
+      StudentFetch({ student: studentId }).then(function (data) {
+          if (data.success) {
+              $('#branchid').val(data.branch_id).trigger('change');
+              $('#hostel').html(` <option value="${data.hostel_id}" selected> ${data.hostel_name} </option> `).trigger('change');
+              $('#room').html(` <option value="${data.room_no}" selected> ${data.room_no} </option> `).trigger('change');
+              $('#sections').html(` <option value="${data.sections}" selected> ${data.sections} </option> `).trigger('change');
+          }
+      }).fail(function () {
+          console.log('Student details fetch failed');
       });
-   });
+  });
 
-   $("#hostel").change(function(){
-      Hostelfetch({hostel: hostel.val()}).then((data) => {
-        room.empty();
-        room.append(`<option value="">Choose Room</option>`);
-        $.each(data, (key, value) => {
-          room.append(`<option value="${value}">${value}</option>`);
-        });
+  $('.editentry').click(function () {
+      let row = $(this).data('row');
+      $('#edit_id').val(row.id);
+      $('#edit_student').val(row.student_id) .trigger('change.select2');
+      loadEditStudent(row.student_id);
+      $('#edit_datetime_out').val(row.datetime_out);
+      $('#edit_reason').val(row.reason);
+      $('#EditEntry').modal('show');
+  });
+  $('#edit_student').change(function () {
+      let studentId = $(this).val();
+      if (!studentId) {
+          return;
+      }
+      loadEditStudent(studentId);
+  });
+  function loadEditStudent(studentId) {
+      StudentFetch({student: studentId }).then(function (data) {
+          if (data.success) {
+              $('#edit_branchid').val(data.branch_id) .trigger('change.select2');
+              $('#edit_hostel').html(`<option value="${data.hostel_id}" selected> ${data.hostel_name} </option>`).trigger('change.select2');
+              $('#edit_room').html(` <option value="${data.room_no}" selected> ${data.room_no} </option> `).trigger('change.select2');
+              $('#edit_sections').html(`<option value="${data.sections}" selected> ${data.sections} </option>`).trigger('change.select2');
+          } else {
+              $('#edit_branchid').val('').trigger('change.select2');
+              $('#edit_hostel').html(` <option value="">Choose Hostel</option> `).trigger('change.select2');
+              $('#edit_room').html(` <option value="">Choose Room</option> `).trigger('change.select2');
+              $('#edit_sections').html(` <option value="">Choose Section</option> `).trigger('change.select2');
+          }
+      }).fail(function () {
+          console.log('Student details fetch failed');
       });
-   });
-
-   $("#room").change(function(){
-      Hostelfetch({room: room.val(), hostel: hostel.val()}).then((data) => {
-        student.empty();
-        student.append(`<option value="">Choose Student</option>`);
-        $.each(data, (key, value) => {
-          student.append(`<option value="${value.student_id}">${value.student_id} - ${value.student_name}</option>`);
-        });
-      });
-   });
-
-   $('.inentry').click(function(){
+  }
+  $('.inentry').click(function(){
     var row = $(this).data('row');
     $('#InEntry').modal('show');
     $('#InEntry').find('input[name="update"]').val(row.id);
    });
-
-   $('.editentry').click(function () {
-    var row = $(this).data('row');
-    console.log(row);
-    $('#edit_id').val(row.id);
-    $('#edit_reason').val(row.reason);
-    if (row.datetime_out) {
-        var datetime = row.datetime_out;
-        if (datetime.includes('T')) {
-            datetime = datetime.substring(0, 16).replace('T', ' ');
-        }
-        $('#edit_datetime_out').val(datetime);
-    }
-    var branchId = row.branch_id;
-    if (!branchId && row.hostel) {
-        branchId = row.hostel.branch_id;
-    }
-    $('#edit_branchid').val(branchId).trigger('change');
-
-    Hostelfetch({branch: branchId}).then((data) => {
-        $('#edit_hostel').empty();
-        $('#edit_hostel').append(`<option value="">Choose Hostel</option>` );
-        $.each(data, (key, value) => {
-            $('#edit_hostel').append( `<option value="${value.id}"> ${value.name} </option>` );
-        });
-
-        $('#edit_hostel') .val(row.hostel_id) .trigger('change');
-        Hostelfetch({hostel: row.hostel_id}).then((rooms) => {
-
-            $('#edit_room').empty();
-            $('#edit_room').append(
-                `<option value="">Choose Room</option>`
-            );
-            $.each(rooms, (key, value) => {
-                $('#edit_room').append(`<option value="${value}"> ${value} </option>`);
-            });
-            $('#edit_room') .val(row.room_no) .trigger('change');
-
-            Hostelfetch({ room: row.room_no, hostel: row.hostel_id}).then((students) => {
-                $('#edit_student').empty();
-                $('#edit_student').append(
-                    `<option value="">Choose Student</option>`
-                );
-                $.each(students, (key, value) => {
-                    $('#edit_student').append(
-                        `<option value="${value.student_id}">
-                            ${value.student_id} - ${value.student_name}
-                        </option>`
-                    );
-                });
-                $('#edit_student').val(row.student_id).trigger('change');
-            });
-        });
-    });
-    $('#EditEntry').modal('show');
-});
-
 
 </script>
 @endsection
