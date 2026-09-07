@@ -35,7 +35,7 @@
 
 
 
-                  <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-3">
                     <label for="branch">Branch</label>
                     <input type="hidden" name="branch_name" id="branch_name" value="{{ request('branch_name') }}">
                     <select name="branch" id="branch" class="form-control form-control-sm" required>
@@ -46,12 +46,22 @@
                     </select>
                   </div>
 
-                  <div class="form-group col-lg-4">
+                  <div class="form-group col-lg-3">
                     <label for="branch">Coaching Type</label>
                     <select name="type" id="type" class="form-control form-control-sm" required>
                       <option value="">-- Choose Coaching Type --</option>
                       @foreach ($types as $row)
                       <option value="{{$row}}" @selected($row==request('type'))>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-3">
+                    <label for="branch">H/D</label>
+                    <select name="hostel_dayscholar" id="hostel_dayscholar" class="form-control form-control-sm">
+                      <option value="">-- H/D Type --</option>
+                      @foreach ($hostel_dayscholar as $row)
+                      <option value="{{$row}}" @selected($row==request('hostel_dayscholar'))>{{$row}}</option>
                       @endforeach
                     </select>
                   </div>
@@ -102,5 +112,15 @@
          branch_name: $("#branch option:selected").data('name')
       });
    });
+      
+$("#hostel_dayscholar").on("change", function () {
+    goToMenu({
+        course: $("#course").val(),
+        branch: $("#branch").val(),
+        type: $("#type").val(),
+        hostel_dayscholar: this.value,
+        branch_name: $("#branch option:selected").data('name')
+    });
+});
 </script>
 @endsection
