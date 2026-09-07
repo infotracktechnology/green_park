@@ -73,9 +73,7 @@
                     </select>
                   </div>
 
-                  
-
-
+                
                   <div class="form-group col-lg-2">
                     <label>In Time</label>
                     <input type="text" name="in_time" id="in_time" class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d H:i') }}" required>
