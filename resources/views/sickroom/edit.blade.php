@@ -25,6 +25,20 @@
                     <h6 class="col-deep-purple">Sick Room Entry</h6>
                   </div>
 
+                  <div class="form-group col-lg-3">
+                      <label>Student</label>
+                      <select class="select2" id="student" name="student_id" required>
+                          <option value="">Choose Student</option>
+
+                          @foreach ($student as $row)
+                              <option value="{{ $row->student_id }}"
+                                  @selected($row->student_id == $sickroom->student_id)>
+                                  {{ $row->student_id }} - {{ $row->student_name }}
+                              </option>
+                          @endforeach
+                      </select>
+                  </div>
+
                   <div class="form-group col-lg-2">
                     <label>Branch</label>
                     <select class="select2" id="branchid" name="branch_id" required>
@@ -55,7 +69,7 @@
                     </select>
                   </div>
 
-                  <div class="form-group col-lg-3">
+                  {{-- <div class="form-group col-lg-3">
                     <label>Student</label>
                     <select class="select2" id="student" name="student_id" required>
                       <option value="">Choose Student</option>
@@ -63,7 +77,7 @@
                       <option value="{{ $row->student_id }}" @selected($row->student_id == $sickroom->student_id)>{{ $row->student_id}} {{ $row->student_name }}</option>
                       @endforeach
                     </select>
-                  </div>
+                  </div> --}}
 
 
                   <div class="form-group col-lg-2">
@@ -132,39 +146,23 @@
       $('#hours_spent').val(hours.toFixed(1));
   });
 
-  const Hostelfetch = (params) => $.get('{{ route("hostel.inoutregister") }}', params);
-   const hostel = $('#hostel');
-   const room = $('#room');
-   const student= $('#student');
+  const StudentFetch = (params) => $.get('{{ route("sickroom.create") }}', params);
 
-   $("#branchid").change(function(){
-      Hostelfetch({branch: $(this).val()}).then((data) => {
-        hostel.empty();
-        hostel.append(`<option value="">Choose Hostel</option>`);
-        $.each(data, (key, value) => {
-          hostel.append(`<option value="${value.id}">${value.name}</option>`);
-        });
-      });
-   });
+  $("#student").change(function () {
+      let studentId = $(this).val();
+      if (!studentId) {
+          return;
+      }
+      StudentFetch({ student: studentId }).then(function (data) {
+          if (data.success) {
+              $('#branchid').val(data.branch_id).trigger('change');
+              $('#hostel').html(` <option value="${data.hostel_id}" selected> ${data.hostel_name} </option>`).trigger('change');
+              $('#room').html(` <option value="${data.room_no}" selected> ${data.room_no} </option> `).trigger('change');
+          }
 
-   $("#hostel").change(function(){
-      Hostelfetch({hostel: hostel.val()}).then((data) => {
-        room.empty();
-        room.append(`<option value="">Choose Room</option>`);
-        $.each(data, (key, value) => {
-          room.append(`<option value="${value}">${value}</option>`);
-        });
+      }).fail(function () {
+          console.log('Student details fetch failed');
       });
-   });
-
-   $("#room").change(function(){
-      Hostelfetch({room: room.val(), hostel: hostel.val()}).then((data) => {
-        student.empty();
-        student.append(`<option value="">Choose Student</option>`);
-        $.each(data, (key, value) => {
-          student.append(`<option value="${value.student_id}">${value.student_id} - ${value.student_name}</option>`);
-        });
-      });
-   });
+  });
 </script>
 @endsection
