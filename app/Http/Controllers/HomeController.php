@@ -303,21 +303,39 @@ class HomeController extends Controller
             ? Student::where('campus', $request->branch)->distinct()->pluck('coaching_type')
             : collect();
 
+        $hostel_dayscholar = [];
+        if ($request->filled('branch') && $request->type === 'OFFLINE') {
+            $hostel_dayscholar = Student::where('campus', $request->branch)->where('coaching_type', $request->type)->distinct()->pluck('hostel_dayscholar');
+        }
+
         $menu_type = [];
         if ($request->filled('branch') && $request->filled('type')) {
-            $menu_type = Options::where('type', "{$request->course}{$request->branch_name}{$request->type} menu")
-                ->value('value') ?? [];
-            $menu_type = collect($menu_type)->pluck('title')->toArray();
+            if ($request->type === 'OFFLINE') {
+                if ($request->filled('hostel_dayscholar')) {
+                    $menu_type = Options::where('type', "{$request->course}{$request->branch_name}{$request->type}{$request->hostel_dayscholar} menu")->value('value') ?? [];
+                }
+            } else {
+                $menu_type = Options::where( 'type', "{$request->course}{$request->branch_name}{$request->type} menu")->value('value') ?? [];
+            }
+            $menu_type = collect($menu_type) ->pluck('title')->toArray();
         }
 
         if ($request->has('assign')) {
-            $menu = collect($request->fields)->map(fn($m) => json_decode($m, true))->toArray();
-            Options::updateOrCreate(['type' => "{$request->course}{$request->branch_name}{$request->type} menu"], ['value' => $menu]);
+        $menu = collect($request->fields)->map(fn($m) => json_decode($m, true))->toArray();
+        if ($request->type === 'OFFLINE') {
+            $menuKey = "{$request->course}{$request->branch_name}{$request->type}{$request->hostel_dayscholar} menu";
+            Options::updateOrCreate(['type' => $menuKey],['value' => $menu]);
+            Student::where('academic_year', $this->academic_year)->where('course', $request->course)->where('campus', $request->branch)->where('coaching_type', $request->type)->where('hostel_dayscholar', $request->hostel_dayscholar)->update(['menu' => $menu]);
+        } else {
+            $menuKey = "{$request->course}{$request->branch_name}{$request->type} menu";
+            Options::updateOrCreate(['type' => $menuKey],['value' => $menu]);
             Student::where('academic_year', $this->academic_year)->where('course', $request->course)->where('campus', $request->branch)->where('coaching_type', $request->type)->update(['menu' => $menu]);
-            return redirect()->route('studentmenu.type')->with('success', 'Menu updated successfully!');
         }
 
-        return view('studentmenu.type', compact('menus', 'menu_type', 'types'));
+        return redirect()->back()->with('success', 'Menu assigned successfully!');
+        }
+
+        return view('studentmenu.type', compact('menus', 'menu_type', 'types', 'hostel_dayscholar'));
     }
     public function studentmenu_student(Request $request)
     {
