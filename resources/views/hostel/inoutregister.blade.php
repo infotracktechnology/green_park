@@ -365,6 +365,7 @@
           console.log('Student details fetch failed');
       });
   }
+  
   $('.inentry').click(function(){
     var row = $(this).data('row');
     $('#InEntry').modal('show');
