@@ -261,7 +261,7 @@
                         </div>
                         <div class="form-group col-lg-6">
                             <label>Section</label>
-                            <select class="select2" id="sections" name="sections" required>
+                            <select class="select2" id="edit_sections" name="sections" required>
                                 <option value="">Choose Section</option>
                             </select>
                         </div>
