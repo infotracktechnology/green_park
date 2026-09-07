@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{SickRoomEntry, Hostel, HostelRoom,Student};
+use App\Models\{SickRoomEntry, Hostel, HostelRoom,Student, Branch};
 
 class SickRoomEntryController extends Controller
 {
@@ -16,14 +16,30 @@ class SickRoomEntryController extends Controller
 
     public function index(Request $request)
     {
-        $entries = SickRoomEntry::with(['hostel', 'student'])->latest()->get();
+        $entries = SickRoomEntry::with(['hostel', 'student'])->when(auth()->user()->branch, function ($q) { $q->whereHas('student', function ($studentQuery) { $studentQuery->where( 'campus', 'like', '%' . auth()->user()->branch . '%' );}); })->latest()->get();
         return view('sickroom.index', compact('entries'));
     }
 
     public function create(Request $request)
     {
-        return view('sickroom.create');
-    }
+        if ($request->ajax() && $request->has('student')) {
+            $student = Student::where('student_id', $request->student)->where('academic_year', $this->academic_year)->first();
+
+            $hostel = Hostel::find($student->hostel_id);
+            return response()->json([
+                'success'     => true,
+                'branch_id'   => $hostel?->branch_id,
+                'hostel_id'   => $student->hostel_id,
+                'hostel_name' => $hostel?->name,
+                'room_no'     => $student->room_no,
+                'sections'    => $student->section,
+            ]);
+        }
+
+        $students = Student::where('academic_year', $this->academic_year)->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%'))->where('hostel_dayscholar', 'HOSTEL')->whereNotNull('hostel_id')->whereNotNull('room_no')->orderBy('student_name')->get();
+        $branches = Branch::all();
+        return view('sickroom.create', compact('students', 'branches'));
+    }  
 
 
     public function store(Request $request)
@@ -47,15 +63,15 @@ class SickRoomEntryController extends Controller
 
 
 
-    public function edit(SickRoomEntry $sickroom, Request $request)
+   public function edit(SickRoomEntry $sickroom, Request $request)
     {
+        $student = Student::where('academic_year', $this->academic_year)->whereNotNull('hostel_id')->whereNotNull('room_no')->orderBy('student_name')->get();
+
         $hostels = Hostel::where('branch_id', $sickroom->branch_id)->get();
 
         $room = HostelRoom::where('hostel_id', $sickroom->hostel_id)->distinct()->pluck('room_no');
 
-        $student = Student::where('hostel_id', $sickroom->hostel_id)->where('room_no', $sickroom->room_no)->get();
-
-        return view('sickroom.edit', compact('hostels', 'room', 'student', 'sickroom'));
+        return view('sickroom.edit', compact('student','hostels','room','sickroom'));
     }
 
 

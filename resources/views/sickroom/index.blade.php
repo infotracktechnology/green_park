@@ -41,11 +41,12 @@
                           <th>Room</th>
                           <th>Student ID</th>
                           <th>Student Name</th>
+                          <th>Section</th>
                           <th>In Time</th>
                           <th>Out Time</th>
                           <th>Illness/Injury</th>
-                          <th>Action Taken</th>
-                          <th>Medical Note</th>
+                          {{-- <th>Action Taken</th> --}}
+                          {{-- <th>Medical Note</th> --}}
                           <th>Total Hrs spent</th>
                           <th>Expance</th>
                           <th>Edit</th>
@@ -60,11 +61,12 @@
                           <td>{{ $entry->room_no }}</td>
                           <td>{{ $entry->student?->student_id }}</td>
                           <td>{{ $entry->student?->student_name }}</td>
+                          <td>{{ $entry->sections }}</td>
                           <td>{{ $entry->in_time->format(' d/m/Y h:i A') }}</td>
                           <td>{{ $entry->out_time->format(' d/m/Y h:i A') }}</td>
                           <td>{{ $entry->illness }}</td>
-                          <td>{{ $entry->action_taken }}</td>
-                          <td>{{ $entry->medical_note }}</td>
+                          {{-- <td>{{ $entry->action_taken }}</td> --}}
+                          {{-- <td>{{ $entry->medical_note }}</td> --}}
                           <td>{{ $entry->hours_spent }}</td>
                           <td>{{ $entry->expense }}</td>
                           <td>
