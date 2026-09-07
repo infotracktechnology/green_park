@@ -44,7 +44,7 @@
 
                   <div class="form-group col-lg-2">
                     <label>Branch</label>
-                    <select class="select2" id="branchid" name="branch_id" required disabled>
+                    <select class="select2" id="branchid" name="branch_id" required readonly>
                       <option value="">Choose Branch</option>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -54,28 +54,26 @@
 
                   <div class="form-group col-lg-3">
                     <label>Hostel</label>
-                    <select class="select2" id="hostel" name="hostel_id" required disabled>
-                      <option value="">Choose Hostel</option>
+                    <select class="select2" id="hostel" name="hostel_id" required readonly>
+                      {{-- <option value="">Choose Hostel</option> --}}
                     </select>
                   </div>
 
                   <div class="form-group col-lg-2">
                     <label>Room No</label>
-                    <select class="select2" id="room" name="room_no" required disabled>
-                      <option value="">Choose Room</option>
+                    <select class="select2" id="room" name="room_no" required readonly>
+                      {{-- <option value="">Choose Room</option> --}}
                     </select>
                   </div>
 
                   <div class="form-group col-lg-2">
                     <label>Section</label>
-                    <select class="select2" id="sections" name="sections" required disabled>
-                      <option value="">Choose Section</option>
+                    <select class="select2" id="sections" name="sections" required readonly>
+                      {{-- <option value="">Choose Section</option> --}}
                     </select>
                   </div>
 
-                  
-
-
+                
                   <div class="form-group col-lg-2">
                     <label>In Time</label>
                     <input type="text" name="in_time" id="in_time" class="datetime-picker form-control form-control-sm" value="{{ now()->format('Y-m-d H:i') }}" required>
