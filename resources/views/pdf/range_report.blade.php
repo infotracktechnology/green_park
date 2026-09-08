@@ -161,7 +161,7 @@
             <div class="content-wrap">
                 <div class="first-mark-container">
                     <span class="first-mark">
-                        FIRST MARK: {{ $firstMark }}
+                        FIRST MARK: {{ $firstMark }} / {{ $totalMark }}
                     </span>
                 </div>
 
