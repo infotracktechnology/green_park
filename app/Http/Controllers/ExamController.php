@@ -647,31 +647,66 @@ class ExamController extends Controller
             return redirect()->back()->with('success', "Markrange File Deleted Successfully.");
         }
 
-        if ($request->isMethod('POST')) {
-            foreach ($request->publish as $name => $publish) {
-                $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
-                if (!$exam) {
-                    continue;
-                }
-                $files = $exam->markrange_file ?? [];
-                if ($request->hasFile("batch.$name")) {
-                    foreach ($request->file("batch.$name") as $batch => $file) {
-                        $filename = "{$name}-{$batch}.pdf";
-                        $file->move('assets/markrange', $filename);
-                        $files[$batch] = "assets/markrange/$filename";
-                    }
-                }
-                $exam->update(['publish' => $publish,'markrange_file' => $files ]);
-                if ($publish === 'Yes') {
-                    $this->MovePervious($exam);
-                }
-            }
-            $this->ClearOldExamAnswers("OFFLINE", $request->course, 4);
-            return back()->with('success','Exams Publish Updated Successfully.'
-            );
-        }
+        // if ($request->isMethod('POST')) {
+        //     foreach ($request->publish as $name => $publish) {
+        //         $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
+        //         if (!$exam) {
+        //             continue;
+        //         }
+        //         $files = $exam->markrange_file ?? [];
+        //         if ($request->hasFile("batch.$name")) {
+        //             foreach ($request->file("batch.$name") as $batch => $file) {
+        //                 $filename = "{$name}-{$batch}.pdf";
+        //                 $file->move('assets/markrange', $filename);
+        //                 $files[$batch] = "assets/markrange/$filename";
+        //             }
+        //         }
+        //         $exam->update(['publish' => $publish,'markrange_file' => $files ]);
+        //         if ($publish === 'Yes') {
+        //             $this->MovePervious($exam);
+        //         }
+        //     }
+        //     $this->ClearOldExamAnswers("OFFLINE", $request->course, 4);
+        //     return back()->with('success','Exams Publish Updated Successfully.'
+        //     );
+        // }
 
         return view('exam.offlinepublish', compact('exams', 'types'));
+    }
+    public function OfflinePublishStore(Request $request)
+    {
+        $allBatchFiles = $request->file('batch', []);
+        foreach ($request->publish ?? [] as $name => $publish) {
+            $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
+            if (!$exam) {
+                continue;
+            }
+            $files = $exam->markrange_file ?? [];
+            if (is_string($files)) {
+                $files = json_decode($files, true) ?? [];
+            }
+            if (!is_array($files)) {
+                $files = [];
+            }
+            $batchFiles = $allBatchFiles[$name] ?? [];
+            foreach ($batchFiles as $batch => $file) {
+                if ($file instanceof \Illuminate\Http\UploadedFile) {
+                    if (!$file->isValid()) {
+                        continue;
+                    }
+                    $filename = "{$name}-{$batch}.pdf";
+                    $file->move('assets/markrange', $filename);
+                    $files[$batch] = "assets/markrange/$filename";
+                }
+            }
+           $exam->update(['publish' => $publish,'markrange_file' => $files ]);
+            if ($publish === 'Yes') {
+                $this->MovePervious($exam);
+            }
+        }
+        $this->ClearOldExamAnswers( "OFFLINE", $request->course, 4 );
+
+        return back()->with('success','Exams Publish Updated Successfully.');
     }
 
     public function OnlinePublish(Request $request)
