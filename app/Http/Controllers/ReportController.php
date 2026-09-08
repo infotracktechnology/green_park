@@ -244,24 +244,56 @@ class ReportController extends Controller
 
     public function AttendanceReport(Request $request)
     {
-        $courses = Student::select('course')->where('academic_year', $this->academic_year)->whereNotNull('course')->where('course', '!=', '')->distinct()->orderBy('course')->get();
+    $courses = collect();
+    $sections = collect();
 
-        $sections = Attendance::select('section')->where('academic_year', $this->academic_year)->whereNotNull('section')->where('section', '!=', '')->distinct()->orderBy('section')->get();
+    if ($request->filled('branch_id')) {
 
-        $attendances = collect([]);
-        if ($request->has('branch_id') && $request->filled('branch_id')) {
+        $courses = Student::select('course')
+            ->where('academic_year', $this->academic_year)
+            ->where('campus', $request->branch_id)
+            ->whereNotNull('course')
+            ->where('course', '!=', '')
+            ->distinct()
+            ->orderBy('course')
+            ->get();
+//                        dd([
+//     'Branch ID' => $request->branch_id,
+//     'Academic Year' => $this->academic_year,
+//     'Courses' => $courses->pluck('course')
+// ]);
+
+        $sections = Attendance::select('section')
+            ->where('academic_year', $this->academic_year)
+            ->where('branch_id', $request->branch_id)
+            ->whereNotNull('section')
+            ->where('section', '!=', '')
+            ->distinct()
+            ->orderBy('section')
+            ->get();
+
+ 
+    }
+
+    $attendances = collect([]);
+
+    if ($request->filled('branch_id')) {
             $studentIds = Student::where('academic_year', $this->academic_year)
                 ->where('campus', $request->branch_id)
                 ->when($request->filled('course'), function ($q) use ($request) {
                     $q->where('course', $request->course);
                 })
                 ->when($request->filled('section'), function ($q) use ($request) {
-                    $q->where('section', $request->section);
+                    $q->whereIn('section', (array) $request->section);
                 })
                 ->pluck('student_id');
 
-            $attendanceQuery = Attendance::where('branch_id', $request->branch_id)
-                ->where('academic_year', $this->academic_year);
+                $attendanceQuery = Attendance::where('branch_id', $request->branch_id)
+                ->where('academic_year', $this->academic_year)
+                ->when($request->filled('section'), function ($q) use ($request) {
+                            $q->whereIn('section', (array) $request->section);
+                        });
+                    
 
             if ($request->filled('date')) {
                 $attendanceQuery->where('attendance_date', $request->date);
@@ -376,6 +408,14 @@ class ReportController extends Controller
                     'afternoon_absent_students' => $afternoonAbsentStudents->values()->toArray(),
                 ];
             });
+            if ($request->filled('section')) {
+
+            $selectedSections = array_values((array) $request->section);
+
+            $attendances = $attendances->sortBy(function ($row) use ($selectedSections) {
+                return array_search($row['section'], $selectedSections);
+            })->values();
+}
         }
 
         if ($request->wantsJson() || $request->is('api/*')) {
