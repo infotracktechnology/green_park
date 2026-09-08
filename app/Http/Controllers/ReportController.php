@@ -992,7 +992,15 @@ class ReportController extends Controller
             return back()->with('error', 'Exam not found.');
         }
 
-        $totalMark = (int) $exam->total_questions * 4;
+         $questionCount = DB::table('exam_answer')->where('testname', $test_name)->where('academic_year', $this->academic_year)
+            ->where(function ($query) {
+                $query->whereNull('answer_key')
+                    ->orWhere('answer_key', '!=', 'DEL');
+            })
+            ->distinct()
+            ->count('q_no');
+
+            $totalMark = $questionCount * 4;
 
                 $rangeReport = collect();
                     foreach ($rangeMarks as $range) {
