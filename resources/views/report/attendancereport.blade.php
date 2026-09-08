@@ -21,7 +21,7 @@
                 <div class="row mb-3">
                   <div class="col-lg-2">
                     <label for="branch">Branch</label>
-                    <select name="branch_id" id="branch" class="form-control form-control-sm" required>
+                    <select name="branch_id" id="branch" class="form-control form-control-sm" required onchange="this.form.submit()">
                       <option value="">Select Branch</option>
                       @foreach ($branches as $branch)
                       <option value="{{ $branch->id }}" @selected($branch->id == request('branch_id'))>
@@ -31,26 +31,26 @@
                     </select>
                   </div>
 
-                  <div class="col-lg-2">
-                      <label>Course</label>
-                      <select name="course" id="course" class="form-control form-control-sm">
-                          <option value="">All Course</option>
-                          @foreach($courses as $course)
-                              <option value="{{ $course->course }}"
-                                  @selected(request('course') == $course->course)>
-                                  {{ $course->course }}
-                              </option>
-                          @endforeach
-                      </select>
-                  </div>
+                 <div class="col-lg-2">
+                    <label for="course">Course</label>
+                    <select name="course" id="course" class="form-control form-control-sm">
+                        <option value="">All Course</option>
+                        @foreach($courses as $course)
+                            <option value="{{ $course->course }}"
+                                @selected(request('course') == $course->course)>
+                                {{ $course->course }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
                   <div class="col-lg-2">
                       <label>Section</label>
-                      <select name="section" id="section" class="form-control form-control-sm">
+                      <select name="section[]" id="section" class="form-control form-control-sm select2" multiple>
                           <option value="">All Section</option>
                           @foreach($sections as $section)
                               <option value="{{ $section->section }}"
-                                  @selected(request('section') == $section->section)>
+                                  @selected(in_array($section->section,(array) request('section', [])))>
                                   {{ $section->section }}
                               </option>
                           @endforeach
@@ -62,7 +62,7 @@
                     <input type="date" name="date" id="date" class="form-control form-control-sm" value="{{ request('date')  ?? date('Y-m-d') }}" class="form-control form-control-sm" required />
                   </div>
 
-                  <div class="col-lg-2 d-flex align-items-end">
+                  <div class="col-lg-2 mt-4">
                     <button type="submit" class="btn btn-primary btn-block">Submit</button>
                   </div>
                 </div>
@@ -177,20 +177,125 @@
 <script src="{{asset('bundles/datatables/export-tables/buttons.flash.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/export-tables/jszip.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/export-tables/buttons.print.min.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
 <script>
   $(document).ready(function () {
-    $("#attendance-table").DataTable({
+    var table = $("#attendance-table").DataTable({
       dom: "Bfrtip",
       buttons: [
         {
           extend: "excelHtml5",
           footer: true,
+        },
+        {
+           extend: "pdfHtml5",
+            className: 'btn btn-danger btn-sm ml-1',
+            action: function (e, dt, node, config) {
+                exportToPDF(dt);
+            }
         }
       ],
       pageLength: 25,
     });
   });
+
+function exportToPDF(dt) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'pt', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();   
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const reportDate = $('#date').val() || '';
+    let formattedDate = '-';
+    let dayName = '-';
+
+    if (reportDate) {
+        const dateObj = new Date(reportDate + 'T00:00:00');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+        formattedDate = `${day}.${month}.${year}`;
+        dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+    }
+
+    const branchText = $('#branch option:selected').text().trim();
+    const branchName = (branchText && branchText !== 'Select Branch') ? branchText : '';
+    const cityName = branchName.includes(',') ? branchName.split(',').pop().trim() : branchName;
+    const titleText = "GREEN PARK COACHING CENTRE" + (cityName ? ", " + cityName : "");
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(0, 140, 70);
+    doc.text(titleText, pageWidth / 2, 35, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setTextColor(90, 90, 90);
+    doc.text("DAILY ATTENDANCE REPORT", pageWidth / 2, 50, { align: 'center' });
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(80, 50, 130); 
+    doc.text("DATE : " + formattedDate, 25, 72);
+    doc.text("DAY : " + dayName, pageWidth - 25, 72, { align: 'right' });
+    doc.setDrawColor(210, 210, 210);
+    doc.setLineWidth(0.8);
+    doc.line(25, 78, pageWidth - 25, 78);
+
+    const previousPageLen = dt.page.len();
+    dt.page.len(-1).draw();
+
+    doc.autoTable({
+        html: '#attendance-table',
+        startY: 86,
+        theme: 'grid',
+        margin: { left: 25, right: 25, bottom: 30 },
+        styles: {
+            font: 'helvetica',
+            fontSize: 7.5,
+            cellPadding: 3.5,
+            halign: 'center',
+            valign: 'middle',
+            lineColor: [220, 220, 220],
+            lineWidth: 0.5
+        },
+        headStyles: {
+            fillColor: [41, 128, 185], 
+            textColor: 255,
+            fontStyle: 'bold',
+            fontSize: 8,
+            halign: 'center'
+        },
+        footStyles: {
+            fillColor: [242, 244, 246],
+            textColor: [30, 30, 30],
+            fontStyle: 'bold',
+            fontSize: 8,
+            halign: 'center'
+        },
+        alternateRowStyles: {
+            fillColor: [252, 252, 252]
+        },
+        didParseCell: function (data) {
+            if (data.column.index === 1 && data.section === 'body') {
+                data.cell.styles.halign = 'left';
+            }
+        },
+        didDrawPage: function (data) {
+            const totalPages = doc.internal.getNumberOfPages();
+            doc.setFontSize(7.5);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(140, 140, 140);
+            doc.text(
+                `Page ${data.pageNumber} of ${totalPages}`,
+                pageWidth / 2,
+                pageHeight - 12,
+                { align: 'center' }
+            );
+        }
+    });
+    dt.page.len(previousPageLen).draw();
+    const safeDateStr = formattedDate !== '-' ? '_' + formattedDate.replace(/\./g, '-') : '';
+    doc.save(`Attendance_Report${safeDateStr}.pdf`);
+}
   
 $('.view-students').on('click', function() {
         var type = $(this).data('type');
