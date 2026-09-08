@@ -1,0 +1,220 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\NeetAchievements;
+use App\Models\Branch;
+use App\Models\Student;
+use App\Models\AcademicYear;
+
+class NeetAchievementController extends Controller
+{
+    public function index(Request $request)
+    {
+        $achievements = NeetAchievements::where('academic_year', $this->academic_year)
+            ->when(auth()->user()->branch, function ($query) {
+                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
+            })
+            ->when($request->coaching_type, function ($query, $coaching_type) {
+                $query->where('coaching_type', 'like', '%' . $coaching_type . '%');
+            })
+            ->when($request->course, function ($query, $course) {
+                $query->where('course', 'like', '%' . $course . '%');
+            })
+            ->latest()
+            ->get();
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'achievements' => $achievements]);
+        }
+
+        return view('neetachievements.index', compact('achievements'));
+    }
+
+    public function show(Request $request, NeetAchievements $achievement)
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'achievement' => $achievement]);
+        }
+        return redirect()->route('neetachievements.index');
+    }
+
+    public function neetachievement()
+    {
+        
+        $neetachievements = NeetAchievements::ForStudent(auth()->user());
+        return view('student.neetachievement', compact('neetachievements'));
+    }
+
+    public function create()
+    {
+        return view('neetachievements.create');
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->except(['_token', '_method', 'existing_images']);
+        foreach (['coaching_type', 'branch', 'category', 'batch', 'filecategory'] as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
+        }
+
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
+            }
+        }
+
+        // Video Upload
+        if ($request->hasFile('video')) {
+            $videoFile = $request->file('video');
+            $videoName = time() . '_' . $videoFile->getClientOriginalName();
+            $videoFile->move('neet_achievements', $videoName);
+            $data['video'] = 'neet_achievements/' . $videoName;
+        }
+
+        // Image Upload
+        if ($request->hasFile('images')) {
+            $images = [];
+            foreach ($request->file('images') as $image) {
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $image->move('neet_achievements', $imageName);
+                $images[] = 'neet_achievements/' . $imageName;
+            }
+            $data['images'] = $images;
+        }
+
+        if ($request->hasFile('pdf')) {
+            $pdfFile = $request->file('pdf');
+            $pdfName = time() . '_' . $pdfFile->getClientOriginalName();
+            $pdfFile->move('neet_achievements', $pdfName);
+            $data['pdf'] = 'neet_achievements/' . $pdfName;
+        }
+
+        $achievement = NeetAchievements::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Achievement added successfully!', 'data' => $achievement], 200);
+        }
+
+        return redirect()->route('neetachievements.index')->with('success', 'Achievement added successfully!');
+    }
+
+    public function edit(Request $request, NeetAchievements $neetachievement)
+    {
+        $type = Student::StudentFilterQuery($neetachievement->branch, $neetachievement->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
+
+        $section = Student::StudentFilterQuery($neetachievement->branch, $neetachievement->course, $neetachievement->type, $neetachievement->category, $neetachievement->batch, $neetachievement->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+
+        $students = Student::StudentFilterQuery($neetachievement->branch, $neetachievement->course, $neetachievement->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'neetachievement' => $neetachievement, 'type' => $type, 'section' => $section, 'students' => $students]);
+        }
+
+        return view('neetachievements.edit', compact('neetachievement', 'type', 'section', 'students'));
+    }
+
+    public function update(Request $request, NeetAchievements $neetachievement)
+    {
+        $data = $request->except(['_token', '_method', 'existing_images']);
+        foreach (['coaching_type', 'branch', 'category', 'batch', 'filecategory'] as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
+            } else {
+                $data[$field] = null;
+            }
+        }
+
+        if (isset($data['usertype']) && $data['usertype'] === 'INDIVIDUAL') {
+            $data['gender'] = null;
+            $data['section'] = null;
+        } elseif (isset($data['usertype']) && $data['usertype'] === 'GROUP') {
+            $data['students'] = null;
+            if (empty($data['gender'])) {
+                $data['gender'] = 'All';
+            }
+        }
+ 
+        if ($request->hasFile('video')) {
+            $videoFile = $request->file('video');
+            $videoName = time() . '_' . $videoFile->getClientOriginalName();
+            $videoFile->move('neet_achievements', $videoName);
+            $data['video'] = 'neet_achievements/' . $videoName;
+        } elseif ($request->has('video')) {
+            $data['video'] = $request->input('video') ?: null;
+        }
+
+        $images = [];
+        if ($request->has('existing_images')) {
+            $existing = $request->input('existing_images');
+            if (is_array($existing)) {
+                $images = array_values(array_filter($existing));
+            } else if (is_string($existing) && !empty($existing)) {
+                $decoded = json_decode($existing, true);
+                $images = is_array($decoded) ? array_values(array_filter($decoded)) : array_values(array_filter(explode(',', $existing)));
+            }
+        }
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $image->move('neet_achievements', $imageName);
+                $images[] = 'neet_achievements/' . $imageName;
+            }
+        }
+        if (!empty($images)) {
+            $data['images'] = $images;
+        } else if ($request->has('existing_images') || $request->hasFile('images')) {
+            $data['images'] = null;
+        }
+
+        if ($request->hasFile('pdf')) {
+            $pdfFile = $request->file('pdf');
+            $pdfName = time() . '_' . $pdfFile->getClientOriginalName();
+            $pdfFile->move('neet_achievements', $pdfName);
+            $data['pdf'] = 'neet_achievements/' . $pdfName;
+        } elseif ($request->has('pdf')) {
+            $data['pdf'] = $request->input('pdf') ?: null;
+        }
+
+        if ($request->has('link')) {
+            $data['link'] = $request->input('link') ?: null;
+        }
+
+        $neetachievement->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Achievement updated successfully!', 'data' => $neetachievement], 200);
+        }
+
+        return redirect()->route('neetachievements.index')->with('success', 'Achievement updated successfully!');
+    }
+
+
+    public function destroy(Request $request, $id = null)
+    {
+        if($request->has('ids')) {
+        $achievements = NeetAchievements::whereIn('id', $request->ids)->get();
+        foreach ($achievements as $achievement) {
+        if ($achievement->video && file_exists($achievement->video)) unlink($achievement->video);
+        if ($achievement->images) {
+            foreach (($achievement->images) as $img) {
+                if (file_exists($img)) unlink($img);
+            }
+        }
+        if ($achievement->pdf && file_exists($achievement->pdf)) unlink($achievement->pdf);
+        $achievement->delete();
+        }
+        }
+        
+        return redirect()->back()->with('success', 'Achievements deleted successfully!');
+    }
+}

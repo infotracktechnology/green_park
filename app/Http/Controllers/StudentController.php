@@ -16,6 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Options;
 use App\Models\StudentLog;
 use App\Models\HostelCourier;
+use App\Models\InOutRegister;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -461,4 +462,11 @@ class StudentController extends Controller
 
     return view('student.neetscorecard', compact('student'));
 }
+    public function InOutRegister(Request $request)
+    {
+        $student = auth()->user();
+        $registers = InOutRegister::where('student_id', $student->student_id)->latest()->get();
+        return view('student.inoutregister', compact('registers'));
+    }
+
 }

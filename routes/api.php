@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier, StudentLog};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier, StudentLog, NeetAchievements};
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Collection;
 /*
@@ -193,6 +193,12 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($achievements);
     });
 
+    Route::get('/neetachievements/{student_id}', function ($student_id) {
+        $student = Student::where('student_id', $student_id)->first();
+        $neetachievements = NeetAchievements::ForStudent($student);
+        return response()->json($neetachievements);
+    });
+
 
     Route::get('/timetable/{branch_id}/{section}', function ($branch_id, $section) {
         $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first();
@@ -259,6 +265,11 @@ Route::group(['prefix' => 'v2'], function () {
     Route::get('/courierentry/{student_id}', function ($student_id) {
         $hostelcouriers = HostelCourier::where('student_id', $student_id)->latest()->get();
         return response()->json($hostelcouriers);
+    });
+
+    Route::get('/inoutregister/{student_id}', function ($student_id) {
+        $registers = InOutRegister::where('student_id', $student_id)->latest()->get();
+        return response()->json($registers);
     });
 
     Route::get('hostel/inoutregister/{student_id}/', function ($student_id) {
