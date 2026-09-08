@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController, NeetScorecardController, PhoneCardController, ExamNameController};
+use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController, NeetScorecardController, PhoneCardController, ExamNameController, NeetAchievementController};
 use App\Models\{Student, Exam};
 
 // ------------------------------------------------------
@@ -111,6 +111,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::get('worksheet/download/{id}', [WorksheetController::class, 'download'])->name('worksheet.download');
     Route::resource('achievement', AchievementController::class);
     Route::resource('examname', ExamNameController::class);
+    Route::resource('neetachievements', NeetAchievementController::class);
 
     Route::controller(ClassVideoController::class)->group(function () {
         Route::resource('classvideo', ClassVideoController::class)->except(['show']);
@@ -265,6 +266,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::match(['get', 'post'], 'neetscorecard', 'NeetScorecard')->name('student.neetscorecard');
         Route::get('studentdownload', 'StudentDownload')->name('student.studentdownload');
         Route::get('courierentry', 'CourierEntry')->name('student.courierentry');
+        Route::get('inoutregister', 'InOutRegister')->name('student.inoutregister');
     });
 
     Route::controller(AnnouncementController::class)->group(function () {
@@ -283,6 +285,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::get('classvideo', [ClassVideoController::class, 'classvideo'])->name('student.classvideo');
     Route::get('revisionvideo', [RevisionVideoController::class, 'revisionvideo'])->name('student.revisionvideo');
     Route::get('achievement', [AchievementController::class, 'achievement'])->name('student.achievement');
+    Route::get('neetachievement', [NeetAchievementController::class, 'neetachievement'])->name('student.neetachievement');
     Route::get('timetable', [TimetableController::class, 'timetable'])->name('student.timetable');
 
     // Student Exam Interface
