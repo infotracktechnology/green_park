@@ -30,7 +30,7 @@
                   <label for="branch_id">Campus</label>
                   <select name="campus" class="form-control form-control-sm" id="campus-select">
                     <option value="" disabled selected>Select Campus</option>
-                    @foreach ($branches as $branch)
+                    @foreach ($branches_list as $branch)
                     <option value="{{ $branch->id }}" @if($branch->id == $Student->campus) selected @endif>
                       {{ $branch->name }}
                     </option>
