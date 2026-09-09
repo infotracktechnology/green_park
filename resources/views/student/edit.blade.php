@@ -639,5 +639,5 @@ $('#previous_course_studied_neet').on('change', function () {
 
 toggleOtherCourse();
 </script>
-
+  
 @endsection
