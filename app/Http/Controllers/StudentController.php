@@ -17,6 +17,7 @@ use App\Models\Options;
 use App\Models\StudentLog;
 use App\Models\HostelCourier;
 use App\Models\InOutRegister;
+use App\Models\Branch;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -113,7 +114,17 @@ class StudentController extends Controller
         $districts = DB::table('district_list')->where('State', $Student->state)->distinct()->orderBy('District')->get();
         $states = DB::table('district_list')->select('State')->distinct()->orderBy('State')->get();
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
-
+        $user = auth()->user();
+        $userType = strtolower(trim($user->type ?? ''));
+                if ($userType === 'admin') {
+                    $branches_list = Branch::all();
+                } else {
+                    $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
+                    if (empty($branchIds) && $user->branch) {
+                        $branchIds = [$user->branch];
+                    }
+                    $branches_list = Branch::whereIn('id', $branchIds)->get();
+                }
         if ($request->wantsJson() || $request->is('api/*')) {
             $Student->load('branch');
             return response()->json([
@@ -121,11 +132,12 @@ class StudentController extends Controller
                 'student' => $Student,
                 'districts' => $districts,
                 'states' => $states,
-                'pincodes' => $pincodes
+                'pincodes' => $pincodes,
+                'branches' => $branches_list
             ], 200);
         }
 
-        return view('student.edit', compact('districts', 'states', 'pincodes', 'Student'));
+        return view('student.edit', compact('districts', 'states', 'pincodes', 'Student', 'branches_list'));
     }
 
 
