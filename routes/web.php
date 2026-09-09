@@ -247,6 +247,8 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::match(['get', 'post'], '/report/studentReport', [ReportController::class, 'studentReport'])->name('studentreport');
         Route::get('/studentexpense', [ReportController::class, 'StudentExpense'])->name('studentexpense');
         Route::post('examination/rangereport',[ReportController::class, 'RangeReport'])->name('rangereport');
+        Route::post('examination/subjectrangereport',[ReportController::class, 'SubjectRangeReport'])->name('subjectrangereport');
+        Route::get('examination/subject-range-subjects',[ReportController::class, 'getSubjectRangeSubjects'])->name('subjectrangesubjects');
         Route::get('examination/dump', [ReportController::class, 'Dump_Report'])->name('dump');
     });
 });
