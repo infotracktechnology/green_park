@@ -1025,6 +1025,144 @@ class ReportController extends Controller
 
     return $pdf->download('Range_Report_' . $test_name . '.pdf');    
     }
+   public function getSubjectRangeSubjects(Request $request)
+    {
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->first();
+
+        if (!$exam) {
+            return response()->json(['status' => false,'subjects' => [] ]);
+        }
+        $subjects = [];
+        if ($exam->phy_start !== null && $exam->phy_end !== null) {
+            $subjects[] = 'physics';
+        }
+        if ($exam->chem_start !== null && $exam->chem_end !== null) {
+            $subjects[] = 'chemistry';
+        }
+        if ($exam->bot_start !== null && $exam->bot_end !== null) {
+            $subjects[] = 'botany';
+        }
+        if ($exam->zoo_start !== null && $exam->zoo_end !== null) {
+            $subjects[] = 'zoology';
+        }
+        if ($exam->bio_start !== null && $exam->bio_end !== null) {
+            $subjects[] = 'biology';
+        }
+        return response()->json(['status' => true,'subjects' => $subjects ]);
+    } 
+       public function SubjectRangeReport(Request $request)
+    {
+        $test_name = $request->test_name;
+
+        if (!$test_name) {
+            return back()->with('error', 'Please select exam name.');
+        }
+
+        $exam = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->first();
+        if (!$exam) {
+            return back()->with('error', 'Exam not found.');
+        }
+
+        $validQuestions = DB::table('exam_answer')->where('testname', $test_name)->where('academic_year', $this->academic_year)->where(function ($query) {
+                $query->whereNull('answer_key')->orWhere('answer_key', '!=', 'DEL');
+            })
+            ->select('q_no')
+            ->distinct()
+            ->pluck('q_no');
+
+        $calcTotal = function ($start, $end) use ($validQuestions) {
+            if ($start === null || $end === null) return 0;
+            return $validQuestions->filter(fn($q) => $q >= $start && $q <= $end)->count() * 4;
+        };
+
+        $physicsTotal   = $calcTotal($exam->phy_start, $exam->phy_end);
+        $chemistryTotal = $calcTotal($exam->chem_start, $exam->chem_end);
+        $botanyTotal    = $calcTotal($exam->bot_start, $exam->bot_end);
+        $zoologyTotal   = $calcTotal($exam->zoo_start, $exam->zoo_end);
+        $biologyTotal   = $calcTotal($exam->bio_start, $exam->bio_end);
+        
+        $overallTotal   = $physicsTotal + $chemistryTotal + $botanyTotal + $zoologyTotal + $biologyTotal;
+
+        $makeCondition = fn($start, $end) => ($start !== null && $end !== null) ? "ea.q_no BETWEEN {$start} AND {$end}" : "1 = 0";
+
+        $phyCond  = $makeCondition($exam->phy_start, $exam->phy_end);
+        $chemCond = $makeCondition($exam->chem_start, $exam->chem_end);
+        $botCond  = $makeCondition($exam->bot_start, $exam->bot_end);
+        $zooCond  = $makeCondition($exam->zoo_start, $exam->zoo_end);
+        $bioCond  = $makeCondition($exam->bio_start, $exam->bio_end);
+
+        $students = DB::table('exam_answer as ea')->join('student as s', 's.student_id', '=', 'ea.student_id')->where('ea.testname', $test_name)->where('ea.academic_year', $this->academic_year)->where(function ($query) {
+                $query->whereNull('ea.answer_key')->orWhere('ea.answer_key', '!=', 'DEL');
+            })
+            ->select('ea.student_id', 's.student_name', 's.coaching_type')
+            ->selectRaw("SUM(CASE WHEN {$phyCond} THEN COALESCE(ea.mark, 0) ELSE 0 END) AS physics_mark")
+            ->selectRaw("SUM(CASE WHEN {$chemCond} THEN COALESCE(ea.mark, 0) ELSE 0 END) AS chemistry_mark")
+            ->selectRaw("SUM(CASE WHEN {$botCond} THEN COALESCE(ea.mark, 0) ELSE 0 END) AS botany_mark")
+            ->selectRaw("SUM(CASE WHEN {$zooCond} THEN COALESCE(ea.mark, 0) ELSE 0 END) AS zoology_mark")
+            ->selectRaw("SUM(CASE WHEN {$bioCond} THEN COALESCE(ea.mark, 0) ELSE 0 END) AS biology_mark")
+            ->groupBy('ea.student_id', 's.student_name', 's.coaching_type')
+            ->get();
+
+        $physicsFirstMark   = $students->max(fn($s) => (float) $s->physics_mark) ?? 0;
+        $chemistryFirstMark = $students->max(fn($s) => (float) $s->chemistry_mark) ?? 0;
+        $botanyFirstMark    = $students->max(fn($s) => (float) $s->botany_mark) ?? 0;
+        $zoologyFirstMark   = $students->max(fn($s) => (float) $s->zoology_mark) ?? 0;
+        $biologyFirstMark   = $students->max(fn($s) => (float) $s->biology_mark) ?? 0;
+
+        $overallFirstMark = $students->max(function ($s) {
+            return $s->physics_mark + $s->chemistry_mark + $s->botany_mark + $s->zoology_mark + $s->biology_mark;
+        }) ?? 0;
+
+        $getRanges = fn($key) => collect($request->input($key, []))->filter(fn($m) => is_numeric($m))->map(fn($m) => (float) $m)->unique()->sortDesc()->values();
+
+        $makeRangeReport = function ($ranges, $field, $total) use ($students) {
+            return $ranges->map(function ($range) use ($students, $field, $total) {
+                $count = $students->filter(function ($student) use ($range, $field) {
+                    if ($field === 'overall') {
+                        $mark = $student->physics_mark +$student->chemistry_mark + $student->botany_mark + $student->zoology_mark + $student->biology_mark;
+                        return $mark >= $range;
+                    }
+                    return $student->{$field} >= $range;
+                })->count();
+
+                $rangeText = ($range == $total)  ? "{$range} / {$total}" : "{$range} AND ABOVE";
+
+                return ['range' => $rangeText,'count' => $count, ];
+            });
+        };
+
+        $physicsReport   = $makeRangeReport($getRanges('physics_range'), 'physics_mark', $physicsTotal);
+        $chemistryReport = $makeRangeReport($getRanges('chemistry_range'), 'chemistry_mark', $chemistryTotal);
+        $botanyReport    = $makeRangeReport($getRanges('botany_range'), 'botany_mark', $botanyTotal);
+        $zoologyReport   = $makeRangeReport($getRanges('zoology_range'), 'zoology_mark', $zoologyTotal);
+        $biologyReport   = $makeRangeReport($getRanges('biology_range'), 'biology_mark', $biologyTotal);
+        $overallReport   = $makeRangeReport($getRanges('overall_range'), 'overall', $overallTotal);
+
+        $pdf = Pdf::loadView('pdf.subjectrange', [
+            'test_name'          => $test_name,
+            'physicsFirstMark'   => $physicsFirstMark,
+            'chemistryFirstMark' => $chemistryFirstMark,
+            'botanyFirstMark'    => $botanyFirstMark,
+            'zoologyFirstMark'   => $zoologyFirstMark,
+            'biologyFirstMark'   => $biologyFirstMark,
+            'physicsTotal'       => $physicsTotal,
+            'chemistryTotal'     => $chemistryTotal,
+            'botanyTotal'        => $botanyTotal,
+            'zoologyTotal'       => $zoologyTotal,
+            'biologyTotal'       => $biologyTotal,
+            'physicsReport'      => $physicsReport,
+            'chemistryReport'    => $chemistryReport,
+            'botanyReport'       => $botanyReport,
+            'zoologyReport'      => $zoologyReport,
+            'biologyReport'      => $biologyReport,
+            'overallFirstMark'   => $overallFirstMark,
+            'overallTotal'       => $overallTotal,
+            'overallReport'      => $overallReport,
+        ]);
+
+        $fileName = 'SubjectRangeReport_' . str_replace(['/', '\\', ' '], '_', $test_name) . '.pdf';
+        return $pdf->download($fileName);
+    }
     public function Dump_Report(Request $request)
     {
         $tests = Exam::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($query) { $query->where('branch_id','like','%' . auth()->user()->branch . '%'); })->select('name')->distinct()->orderBy('name')->get();
@@ -1604,10 +1742,9 @@ class ReportController extends Controller
             $allExams = ExamSubjectReport::select(
         'category',
         'subject',
-        'exdate',
-        'sec'
+        'exdate'
     )
-    ->where('sec', $student->section)
+    ->where('stuid', $student->student_id)
     ->groupBy('category', 'subject', 'exdate', 'sec')
     ->get()
     ->sortBy(function ($exam) {

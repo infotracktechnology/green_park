@@ -58,8 +58,9 @@
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.sectionwisemarks') }}">Section Wise Marks Analysis</button>
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.sectionwisetopper') }}">Section Wise Topper Marks</button>
                     <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.subjectwisemarks') }}">Student Subject Wise Analysis</button>
-                   <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.overallmarkanalysis') }}">Overall Marks Analysis</button>
-                    <button type="button" class="btn btn-primary m-2" data-toggle="modal" data-target="#rangeModal">Range Report</button>
+                    <button type="button" class="btn btn-primary m-2" data-action="{{ route('report.overallmarkanalysis') }}">Overall Marks Analysis</button>
+                    <button type="button" class="btn btn-primary m-2" data-toggle="modal" data-target="#rangeModal">Overall Range Report</button>
+                    <button type="button" class="btn btn-primary m-2" data-toggle="modal" data-target="#subjectrangeModal">Subject Wise Range Report</button>
                    
                 </div>
               </form>
@@ -116,6 +117,40 @@
     </div>
 
 </div>
+<!-- Subject Range Report Modal -->
+<div class="modal fade" id="subjectrangeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Subject Wise Range Report
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <form method="POST" id="subjectRangeReportForm" action="{{ route('report.subjectrangereport') }}" target="subjectRangeDownloadFrame">
+            @csrf
+            <input type="hidden" name="testcategory" id="subject_range_testcategory">
+            <input type="hidden" name="test_name" id="subject_range_test_name">
+
+            <div class="modal-body">
+                <label>
+                    <strong>Enter Subject Wise Marks</strong>
+                </label>
+                <div id="subjectRangeContainer"></div>
+            </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button  class="btn btn-primary"> submit</button>
+                </div>
+            </form>
+            <iframe name="subjectRangeDownloadFrame" id="subjectRangeDownloadFrame" style="display:none;"></iframe>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -166,7 +201,121 @@
 
     });
 
-$('#testcategory').change(() => window.location = `{{ route('report.exam_analyisis', [], false) }}?testcategory=${$('#testcategory').val()}`);
+function loadSubjectRangeSubjects() {
+    let testName = $('#testname').val();
+    if (!testName) {
+        $('#subjectRangeContainer').html('');
+        return;
+    }
+    $.ajax({ url: "{{ route('report.subjectrangesubjects') }}", type: "GET", data: { test_name: testName }, success: function(response) {
+  
+        let html = '';
+            if (response.status && response.subjects.length > 0) {
+                response.subjects.forEach(function(subject) {
+                    let key = subject.toLowerCase();
+                    let title = subject.charAt(0).toUpperCase()   + subject.slice(1); html += `
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <strong>${subject.toUpperCase()}</strong>
+                            </div>
+                            <div class="card-body">
+                                <div id="${key}RangeRows">
+                                    <div class="row range-row mb-2">
+                                        <div class="col-md-8">
+                                            <input type="number" name="${key}_range[]" class="form-control" placeholder="Enter ${title} Mark">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="button" class="btn btn-danger remove-subject-range"> Remove </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button"class="btn btn-success btn-sm add-subject-range"data-target="${key}RangeRows" data-name="${key}_range[]"> + Add ${title} Mark </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>OVERALL</strong>
+                        </div>
+                        <div class="card-body">
+                            <div id="overallRangeRows">
+                                <div class="row range-row mb-2">
+                                    <div class="col-md-8">
+                                        <input type="number" name="overall_range[]" class="form-control" placeholder="Enter Overall Mark">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-danger remove-subject-range">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm add-subject-range" data-target="overallRangeRows" data-name="overall_range[]"> + Add Overall Mark </button>
+                        </div>
+                    </div> `;
+                } else {
+                html = ` <div class="alert alert-warning"> No subjects found for this exam. </div>`;
+            }
+            $('#subjectRangeContainer').html(html);
+        }
+    });
+}
+    $('#subjectrangeModal').on('show.bs.modal', function () {
+        $('#subject_range_testcategory').val(
+            $('#testcategory').val()
+        );
+        $('#subject_range_test_name').val(
+            $('#testname').val()
+        );
+        loadSubjectRangeSubjects();
+    });
+    $(document).on('click', '.add-subject-range', function () {
+
+    let target = $(this).data('target');
+    let name = $(this).data('name');
+
+    let title = 'Mark';
+
+    if (target === 'overallRangeRows') {
+        title = 'Overall Mark';
+    } else {
+        title = $(this).text()
+            .replace('+ Add', '')
+            .trim();
+    }
+
+    let html = `
+        <div class="row range-row mb-2">
+            <div class="col-md-8">
+                <input type="number"
+                       name="${name}"
+                       class="form-control"
+                       placeholder="Enter ${title}">
+            </div>
+
+            <div class="col-md-4">
+                <button type="button"
+                        class="btn btn-danger remove-subject-range">
+                    Remove
+                </button>
+            </div>
+        </div>
+    `;
+
+    $('#' + target).append(html);
+});
+$(document).on('click', '.remove-subject-range', function () {
+
+    let rows = $(this).closest('.range-row');
+
+    if (rows.siblings('.range-row').length > 0) {
+        rows.remove();
+    }
+});
+$('#testcategory').change(() => window.location = `{{ route('report.exam_analyisis') }}?testcategory=${$('#testcategory').val()}`);
 
 </script>
 @endsection
