@@ -26,12 +26,17 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-
         $query = Student::with('branch')
             ->when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))
-            ->when($user && $user->branch, function ($q) use ($user) {
-                $q->where('campus', $user->branch);
-            })
+            ->when($user && strtolower(trim($user->type ?? '')) !== 'admin', function ($q) use ($user) {
+                    $branchIds = array_filter(
+                        explode(',', $user->branch_ids ?? '')
+                    );
+                    if (empty($branchIds) && $user->branch) {
+                        $branchIds = [$user->branch];
+                    }
+                    $q->whereIn('campus', $branchIds);
+                })
             ->when($request->filled('branch_id') || $request->filled('campus'), function ($q) use ($request) {
                 $branch = $request->branch_id ?? $request->campus;
                 $q->where('campus', $branch);
