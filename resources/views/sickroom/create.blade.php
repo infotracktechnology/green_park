@@ -84,15 +84,15 @@
                     <textarea name="illness" rows="3" class="form-control form-control-sm" required></textarea>
                   </div>
 
-                  <div class="form-group col-lg-3">
+                  {{-- <div class="form-group col-lg-3">
                     <label>Action Taken</label>
                     <textarea name="action_taken" rows="3" class="form-control form-control-sm"></textarea>
-                  </div>
+                  </div> --}}
 
-                  <div class="form-group col-lg-3">
+                  {{-- <div class="form-group col-lg-3">
                     <label>Medical Officer's/Nurse's Note</label>
                     <textarea name="medical_note" rows="3" class="form-control form-control-sm"></textarea>
-                  </div>
+                  </div> --}}
 
                   <div class="form-group col-lg-2">
                     <label>Out Time</label>
@@ -100,10 +100,10 @@
                     <input type="hidden" name="hours_spent" id="hours_spent">
                   </div>
 
-                <div class="form-group col-lg-2">
+                {{-- <div class="form-group col-lg-2">
                     <label>Expense</label>
                     <input type="number" name="expense" class="form-control form-control-sm" value="0" min="0">
-                </div>
+                </div> --}}
 
                   <div class="form-group col-lg-12">
                     <button type="submit" class="btn btn-primary">Submit</button>
