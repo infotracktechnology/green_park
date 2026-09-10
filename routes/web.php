@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController, NeetScorecardController, PhoneCardController, ExamNameController, NeetAchievementController};
+use App\Http\Controllers\{Auth\LoginController, Auth\LogoutController, HomeController, ImportController, HostelController, StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ExamController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, SickRoomEntryController, StudentDocumentController, StudentActivityController, UsersController, ReportController, FinanceController, FinanceReportController, ReceiptCancellationController, SegmentController, ConcessionControllerReferencevideoController, MockTestController, BranchController, ExportController, AcademicYearController, HolidayController, TimetableController, WorkshiftController, NeetScorecardController, PhoneCardController, ExamNameController, NeetAchievementController, MedicalEntryController};
 use App\Models\{Student, Exam};
 
 // ------------------------------------------------------
@@ -136,7 +136,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::get('phoneturn/create', [PhoneCardController::class, 'create'])->name('phoneturn.create');
     Route::post('phoneturn', [PhoneCardController::class, 'store'])->name('phoneturn.store');
     Route::match(['get', 'post'],'hostel/topup',[HostelController::class, 'Topup'])->name('hostel.topup');
-    
+    Route::resource('medical', MedicalEntryController::class);
     // Hostel & Sickroom
     Route::resource('hostel', HostelController::class);
     Route::resource('sickroom', SickRoomEntryController::class)->except(['update']);
@@ -233,6 +233,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('/hostel/vacate', [ReportController::class, 'HostelVacate'])->name('hostelvacate');
         Route::get('/hostel/inoutregister', [ReportController::class, 'InOutRegister'])->name('inoutregister');
         Route::get('/hostel/sickroom', [ReportController::class, 'Sickroom'])->name('sickroom');
+        Route::get('/hostel/medical', [ReportController::class, 'Medical'])->name('medical');
         Route::get('/hostel/attendance', [ReportController::class, 'HostelAttendance'])->name('hostelattendance');
         Route::get('/hostel/courier', [ReportController::class, 'HostelCourier'])->name('hostelcourier');
         Route::get('/hostel/roomlist', [ReportController::class, 'HostelRoomList'])->name('hostelroomlist');
@@ -304,6 +305,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
     Route::match(['get', 'post'], 'mocktest', [MockTestController::class, 'MockTest'])->name('student.mock');
     Route::get('mocktestpdf/{testname}', [MockTestController::class, 'downloadMockTestPdf'])->name('student.mocktestpdf');
     Route::get('sickroom', [SickRoomEntryController::class, 'sickroom'])->name('student.sickroom');
+    Route::get('medical', [MedicalEntryController::class, 'medical'])->name('student.medical');
     Route::get('video/{id}', [ChairmanVideoController::class, 'video'])->name('video');
 });
 

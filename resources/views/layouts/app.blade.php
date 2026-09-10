@@ -149,7 +149,6 @@
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="message-square"></i><span>Communication</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('announcement.index') }}" class="nav-link">Announcement</a></li>
-                <li><a href="{{ route('neetachievements.index') }}" class="nav-link">Achievements</a></li>
                 <li><a href="{{route('chairmanvideo.index')}}" class="nav-link"> Chairman Video</a></li>
                 <li><a href="{{route('classvideo.index')}}" class="nav-link"> Class Video</a></li>
                 <li><a href="{{route('revisionvideo.index')}}" class="nav-link"> Revision Video</a></li>
@@ -160,6 +159,7 @@
                 <li><a href="{{ route('download.index') }}" class="nav-link">Downloads</a></li>
                 <li><a href="{{ route('worksheet.index') }}" class="nav-link">Worksheet</a></li>
                 <li><a href="{{ route('achievement.index') }}" class="nav-link">MBBS/BDS Counselling</a></li>
+                <li><a href="{{ route('neetachievements.index') }}" class="nav-link">NEET Gallery</a></li>
                 <li><a href="{{ route('parent_concern') }}" class="nav-link">Parent Concern</a></li>
                 <li><a href="{{ route('neetscorecard.index') }}" class="nav-link">Document Reupload</a></li>
               </ul>
@@ -216,6 +216,7 @@
                 <li><a href="{{ route('report.hostellist') }}" class="nav-link">Hostel Attendance list</a></li>
                 <li><a href="{{ route('hostel.inoutregister') }}" class="nav-link">In/Out Register</a></li>
                 <li><a href="{{ route('sickroom.index') }}" class="nav-link">Sick Room Entry</a></li>
+                <li><a href="{{ route('medical.index') }}" class="nav-link">Medical Entry</a></li>
                 <li><a href="{{ route('phoneturn.create') }}" class="nav-link">Phone Turn Entry</a></li>
                 <li><a href="{{ route('hostel.courier') }}" class="nav-link">Courier Entry</a></li>
                 <li><a href="{{ route('hostel.topup') }}" class="nav-link">Student Topup</a></li>
@@ -229,6 +230,7 @@
                     <li><a href="{{ route('report.hostelvacancy') }}" class="nav-link">Hostel Vacancy Report</a></li>
                     <li><a href="{{ route('report.inoutregister') }}" class="nav-link">In/Out Register Report</a></li>
                     <li><a href="{{ route('report.sickroom') }}" class="nav-link">Sick Room Entry Report</a></li>
+                    <li><a href="{{ route('report.medical') }}" class="nav-link">Medical Entry Report</a></li>
                     <li><a href="{{ route('report.hostelcourier') }}" class="nav-link">Hostel Courier Report</a></li>
                     <li><a href="{{ route('report.studentexpense') }}" class="nav-link">Student Expense Report</a></li>
                     <li><a href="{{ route('report.hostelroomlist') }}" class="nav-link">Phone/Sign List (Section)</a></li>
