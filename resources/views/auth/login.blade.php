@@ -266,7 +266,7 @@
                 </div>
                 <!-- Slide -->
                 <div class="slide">
-                  <img src="{{asset('img/silde/slide-12.jpeg')}}" alt="slide 1">
+                  <img src="{{asset('img/silde/slide-13.webp')}}" alt="slide 1">
                   <div class="slide-info">
                     <div class="slide-text">Batch 2026</div>
                     <!-- data-light contains the image to show in lightbox -->
