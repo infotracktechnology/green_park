@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
-use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport, PhoneCard};
+use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport, PhoneCard, Medical};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -1312,6 +1312,25 @@ class ReportController extends Controller
                 ->get()
             : collect();       
              return view('report.sickroom', compact('hostels', 'room', 'sickroom'));
+    }
+
+    public function Medical(Request $request)
+    {
+        $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
+        $medical = $request->room
+            ? Medical::where('hostel_id', $request->hostel)
+                ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
+                ->when($request->filled('from_date'), function ($q) use ($request) {
+                    $q->whereDate('in_time', '>=', $request->from_date);
+                })
+                ->when($request->filled('to_date'), function ($q) use ($request) {
+                    $q->whereDate('in_time', '<=', $request->to_date);
+                })
+                ->with('student')
+                ->get()
+            : collect();       
+             return view('report.medical', compact('hostels', 'room', 'medical'));
     }
 
    public function HostelAttendance(Request $request)

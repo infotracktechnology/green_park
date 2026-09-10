@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'MBBS/BDS Counselling')
+@section('title', 'NEET Gallery')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
@@ -45,7 +45,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4><i style="font-size: 20px;"class="fas fa-trophy mr-2 text-warning"></i> Achievements</h4>
+                            <h4><i style="font-size: 20px;"class="fas fa-trophy mr-2 text-warning"></i> NEET Gallery</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -74,7 +74,6 @@
                                             <div class="mb-2">
                                                 {!! $achievement->content !!}
                                             </div>
-                                            <div class="mt-3">
                                                 @if(in_array('Video', $categories) && $achievement->video)
                                                     <a href="{{ env('APP_URL').$achievement->video }}" target="_blank" class="btn btn-sm btn-outline-primary mb-2 mr-1">
                                                         <i class="fas fa-video"></i> Watch Video
@@ -109,8 +108,8 @@
                                 </div>
                                 @empty
                                 <div class="col-12 text-center py-5">
-                                    <i style="font-size: 25px;" class="fas fa-award fa-4x text-muted mb-3 "></i>
-                                    <h5>Stay tuned for new achievements!</h5>
+                                    <i style="font-size: 25px;" class="fas fa-image fa-4x text-muted mb-3 "></i>
+                                    <h5>Stay tuned for exciting NEET moments!</h5>
                                 </div>
                                 @endforelse
                             </div>
