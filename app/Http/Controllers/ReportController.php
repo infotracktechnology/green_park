@@ -633,6 +633,17 @@ class ReportController extends Controller
     }
     public function SectionList(Request $request)
     {
+         $user = auth()->user();
+        $userType = strtolower(trim($user->type ?? ''));
+                if ($userType === 'admin') {
+                    $branches_list = Branch::all();
+                } else {
+                    $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
+                    if (empty($branchIds) && $user->branch) {
+                        $branchIds = [$user->branch];
+                    }
+                    $branches_list = Branch::whereIn('id', $branchIds)->get();
+                }
         $branch = $request->branch ?? 0;
         $course = $request->course ?? 0;
         $data = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,batch,section,COUNT(*) as total,b.id,concat(gender,'-',hostel_dayscholar)gender,sum(ac_nonac='AC')ac,sum(ac_nonac='NON AC')nonac,sum(board_of_study_XII_std='SB')sb,sum(board_of_study_XII_std='CBSE')cbse,hostel_dayscholar, coaching_type")->where('academic_year', $this->academic_year)->where('b.id', $branch)->where('course', $course)->groupBy('section', 
@@ -657,7 +668,7 @@ class ReportController extends Controller
             return $pdf->download("$section-$request->view.pdf");
         }
 
-        return view('report.sectionlist', compact('grouped', 'offline', 'online'));
+        return view('report.sectionlist', compact('grouped', 'offline', 'online','branches_list'));
     }
     public function ExaminationAnalysis(Request $request)
     {
@@ -1747,8 +1758,20 @@ class ReportController extends Controller
                 ->get();
             return response()->json(['status' => true, 'students' => $query], 200);
         }
+        $user = auth()->user();
 
-        $students = Student::select('student_id', 'student_name')->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
+        $students = Student::select('student_id', 'student_name')
+        ->where('academic_year', $this->academic_year)
+        ->when( $user && strtolower(trim($user->type ?? '')) !== 'admin', function ($q) use ($user) {
+                $branchIds = array_filter(  explode(',', $user->branch_ids ?? '') );
+                if (empty($branchIds) && $user->branch) {
+                    $branchIds = [$user->branch];
+                }
+                $q->whereIn('campus', $branchIds);
+            }
+        )
+        ->orderBy('student_name')
+        ->get();
 
         if ($request->isMethod('post')) {
             $student = Student::where('student_id', $request->student_id)->first();

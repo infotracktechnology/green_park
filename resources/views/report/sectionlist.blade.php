@@ -43,7 +43,7 @@
                         <label>Branch</label>
                         <select name="branch" class="form-control form-control-sm" required>
                           <option value="">Select Branch</option>
-                          @foreach ($branches as $branch)
+                          @foreach ($branches_list as $branch)
                           <option value="{{ $branch->id }}" @selected($branch->id == request('branch'))>{{ $branch->name }}</option>
                           @endforeach
                         </select>
