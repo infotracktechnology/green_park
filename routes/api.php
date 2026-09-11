@@ -326,6 +326,18 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($files);
     });
 
+    Route::get('/visitors/{student_id}', function ($student_id) {
+        $student = Student::where('student_id', $student_id)->select('academic_year','student_id', 'student_name','course', 'section','dob','aadhar_card_no','door_no','street_name','city','district','state','pincode','blood_group','father_name', 'father_ph_no','mother_name','guardian_name','guardian_ph_no')->first();
+        $student->photo = file_exists(base_path("assets/profilepic/{$student->student_id}.jpg")) ? asset("profilepic/{$student->student_id}.jpg") : asset('img/avather.png');
+        $student->fatherphoto = file_exists(base_path("assets/fatherpic/{$student->student_id}.jpg")) ? asset("fatherpic/{$student->student_id}.jpg") : asset('img/avather.png');
+        $student->motherphoto = file_exists(base_path("assets/motherpic/{$student->student_id}.jpg")) ? asset("motherpic/{$student->student_id}.jpg") : asset('img/avather.png');
+        $student->guardianphoto = file_exists(base_path("assets/guardianpic/{$student->student_id}.jpg")) ? asset("guardianpic/{$student->student_id}.jpg") : asset('img/avather.png');
+        if (!$student) {
+            return response()->json(['status' => false,'message' => 'Student not found'], 404);
+        }
+        return response()->json(['status' => true,'data' => $student ]);
+    });
+
     Route::post('/logactivity', [StudentController::class, 'logActivity']);
 
     Route::get('/video/{student_id}/{id}', function (Request $request, $student_id, $id) {
