@@ -165,6 +165,9 @@
           </ul>
         </div>
         <ul class="navbar-nav navbar-right align-items-center">
+            <li class="nav-item mr-3">
+                <a href="javascript:void(0);" class="btn btn-light btn-sm font-weight-bold" data-toggle="modal" data-target="#contactModal"> <i class="fas fa-user-tie mr-1"></i> Contact Us </a>
+            </li>
 
           <!-- Current Time Clock -->
           <li class="nav-item dropdown d-none d-md-block">
@@ -181,8 +184,6 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
               <div class="dropdown-title">Hi, {{ auth()->user()->user_name }}</div>
-              <div class="dropdown-divider"></div>
-             <a href="javascript:void(0);"class="dropdown-item has-icon" data-toggle="modal" data-target="#contactModal"> <i class="fas fa-address-book"></i> Contact Us </a>
               <div class="dropdown-divider"></div>
               <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="javascript:void(0);" class="dropdown-item has-icon text-danger logout">
                 <i class="fas fa-sign-out-alt"></i> Logout
@@ -339,7 +340,7 @@
                                           data-target="#examCollapse">
                                       <span>
                                           <i class="fas fa-laptop text-info mr-2"></i>
-                                          ONLINE EXAM / VIDEOS
+                                          ONLINE EXAM / ONLINE CLASS / VIDEOS 
                                       </span>
                                       <i class="fas fa-chevron-down text-muted small"></i>
                                   </button>
