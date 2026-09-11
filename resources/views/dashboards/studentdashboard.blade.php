@@ -214,7 +214,7 @@ $isExamUpcoming = $exam && $exam->start_at > now();
         </div>
 
         <!-- Attendance Card (Offline Only) -->
-        @if($isOffline)
+        {{-- @if($isOffline)
         <div class="col-xl-4 col-lg-6">
           <div class="card l-bg-orange" style="border-radius: 12px;">
             <div class="card-statistic-3">
@@ -233,7 +233,7 @@ $isExamUpcoming = $exam && $exam->start_at > now();
             </div>
           </div>
         </div>
-        @endif
+        @endif --}}
 
         <!-- Microsoft Teams Card (Online Only) -->
         @if(auth()->user()->coaching_type == 'ONLINE LIVE')
