@@ -117,12 +117,14 @@ class Student extends Authenticatable
             ->first();
         $totalDays = $stats->total_days ?? 0;
         $presentDays = $stats->present_days ?? 0;
+        $absentDays = $stats->absent_days ?? 0;
         $percentage = ($totalDays > 0)
             ? round(($presentDays / $totalDays) * 100, 2)
             : 0;
         return (object) [
             'total_days' => $totalDays,
             'present_days' => $presentDays,
+            'absent_days' => $absentDays,
             'percentage' => $percentage,
         ];
     }
