@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier, StudentLog, NeetAchievements};
+use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier, StudentLog, NeetAchievements, Medical};
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Collection;
 /*
@@ -37,6 +37,7 @@ Route::group(['prefix' => 'v2'], function () {
         $attendanceStats = $attendanceService->calculateCurrentMonthStats($student->student_id);
         $student->total_attendance_days = $attendanceStats->total_days;
         $student->present_attendance_days = $attendanceStats->present_days;
+        $student->absent_attendance_days = $attendanceStats->absent_days;
         $student->branch_name = $student->branch->name ?? 'N/A';
         return response()->json($student);
     });
@@ -260,6 +261,10 @@ Route::group(['prefix' => 'v2'], function () {
     Route::get('/sickroomentry/{student_id}', function ($student_id) {
         $sickroomentry = SickRoomEntry::where('student_id', $student_id)->latest()->get();
         return response()->json($sickroomentry);
+    });
+    Route::get('/medicalentry/{student_id}', function ($student_id) {
+        $medical = Medical::where('student_id', $student_id)->latest()->get();
+        return response()->json($medical);
     });
 
     Route::get('/courierentry/{student_id}', function ($student_id) {
