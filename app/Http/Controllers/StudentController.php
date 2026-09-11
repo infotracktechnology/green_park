@@ -241,7 +241,7 @@ class StudentController extends Controller
 
         $totalDaysInMonth = $stats->total_days ?? 0;
         $presentDaysInMonth = $stats->present_days ?? 0;
-        $absentDaysInMonth = $totalDaysInMonth - $presentDaysInMonth;
+        $absentDaysInMonth = $status->absent_days ?? 0;
 
         $percentage = $totalDaysInMonth > 0 ? round(($presentDaysInMonth / $totalDaysInMonth) * 100, 2) : 0;
 
