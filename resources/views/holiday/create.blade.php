@@ -119,6 +119,25 @@
                     </select>
                   </div>
 
+                  <div class="form-group col-lg-2">
+                    <label for="branch">Branch</label>
+
+                    <select name="branch_id[]" id="branch_id" class="select2" multiple required>
+                      @foreach ($branches as $branch)
+                      <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="form-group col-lg-2">
+                    <label for="hostel">Hostel / Dayscholar</label>
+                    <select name="hostel" id="hostels" onchange="getSection();" class="form-control form-control-sm" required>
+                      <option value="">Select Option</option>
+                      @foreach (['Hostel','Dayscholar'] as $row)
+                      <option value="{{ $row }}">{{ $row }}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
 
                   <div class="form-group col-lg-3">
@@ -128,12 +147,7 @@
 
                   <div class="form-group col-lg-3">
                     <label for="holiday_type">Holiday Type</label>
-                    <select name="type" id="type" class="form-control form-control-sm" required>
-                      <option value="">Select Holiday Type</option>
-                      @foreach(['Public Holiday','Vacation','Events','Other'] as $holiday_type)
-                      <option value="{{ $holiday_type }}">{{ $holiday_type }}</option>
-                      @endforeach
-                    </select>
+                    <input type="text" name="type" id="type"  class="form-control form-control-sm">
                   </div>
 
 
@@ -178,7 +192,7 @@
      enableTime: true,
      allowInput: true,
      dateFormat: "Y-m-d H:i",
-     minDate: "today",
+    //  minDate: "today",
      plugins: [
          new confirmDatePlugin({
              confirmText: "OK",
@@ -191,7 +205,7 @@
      enableTime: false,
      allowInput: true,
      dateFormat: "Y-m-d",
-     minDate: "today",
+    //  minDate: "today",
      plugins: [
          new confirmDatePlugin({
              confirmText: "OK",
