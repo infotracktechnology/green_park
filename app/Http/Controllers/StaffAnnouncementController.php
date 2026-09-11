@@ -29,7 +29,7 @@ class StaffAnnouncementController extends Controller
     {
         $department = Staff::whereNotNull('department')->where('department', '!=', '')->distinct()->pluck('department');
         $branches = Branch::get();
-        $staff = Staff::whereNotNull('username')->where('username', '!=', '')->orderBy('username')->get(['username','branch_id', 'department'
+        $staff = Staff::whereNotNull('username')->where('username', '!=', '')->orderBy('username')->get(['username','school_initial','branch_id', 'department'
         ]);
         return view('staffannouncement.create', compact('department', 'branches', 'staff'));
     }
@@ -88,12 +88,12 @@ class StaffAnnouncementController extends Controller
         $department = Staff::whereNotNull('department')->where('department', '!=', '')->distinct()->pluck('department');
 
         $branches = Branch::get();
-
+         $staff = Staff::whereNotNull('username')->where('username', '!=', '')->orderBy('username')->get(['username', 'school_initial', 'branch_id', 'department' ]);
         if ($request->wantsJson()) {
             return response()->json([ 'status' => true, 'announcement' => $announcement, 'department' => $department, 'branches' => $branches ?? [], ]);
         }
 
-        return view('staffannouncement.edit', compact('announcement','department','branches'));
+        return view('staffannouncement.edit', compact('announcement','department','branches','staff'));
     }
 
     public function update(Request $request, StaffAnnouncement $staffannouncement)

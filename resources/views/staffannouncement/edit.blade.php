@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Staff Announcement')
 
 @section('css')
@@ -13,232 +12,119 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-
                     <div class="card card-primary">
-
                         <form method="post" id="myForm" action="{{ route('staffannouncement.update', $announcement->id) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
+                            
                             <div class="card-body">
-                            <div class="row">
+                                <div class="row">
                                     <div class="col-md-12 mb-3">
-                                        <h6 class="col-deep-purple"> Update Staff Announcement </h6>
+                                        <h6 class="col-deep-purple">Update Staff Announcement</h6>
                                     </div>
+
                                     {{-- User Type --}}
                                     <div class="form-group col-lg-3">
-                                        <label>User Type</label>
-
-                                        <select name="usertype"
-                                                id="usertype"
-                                                class="form-control form-control-sm"
-                                                required>
-
-                                            <option value="GROUP"
-                                                @selected($announcement->usertype == 'GROUP')>
-                                                GROUP
-                                            </option>
-
-                                            <option value="INDIVIDUAL"
-                                                @selected($announcement->usertype == 'INDIVIDUAL')>
-                                                INDIVIDUAL
-                                            </option>
-
+                                        <label for="usertype">User Type</label>
+                                        <select name="usertype" id="usertype" class="form-control form-control-sm" required>
+                                            <option value="GROUP" @selected($announcement->usertype == 'GROUP')>GROUP</option>
+                                            <option value="INDIVIDUAL" @selected($announcement->usertype == 'INDIVIDUAL')>INDIVIDUAL</option>
                                         </select>
                                     </div>
 
                                     {{-- Department --}}
                                     <div class="form-group col-lg-3">
-                                        <label>Department</label>
-
-                                        <select name="department[]"
-                                                id="department"
-                                                class="select2"
-                                                multiple
-                                                required>
-
-                                            <option value="All"
-                                                @selected(in_array('All', explode(',', $announcement->department ?? '')))>
+                                        <label for="department">Department</label>
+                                        <select name="department[]" id="department" class="select2" multiple required>
+                                            <option value="All" @selected(in_array('All', explode(',', $announcement->department ?? '')))>
                                                 All Department
                                             </option>
-
                                             @foreach ($department as $row)
-
-                                                <option value="{{ $row }}"
-                                                    @selected(in_array($row, explode(',', $announcement->department ?? '')))>
+                                                <option value="{{ $row }}" @selected(in_array($row, explode(',', $announcement->department ?? '')))>
                                                     {{ $row }}
                                                 </option>
-
                                             @endforeach
-
                                         </select>
                                     </div>
 
                                     {{-- Branch --}}
                                     <div class="form-group col-lg-3">
-                                        <label>Branch</label>
-
-                                        <select name="branch[]"
-                                                id="branch"
-                                                class="select2"
-                                                multiple
-                                                required>
-
+                                        <label for="branch">Branch</label>
+                                        <select name="branch[]" id="branch" class="select2" multiple required>
                                             @foreach ($branches as $branch)
-
-                                                <option value="{{ $branch->id }}"
-                                                    @selected(in_array(
-                                                        $branch->id,
-                                                        explode(',', $announcement->branch ?? '')
-                                                    ))>
-
+                                                <option value="{{ $branch->id }}" @selected(in_array($branch->id, explode(',', $announcement->branch ?? '')))>
                                                     {{ $branch->name }}
-
                                                 </option>
-
                                             @endforeach
-
                                         </select>
                                     </div>
 
                                     {{-- Title --}}
                                     <div class="form-group col-lg-3">
                                         <label for="title">Title</label>
+                                        <input type="text" name="title" id="title" class="form-control form-control-sm" value="{{ $announcement->title }}" required>
+                                    </div>
 
-                                        <input type="text"
-                                               name="title"
-                                               id="title"
-                                               class="form-control form-control-sm"
-                                               value="{{ $announcement->title }}"
-                                               required>
+                                    <div class="form-group col-lg-4" id="staff_field" style="{{ $announcement->usertype == 'INDIVIDUAL' ? '' : 'display: none;' }}">
+                                        <label for="staff">Staff</label>
+                                        <select name="staff[]" id="staff" class="form-control form-control-sm select2" multiple
+                                            {{ $announcement->usertype == 'INDIVIDUAL' ? 'required' : '' }}>
+                                        </select>
+
                                     </div>
 
                                     {{-- Attachment --}}
                                     <div class="form-group col-lg-4">
                                         <label for="attachment">Attachment</label>
-
-                                        <input type="file"
-                                               name="attachment[]"
-                                               id="attachment"
-                                               class="form-control form-control-sm"
-                                               multiple>
+                                        <input type="file" name="attachment[]" id="attachment" class="form-control form-control-sm" multiple>
 
                                         @if (!empty($announcement->attachment))
-
-                                            <div class="mt-2"
-                                                 id="existing_attachments_container">
-
+                                            <div class="mt-2" id="existing_attachments_container">
                                                 <strong>Current Attachments:</strong>
-
                                                 @foreach($announcement->attachment as $idx => $file)
-
-                                                    <div class="d-flex align-items-center justify-content-between bg-light rounded px-2 py-1 my-1"
-                                                         id="existing_file_{{ $idx }}">
-
-                                                        <input type="hidden"
-                                                               name="existing_attachment[]"
-                                                               value="{{ $file }}">
-
-                                                        <a href="{{ url($file) }}"
-                                                           target="_blank"
-                                                           class="text-truncate mr-2"
-                                                           style="max-width: 180px;">
-
-                                                            <i class="fas fa-paperclip"></i>
-                                                            {{ basename($file) }}
-
+                                                    <div class="d-flex align-items-center justify-content-between bg-light rounded px-2 py-1 my-1" id="existing_file_{{ $idx }}">
+                                                        <input type="hidden" name="existing_attachment[]" value="{{ $file }}">
+                                                        <a href="{{ url($file) }}" target="_blank" class="text-truncate mr-2" style="max-width: 180px;">
+                                                            <i class="fas fa-paperclip"></i> {{ basename($file) }}
                                                         </a>
-
-                                                        <button type="button"
-                                                                class="btn btn-sm btn-outline-danger py-0 px-1"
-                                                                onclick="document.getElementById('existing_file_{{ $idx }}').remove();">
-
+                                                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="document.getElementById('existing_file_{{ $idx }}').remove();">
                                                             &times;
-
                                                         </button>
-
                                                     </div>
-
                                                 @endforeach
-
                                             </div>
-
                                         @endif
-
                                     </div>
 
                                     {{-- Schedule --}}
                                     <div class="form-group col-lg-12">
-
                                         <div class="custom-control custom-checkbox">
-
-                                            <input type="checkbox"
-                                                   name="is_schedule"
-                                                   class="custom-control-input"
-                                                   id="is_schedule"
-                                                   value="1"
-                                                   @checked($announcement->is_schedule)>
-
-                                            <label class="custom-control-label"
-                                                   for="is_schedule">
-
-                                                Is Schedule
-
-                                            </label>
-
+                                            <input type="checkbox" name="is_schedule" class="custom-control-input" id="is_schedule" value="1" @checked($announcement->is_schedule)>
+                                            <label class="custom-control-label" for="is_schedule">Is Schedule</label>
                                         </div>
-
                                     </div>
 
-                                    <div class="col-lg-12 row"
-                                         id="schedule_fields"
-                                         style="{{ $announcement->is_schedule ? '' : 'display: none;' }}">
-
+                                    <div class="col-lg-12 row" id="schedule_fields" style="{{ $announcement->is_schedule ? '' : 'display: none;' }}">
                                         <div class="form-group col-lg-3">
-
-                                            <label>Start Datetime</label>
-
-                                            <input type="text"
-                                                   id="start_at"
-                                                   name="start_at"
-                                                   class="datetime-picker form-control form-control-sm"
-                                                   value="{{ $announcement->start_at }}"
-                                                   {{ $announcement->is_schedule ? 'required' : '' }}>
-
+                                            <label for="start_at">Start Datetime</label>
+                                            <input type="text" id="start_at" name="start_at" class="datetime-picker form-control form-control-sm" value="{{ $announcement->start_at }}" {{ $announcement->is_schedule ? 'required' : '' }}>
                                         </div>
-
                                     </div>
 
                                     {{-- Content --}}
                                     <div class="form-group col-lg-12">
-
                                         <label for="content">Content</label>
-
-                                        <textarea name="content"
-                                                  class="form-control form-control-sm"
-                                                  id="content">{{ $announcement->content }}</textarea>
-
+                                        <textarea name="content" class="form-control form-control-sm" id="content" rows="4">{{ $announcement->content }}</textarea>
                                     </div>
 
                                     {{-- Submit --}}
                                     <div class="form-group col-lg-12">
-
-                                        <button type="submit"
-                                                class="btn btn-primary">
-
-                                            Submit
-
-                                        </button>
-
+                                        <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
-
                                 </div>
-
                             </div>
-
                         </form>
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -247,42 +133,97 @@
 @endsection
 
 @section('js')
-
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 
 <script>
+    // let staffList = @json($staff);
+    // let selectedStaff = @json($announcement->staff_ids ?? []);
+    flatpickr(".datetime-picker", {
+        enableTime: true,
+        allowInput: true,
+        dateFormat: "Y-m-d H:i",
+        plugins: [
+            new confirmDatePlugin({
+                confirmText: "OK",
+                showAlways: false,
+                theme: "light"
+            })
+        ]
+    });
 
-flatpickr(".datetime-picker", {
-    enableTime: true,
-    allowInput: true,
-    dateFormat: "Y-m-d H:i",
+    $('#is_schedule').change(function () {
+        if ($(this).is(':checked')) {
+            $('#schedule_fields').show();
+            $('#start_at').attr('required', true);
+        } else {
+            $('#schedule_fields').hide();
+            $('#start_at').attr('required', false);
+        }
+    });
 
-    plugins: [
-        new confirmDatePlugin({
-            confirmText: "OK",
-            showAlways: false,
-            theme: "light"
-        })
-    ]
-});
+    let staffList = @json($staff);
+    let selectedStaff = @json($announcement->staff_ids ?? []);
 
-$('#is_schedule').change(function () {
+    $('#usertype').change(function () {
+        if ($(this).val() === 'INDIVIDUAL') {
+            $('#staff_field').show();
+            $('#staff').attr('required', true);
+            loadStaff();
+        } else {
+            $('#staff_field').hide();
+            $('#staff').removeAttr('required');
+            $('#staff').empty().trigger('change');
+        }
+    });
+    $('#branch, #department').change(function () {
+        if ($('#usertype').val() === 'INDIVIDUAL') {
+            loadStaff();
+        }
+    });
 
-    if ($(this).is(':checked')) {
+    function loadStaff()
+    {
+        let branches = $('#branch').val() || [];
+        let departments = $('#department').val() || [];
+        branches = branches.map(function (value) {
+            return String(value).trim();
+        });
+        departments = departments.map(function (value) {
+            return String(value).trim();
+        });
+        $('#staff').empty();
 
-        $('#schedule_fields').show();
-        $('#start_at').attr('required', true);
+        staffList.forEach(function (row) {
+            let staffBranch = String(row.branch_id ?? '').trim();
+            let staffDepartment = String(row.department ?? '').trim();
+            let branchMatch = branches.includes(staffBranch);
+            let departmentMatch = departments.includes(staffDepartment);
 
-    } else {
+            if (branchMatch && departmentMatch) {
+                let displayName = row.username;
+                if (row.school_initial) {
+                    displayName += ' ' + row.school_initial;
+                }
+                let option = $('<option>', {
+                    value: row.username,
+                    text: displayName
+                });
+                if (selectedStaff.includes(row.username)) {
+                    option.prop('selected', true);
+                }
+                $('#staff').append(option);
+            }
+        });
 
-        $('#schedule_fields').hide();
-        $('#start_at').attr('required', false);
-
+        $('#staff').trigger('change');
     }
 
-});
+    $(document).ready(function () {
+        if ($('#usertype').val() === 'INDIVIDUAL') {
+            loadStaff();
+        }
+    });
 
 </script>
-
 @endsection
