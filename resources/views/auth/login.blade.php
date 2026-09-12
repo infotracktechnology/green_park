@@ -420,7 +420,7 @@
             <h4 class="app_txt">GPCC</h4>
             <div class="small">Get on your mobile - Download now</div>
             <div class="download-links">
-              <a href="https://play.google.com/store/apps/details?id=com.gpcc.gpcc" target="_blank"><img src="{{asset('img/silde/google-play.png')}}" alt="Google Play">
+              <a href="https://play.google.com/store/apps/details?id=com.gpcc.gpcc" target="_blank"><img src="{{asset('img/silde/google-play.png')}}" alt="Google Play"></a>
                 {{-- <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank"><img src="{{asset('img/silde/app-store.png')}}" alt="App Store"></a> --}}
             </div>
           </div>
