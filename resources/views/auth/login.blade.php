@@ -515,9 +515,9 @@
             <img src="{{asset('img/silde/google-play.png')}}" alt="Google Play" style="width:100px">
           </a>
 
-          <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank" class="app-img">
+          {{-- <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank" class="app-img">
             <img src="{{asset('img/silde/app-store.png')}}" alt="App Store" style="width:100px">
-          </a>
+          </a> --}}
         </div>
       </div>
     </div>
