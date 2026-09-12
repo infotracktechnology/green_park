@@ -134,15 +134,15 @@
                     </select>
                   </div>
 
-                  {{-- <div class="col-md-2 col-sm-6 form-group">
-                    <label>Section</label>
-                    <select class="form-control form-control-sm" name="section" onchange="document.getElementById('filterForm').submit();">
-                      <option value="">All Sections</option>
-                      @foreach($sections as $row)
-                      <option value="{{ $row }}" @selected(request('section') == $row)>{{ $row }}</option>
+                  <div class="col-md-2 col-sm-6 form-group">
+                    <label>H/D</label>
+                    <select class="form-control form-control-sm" name="hostel_dayscholar" onchange="document.getElementById('filterForm').submit();">
+                      <option value="">All H/D</option>
+                      @foreach($hosteldayscolor as $row)
+                      <option value="{{ $row }}" @selected(request('hostel_dayscholar') == $row)>{{ $row }}</option>
                       @endforeach
                     </select>
-                  </div> --}}
+                  </div>
 
                  <div class="col-md-2 col-sm-6 form-group">
                     <label>Coaching Type</label>
@@ -209,6 +209,7 @@
                         <th>coaching type</th>
                         <th>Course</th>
                         <th>Section</th>
+                        <th>H/D</th>
                         <th>Father Number</th>
                         <th>Mother Number</th>
                         <th>Device</th>
@@ -226,6 +227,7 @@
                         <td>{{ $student->coaching_type }}</td>
                         <td>{{ $student->course }}</td>
                         <td>{{ $student->section }}</td>
+                        <td>{{ $student->hostel_dayscholar }}</td>
                         <td>{{ $student->father_ph_no }}</td>
                         <td>{{ $student->mother_ph_no }}</td>
                         <td>{{ $student->device ?? 'N/A' }}</td>
