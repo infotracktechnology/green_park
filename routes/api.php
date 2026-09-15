@@ -107,10 +107,8 @@ Route::group(['prefix' => 'v2'], function () {
         ->pluck('category')
         ->map(function ($item) {
             return trim(str_replace('/', '', $item));
-        })
-        ->filter()
-        ->unique()
-        ->values();
+        })->filter()->unique()->values();
+        
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);
     });
