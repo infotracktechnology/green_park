@@ -103,28 +103,24 @@ Route::group(['prefix' => 'v2'], function () {
             return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total, 'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark, 'markrange' => $markrange];
         });
 
-        $testgroup = ExamSubjectReport::where([['category', '!=', ''], ['stuid', $student_id]])->pluck('category')->unique();
+        $testgroup = ExamSubjectReport::where([['category', '!=', ''], ['stuid', $student_id]])
+        ->pluck('category')
+        ->map(function ($item) {
+            return trim(str_replace('/', '', $item));
+        })
+        ->filter()
+        ->unique()
+        ->values();
         $results = count($results) > 0 ? $results : [];
         return response()->json(['results' => $results, 'testgroup' => $testgroup]);
     });
 
-    Route::get('/perviousexamresult/{student_id}/{subject}', function (Request $request, $student_id, $subject) {
-    $cleanSubject = urldecode($subject);
-    $cleanSubject = str_replace(['-', '_'], ' ', $cleanSubject);
-    $cleanSubject = preg_replace('/[^\p{L}\p{N}\s]/u', '', $cleanSubject);
-    $cleanSubject = trim(preg_replace('/\s+/', ' ', $cleanSubject));
-    $escapedSubject = addcslashes($cleanSubject, '%_');
-
-    $subjectexam = ExamSubjectReport::where('category', 'like', "%{$escapedSubject}%")->where('stuid', $student_id)->whereNotIn('subject', function ($query) use ($student_id) {
-            $query->select('testname')
-                ->from('exam_answer')
-                ->where('student_id', $student_id);
-        })
-        ->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")
-        ->get();
-
-    return response()->json(['results' => $subjectexam]);
-});
+   Route::get('/perviousexamresult/{student_id}/{subject}', function (Request $request, $student_id, $subject) {
+        $subjectexam = ExamSubjectReport::where("category", "like", "%$subject%")->where("stuid", $student_id)->whereNotIn('subject', function ($query) use ($student_id) {
+            $query->select('testname')->from('exam_answer')->where('student_id', $student_id);
+        })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+        return response()->json(['results' => $subjectexam]);
+    }); 
 
     Route::get('/marksheet/{student_id}/{testname}', function (Request $request, $student_id, $testname) {
         $student = Student::where('student_id', $student_id)->select('student_name', 'user_name', 'academic_year')->first();
