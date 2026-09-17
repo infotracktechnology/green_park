@@ -459,19 +459,79 @@ public function RoomTransfer(Request $request)
         return view('hostel.inoutregister', compact('register','students','branches'));
     }
      public function HostelCourier(Request $request)
-     {
+    {
+        if ($request->ajax() && $request->has('edit')) {
+
+        $courier = HostelCourier::with('hostel')->find($request->edit);
+        if (!$courier) {
+            return response()->json(['success' => false,'message' => 'Courier entry not found'], 404);
+        }
+
+        return response()->json([
+            'success'          => true,
+            'student_id'       => $courier->student_id,
+            'branch_id'        => $courier->hostel?->branch_id,
+            'hostel_id'        => $courier->hostel_id,
+            'hostel_name'      => $courier->hostel?->name,
+            'room_no'          => $courier->room_no,
+            'sections'         => $courier->section,
+            'datetime'         => $courier->datetime_arrival->format('Y-m-d H:i'),
+            'courier_company'  => $courier->courier_company,
+            'sender_info'      => $courier->sender_info,
+            'courier_details'  => $courier->courier_details,
+        ]);
+    }
+        if ($request->ajax() && $request->has('student')) {
+            $student = Student::where('student_id', $request->student)->where('academic_year', $this->academic_year)->first();
+
+            if (!$student) {
+                return response()->json(['success' => false,'message' => 'Student not found'], 404);
+            }
+
+            $hostel = Hostel::find($student->hostel_id);
+            return response()->json([
+                'success'     => true,
+                'branch_id'   => $hostel?->branch_id,
+                'hostel_id'   => $student->hostel_id,
+                'hostel_name' => $hostel?->name,
+                'room_no'     => $student->room_no,
+                'sections'    => $student->section
+            ]);
+        }
+
         if ($request->isMethod('post')) {
             $data = $request->except(['_token', 'branch']);
-            $courier = HostelCourier::create($data);
-            return back()->with('success', "Courier entry added successfully");
+            HostelCourier::create($data);
+            return back()->with( 'success', "Courier entry added successfully");
         }
-        if($request->delete) {
-           $courier = HostelCourier::find($request->delete)->delete();
-           return back()->with('success', "Courier entry deleted successfully");
+        if ($request->delete) {
+            $courier = HostelCourier::find($request->delete);
+            if ($courier) {
+                $courier->delete();
+            }
+            return back()->with('success',"Courier entry deleted successfully" );
         }
-        $hostelcourier = HostelCourier::with(['hostel', 'student'])->latest()->get();
-        return view('hostel.hostelcourier', compact('hostelcourier'));
-     }
+
+        $hostelcourier = HostelCourier::with(['hostel', 'student' ])->latest()->get();
+
+        $students = Student::where('academic_year', $this->academic_year)->when(auth()->user()->branch, fn($q) => $q->where('campus', 'like', '%' . auth()->user()->branch . '%' ) )
+            ->where('hostel_dayscholar', 'HOSTEL')
+            ->whereNotNull('hostel_id')
+            ->whereNotNull('room_no')
+            ->whereNotNull('section')
+            ->orderBy('student_name')
+            ->get();
+
+        $branches = Branch::all();
+        return view('hostel.hostelcourier', compact('hostelcourier', 'students', 'branches'));
+    }
+    public function updateCourier(Request $request, $id)
+    {
+        $courier = HostelCourier::findOrFail($id);
+        $data = $request->except(['_token','_method', 'branch' ]);
+        $courier->update($data);
+        return redirect()->route('hostel.courier')->with('success', 'Courier entry updated successfully');
+            }
      public function Topup(Request $request) {
          if ($request->ajax()) {
 

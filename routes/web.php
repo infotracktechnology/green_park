@@ -152,6 +152,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::match(['get', 'post'], 'hostel/room/reallocation', 'RoomReallocation')->name('room.reallocation');
         Route::match(['get', 'post'], 'hostel/room/inoutregister', 'InOutRegister')->name('hostel.inoutregister');
         Route::match(['get', 'post'], 'hostel/room/courier', 'HostelCourier')->name('hostel.courier');
+        Route::put('/hostel/courier/{id}',[HostelController::class, 'updateCourier'])->name('hostel.courier.update');
     });
 
     // Finance Module
