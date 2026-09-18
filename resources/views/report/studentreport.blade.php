@@ -71,6 +71,15 @@
 
                                         </select>
                                     </div>
+                                    <div class="form-group col-lg-2 col-md-6">
+                                        <label>From Date</label>
+                                        <input type="date" name="from_date" class="form-control" value="{{ old('from_date', request('from_date')) }}">
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-6">
+                                        <label>To Date</label>
+                                        <input type="date" name="to_date" class="form-control" value="{{ old('to_date', request('to_date')) }}">
+                                    </div>
 
                                      <div class="col-md-2 mt-4">
                                         <button class="btn btn-primary"> Download Report </button>
