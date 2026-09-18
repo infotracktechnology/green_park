@@ -11,11 +11,13 @@
             margin: 0;
             padding: 0;
             color: #000;
-            font-size: 11px;
+            font-size: 14px;
             line-height: 1.2;
         }
 
-        .text-center { text-align: center; }
+        .text-center { text-align: center;
+        font-size: 14px;
+     }
         .text-left { text-align: left; }
         .text-right { text-align: right; }
         .text-bold { font-weight: bold; }
@@ -39,7 +41,7 @@
         }
 
         .institute-title {
-            font-size: 15px;
+            font-size: 20px;
             font-weight: bold;
             letter-spacing: 0.3px;
         }
@@ -82,7 +84,7 @@
         /* Section Titles */
         .section-heading {
             text-align: center;
-            font-size: 11.5px;
+            font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
             margin: 10px 0 4px 0;
@@ -101,7 +103,7 @@
             border: 1px solid #000;
             padding: 2.5px 4px;
             text-align: center;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .report-table th {
@@ -171,11 +173,15 @@
                         GREEN PARK CAREER ACADEMY, {{ $student->branch->name ?? 'COIMBATORE' }}
                     </div>
                     <div class="statement-title uppercase">
-                        STATEMENT OF MARKS ({{ $student->coaching_type ?? 'LONGTERM' }})
+                        STATEMENT OF MARKS ({{ $student->coaching_type === 'OFFLINE' ? 'LONGTERM' : $student->coaching_type }})
                     </div>
                     @if(!empty($student->academic_period) || !empty($student->academic_year))
                         <div class="date-range">
-                            ({{ $student->academic_period ?? $student->academic_year }})
+                            @if(request('from_date') && request('to_date'))
+                                ({{ \Carbon\Carbon::parse(request('from_date'))->format('d-m-Y') }}
+                                To
+                                {{ \Carbon\Carbon::parse(request('to_date'))->format('d-m-Y') }})
+                            @endif
                         </div>
                     @endif
                 </td>
@@ -254,11 +260,21 @@
                     && $rows->contains(
                         fn($r) => isset($r['overall_top']) && $r['overall_top'] !== null
                     );
+
+                    $categoryTitle = strtoupper(
+                        trim($group['category'] ?? 'TEST REPORT')
+                    );
+
+                    if (str_contains($categoryTitle, 'WEEKEND')) {
+                        $categoryTitle = 'WEEKEND SLIP TEST REPORT';
+                    } elseif (str_contains($categoryTitle, 'GRAND')) {
+                        $categoryTitle = 'GRAND TEST REPORT';
+                    }
             @endphp
 
             {{-- Category Title --}}
             <div class="section-heading">
-                {{ strtoupper($group['category'] ?? 'TEST REPORT') }}
+                 {{ $categoryTitle }}
             </div>
 
             <table class="report-table">
