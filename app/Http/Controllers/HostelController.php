@@ -153,16 +153,30 @@ class HostelController extends Controller
         foreach ($rooms as $room) {
             $cots = HostelRoom::where('hostel_id', $hostels->id)->where('room_no', $room->room_no)->get();
 
-            $occupiedCots = Student::where('hostel_dayscholar', 'HOSTEL')->where('hostel_id', $hostels->id)
+            $students = Student::where('hostel_id', $hostels->id)
             ->where('room_no', $room->room_no)
             ->where('academic_year', $this->academic_year)
-            ->pluck('cots_no')->toArray();
+            ->get()
+            ->keyBy('cots_no');
 
             foreach ($cots as $cot) {
-               $cot->status = in_array($cot->cart_no, $occupiedCots) ? 'occupied' : 'free';
+                $student = $students->get($cot->cart_no);
+
+            if ($student) {
+
+                if ($student->hostel_dayscholar === 'HOSTEL') {
+                    $cot->status = 'hostel_occupied';
+                } else {
+                    $cot->status = 'dayscholar_occupied';
+                }
+
+            } else {
+                $cot->status = 'free';
             }
-            $room->cots = $cots;
         }
+
+        $room->cots = $cots;
+    }
         
 
         return view('hostel.show', compact('hostels', 'rooms'));
@@ -229,7 +243,7 @@ class HostelController extends Controller
         }
 
         if ($request->reason && $request->datetime) {
-            $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => '', 'room_no' => '', 'cots_no' => '', 'hostel_dayscholar' => 'DAYSCHOLAR', 'ac_nonac' => '']);
+            $student = Student::where('student_id', $request->student_id)->update(['hostel_id' => null, 'room_no' => null, 'cots_no' => null]);
             $vacate = DB::table('vacate_log')->insert($request->all());
             return back()->with('success', "Room vacated successfully for student $request->student_id");
         }
@@ -241,7 +255,7 @@ class HostelController extends Controller
 
         $availableStudents = Student::where('hostel_dayscholar', 'HOSTEL')->whereNull('cots_no')->get();
 
-        $allocatedStudents = ($hostelId && $roomNo) ? Student::where('hostel_dayscholar', 'HOSTEL')->where('hostel_id', $hostelId)->where('room_no', $roomNo)->get() : collect();
+        $allocatedStudents = ($hostelId && $roomNo) ? Student::where('hostel_id', $hostelId)->where('room_no', $roomNo)->get() : collect();
 
         $carts = HostelRoom::where('hostel_id', $hostelId)->where('room_no', $roomNo)->whereNotIn('cart_no',fn($q) => $q->select('cots_no')->from('student')->where('hostel_id', $hostelId)->where('room_no', $roomNo))->get()->pluck('cart_no');
 

@@ -89,6 +89,7 @@
                       <thead>
                         <tr>
                           <th>S.No</th>
+                          <th>H/D</th>
                           <th>Student ID</th>
                           <th>Name</th>
                           <th>Section</th>
@@ -101,6 +102,7 @@
                         @foreach ($allocatedStudents as $key => $row)
                         <tr>
                           <td>{{ $key+1 }}</td>
+                          <td>{{ $row->hostel_dayscholar}}</td>
                           <td>{{ $row->student_id }}</td>
                           <td>{{ $row->student_name }}</td>
                           <td>{{ $row->section }}</td>
