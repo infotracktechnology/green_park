@@ -181,7 +181,7 @@
                 </td>
                 <td style="width: 12%; text-align: right;">
                     <div class="roll-box">
-                        {{ $student->roll_no ?? $loop->iteration }}
+                        {{  $loop->iteration }}
                     </div>
                 </td>
             </tr>
@@ -190,19 +190,28 @@
         {{-- ================= STUDENT DETAILS ================= --}}
         <table class="student-info-table">
             <tr>
-                <td style="width: 58%;">
-                    STUDENT NAME : <span class="uppercase">{{ $student->student_name ?? '' }}</span>
+                <td style="width: 75%;">
+                    STUDENT NAME : <span class="uppercase">{{ $student->student_name }}</span>
                 </td>
-                <td style="width: 42%;">
-                    COURSE : <span class="uppercase">{{ $student->course ?? '' }}</span>
-                </td>
+
+                 @if(strtoupper(trim($student->coaching_type ?? '')) === 'OFFLINE')
+                <td>
+                    CLASS : <span class="uppercase">{{ $student->section }} - {{ $student->batch }}</span>
+                @endif
+            </td>
+
+                <td>
+                @if(strtoupper(trim($student->coaching_type ?? '')) !== 'OFFLINE')
+                    COURSE : <span class="uppercase">{{ $student->course }}</span>
+                @endif
+            </td>
             </tr>
             <tr>
                 <td>
-                    STUDENT ID : <span>{{ $student->student_id ?? '' }}</span>
+                    STUDENT ID : <span>{{ $student->student_id  }}</span>
                 </td>
                 <td>
-                    GENDER : <span class="uppercase">{{ $student->gender ?? 'MALE' }}</span>
+                    GENDER : <span class="uppercase">{{ $student->gender ?? '' }}</span>
                 </td>
             </tr>
         </table>
@@ -236,9 +245,10 @@
                     }
                 }
 
-                $hasTotal = $rows->contains(
-                    fn($r) => isset($r['total']) && $r['total'] !== null
-                );
+                $hasTotal = ($group['type'] ?? '') === 'simple'
+                    && $rows->contains(
+                        fn($r) => isset($r['total']) && $r['total'] !== null
+                    );
 
                 $hasOverallTop = ($group['type'] ?? '') === 'simple'
                     && $rows->contains(
@@ -312,7 +322,7 @@
                                 @endif
                             </td>
 
-                            {{-- Subject Marks --}}
+                             {{-- Subject Marks --}}
                            @foreach($subjectLabels as $label)
                             @php
                                 $rowSubjects = $row['subjects'] ?? [];
@@ -330,7 +340,6 @@
 
                              @endforeach
 
-                            {{-- Total --}} 
                             @if($hasTotal)
                                 <td class="text-bold" style="width: 10%;">
                                     @if(isset($row['total']) && $row['total'] !== null)
@@ -347,21 +356,41 @@
                         </tr>
                     @endforeach
 
-                    {{-- Average Row --}}
                     @if(isset($group['averages']) || isset($group['show_average']))
                         <tr class="avg-row">
                             <td colspan="2" class="text-bold" style="font-size: 11px;">Average</td>
-                            @foreach($subjectLabels as $label)
-                                <td>
-                                    {{ $group['averages'][$label] ?? '0' }}
-                                    @if(isset($subjectMaxMarks[$label]))
-                                        / {{ $subjectMaxMarks[$label] }}
-                                    @endif
-                                </td>
-                            @endforeach
+                           @foreach($subjectLabels as $label)
+                            @php
+                                $maxMark = null;
+
+                                foreach ($subjectMaxMarks as $maxData) {
+                                    if (
+                                        is_array($maxData) &&
+                                        isset($maxData['label']) &&
+                                        strtoupper($maxData['label']) === strtoupper($label)
+                                    ) {
+                                        $maxMark = $maxData['mark'] ?? null;
+                                        break;
+                                    }
+                                }
+                            @endphp
+
+                            <td>
+                                {{ $group['averages'][$label] ?? '0' }}
+
+                                @if($maxMark !== null)
+                                    / {{ $maxMark }}
+                                @endif
+                            </td>
+                        @endforeach
 
                             @if($hasTotal)
-                                <td>{{ $group['averages']['total'] ?? '0' }}</td>
+                                <td>
+                                    {{ $group['averages']['total'] ?? '0' }}
+                                    @if(isset($group['total_max']))
+                                        / {{ $group['total_max'] }}
+                                    @endif
+                                </td>
                             @endif
 
                             @if($hasOverallTop)
@@ -381,7 +410,6 @@
                     @if($signData)
                         <img class="sign-img" src="data:image/png;base64,{{ $signData }}" alt="Signature">
                     @else
-                        {{-- Fallback styling if image not present --}}
                         <div style="font-family: cursive; font-size: 16px; color: #1a0dab; margin-bottom: 2px;">
                             Mvg. Bymd
                         </div>
