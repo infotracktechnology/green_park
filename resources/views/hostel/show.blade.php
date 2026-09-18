@@ -71,9 +71,19 @@
                                 <td>{{ $room->no_of_cots }}</td>
                                 <td>
                                     @foreach ($room->cots as $cot)
-                                        <span class="badge badge-{{ $cot->status === 'occupied' ? 'danger' : 'success' }}">
-                                            {{ $cot->cart_no }}
-                                        </span>
+                                        @if ($cot->status === 'hostel_occupied')
+                                            <span class="badge badge-danger">
+                                                {{ $cot->cart_no }}
+                                            </span>
+                                        @elseif ($cot->status === 'dayscholar_occupied')
+                                            <span class="badge badge-warning">
+                                                {{ $cot->cart_no }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-success">
+                                                {{ $cot->cart_no }}
+                                            </span>
+                                        @endif
                                     @endforeach
                                 </td>
                                 <td>
