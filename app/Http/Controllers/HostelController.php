@@ -153,7 +153,7 @@ class HostelController extends Controller
         foreach ($rooms as $room) {
             $cots = HostelRoom::where('hostel_id', $hostels->id)->where('room_no', $room->room_no)->get();
 
-            $occupiedCots = Student::where('hostel_id', $hostels->id)
+            $occupiedCots = Student::where('hostel_dayscholar', 'HOSTEL')->where('hostel_id', $hostels->id)
             ->where('room_no', $room->room_no)
             ->where('academic_year', $this->academic_year)
             ->pluck('cots_no')->toArray();
@@ -241,7 +241,7 @@ class HostelController extends Controller
 
         $availableStudents = Student::where('hostel_dayscholar', 'HOSTEL')->whereNull('cots_no')->get();
 
-        $allocatedStudents = ($hostelId && $roomNo) ? Student::where('hostel_id', $hostelId)->where('room_no', $roomNo)->get() : collect();
+        $allocatedStudents = ($hostelId && $roomNo) ? Student::where('hostel_dayscholar', 'HOSTEL')->where('hostel_id', $hostelId)->where('room_no', $roomNo)->get() : collect();
 
         $carts = HostelRoom::where('hostel_id', $hostelId)->where('room_no', $roomNo)->whereNotIn('cart_no',fn($q) => $q->select('cots_no')->from('student')->where('hostel_id', $hostelId)->where('room_no', $roomNo))->get()->pluck('cart_no');
 
@@ -258,7 +258,8 @@ public function RoomTransfer(Request $request)
                 'to_cot_no'    => 'required',
             ]);
 
-            $isOccupied = Student::where('hostel_id', $request->to_hostel_id)
+            $isOccupied = Student::where('hostel_dayscholar', 'HOSTEL')
+                ->where('hostel_id', $request->to_hostel_id)
                 ->where('academic_year', $this->academic_year)
                 ->where('room_no', $request->to_room_no)
                 ->where('cots_no', $request->to_cot_no)
@@ -309,7 +310,8 @@ public function RoomTransfer(Request $request)
                 $hostelId = $request->hostel_id;
                 $roomNo = $request->room_no;
 
-                $occupiedCots = Student::where('hostel_id', $hostelId)
+                $occupiedCots = Student::where('hostel_dayscholar', 'HOSTEL')
+                    ->where('hostel_id', $hostelId)
                     ->where('room_no', $roomNo)
                     ->where('academic_year', $this->academic_year)
                     ->whereNotNull('cots_no')
@@ -342,7 +344,7 @@ public function RoomTransfer(Request $request)
         
         $section = $request->hostel_id ? Student::where('hostel_id', $request->hostel_id)->distinct()->pluck('section') : collect();
 
-        $students = $request->section ? Student::where('hostel_id', $request->hostel_id)->when($request->section, fn($q) => $q->where('section', $request->section))->get() : collect();
+        $students = $request->section ? Student::where('hostel_dayscholar', 'HOSTEL')->where('hostel_id', $request->hostel_id)->when($request->section, fn($q) => $q->where('section', $request->section))->get() : collect();
         $attendance = $request->attendance_date ? HostelAttendance::where('hostel_id', $request->hostel_id)->where('section', $request->section)->where('attendance_date', $request->attendance_date)->get() : collect();
 
         if ($request->has('delete')) {
