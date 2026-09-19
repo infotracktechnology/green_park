@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
-use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport, PhoneCard, Medical};
+use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, ExamName, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport, PhoneCard, Medical};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -162,14 +162,14 @@ class ReportController extends Controller
 
     public function examLogReport(Request $request)
     {
-        $exams = Exam::select('id', 'name')->orderBy('id','desc')->get();
+        $exams = ExamName::select('id', 'name')->where('coaching_type', '!=', 'OFFLINE')->orderBy('id','desc')->get();
         
         if ($request->isMethod('post')) {
             $student = Student::where('student_id', $request->student_id)->first();
             if (!$student) {
                 return back()->with('error','Student not found');
             }
-            $exam = Exam::find($request->exam_id);
+            $exam = ExamName::find($request->exam_id);
             $logs = StudentLog::where('student_id', $student->student_id)->whereRaw("action LIKE ?", ['%' . $exam->name . '%'])->orderBy('created_at')->get();
 
             if ($logs->isEmpty()) {
@@ -2055,21 +2055,32 @@ class ReportController extends Controller
         $reports = [];
 
         $allExamRows = DB::table('examsubjectreport')
-            ->join('student', 'student.student_id', '=', 'examsubjectreport.stuid')
-            ->where('student.academic_year', $this->academic_year)
-            ->where('student.campus', $request->branch)
-            ->where('student.course', $request->course)
-            ->where('student.section', $request->section)
-            ->where('student.coaching_type', $request->coaching_type)
-            ->select(
-                'examsubjectreport.testid',
-                'examsubjectreport.category',
-                'examsubjectreport.subject',
-                'examsubjectreport.exdate'
-            )
-            ->distinct()
-            ->orderBy('examsubjectreport.exdate')
-            ->get();
+    ->join('student', 'student.student_id', '=', 'examsubjectreport.stuid')
+    ->where('student.academic_year', $this->academic_year)
+    ->where('student.campus', $request->branch)
+    ->where('student.course', $request->course)
+    ->where('student.section', $request->section)
+    ->where('student.coaching_type', $request->coaching_type)
+    ->where('examsubjectreport.batch', function ($query) use ($request) {
+        $query->select('batch')
+            ->from('student')
+            ->where('academic_year', $this->academic_year)
+            ->where('campus', $request->branch)
+            ->where('course', $request->course)
+            ->where('section', $request->section)
+            ->where('coaching_type', $request->coaching_type)
+            ->limit(1);
+    })
+    ->select(
+        'examsubjectreport.testid',
+        'examsubjectreport.category',
+        'examsubjectreport.subject',
+        'examsubjectreport.exdate',
+        'examsubjectreport.batch'
+    )
+    ->distinct()
+    ->orderBy('examsubjectreport.exdate')
+    ->get();
 
         $fromDate = $request->filled('from_date')
             ? Carbon::parse($request->from_date)->startOfDay()
@@ -2106,6 +2117,7 @@ class ReportController extends Controller
         foreach ($students as $student) {
             $studentRows = DB::table('examsubjectreport')
                 ->where('stuid', $student->student_id)
+                ->where('batch', $student->batch)
                 ->get()
                 ->map(function ($row) {
                     $row = $this->normalizeRow($row);
@@ -2161,10 +2173,7 @@ class ReportController extends Controller
                     ];
                 }
             }
-
-            $studentReport = $rows->isNotEmpty()
-                ? $this->buildDynamicReport($rows, $subjectMaxMarks, $request->section)
-                : collect();
+            $studentReport = $rows->isNotEmpty() ? $this->buildDynamicReport($rows, $subjectMaxMarks, $request->section) : collect();
 
             $reports[] = [
                 'student' => $student,
@@ -2185,9 +2194,7 @@ class ReportController extends Controller
         if (empty($reports)) {
             return back()->with('error', 'No students found');
         }
-
         $pdf = PDF::loadView('pdf.studentreport', compact('reports'));
-
         return $pdf->stream('studentReport.pdf');
     }
 
@@ -2228,15 +2235,36 @@ class ReportController extends Controller
         $row->_is_numbered = ($examNumber !== null);
 
         if ($examNumber !== null) {
-            $row->_pta_group_key = $baseCategory . '|' . $examNumber;
-        } elseif (str_contains(strtoupper($baseCategory), 'CUMULATIVE') && $categorySubject !== null) {
+
+            // CUMULATIVE category with subject group
+            if (
+                str_contains(strtoupper($baseCategory), 'CUMULATIVE') &&
+                $categorySubject !== null
+            ) {
+                $row->_pta_group_key =
+                    $baseCategory . '|' . $categorySubject . '|' . $examNumber;
+            } else {
+                // WEEKEND / GRAND / normal numbered exams
+                $row->_pta_group_key =
+                    $baseCategory . '|' . $examNumber;
+            }
+
+        } elseif (
+            str_contains(strtoupper($baseCategory), 'CUMULATIVE') &&
+            $categorySubject !== null
+        ) {
+
             $dateKey = $row->parsed_date
                 ? $row->parsed_date->format('Y-m-d')
                 : trim((string) $row->exdate);
 
-            $row->_pta_group_key = $baseCategory . '|' . $categorySubject . '|' . $dateKey;
+            $row->_pta_group_key =
+                $baseCategory . '|' . $categorySubject . '|' . $dateKey;
+
         } else {
-            $row->_pta_group_key = $baseCategory . '|' . $examName;
+
+            $row->_pta_group_key =
+                $baseCategory . '|' . $examName;
         }
 
         return $row;
@@ -2253,6 +2281,29 @@ class ReportController extends Controller
             }
 
             return $baseCategory;
+        });
+        $groups = $groups->sortBy(function ($categoryRows, $categoryName) {
+            $categoryUpper = strtoupper(trim($categoryName));
+            $categorySubject = strtoupper( trim($categoryRows->first()->_category_subject ?? ''));
+            if (str_contains($categoryUpper, 'WEEKEND')) {
+                return 1;
+            }
+            if (
+                str_contains($categoryUpper, 'CUMULATIVE') &&
+                $categorySubject === 'PHY/ZOO'
+            ) {
+                return 2;
+            }
+            if (
+                str_contains($categoryUpper, 'CUMULATIVE') &&
+                $categorySubject === 'CHE/BOT'
+            ) {
+                return 3;
+            }
+            if (str_contains($categoryUpper, 'GRAND')) {
+                return 4;
+            }
+            return 5;
         });
 
         $report = collect();
@@ -2360,13 +2411,7 @@ class ReportController extends Controller
         return $report->values();
     }
 
-    private function buildMergedReport(
-        $rows,
-        $groupField = null,
-        $includeOverallTop = false,
-        $section = null,
-        $isWeekend = false
-    ) {
+    private function buildMergedReport($rows, $groupField = null, $includeOverallTop = false, $section = null, $isWeekend = false ) {
         $groups = $groupField
             ? $rows->groupBy($groupField)
             : $rows->map(fn($r) => collect([$r]));

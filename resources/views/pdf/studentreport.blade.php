@@ -151,7 +151,7 @@
 @php
    
 
-    $signPath = public_path('img/chairman_sign.png');
+    $signPath = asset('img/favicon.png');
     $signData = file_exists($signPath) ? base64_encode(file_get_contents($signPath)) : '';
 @endphp
 
@@ -170,7 +170,7 @@
                 </td>
                 <td style="width: 73%;" class="text-center">
                     <div class="institute-title uppercase">
-                        GREEN PARK CAREER ACADEMY, {{ $student->branch->name ?? 'COIMBATORE' }}
+                        GREEN PARK COACHING CENTRE, {{ strtoupper($student->branch->campus == 'GP' ? 'NAMAKKAL' : ($student->branch->campus ?? '')) }}
                     </div>
                     <div class="statement-title uppercase">
                         STATEMENT OF MARKS ({{ $student->coaching_type === 'OFFLINE' ? 'LONGTERM' : $student->coaching_type }})
@@ -196,13 +196,13 @@
         {{-- ================= STUDENT DETAILS ================= --}}
         <table class="student-info-table">
             <tr>
-                <td style="width: 75%;">
+                <td style="width: 83%;">
                     STUDENT NAME : <span class="uppercase">{{ $student->student_name }}</span>
                 </td>
 
                  @if(strtoupper(trim($student->coaching_type ?? '')) === 'OFFLINE')
                 <td>
-                    CLASS : <span class="uppercase">{{ $student->section }} - {{ $student->batch }}</span>
+                    CLASS : <span class="uppercase">{{ $student->section }} </span>
                 @endif
             </td>
 
@@ -217,7 +217,7 @@
                     STUDENT ID : <span>{{ $student->student_id  }}</span>
                 </td>
                 <td>
-                    GENDER : <span class="uppercase">{{ $student->gender ?? '' }}</span>
+                    BATCH : <span class="uppercase"> {{ $student->batch }}</span>
                 </td>
             </tr>
         </table>
@@ -266,9 +266,9 @@
                     );
 
                     if (str_contains($categoryTitle, 'WEEKEND')) {
-                        $categoryTitle = 'WEEKEND SLIP TEST REPORT';
+                        $categoryTitle = 'WEEKEND SLIP TEST MARKS';
                     } elseif (str_contains($categoryTitle, 'GRAND')) {
-                        $categoryTitle = 'GRAND TEST REPORT';
+                        $categoryTitle = 'GRAND TEST MARKS';
                     }
             @endphp
 
@@ -422,14 +422,8 @@
         <table class="footer-section">
             <tr>
                 <td style="width: 70%;"></td>
-                <td style="width: 30%; text-align: center;">
-                    @if($signData)
-                        <img class="sign-img" src="data:image/png;base64,{{ $signData }}" alt="Signature">
-                    @else
-                        <div style="font-family: cursive; font-size: 16px; color: #1a0dab; margin-bottom: 2px;">
-                            Mvg. Bymd
-                        </div>
-                    @endif
+                <td style="width: 30%; padding: 20px; text-align: center;">
+                 <img class="chairman-logo" src="data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/chairman_sign.jpeg'))) }}" style="width: 80px;">
                     <div class="chairman-text">CHAIRMAN</div>
                 </td>
             </tr>
