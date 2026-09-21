@@ -140,7 +140,7 @@
                         <td>{{ $row->subject }}</td>
                         {{-- If single subject: show only total mark --}}
                         @if($isSingleSubject)
-                          <td>{{ $row->tot }} / {{ $row->totmark }}</td>
+                          <td>{{ $row->nettot }} / {{ $row->totmark }}</td>
                         @else
                           {{-- Multi-subject: show marks for each subject and net total --}}
                           @foreach($availableSubjects as $cols)
