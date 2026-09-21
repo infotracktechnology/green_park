@@ -111,6 +111,7 @@
                         if ($exists) {
                             $availableSubjects[$name] = $cols;
                         }
+                        $isSingleSubject = count($availableSubjects) === 1;
                     }
                     ?>
                     <thead>
