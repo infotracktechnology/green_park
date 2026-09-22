@@ -266,16 +266,24 @@ class StaffProfileController extends Controller
         $branches = Branch::all();
         $staffDetails = Staff::all();
         $departments = Staff::distinct()->pluck('department');
+        $coachingtypes = Student::distinct()->pluck('coaching_type');
         $sections = Student::distinct()
+            ->where('academic_year', $this->academic_year)
             ->whereNotNull('section')
             ->whereNotNull('campus')
             ->whereNotNull('coaching_type')
             ->where('section', '!=', '')
             ->where('campus', '!=', '')
-            ->where('coaching_type', '!=', '')
-            ->get(['section', 'campus', 'coaching_type']);
+            ->where('coaching_type', '!=', '');
 
-        return view('staff.class', compact('branches', 'departments', 'staffDetails', 'sections'));
+        if ($request->filled('branch')) {
+            $sections->where('campus', $request->branch);
+        }
+
+        $sections = $sections
+            ->orderBy('section', 'asc')
+            ->get(['section', 'campus', 'coaching_type']);
+        return view('staff.class', compact('branches', 'departments', 'staffDetails', 'sections', 'coachingtypes'));
     }
 
 
