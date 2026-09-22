@@ -28,7 +28,7 @@
                                         <select name="name" id="staff_name" class="select2 form-control form-control-sm" required>
                                             <option value="">Choose Staff Name</option>
                                             @foreach ($staffDetails as $staff)
-                                                <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                                <option value="{{ $staff->id }}">{{ $staff->name }} - {{ $staff->school_initial }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -49,21 +49,20 @@
                         </div>
                     </div>
 
-                    <!-- Assignment Tabs -->
                    <!-- Assignment Tabs -->
-<div class="card" id="assignCard" style="display: none;">
-    <div class="card-header"><h4>Assignment Tabs</h4></div>
-    <div class="card-body">
-        <ul class="nav nav-pills mb-3" id="assignTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="class-tab" data-toggle="tab" href="#class" role="tab">Class Assign</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="subject-tab" data-toggle="tab" href="#subject" role="tab">Subject Assign</a>
-            </li>
-        </ul>
+            <div class="card" id="assignCard" style="display: none;">
+                <div class="card-header"><h4>Assignment Tabs</h4></div>
+                <div class="card-body">
+                    <ul class="nav nav-pills mb-3" id="assignTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="class-tab" data-toggle="tab" href="#class" role="tab">Class Assign</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="subject-tab" data-toggle="tab" href="#subject" role="tab">Subject Assign</a>
+                        </li>
+                    </ul>
 
-        <div class="tab-content" id="assignTabContent">
+                <div class="tab-content" id="assignTabContent">
 
             <!-- CLASS ASSIGN TAB -->
             <div class="tab-pane fade show active" id="class" role="tabpanel">
@@ -88,7 +87,7 @@
                             <label>Coaching Type</label>
                             <select name="coaching_type" id="coaching_type_class" class="select2 form-control form-control-sm" required>
                                 <option value="">Choose Coaching Type</option>
-                                @foreach (['Offline', 'Online Recorded', 'Online Live', 'Test Series', '11', '12'] as $ctype)
+                                @foreach ($coachingtypes as $ctype)
                                     <option value="{{ $ctype }}">{{ $ctype }}</option>
                                 @endforeach
                             </select>
@@ -139,7 +138,7 @@
                             <label>Coaching Type</label>
                             <select name="coaching_type" id="coaching_type_subject" class="select2 form-control form-control-sm" required>
                                 <option value="">Choose Coaching Type</option>
-                                @foreach (['Offline', 'Online Recorded', 'Online Live', 'Test Series', '11 to XI - OB','12 TO XII - OB'] as $ctype)
+                                @foreach ($coachingtypes as $ctype)
                                     <option value="{{ $ctype }}">{{ $ctype }}</option>
                                 @endforeach
                             </select>
@@ -201,19 +200,20 @@
             const branch = $(`#branch_${type}`).val();
             const coachingType = $(`#coaching_type_${type}`).val();
             const staffId = $('#staff_name').val();
-            const slug = slugify(coachingType);
+            const slug = coachingType ? coachingType.toLowerCase().trim().replace(/\s+/g, '-') : '';
 
             $(`${wrapper} .form-check`).hide();
             $(`${wrapper} input[type="checkbox"]`).prop('checked', false);
-
-            if (!branch || !coachingType) return;
+            if (!branch || !coachingType) {
+                return;
+            }
             $(`${wrapper} .${type}-section-${branch}-${slug}`).show();
-
-            if (type === 'class' && staffAssignData[staffId]?.class_assign?.branch_id == branch) {
+            if (type === 'class' && staffAssignData[staffId]?.class_assign?.branch_id == branch ) {
                 const assigned = staffAssignData[staffId].class_assign;
                 if (assigned.coaching_types === coachingType) {
                     (assigned.sections || []).forEach(section => {
-                        $(`${wrapper} input[value="${section}"]`).prop('checked', true);
+                        $(`${wrapper} input[value="${section}"]`)
+                            .prop('checked', true);
                     });
                 }
             }
