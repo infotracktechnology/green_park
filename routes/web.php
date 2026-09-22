@@ -253,6 +253,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('examination/subjectrangereport',[ReportController::class, 'SubjectRangeReport'])->name('subjectrangereport');
         Route::get('examination/subject-range-subjects',[ReportController::class, 'getSubjectRangeSubjects'])->name('subjectrangesubjects');
         Route::get('examination/dump', [ReportController::class, 'Dump_Report'])->name('dump');
+        Route::get('student/allotment', [ReportController::class, 'allotment'])->name('allotment');
     });
 });
 

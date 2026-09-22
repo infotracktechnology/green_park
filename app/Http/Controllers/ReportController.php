@@ -2687,4 +2687,80 @@ class ReportController extends Controller
             return null;
         }
     }
+    public function allotment(Request $request)
+    {
+        $user = auth()->user();
+       $query = Student::with(['branch', 'hostel'])
+    ->leftJoin('hostel_rooms', function ($join) {
+        $join->on('hostel_rooms.hostel_id', '=', 'student.hostel_id')
+             ->on('hostel_rooms.room_no', '=', 'student.room_no')
+             ->on('hostel_rooms.cart_no', '=', 'student.cots_no');
+    })
+    ->select(
+        'student.*',
+        'hostel_rooms.floor as hostel_floor'
+    )
+            ->when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))
+            ->when($user && strtolower(trim($user->type ?? '')) !== 'admin', function ($q) use ($user) {
+                    $branchIds = array_filter(
+                        explode(',', $user->branch_ids ?? '')
+                    );
+                    if (empty($branchIds) && $user->branch) {
+                        $branchIds = [$user->branch];
+                    }
+                    $q->whereIn('campus', $branchIds);
+                })
+            ->when($request->filled('branch_id') || $request->filled('campus'), function ($q) use ($request) {
+                $branch = $request->branch_id ?? $request->campus;
+                $q->where('campus', $branch);
+            })
+            ->when($request->filled('course'), function ($q) use ($request) {
+                $q->where('course', $request->course);
+            })
+            ->when($request->filled('coaching_type'), function ($q) use ($request) {
+                $q->where('coaching_type', $request->coaching_type);
+            })
+            ->when($request->filled('batch'), function ($q) use ($request) {
+                $q->where('batch', $request->batch);
+            })
+            ->when($request->filled('section'), function ($q) use ($request) {
+                $q->where('section', $request->section);
+            })
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+                $q->where(function ($query) use ($search) {
+                    $query->where('student_id', 'like', "%{$search}%")
+                        ->orWhere('student_name', 'like', "%{$search}%")
+                        ->orWhere('user_name', 'like', "%{$search}%")
+                        ->orWhere('father_ph_no', 'like', "%{$search}%")
+                        ->orWhere('mother_ph_no', 'like', "%{$search}%")
+                        ->orWhere('batch', 'like', "%{$search}%")
+                        ->orWhere('section', 'like', "%{$search}%");
+                });
+            });
+
+    if ($request->view == 'website_login' && $request->filled('student_id')) {
+        $student = $query->where('id', $request->student_id)->firstOrFail();
+        $pdf = Pdf::loadView('pdf.websitelogin', compact('student') );
+        return $pdf->stream('Website_Login_Details' . $student->student_id . '.pdf');
+    }
+    if ($request->view == 'hostel_verification' && $request->filled('student_id')) {
+        $student = $query->where('id', $request->student_id)->firstOrFail();
+        $pdf = Pdf::loadView('pdf.hostelverification',compact('student'));
+        return $pdf->stream('Hostel_Verification' . $student->student_id . '.pdf');
+    }
+    if ($request->view == 'hostel_allotment' && $request->filled('student_id')) {
+        $student = $query->where('student.id', $request->student_id)->firstOrFail();
+        $pdf = Pdf::loadView('pdf.hostelallotment',compact('student'));
+        return $pdf->stream('hostel_allotment' . $student->student_id . '.pdf');
+
+    }
+
+        $students = [];
+        if ($request->filled('course') || $request->filled('search')) {
+            $students = $query->get();
+        }
+
+        return view('report.allotment', compact('students'));
+    }
 }

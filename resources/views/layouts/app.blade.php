@@ -125,6 +125,7 @@
                 <li><a href="{{ route('export.student') }}" class="nav-link">Export Students</a></li>
                 <li><a href="{{ route('import.student') }}" class="nav-link">Student Bulk Add</a></li>
                 <li><a href="{{ route('import.studentupdate') }}" class="nav-link">Student Bulk Update</a></li>
+                <li><a href="{{ route('report.allotment') }}" class="nav-link">Student Allotment's</a></li>
               </ul>
             </li>
 
