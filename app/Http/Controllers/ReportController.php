@@ -2740,19 +2740,19 @@ class ReportController extends Controller
             });
 
     if ($request->view == 'website_login' && $request->filled('student_id')) {
-        $student = $query->where('id', $request->student_id)->firstOrFail();
+        $student = $query->where('student.id', $request->student_id)->firstOrFail();
         $pdf = Pdf::loadView('pdf.websitelogin', compact('student') );
-        return $pdf->stream('Website_Login_Details' . $student->student_id . '.pdf');
+        return $pdf->download('Website_Login_Details' . $student->student_id . '.pdf');
     }
     if ($request->view == 'hostel_verification' && $request->filled('student_id')) {
-        $student = $query->where('id', $request->student_id)->firstOrFail();
+        $student = $query->where('student.id', $request->student_id)->firstOrFail();
         $pdf = Pdf::loadView('pdf.hostelverification',compact('student'));
-        return $pdf->stream('Hostel_Verification' . $student->student_id . '.pdf');
+        return $pdf->download('Hostel_Verification' . $student->student_id . '.pdf');
     }
     if ($request->view == 'hostel_allotment' && $request->filled('student_id')) {
         $student = $query->where('student.id', $request->student_id)->firstOrFail();
         $pdf = Pdf::loadView('pdf.hostelallotment',compact('student'));
-        return $pdf->stream('hostel_allotment' . $student->student_id . '.pdf');
+        return $pdf->download('hostel_allotment' . $student->student_id . '.pdf');
 
     }
 
