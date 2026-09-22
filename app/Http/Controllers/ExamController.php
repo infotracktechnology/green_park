@@ -786,7 +786,7 @@ class ExamController extends Controller
         foreach (array_chunk($answers, 500) as $chunk) {
             foreach ($chunk as $row) {
                 ExamSubjectReport::updateOrInsert(
-                    ['stuid'   => $row['stuid'], 'testid'  => $row['testid'], 'subject' => $row['subject'],],
+                    ['stuid'   => $row['stuid'], 'subject' => $row['subject'],],
                     $row
                 );
             }
@@ -866,5 +866,126 @@ class ExamController extends Controller
         }
 
         return view('student.downloadresponse', compact('category', 'exams'));
+    }
+    public function responsemanagement(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'change_type' => 'required|in:student,test,both',
+                'testname' => 'required',
+                'wrong_student_id' => 'required_if:change_type,student,both',
+                'correct_student_id' => 'required_if:change_type,student,both',
+                'student_id' => 'required_if:change_type,test',
+                'old_test_id' => 'required_if:change_type,test,both',
+                'new_test_id' => 'required_if:change_type,test,both',
+            ]);
+            DB::beginTransaction();
+            try {
+                $changeType = $request->change_type;
+                $testName = $request->testname;
+                if ($changeType === 'student') {
+
+                    $oldStudentId = $request->wrong_student_id;
+                    $newStudentId = $request->correct_student_id;
+
+                    $exists = ExamAnswer::where('student_id', $oldStudentId)->where('testname', $testName)->where('academic_year', $this->academic_year)->exists();
+
+                    if (!$exists) {
+                        DB::rollBack();
+                        return back()->with( 'error','No exam response found for the Old Student ID.' )->withInput();
+                    }
+                    $studentExists = Student::where('student_id', $newStudentId)->where('academic_year', $this->academic_year)->exists();
+
+                    if (!$studentExists) {
+                        DB::rollBack();
+                        return back()->with('error','Correct Student ID not found.' )->withInput();
+                    }
+
+                    $duplicate = ExamAnswer::where('student_id', $newStudentId)->where('testname', $testName)->where('academic_year', $this->academic_year)->exists();
+
+                    if ($duplicate) {
+                        DB::rollBack();
+                        return back() ->route('exam.offlinepublish')->with( 'error','Correct Student ID already has a response for this exam.' )->withInput();
+                    }
+                    ExamAnswer::where('student_id', $oldStudentId)->where('testname', $testName)->where('academic_year', $this->academic_year)->update(['student_id' => $newStudentId, ]);
+                    ExamSubjectReport::where('stuid', $oldStudentId)->where('subject', $testName)->delete();
+                }
+
+                elseif ($changeType === 'test') {
+                    $studentId = $request->student_id;
+                    $oldTestId = $request->old_test_id;
+                    $newTestId = $request->new_test_id;
+
+                    $exists = ExamAnswer::where('student_id', $studentId)->where('testname', $testName)->where('test_id', $oldTestId)->where('academic_year', $this->academic_year)->exists();
+
+                    if (!$exists) {
+                        DB::rollBack();
+                        return back()->with('error','No response found for this Student ID and Old Test ID.')->withInput();
+                    }
+
+                    $duplicate = ExamAnswer::where('student_id', $studentId)->where('testname', $testName)->where('test_id', $newTestId)->where('academic_year', $this->academic_year)->exists();
+
+                    if ($duplicate) {
+                        DB::rollBack();
+                        return back()->with('error','New Test ID already exists for this student.' )->withInput();
+                    }
+                    
+                    ExamAnswer::where('student_id', $studentId)
+                        ->where('testname', $testName)
+                        ->where('test_id', $oldTestId)
+                        ->where('academic_year', $this->academic_year)
+                        ->update(['test_id' => $newTestId,'answer_key' => null,'mark' => null, ]);
+                    ExamSubjectReport::where('stuid', $studentId)->where('testid', $oldTestId)->where('subject', $testName)->delete();
+                }
+
+                elseif ($changeType === 'both') {
+                    $oldStudentId = $request->wrong_student_id;
+                    $newStudentId = $request->correct_student_id;
+                    $oldTestId = $request->old_test_id;
+                    $newTestId = $request->new_test_id;
+                    $exists = ExamAnswer::where('student_id', $oldStudentId)->where('testname', $testName)->where('test_id', $oldTestId)->where('academic_year', $this->academic_year)->exists();
+
+                    if (!$exists) {
+                        DB::rollBack();
+                        return back()->with('error','Old Student ID and Test ID response not found.')->withInput();
+                    }
+                    $studentExists = Student::where('student_id', $newStudentId)->where('academic_year', $this->academic_year)->exists();
+
+                    if (!$studentExists) {
+                        DB::rollBack();
+                        return back()->with('error','Correct Student ID not found.')->withInput();
+                    }
+
+                    $duplicate = ExamAnswer::where('student_id', $newStudentId)->where('testname', $testName)->where('test_id', $newTestId)->where('academic_year', $this->academic_year)->exists();
+                    if ($duplicate) {
+                        DB::rollBack();
+                        return back()->with('error','New Student ID and Test ID combination already exists.' )->withInput();
+                    }
+                    ExamAnswer::where('student_id', $oldStudentId)->where('testname', $testName)->where('test_id', $oldTestId)->where('academic_year', $this->academic_year)->update(['student_id' => $newStudentId,'test_id' => $newTestId, 'answer_key' => null, 'mark' => null,]);
+                    ExamSubjectReport::where('stuid', $oldStudentId)->where('testid', $oldTestId)->where('subject', $testName)->delete();
+                }
+
+
+                DB::commit();
+                if ($changeType === 'student') {
+                    return redirect()->route('exam.offlinepublish')
+                        ->with('success', 'Student ID changed successfully. Please publish the exam again.' );
+                }
+                if ($changeType === 'test') {
+                    return redirect()->route('exam.answerkey', ['type' => 'OFFLINE'])->with( 'success', 'Test ID changed successfully. Please validate the answer key again.' );
+                }
+                if ($changeType === 'both') {
+                    return redirect()->route('exam.answerkey', ['type' => 'OFFLINE'])->with('success', 'Student ID and Test ID changed successfully. Please validate the answer key again.' );
+                }
+
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return back()->with('error', 'Change failed: ' . $e->getMessage() )->withInput();
+            }
+        }
+
+        $examNames = Exam::where('academic_year', $this->academic_year)->where('coaching_type','OFFLINE')->select('name')->whereNotNull('name')->distinct()->orderBy('name')->pluck('name');
+        return view('exam.responsemanagement', compact('examNames'));
+    
     }
 }
