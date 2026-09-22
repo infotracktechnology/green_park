@@ -97,6 +97,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::post('examination/onlinepublish', 'OnlinePublishStore')->name('exam.onlinepublish.store');
         Route::get('examination/perviousexamresult/', 'PerviousExamResult')->name('exam.perviousexamresult');
         Route::match(['get', 'post'], 'examination/previousexamupload', 'PreviousExamUpload')->name('exam.previousexamupload');
+        Route::match(['get', 'post'], 'examination/responsemanagement', 'responsemanagement')->name('exam.responsemanagement');
     });
 
     // Learning Content (Videos, Keys, Downloads)

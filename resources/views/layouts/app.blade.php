@@ -193,6 +193,7 @@
                     <li><a href="{{ route('exam.answerkey','OFFLINE')}}" class="nav-link">Answer Key Valuation</a></li>
                     <li><a href="{{ route('report.section_exam') }}" class="nav-link">Branch Wise Report</a></li>
                     <li><a href="{{ route('exam.offlinepublish')}}" class="nav-link">Exam Result Publish</a></li>
+                    <li><a href="{{ route('exam.responsemanagement') }}">Responce Management</a></li>
                   </ul>
                 </li>
 
