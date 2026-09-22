@@ -339,7 +339,26 @@ class StudentController extends Controller
     public function attendance()
     {
         $student_id = Auth::user()->student_id;
-        $attendance = DB::table('attendance')->selectRaw("student_id,DATE_FORMAT(attendance_date, '%Y-%m') AS month,GROUP_CONCAT(timing) AS timings,GROUP_CONCAT(status) AS statuses,COUNT(DISTINCT attendance_date) AS total_days,SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days,SUM(CASE WHEN status = 'A' THEN 0.5 ELSE 0 END) AS absent_days")->where('student_id', $student_id)->groupByRaw("student_id, DATE_FORMAT(attendance_date, '%Y-%m')")->orderByRaw("DATE_FORMAT(attendance_date, '%Y-%m')")->get();
+        $dailyAttendance = DB::table('attendance')
+            ->selectRaw("student_id, attendance_date, DATE_FORMAT(attendance_date, '%Y-%m') AS month, COUNT(DISTINCT timing) AS timing_count, SUM(CASE WHEN status = 'P' THEN 0.5 ELSE 0 END) AS present_days, SUM(CASE WHEN status = 'A' THEN 0.5 ELSE 0 END) AS absent_days")
+            ->where('student_id', $student_id)
+            ->groupBy('student_id', 'attendance_date')
+            ->get();
+
+        $attendance = $dailyAttendance->groupBy('month')->map(function ($days, $month) {
+                $total_days = $days->sum(function ($day) {
+                    return $day->timing_count >= 2 ? 1 : 0.5;
+                });
+                $present_days = $days->sum('present_days');
+                $absent_days = $days->sum('absent_days');
+                return (object) [
+                    'student_id'   => $days->first()->student_id,
+                    'month'        => $month,
+                    'total_days'   => $total_days,
+                    'present_days' => $present_days,
+                    'absent_days'  => $absent_days,
+                ];
+            })->values();
 
         $total_present = $attendance->sum('present_days');
         $total_days = $attendance->sum('total_days');
