@@ -519,12 +519,12 @@ class ExamController extends Controller
                             $answerKey = count($ansKey) ? $ans : 'DEL';
                             $mark = 0;
 
-                            if ($answerKey === 'DEL') {
-                                $mark = null;
-                            }
-
                             if (count($ansKey) && $row->answer) {
                                 $mark = in_array($row->answer, $ansKey) ? 4 : -1;
+                            }
+
+                            if ($answerKey === 'DEL') {
+                                $mark = null;
                             }
 
                             $bulkData[] = ['id' => $row->id, 'answer_key' => $answerKey, 'mark' => $mark];
