@@ -5,6 +5,11 @@
     <title>Statement of Marks</title>
 
     <style>
+        @page {
+            size: legal portrait;
+            margin: 8mm; 
+        }
+
         
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -23,7 +28,6 @@
         .text-bold { font-weight: bold; }
         .uppercase { text-transform: uppercase; }
 
-        /* Header Layout */
         .header-table {
             width: 100%;
             border-collapse: collapse;
@@ -68,7 +72,6 @@
             min-width: 35px;
         }
 
-        /* Student Info Grid */
         .student-info-table {
             width: 100%;
             border-collapse: collapse;
@@ -81,7 +84,6 @@
             font-weight: bold;
         }
 
-        /* Section Titles */
         .section-heading {
             text-align: center;
             font-size: 14px;
@@ -91,7 +93,6 @@
             letter-spacing: 0.3px;
         }
 
-        /* Report Tables */
         .report-table {
             width: 100%;
             border-collapse: collapse;
@@ -122,7 +123,7 @@
             background-color: #fafafa;
         }
 
-        /* Footer Signature */
+      
         .footer-section {
             margin-top: 15px;
             width: 100%;
@@ -345,9 +346,9 @@
                                 $val = is_array($rowSubjects) && array_key_exists($label, $rowSubjects) ? $rowSubjects[$label] : null;
                             @endphp
                             <td style="width: 8%;">
-                                @if($val === 'AB')
+                                @if($val === 'AB' )
                                     AB
-                                @elseif($val === null || $val === '')
+                                @elseif( $val === '' || $val === null)
                                     -
                                 @else
                                     {{ $val }}

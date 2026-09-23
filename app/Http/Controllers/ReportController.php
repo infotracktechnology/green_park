@@ -2082,37 +2082,26 @@ class ReportController extends Controller
     ->orderBy('examsubjectreport.exdate')
     ->get();
 
-        $fromDate = $request->filled('from_date')
-            ? Carbon::parse($request->from_date)->startOfDay()
-            : null;
-
-        $toDate = $request->filled('to_date')
-            ? Carbon::parse($request->to_date)->endOfDay()
-            : null;
+        $fromDate = $request->filled('from_date') ? Carbon::parse($request->from_date)->startOfDay() : null;
+        $toDate = $request->filled('to_date') ? Carbon::parse($request->to_date)->endOfDay() : null;
 
         $allExamRows = $allExamRows
             ->filter(function ($row) use ($fromDate, $toDate) {
                 if (!$fromDate && !$toDate) {
                     return true;
                 }
-
                 $examDate = $this->parseDate($row->exdate ?? null);
-
                 if (!$examDate) {
                     return false;
                 }
-
                 if ($fromDate && $examDate->lt($fromDate)) {
                     return false;
                 }
-
                 if ($toDate && $examDate->gt($toDate)) {
                     return false;
                 }
-
                 return true;
-            })
-            ->values();
+            })->values();
 
         foreach ($students as $student) {
             $studentRows = DB::table('examsubjectreport')
@@ -2144,9 +2133,14 @@ class ReportController extends Controller
                     $row->{$key . '_l'} = 0;
                     $row->{$key . '_tot'} = null;
                 }
-
+                if (str_contains(strtoupper($row->category), 'GRAND')) {
+                    $row->phy_tot = 'AB';
+                    $row->che_tot = 'AB';
+                    $row->bot_tot = 'AB';
+                    $row->zoo_tot = null;
+                    $row->bio_tot = null;
+                }
                 $row->nettot = null;
-
                 return $row;
             });
 
@@ -2551,13 +2545,10 @@ class ReportController extends Controller
                             ->value('nettot');
                     }
                 }
-
                 $row['overall_top'] = $overallTop;
             }
-
             $result->push($row);
         }
-
         return $result->values();
     }
 
@@ -2593,19 +2584,23 @@ class ReportController extends Controller
                     if (property_exists($row, $key . '_tot') && $row->{$key . '_tot'} !== null && ($r > 0 || $w > 0 || $l > 0)) {
                         $examExists = true;
                     }
-                } else {
-                    $examSubject = strtoupper(trim($row->_category_subject ?? ''));
 
+                    } else {
+                    $baseCategory = strtoupper(trim($row->_base_category ?? ''));
+                    if (str_contains($baseCategory, 'GRAND')) {
+                        if ( $label === 'PHYSICS' || $label === 'CHEMISTRY' || $label === 'BOTANY' ) {
+                            $examExists = true;
+                        }
+                        continue;
+                    }
+                    $examSubject = strtoupper(trim($row->_category_subject ?? ''));
                     if ($examSubject === $label) {
                         $examExists = true;
                     }
-
                     if ($examSubject !== '') {
                         $parts = preg_split('/\s*\/\s*/', $examSubject);
-
                         foreach ($parts as $part) {
                             $part = strtoupper(trim($part));
-
                             $matches = (($part === 'PHY' || $part === 'PHYSICS') && $label === 'PHYSICS')
                                 || (($part === 'CHE' || $part === 'CHEMISTRY') && $label === 'CHEMISTRY')
                                 || (($part === 'BOT' || $part === 'BOTANY') && $label === 'BOTANY')
@@ -2628,10 +2623,8 @@ class ReportController extends Controller
                 $subjects[$label] = null;
             }
         }
-
         return $subjects;
     }
-
     private function detectSubjectKeys($row)
     {
         $labels = [
@@ -2649,7 +2642,6 @@ class ReportController extends Controller
                 $keys[$key] = $label;
             }
         }
-
         return $keys;
     }
 
