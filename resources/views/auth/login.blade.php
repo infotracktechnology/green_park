@@ -106,7 +106,7 @@
         </div>
       </div>
 
-       <!-- Regarding Online Exam -->
+       {{-- <!-- Regarding Online Exam -->
       <div class="acc-item">
         <button class="acc-btn" aria-expanded="false">
           <span class="acc-text">
@@ -204,10 +204,10 @@
               <a href="tel:+919342440024">9342440024</a>
             </li>
           </ul>
-        </div>
-      </div>
+        </div> --}}
+      {{-- </div> --}}
       <!-- COUNSELLING -->
-      <div class="acc-item">
+      {{-- <div class="acc-item">
         <button class="acc-btn" aria-expanded="false">
           <span class="acc-text">
             <strong>NEET APPLICATION & MBBS COUNSELLING</strong>
@@ -242,7 +242,7 @@
             </li>
           </ul>
         </div>
-      </div>
+      </div> --}}
     </div>
   </aside>
   <div id="sideOverlay" class="side-overlay" aria-hidden="true"></div>
