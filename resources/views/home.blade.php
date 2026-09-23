@@ -2,8 +2,14 @@
 @section('title', 'Admin Dashboard')
 
 @section('css')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <style>
+      .main-content {
+        font-family: 'Playfair Display',sans-serif;
+    }
   /* Fix Bootstrap collapse conflict with Tailwind CSS v4 */
   .collapse {
     visibility: visible !important;
