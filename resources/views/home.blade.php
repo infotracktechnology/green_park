@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <style>
       .main-content {
-        font-family: 'Playfair Display',sans-serif;
+        font-family: 'Poppins',sans-serif;
     }
   /* Fix Bootstrap collapse conflict with Tailwind CSS v4 */
   .collapse {
