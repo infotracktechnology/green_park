@@ -45,8 +45,8 @@ class ReportController extends Controller
         if ($request->query('type') == 'omr') {
             $section = $request->section;
             $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section], ['coaching_type', 'OFFLINE']])->when(auth()->user()->branch, fn($q) => $q->where('a.campus', auth()->user()->branch))->orderBy('test_id')->orderBy('student_name')->get();
-            $exam = Exam::where('name', $test_name)->where('academic_year', $this->academic_year)->first();
-            $key_correction = $exam->key_correction ;
+            $testIds = $answers->pluck('test_id')->unique();
+            $key_correction = DB::table('key_corrections')->where('academic_year', $this->academic_year)->whereIn('testid', $testIds)->pluck('key_correction', 'testid');
             return view('report.omr_print', compact('answers', 'test_name','key_correction'));
         }
 
