@@ -12,7 +12,7 @@
     gtag('js', new Date());
     gtag('config', 'G-S6Y9QBHDM9');
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="{{asset('css/login.css')}}">
   <link rel="icon" href="{{asset('img/favicon.png')}}" type="image/png">
   <link rel="shortcut icon" href="{{asset('img/favicon.png')}}" type="image/png')}}">

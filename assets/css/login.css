@@ -6,7 +6,7 @@
          --page-blue: #2b66a2;
          }
          *{box-sizing:border-box}
-         body{font-family:Montserrat,system-ui,Segoe UI,Roboto,Arial; margin:0; color:#15324a; background:#f6f9fb}
+         body{font-family:Poppins,Montserrat,system-ui,Segoe UI,Roboto,Arial; margin:0; color:#15324a; background:#f6f9fb}
          /* Header */
          header.site-header{background:#fff; border-bottom:1px solid #eef3f8; padding:14px 24px; display:flex; align-items:center; justify-content:space-between}
          .logo{display:flex; align-items:center; gap:14px}
