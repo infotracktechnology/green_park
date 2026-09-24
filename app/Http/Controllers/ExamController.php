@@ -482,9 +482,6 @@ class ExamController extends Controller
 
     public function uploadAnswerKey(Request $request, ImportController $import)
     {
-        $request->validate([
-            'answer_key' => 'required|max:1024',
-        ]);
 
         try {
             $file = $request->file('answer_key');
@@ -499,7 +496,7 @@ class ExamController extends Controller
             if(empty($exam)) return back()->with('error', 'No such Exam exists.');
 
             $examtype = $exam->examtype;
-            $exam->update([ 'key_correction' => $request->key_correction ]);
+            // $exam->update([ 'key_correction' => $request->key_correction ]);
 
             foreach ($answers as $answer) {
                 $testId = $answer['test_id'];
@@ -526,12 +523,25 @@ class ExamController extends Controller
                             if ($answerKey === 'DEL') {
                                 $mark = null;
                             }
+                            if ($answerKey === 'ADD') {
+                                $mark = 4;
+                            }
 
                             $bulkData[] = ['id' => $row->id, 'answer_key' => $answerKey, 'mark' => $mark];
                         }
 
                         $this->executeBatchUpdate($bulkData);
                     });
+            }
+            if ($request->filled('key_correction')) {
+                $keyCorrections = $request->input('key_correction', []);
+                foreach ($uniqueTests as $testId => $testname) {
+                    $correction = $keyCorrections[$testId] ?? null;
+                    if ($correction !== null && $correction !== '') {
+                        DB::table('key_corrections')->updateOrInsert(['academic_year' => $this->academic_year, 'testid' => $testId,'name' => $testname,],['exam_date'      => $exam->exam_date,'key_correction' => $correction,]
+                        );
+                    }
+                }
             }
 
             $filename = now()->format('Y-m-d_H-i-s') . '_' . $file->getClientOriginalName();
