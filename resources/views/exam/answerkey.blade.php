@@ -47,9 +47,9 @@
                                         <label class="form-check-label" for="key_correction_check"> Key Correction </label>
                                     </div>
 
-                                    <div id="key_correction_div" style="display:none;" class="mt-2">
-                                        <input type="text" class="form-control" name="key_correction" id="key_correction" placeholder="Enter Key Correction Value" min="0">
-                                    </div>
+                                  <div id="key_correction_div" style="display:none;" class="mt-2">
+                                      <div id="key_correction_inputs"></div>
+                                  </div>
 
                                </div>
     
@@ -161,20 +161,51 @@
         tableHtml += '</tbody>';
 
         $('#preview').html(tableHtml);
-    }
+
+   let testIds = [];
+
+                results.data.forEach(row => {
+
+                    if(row.test_id !== undefined && row.test_id !== null && row.test_id !== '') {
+                        let testId = String(row.test_id);
+                        if (!testIds.includes(testId)) {
+                            testIds.push(testId);
+                        }
+                    }
+                });
+                let correctionHtml = '';
+                testIds.forEach(function(testId) {
+                    correctionHtml += `
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label class="font-weight-bold">
+                                    Test ID: ${testId}
+                                </label>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       name="key_correction[${testId}]"
+                                       placeholder="Enter Key Correction Value">
+                            </div>
+                        </div>
+                    `;
+                });
+                $('#key_correction_inputs').html(correctionHtml);
+                    }
 });
     })
-
     $(document).ready(function () {
-      $('#key_correction_check').change(function () {
-          if ($(this).is(':checked')) {
-              $('#key_correction_div').show();
-          } else {
-              $('#key_correction_div').hide();
-              $('#key_correction').val('');
-          }
-      });
-
-  });
+        $('#key_correction_check').change(function () {
+            if ($(this).is(':checked')) {
+                $('#key_correction_div').show();
+            } else {
+                $('#key_correction_div').hide();
+                $('#key_correction_inputs')
+                    .find('input')
+                    .val('');
+            }
+        });
+    });
   </script>
 @endsection
