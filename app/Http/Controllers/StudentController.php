@@ -504,5 +504,12 @@ class StudentController extends Controller
         $registers = InOutRegister::where('student_id', $student->student_id)->latest()->get();
         return view('student.inoutregister', compact('registers'));
     }
-
+    public function Contact()
+    {
+        $contactOption = Options::where('type', 'admin_contacts')->first();
+        $contacts = $contactOption ? $contactOption->value : [];
+        
+        return view('student.contact', compact('contacts'));
+    }
+   
 }

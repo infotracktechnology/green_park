@@ -72,7 +72,7 @@
     body.no-sidebar .collapse-btn {
       display: none !important;
     }
-    /* Contact Modal */
+    /* Contact Modal
     #contactModal .modal-content {
         border: none;
         border-radius: 16px;
@@ -136,7 +136,7 @@
     #contactModal .phone-btn i {
         margin-right: 8px;
         font-size: 0.85rem;
-    }
+    } */
   </style>
 
   @yield('css')
@@ -166,7 +166,7 @@
         </div>
         <ul class="navbar-nav navbar-right align-items-center">
             <li class="nav-item mr-3">
-                <a href="javascript:void(0);" class="btn btn-light btn-sm font-weight-bold" data-toggle="modal" data-target="#contactModal"> <i class="fas fa-user-tie mr-1"></i> Contact Us </a>
+                <a href="{{ route('student.contact') }}" class="btn btn-light btn-sm font-weight-bold"> <i class="fas fa-user-tie mr-1"></i> Contact Us </a>
             </li>
 
           <!-- Current Time Clock -->
@@ -257,7 +257,7 @@
       </footer>
 
       <!-- CONTACT MODAL -->
-      <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+      {{-- <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
               <div class="modal-content">
 
@@ -442,7 +442,7 @@
                   </div>
               </div>
           </div>
-      </div>
+      </div> --}}
       </div>
     </div>
   </div>

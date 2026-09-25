@@ -275,6 +275,7 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::get('studentdownload', 'StudentDownload')->name('student.studentdownload');
         Route::get('courierentry', 'CourierEntry')->name('student.courierentry');
         Route::get('inoutregister', 'InOutRegister')->name('student.inoutregister');
+        Route::get('contact', 'Contact')->name('student.contact');
     });
 
     Route::controller(AnnouncementController::class)->group(function () {
