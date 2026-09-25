@@ -276,6 +276,8 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::get('courierentry', 'CourierEntry')->name('student.courierentry');
         Route::get('inoutregister', 'InOutRegister')->name('student.inoutregister');
         Route::get('contact', 'Contact')->name('student.contact');
+        Route::match(['get', 'post'], 'report', 'report')->name('student.report');
+        Route::get('report/stream', 'streamReport')->name('student.reportstream');
     });
 
     Route::controller(AnnouncementController::class)->group(function () {

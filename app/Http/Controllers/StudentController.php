@@ -511,5 +511,101 @@ class StudentController extends Controller
         
         return view('student.contact', compact('contacts'));
     }
+    public function report()
+    {
+        $student = Auth::guard('student')->user();
+        if (!$student) {
+            return redirect()->route('login')->with('error', 'Please login first.');
+        }
+        return view('student.consalidated');
+    }
+
+    public function streamReport()
+    {
+        $student = Auth::guard('student')->user();
+        if (!$student) {
+            return redirect()->route('login')
+                ->with('error', 'Please login first.');
+        }
+
+        $studentId = $student->student_id;
+        $marks = ExamSubjectReport::where('stuid', $studentId)->get();
+        $allExams = ExamSubjectReport::select('category', 'subject', 'exdate')->where('stuid', $studentId)->groupBy('category', 'subject', 'exdate', 'sec')->get()->sortBy(function ($exam) {
+                $category = $exam->category;
+
+                if (str_starts_with($category, 'CUMULATIVE TEST')) {
+                    $groupOrder = 1;
+                } elseif (str_starts_with($category, 'GRAND TEST')) {
+                    $groupOrder = 2;
+                } elseif (str_starts_with($category, 'WEEKEND TEST')) {
+                    $groupOrder = 3;
+                } elseif (str_starts_with($category, 'UNIT TEST')) {
+                    $groupOrder = 4;
+                } else {
+                    $groupOrder = 99;
+                }
+
+                if (str_contains($category, 'PHY')) {
+                    $subjectOrder = 1;
+                } elseif (str_contains($category, 'CHE')) {
+                    $subjectOrder = 2;
+                } elseif (str_contains($category, 'BOT')) {
+                    $subjectOrder = 3;
+                } elseif (str_contains($category, 'ZOO')) {
+                    $subjectOrder = 4;
+                } elseif (str_contains($category, 'BIO')) {
+                    $subjectOrder = 5;
+                } else {
+                    $subjectOrder = 0;
+                }
+                if ($category === 'CUMULATIVE TEST') {
+                    $subjectOrder = 0;
+                }
+                $date = \Carbon\Carbon::createFromFormat(
+                    'd-m-Y',
+                    $exam->exdate
+                );
+                return [($groupOrder * 100) + $subjectOrder,$date->timestamp
+                ];
+            })->values();
+
+        $examSubjects = $allExams->pluck('subject')->unique()->values();
+
+        $marks = $marks->filter(function ($mark) use ($examSubjects) {
+            return $examSubjects->contains($mark->subject);
+        })->values();
+
+        $report = collect();
+        foreach ($allExams as $exam) {
+            $mark = $marks->firstWhere('subject', $exam->subject);
+            $subjectFields = ['phy', 'che', 'bot', 'zoo', 'bio' ];
+            $subjectData = [];
+            foreach ($subjectFields as $key) {
+                $subjectData[$key . '_r'] = $mark->{$key . '_r'} ?? 0;
+                $subjectData[$key . '_w'] = $mark->{$key . '_w'} ?? 0;
+                $subjectData[$key . '_l'] = $mark->{$key . '_l'} ?? 0;
+            }
+            $data = [
+                'category' => $exam->category,
+                'subject'  => $exam->subject,
+                'exdate'   => $exam->exdate,
+                'phy_tot' => $mark->phy_tot ?? null,
+                'che_tot' => $mark->che_tot ?? null,
+                'bot_tot' => $mark->bot_tot ?? null,
+                'zoo_tot' => $mark->zoo_tot ?? null,
+                'bio_tot' => $mark->bio_tot ?? null,
+                'nettot'  => $mark->nettot ?? null,
+                'totmark' => $mark->totmark ?? 0,
+            ];
+
+            $data = array_merge($data, $subjectData);
+            $report->push((object) $data);
+        }
+
+        $average = ['phy'   => round($marks->avg('phy_tot')), 'che'   => round($marks->avg('che_tot')), 'bot'   => round($marks->avg('bot_tot')), 'zoo'   => round($marks->avg('zoo_tot')), 'bio'   => round($marks->avg('bio_tot')), 'total' => round($marks->avg('nettot')),];
+        $pdf = PDF::loadView('pdf.consolidated',compact('student','marks','average','report' ));
+
+        return $pdf->stream($student->student_id . '_ConsolidatedReport.pdf');
+    }
    
 }
