@@ -418,4 +418,10 @@ Route::group(['prefix' => 'v2'], function () {
         ];
         return response()->json($counts);
     });
+
+    Route::get('/contacts', function () {
+        $contactOption = Options::where('type', 'admin_contacts')->first();
+        $contacts = $contactOption ? $contactOption->value : [];
+        return response()->json($contacts);
+    }); 
 });

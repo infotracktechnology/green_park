@@ -480,12 +480,79 @@ class HomeController extends Controller
         $setting = Setting::where('academic_year', $this->academic_year)->get();
         $category = Options::where('type', 'testcategory')->first()->value ?? [];
         $documents = Options::where('type', 'Document Option')->first()->value ?? [];
+        $contactOption = Options::where('type', 'admin_contacts')->first();
+        $contacts = $contactOption ? ($contactOption->value ?? []) : [];
+ 
+        if ($request->isMethod('POST') && $request->contact_action === 'add_section') {
+
+            $contacts[] = ['title' => $request->title, 'subtitle' => $request->subtitle, 'contacts' => [] ];
+            if ($contactOption) {
+                $contactOption->update(['value' => $contacts]);
+            } else {
+                Options::create(['type' => 'admin_contacts', 'value' => $contacts]);
+            }
+            return redirect()->back()->with('success', 'Contact section added successfully!');
+        }
+        if ($request->isMethod('POST') && $request->contact_action === 'add_number') {
+            $sectionIndex = $request->section_index;
+            if (!isset($contacts[$sectionIndex])) {
+                return redirect()->back()->with('error', 'Contact section not found.');
+            }
+
+            $contacts[$sectionIndex]['contacts'][] = ['number' => $request->number];
+            $contactOption->update(['value' => $contacts]);
+
+            return redirect()->back()->with('success', 'Contact number added successfully!');
+        }
+
+        if ($request->isMethod('POST') && $request->contact_action === 'edit_number') {
+            $sectionIndex = $request->section_index;
+            $numberIndex = $request->number_index;
+
+            if (!isset($contacts[$sectionIndex]['contacts'][$numberIndex])) {
+                return redirect()->back()->with('error', 'Contact number not found.');
+            }
+
+            $contacts[$sectionIndex]['contacts'][$numberIndex]['number'] = $request->number;
+            $contactOption->update(['value' => $contacts]);
+
+            return redirect()->back()->with('success', 'Contact number updated successfully!');
+        }
+
+        if ($request->isMethod('POST') && $request->contact_action === 'delete_number') {
+            $sectionIndex = $request->section_index;
+            $numberIndex = $request->number_index;
+
+            if (!isset($contacts[$sectionIndex]['contacts'][$numberIndex])) {
+                return redirect()->back()->with('error', 'Contact number not found.');
+            }
+            unset($contacts[$sectionIndex]['contacts'][$numberIndex]);
+            $contacts[$sectionIndex]['contacts'] = array_values($contacts[$sectionIndex]['contacts']);
+
+            $contactOption->update(['value' => $contacts]);
+            return redirect()->back()->with('success', 'Contact number deleted successfully!');
+        }
+
+        if ($request->isMethod('POST') && $request->contact_action === 'delete_section') {
+            $sectionIndex = $request->section_index;
+            if (!isset($contacts[$sectionIndex])) {
+                return redirect()->back()->with('error', 'Contact section not found.');
+            }
+
+            unset($contacts[$sectionIndex]);
+            $contacts = array_values($contacts);
+
+            if ($contactOption) {
+                $contactOption->update(['value' => $contacts]);
+            }
+            return redirect()->back()->with('success', 'Contact section deleted successfully!');
+        }
 
         if ($request->isMethod('POST')) {
             $row = Setting::find($request->id)->update(['value' => $request->value]);
             return redirect()->back()->with('success', 'Setting new value updated successfully!');
         }
 
-        return view('setting', compact('setting', 'category', 'documents'));
+        return view('setting', compact('setting', 'category', 'documents', 'contacts'));
     }
 }
