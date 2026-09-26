@@ -104,7 +104,7 @@
                   <div class="form-group col-lg-2">
                     <label>Out Time</label>
                     <input type="text" name="out_time" id="out_time" value="{{ $sickroom->out_time }}" class="datetime-picker form-control form-control-sm" required>
-                    <input type="hidden" name="hours_spent" id="hours_spent">
+                    <input type="hidden" name="hours_spent" id="hours_spent" value="{{ $sickroom->hours_spent }}">
                   </div>
 
                   {{-- <div class="form-group col-lg-2">
@@ -138,13 +138,17 @@
       maxDate: "today",
       plugins: [new confirmDatePlugin({ confirmText: "OK"})]
   });
-  $('#out_time').change(function() {
-      var startTime = new Date($('#in_time').val());
-      var endTime = new Date($(this).val());
-      var diff = endTime - startTime;
-      var hours = diff / (1000 * 60 * 60);
-      $('#hours_spent').val(hours.toFixed(1));
-  });
+$('#out_time').change(function () {
+    var startTime = new Date($('#in_time').val());
+    var endTime = new Date($(this).val());
+    var diff = endTime - startTime;
+    var minutes = Math.floor(diff / (1000 * 60));
+    if (minutes >= 0) {
+        $('#hours_spent').val(minutes);
+    } else {
+        $('#hours_spent').val('');
+    }
+}); 
 
   const StudentFetch = (params) => $.get('{{ route("sickroom.create") }}', params);
 
