@@ -47,7 +47,7 @@
                           <th>Illness/Injury</th>
                           <th>Action Taken</th>
                           {{-- <th>Medical Note</th> --}}
-                          <th>Total Hrs spent</th>
+                          <th>Total Mins spent</th>
                           <th>Expance</th>
                           <th>Edit</th>
                           <th>Delete</th>
