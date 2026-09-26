@@ -125,7 +125,7 @@
 
       
         .footer-section {
-            margin-top: 15px;
+            margin-top: 9px;
             width: 100%;
             border-collapse: collapse;
         }
@@ -145,6 +145,94 @@
         .page-break {
             page-break-after: always;
         }
+        .attendance-report-box {
+            border: 1px solid #000;
+            padding: 10px 15px;
+            margin-left: 25px;
+            margin-top: 10px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+
+        .attendance-report-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed #000;
+        }
+
+        .attendance-details {
+            width: 50%;
+            margin: 0 auto;
+            font-size: 14px;
+        }
+
+        .attendance-details div {
+            display: table;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .attendance-details strong {
+            display: table-cell;
+            width: 60%;
+            text-align: left;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .attendance-details span {
+            display: table-cell;
+            width: 28%;
+            text-align: left;
+             font-weight: bold;
+            white-space: nowrap;
+        }
+        .average-180-box {
+    border: 1px solid #000;
+    padding: 10px 15px;
+    margin-left: 25px;
+    margin-top: 10px;
+    width: 90%;
+    box-sizing: border-box;
+}
+
+.average-180-title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 7px;
+    margin-bottom: 8px;
+    border-bottom: 2px dashed #000;
+}
+
+.average-180-details {
+    width: 65%;
+    margin: 0 auto;
+    font-size: 14px;
+}
+
+.average-180-details div {
+    display: table;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+.average-180-details strong {
+    display: table-cell;
+    width: 75%;
+    text-align: left;
+}
+
+.average-180-details span {
+    display: table-cell;
+    width: 25%;
+    text-align: left;
+    font-weight: bold;
+    white-space: nowrap;
+}
     </style>
 </head>
 <body>
@@ -418,6 +506,114 @@
                 </tbody>
             </table>
         @endforeach
+        <div class="attendance-report-box">
+            <div class="attendance-report-title">
+                SCHOOL ATTENDANCE REPORT
+                @if(request('from_date') && request('to_date'))
+            ({{ \Carbon\Carbon::parse(request('from_date'))->format('d-m-Y') }}
+            To
+            {{ \Carbon\Carbon::parse(request('to_date'))->format('d-m-Y') }})
+        @endif
+            </div>
+            <div class="attendance-details">
+                <div>
+                    <strong>Total No of Working Days</strong>
+                    <span>: {{ $student->total_wrk_days }} Days</span>
+                </div>
+                <div>
+                    <strong>No of Days Present</strong>
+                    <span>: {{ $student->present_days }} Days</span>
+                </div>
+                <div>
+                    <strong>No of Days Absent</strong>
+                    <span>: {{ $student->absent_days }} Days</span>
+                </div>
+            </div>
+        </div>
+@php
+    $finalAverage180 = [];
+
+    foreach ($reportGroups as $group) {
+
+        $category = strtoupper($group['category'] ?? '');
+        $averageData = $group['average_180'] ?? [];
+
+        if (empty($averageData)) {
+            continue;
+        }
+
+        if (str_contains($category, 'WEEKEND')) {
+
+            $values = [];
+
+            foreach ($averageData as $value) {
+                if (is_numeric($value)) {
+                    $values[] = (float) $value;
+                }
+            }
+
+            if (count($values) > 0) {
+
+                $finalAverage180[] = [
+                    'label' => 'Weekend Slip Test',
+                    'value' => round(array_sum($values) / count($values)),
+                ];
+            }
+        }
+
+ 
+        elseif (str_contains($category, 'CUMULATIVE')) {
+
+            if (isset($averageData['TOTAL'])) {
+
+                $finalAverage180[] = [
+                    'label' => $group['category'],
+                    'value' => $averageData['TOTAL'],
+                ];
+            }
+        }
+
+        elseif (str_contains($category, 'GRAND')) {
+
+            if (isset($averageData['TOTAL'])) {
+
+                $finalAverage180[] = [
+                    'label' => 'Grand Test',
+                    'value' => $averageData['TOTAL'],
+                ];
+            }
+        }
+    }
+@endphp
+
+
+@if(!empty($finalAverage180))
+
+    <div class="average-180-box">
+
+        <div class="average-180-title">
+            AVERAGE
+        </div>
+
+        <div class="average-180-details">
+
+            @foreach($finalAverage180 as $item)
+
+                <div>
+                    <strong>{{ $item['label'] }}</strong>
+
+                    <span>
+                        : {{ number_format($item['value'], 0) }} / 180
+                    </span>
+                </div>
+
+            @endforeach
+
+        </div>
+
+    </div>
+
+@endif
 
         {{-- ================= FOOTER / SIGNATURE ================= --}}
         <table class="footer-section">
@@ -426,14 +622,14 @@
                 <td style="width: 30%; padding: 20px; text-align: center;">
                  <img class="chairman-logo" src="data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/chairman_sign.jpeg'))) }}" style="width: 80px;">
                     <div class="chairman-text">CHAIRMAN</div>
-                </td>
+                </td>   
             </tr>
         </table>
     </div>
 
-    @if(!$loop->last)
+    {{-- @if(!$loop->last)
         <div class="page-break"></div>
-    @endif
+    @endif --}}
 @endforeach
 
 </body>

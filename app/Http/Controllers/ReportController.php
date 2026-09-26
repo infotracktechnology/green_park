@@ -2553,17 +2553,91 @@ class ReportController extends Controller
                 ->pluck('nettot')
                 ->filter(fn($value) => is_numeric($value));
 
-            $averages['total'] = $totalValues->isNotEmpty() ? round($totalValues->avg()) : null;
+           $averages['total'] = $totalValues->isNotEmpty() ? round($totalValues->avg()) : null;
 
-            $totalMax = 0;
 
-            foreach ($categoryMaxMarks as $maxData) {
+$totalMax = 0;
+
+foreach ($categoryMaxMarks as $maxData) {
                 if (is_array($maxData) && isset($maxData['mark']) && $maxData['mark'] > 0) {
                     $totalMax += (int) $maxData['mark'];
                 }
             }
 
-            $displayCategory = $categoryName;
+
+
+$average180 = [];
+
+if (str_contains($categoryUpper, 'WEEKEND')) {
+
+    foreach ([
+        'PHYSICS',
+        'CHEMISTRY',
+        'BOTANY',
+        'ZOOLOGY'
+    ] as $label) {
+
+        $subjectAverage = $averages[$label] ?? null;
+
+        if ($subjectAverage === null) {
+            continue;
+        }
+
+        $maxMark = 0;
+
+        foreach ($categoryMaxMarks as $maxData) {
+
+            if (
+                is_array($maxData) &&
+                isset($maxData['label']) &&
+                strtoupper(trim($maxData['label'])) === $label
+            ) {
+                $maxMark = (float) ($maxData['mark'] ?? 0);
+                break;
+            }
+        }
+
+        if ($maxMark > 0) {
+
+            $average180[$label] = round(
+                ($subjectAverage / $maxMark) * 180,
+                2
+            );
+        }
+    }
+}
+
+
+elseif (str_contains($categoryUpper, 'CUMULATIVE')) {
+
+    $totalAverage = $averages['total'] ?? null;
+
+    if ($totalAverage !== null && $totalMax > 0) {
+
+        $average180['TOTAL'] = round(
+            ($totalAverage / $totalMax) * 180,
+            2
+        );
+    }
+}
+
+
+elseif (str_contains($categoryUpper, 'GRAND')) {
+
+    $totalAverage = $averages['total'] ?? null;
+
+    if ($totalAverage !== null && $totalMax > 0) {
+
+        $average180['TOTAL'] = round(
+            ($totalAverage / $totalMax) * 180,
+            2
+        );
+    }
+}
+
+
+$displayCategory = $categoryName;
+            
 
             if (str_contains($categoryName, '|')) {
                 [$baseCategory, $subjectGroup] = explode('|', $categoryName, 2);
@@ -2585,6 +2659,7 @@ class ReportController extends Controller
                 'max_marks'  => $categoryMaxMarks,
                 'total_max'  => $totalMax,
                 'averages'   => $averages,
+                'average_180' => $average180
             ]);
         }
 
