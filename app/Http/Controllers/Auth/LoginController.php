@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use illuminate\Database\Eloquent\Model;
+use App\Providers\UserLogServiceProvider;
 
 class LoginController extends Controller
 {
@@ -15,11 +16,13 @@ class LoginController extends Controller
      {
          
          if (Auth::guard('web')->attempt(['username' => $request->username, 'password' => $request->password])) {
-             return redirect()->route('admin.home')->with('success', 'Welcome back!');
+            $user = Auth::guard('web')->user();
+            UserLogServiceProvider::storelog($user->id,$user->type,'login successful', 'Web' );
+            return redirect()->route('admin.home')->with('success', 'Welcome back!');
          }
         elseif($student = Student::where('user_name', $request->username)->where('password', $request->password)->first()) {
             Auth::guard('student')->login($student);
-            $student->update(['active' => 1, 'last_login' => now(),'device' => 'Web']);   
+             UserLogServiceProvider::storelog($student->student_id,'Student','login successful', 'Web' );   
             return redirect()->route('studentdashboard')->with('success', 'Welcome back!');
         }
     

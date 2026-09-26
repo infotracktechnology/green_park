@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use illuminate\Database\Eloquent\Model;
+use App\Providers\UserLogServiceProvider;
 
 class LogoutController extends Controller
 {
@@ -15,12 +16,14 @@ class LogoutController extends Controller
     {
         if (Auth::guard('student')->check()) {
             $student = Auth::guard('student')->user();
-            $student->active = 0;
-            if ($student instanceof \Illuminate\Database\Eloquent\Model) {
-                $student->save();
-            }
+            UserLogServiceProvider::storelog($student->student_id,'Student','logout successful', 'Web' );
+            // if ($student instanceof \Illuminate\Database\Eloquent\Model) {
+            //     $student->save();
+            // }
             Auth::guard('student')->logout();
         } elseif (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+            UserLogServiceProvider::storelog($user->id,$user->type,'logout successful', 'Web' );
             Auth::guard('web')->logout();
         }
 
