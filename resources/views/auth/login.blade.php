@@ -361,7 +361,7 @@
                 <div class="slide">
                   <img src="{{asset('img/silde/slide-23.webp')}}" alt="slide 3">
                   <div class="slide-info">
-                    <div class="slide-text">YEAR WISE ACHIVEMENT'S</div>
+                    <div class="slide-text">YEAR WISE ACHIEVEMENT'S</div>
                     <!-- change this path to your real image -->
                     <!-- <a href="#" class="slide-btn open-lightbox" data-light="#">College List</a> -->>
                   </div>
