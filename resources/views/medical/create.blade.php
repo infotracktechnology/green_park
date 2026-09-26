@@ -89,10 +89,10 @@
                     <textarea name="action_taken" rows="3" class="form-control form-control-sm"></textarea>
                   </div>
 
-                  <div class="form-group col-lg-3">
+                  {{-- <div class="form-group col-lg-3">
                     <label>Medical Officer's/Nurse's Note</label>
                     <textarea name="medical_note" rows="3" class="form-control form-control-sm"></textarea>
-                  </div>
+                  </div> --}}
 
                   <div class="form-group col-lg-2">
                     <label>IN Time</label>

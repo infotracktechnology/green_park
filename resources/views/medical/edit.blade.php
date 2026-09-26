@@ -95,16 +95,16 @@
                     <textarea name="action_taken" rows="3" class="form-control form-control-sm">{{ $medical->action_taken }}</textarea>
                   </div>
 
-                  <div class="form-group col-lg-3">
+                  {{-- <div class="form-group col-lg-3">
                     <label>Medical Officer's/Nurse's Note</label>
                     <textarea name="medical_note" rows="3" class="form-control form-control-sm">{{ $medical->medical_note }}</textarea>
-                  </div>
+                  </div> --}}
 
 
                   <div class="form-group col-lg-2">
                     <label>IN Time</label>
                     <input type="text" name="out_time" id="out_time" value="{{ $medical->out_time }}" class="datetime-picker form-control form-control-sm" required>
-                    <input type="hidden" name="hours_spent" id="hours_spent">
+                    <input type="hidden" name="hours_spent" id="hours_spent" value="{{ $medical->hours_spent }}">
                   </div>
 
                   <div class="form-group col-lg-2">

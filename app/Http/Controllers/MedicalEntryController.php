@@ -44,21 +44,9 @@ class MedicalEntryController extends Controller
 
     public function store(Request $request)
     {
-        $student = Student::where('student_id', $request->student_id)->first(); 
-
-            if ($request->expense > 0) {
-                if ($request->expense > $student->deposit) {
-                     return redirect()->back()->with('error', 'Insufficient Deposit Balance');
-                } 
-            $student->deposit = $student->deposit - $request->expense; $student->save();
-            }
             
             $medical = medical::create($request->all()); 
-            if ($student->deposit <= 500) { 
-                return redirect()->route('medical.index') ->with('warning', 'Student deposit balance is only ₹' . $student->deposit . '. Please recharge.');
-                } 
-                
-                return redirect()->route('medical.index')->with('success', 'Sick Room Entry added successfully!');
+            return redirect()->route('medical.index')->with('success', 'Sick Room Entry added successfully!');
     }
 
 
@@ -78,22 +66,6 @@ class MedicalEntryController extends Controller
     public function update(Request $request, Medical $medical)
     {
         $data = $request->all();
-        $student = Student::where('student_id', $medical->student_id)->firstOrFail();
-        $oldExpense = $medical->expense;
-        $newExpense = $request->expense ;
-        $difference = $newExpense - $oldExpense;
-        if ($difference > 0) {
-            if ($difference > $student->deposit) {
-                return redirect()->back()
-                    ->with('error', 'Insufficient Deposit Balance');
-            }
-            $student->deposit -= $difference;
-        }
-        elseif ($difference < 0) {
-            $student->deposit += abs($difference);
-        }
-        $student->save();
-        
         $medical->update($data);
 
         return redirect()->route('medical.index')->with('success', 'Entry updated successfully!');
