@@ -138,13 +138,17 @@
       maxDate: "today",
       plugins: [new confirmDatePlugin({ confirmText: "OK"})]
   });
-  $('#out_time').change(function() {
-      var startTime = new Date($('#in_time').val());
-      var endTime = new Date($(this).val());
-      var diff = endTime - startTime;
-      var hours = diff / (1000 * 60 * 60);
-      $('#hours_spent').val(hours.toFixed(1));
-  });
+$('#out_time').change(function () {
+    var startTime = new Date($('#in_time').val());
+    var endTime = new Date($(this).val());
+    var diff = endTime - startTime;
+    var minutes = Math.floor(diff / (1000 * 60));
+    if (minutes >= 0) {
+        $('#hours_spent').val(minutes);
+    } else {
+        $('#hours_spent').val('');
+    }
+});
 
   const StudentFetch = (params) => $.get('{{ route("medical.create") }}', params);
 
