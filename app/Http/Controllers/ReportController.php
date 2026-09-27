@@ -1672,7 +1672,7 @@ class ReportController extends Controller
 
             return view('report.hostelvacancy', compact('branches', 'hostels', 'room', 'vacancy_log'));
         }
-       public function UserLoginReport(Request $request)
+    public function UserLoginReport(Request $request)
     {
         $branches = Branch::all();
         $students = DB::table('student')->leftJoin('user_logs', function ($join) {
@@ -1680,39 +1680,25 @@ class ReportController extends Controller
              ->where('user_logs.role', 'Student');
         })
         ->leftJoin('branch', 'branch.id', '=', 'student.campus')
-
         ->where('student.academic_year', $this->academic_year)
-
         ->when(auth()->user()->branch, function ($q) {
             $q->where('student.campus', auth()->user()->branch);
         })
-
         ->when($request->filled('student_branch'), function ($q) use ($request) {
-            $q->where('student.campus', $request->branch);
+            $q->where('student.campus', $request->student_branch);
         })
-
         ->when($request->filled('course'), function ($q) use ($request) {
             $q->where('student.course', $request->course);
         })
-
         ->when($request->filled('hostel_dayscholar'), function ($q) use ($request) {
-            $q->where(
-                'student.hostel_dayscholar',
-                $request->hostel_dayscholar
-            );
+            $q->where('student.hostel_dayscholar',$request->hostel_dayscholar);
         })
-
         ->when($request->filled('coaching_type'), function ($q) use ($request) {
-            $q->where(
-                'student.coaching_type',
-                $request->coaching_type
-            );
+            $q->where('student.coaching_type',$request->coaching_type);
         })
-
         ->when($request->filled('device'), function ($q) use ($request) {
             $q->where('user_logs.device', $request->device);
         })
-
         ->when($request->filled('status'), function ($q) use ($request) {
             if ($request->status === 'login successful') {
                 $q->where('user_logs.action', 'login successful');
@@ -1722,69 +1708,26 @@ class ReportController extends Controller
         $q->whereNotExists(function ($sub) {
             $sub->select(DB::raw(1))
                 ->from('user_logs')
-                ->whereColumn(
-                    'user_logs.user_id',
-                    'student.student_id'
-                )
+                ->whereColumn('user_logs.user_id','student.student_id')
                 ->where('user_logs.role', 'Student');
         });
     }
         })
-
         ->when($request->filled('from_date'), function ($q) use ($request) {
-            $q->whereDate(
-                'user_logs.created_at',
-                '>=',
-                $request->from_date
-            );
+            $q->whereDate('user_logs.created_at','>=', $request->from_date);
         })
-
-        ->when($request->filled('to_date'), function ($q) use ($request) {
-            $q->whereDate(
-                'user_logs.created_at',
-                '<=',
-                $request->to_date
-            );
+        ->when($request->filled('to_date'), function ($q) use ($request) {$q
+            ->whereDate('user_logs.created_at','<=',$request->to_date);
         })
-
         ->when($request->filled('search'), function ($q) use ($request) {
-
             $search = $request->search;
-
-            $q->where(function ($subQuery) use ($search) {
-
-                $subQuery
-                    ->where(
-                        'student.student_id',
-                        'LIKE',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'student.student_name',
-                        'LIKE',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'student.user_name',
-                        'LIKE',
-                        "%{$search}%"
-                    );
+            $q->where(function ($subQuery) use ($search) {$subQuery
+                    ->where('student.student_id','LIKE',"%{$search}%")
+                    ->orWhere('student.student_name','LIKE',"%{$search}%")
+                    ->orWhere('student.user_name','LIKE',"%{$search}%");
             });
         })
-
-        ->select(
-            'student.student_id',
-            'student.student_name',
-            'branch.campus as campus',
-            'student.course',
-            'student.section',
-            'student.hostel_dayscholar',
-            'student.coaching_type',
-            'user_logs.action',
-            'user_logs.device',
-            'user_logs.created_at as login_time'
-        )
-
+        ->select('student.student_id','student.student_name','branch.campus as campus','student.course','student.section','student.hostel_dayscholar', 'student.coaching_type','user_logs.action','user_logs.device','user_logs.created_at as login_time')
         ->orderByDesc('user_logs.created_at')
         ->get();
 
@@ -1795,7 +1738,7 @@ class ReportController extends Controller
             ->when($request->filled('admin_user'), function ($q) use ($request) {
                 $q->where('user_logs.user_id', $request->admin_user);
             })
-            ->when($request->filled('admin_branch_admin'), function ($q) use ($request) {
+            ->when($request->filled('admin_branch'), function ($q) use ($request) {
                 $q->where('users.branch', $request->admin_branch);
             })
            ->when($request->filled('admin_from_date'), function ($q) use ($request) {
@@ -1810,10 +1753,7 @@ class ReportController extends Controller
             ->get();
 
 
-                $totalStudents = Student::where(
-                    'academic_year',
-                    $this->academic_year
-                )
+            $totalStudents = Student::where('academic_year',$this->academic_year)
                 ->when(auth()->user()->branch, function ($q) {
                     $q->where('campus', auth()->user()->branch);
                 })
@@ -1832,8 +1772,8 @@ class ReportController extends Controller
             ->when(auth()->user()->branch, function ($q) {
                 $q->where('student.campus', auth()->user()->branch);
             })
-            ->when($request->filled('branch'), function ($q) use ($request) {
-                $q->where('student.campus', $request->branch);
+            ->when($request->filled('student_branch'), function ($q) use ($request) {
+                $q->where('student.campus', $request->student_branch);
             })
             ->distinct('user_logs.user_id')
             ->count('user_logs.user_id');
@@ -1899,22 +1839,21 @@ class ReportController extends Controller
         ->when(auth()->user()->branch, function ($q) {
             $q->where('campus', auth()->user()->branch);
         })
-        ->when($request->filled('branch'), function ($q) use ($request) {
-            $q->where('campus', $request->branch);
+        ->when($request->filled('student_branch'), function ($q) use ($request) {
+            $q->where('campus', $request->student_branch);
         })->select('course')->distinct()->orderBy('course')->pluck('course');
 
         $hosteldayscolor = Student::where('academic_year', $this->academic_year)
         ->when(auth()->user()->branch, function ($q) {
             $q->where('campus', auth()->user()->branch);
         })
-        ->when($request->filled('branch'), function ($q) use ($request) {
-            $q->where('campus', $request->branch);
+        ->when($request->filled('student_branch'), function ($q) use ($request) {
+            $q->where('campus', $request->student_branch);
         })
         ->when($request->filled('course'), function ($q) use ($request) {
             $q->where('course', $request->course);
-        })
-        ->select('hostel_dayscholar')->distinct()->orderBy('hostel_dayscholar')->pluck('hostel_dayscholar');
-
+        })->whereNotNull('hostel_dayscholar')->whereRaw("TRIM(hostel_dayscholar) != ''")->select('hostel_dayscholar')->distinct()->orderBy('hostel_dayscholar')->pluck('hostel_dayscholar');
+        
         $coaching_type = Student::where('academic_year',$this->academic_year)->select('coaching_type')->distinct()->get();
 
         return view('report.userloginreport',compact('students','branches','courses','coaching_type','hosteldayscolor','totalStudents','todayLogin','webLogin','androidLogin','iosLogin','adminLogs','adminbranchtotal','adminTodayLogin','webAdminTodayLogin','andriodadmin','iosadmin'));
