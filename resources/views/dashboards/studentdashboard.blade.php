@@ -208,6 +208,9 @@ $isExamUpcoming = $exam && $exam->start_at > now();
                 <h4 class="card-title">Branch : {{ $user->branch?->name }}</h4>
                 <p class="mb-0 text-sm mt-2"><span class="text-nowrap"><strong>Course:</strong> {{ $user->course }}</span></p>
                 <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Section:</strong> {{ $user->section }}</span></p>
+                @if($user->course == 'NEET' && $user->coaching_type == 'OFFLINE')
+                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Batch:</strong> {{ $user->batch }}</span></p>
+                @endif
               </div>
             </div>
           </div>
