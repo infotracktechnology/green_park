@@ -105,7 +105,7 @@
                                                     <th>Campus</th>
                                                     <th>Course</th>
                                                     <th>Section</th>
-                                                    <th>Avail. Bal</th>
+                                                    {{-- <th>Avail. Bal</th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -125,7 +125,7 @@
                                                         <td>{{ $student->branch->name }}</td>
                                                         <td>{{ $student->course }}</td>
                                                         <td>{{ $student->section }}</td>
-                                                        <td>₹{{ number_format($student->deposit, 2) }}</td>
+                                                        {{-- <td>₹{{ number_format($student->deposit, 2) }}</td> --}}
                                                     </tr>
                                                 @empty
                                                     <tr>
