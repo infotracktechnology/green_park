@@ -279,7 +279,7 @@
                   <div class="slide-info">
                     <div class="slide-text">Batch 2025</div>
                     <!-- data-light contains the image to show in lightbox -->
-                    <a href="#" class="slide-btn open-lightbox" data-light="{{asset('img/silde/2025b.jpg')}}">College List</a>
+                    <a href="#" class="slide-btn open-lightbox" data-light="{{asset('img/silde/2025b.webp')}}">College List</a>
                   </div>
                 </div>
                 <!-- Slide 1 -->
@@ -288,7 +288,7 @@
                   <div class="slide-info">
                     <div class="slide-text">Batch 2024</div>
                     <!-- data-light contains the image to show in lightbox -->
-                    <a href="#" class="slide-btn open-lightbox" data-light="{{asset('img/silde/gpcc24.jpg')}}">College List</a>
+                    <a href="#" class="slide-btn open-lightbox" data-light="{{asset('img/silde/2024b.webp')}}">College List</a>
                   </div>
                 </div>
                 <!-- Slide 2 -->
