@@ -38,54 +38,23 @@ class PhoneCardController extends Controller
     {
         $selectedStudents = $request->student_id ?? [];
 
-        $existingEntries = PhoneCard::where('branch_id', $request->branch_id)->where('hostel_id', $request->hostel_id)->where('room_no', $request->room_no)->where('phone_date', $request->phone_date)->where('academic_year', $this->academic_year)->get();
-        foreach ($existingEntries as $entry) {
-
-            if (!in_array($entry->student_id, $selectedStudents)) {
-                $student = Student::where('student_id', $entry->student_id)->where('academic_year', $this->academic_year)->where('hostel_dayscholar', 'Hostel')->first();
-                if ($student) {
-                    $student->deposit = $student->deposit + $entry->expense;
-                    $student->save();
-                }
-                $entry->delete();
-            }
-        }
-
         foreach ($selectedStudents as $studentId) {
-            $existingEntry = $existingEntries->firstWhere('student_id', $studentId);
-            if ($existingEntry) {
-                $oldExpense = $existingEntry->expense;
-                $newExpense = $request->expense;
-                if ($oldExpense != $newExpense) {
-                    $student = Student::where('student_id', $studentId)->where('academic_year', $this->academic_year)->where('hostel_dayscholar', 'Hostel')->first();
 
-                    if ($student) {
-                        $student->deposit = $student->deposit + $oldExpense - $newExpense;
-                        $student->save();
-                    }
-                    $existingEntry->update([ 'expense' => $newExpense, ]);
-                }
-                continue;
-            }
-            $student = Student::where('student_id', $studentId)->where('academic_year', $this->academic_year)->where('hostel_dayscholar', 'Hostel')->first();
-
-            if (!$student) {
-                continue;
-            }
-            $student->deposit = $student->deposit - $request->expense;
-            $student->save();
-
-            PhoneCard::create([
+            PhoneCard::updateOrCreate(
+            [
+                'student_id'    => $studentId,
+                'phone_date'    => $request->phone_date,
                 'academic_year' => $this->academic_year,
-                'branch_id'  => $request->branch_id,
-                'hostel_id'  => $request->hostel_id,
-                'student_id' => $studentId,
-                'room_no'    => $request->room_no,
-                'phone_date' => $request->phone_date,
-                'expense'    => $request->expense,
-            ]);
+            ],
+            [
+                'branch_id' => $request->branch_id,
+                'hostel_id' => $request->hostel_id,
+                'room_no'   => $request->room_no,
+                'expense'   => $request->expense,
+            ]
+        );
         }
 
-        return redirect()->route('phoneturn.create')->with('success', 'Phone Turn Entry updated successfully.');
+        return redirect()->route('phoneturn.create')->with('success', 'Phone Turn Entry added successfully.');
     }
 }
