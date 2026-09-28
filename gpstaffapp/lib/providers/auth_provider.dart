@@ -123,6 +123,15 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Record the logout in the user_logs table (best effort).
+    try {
+      await ApiClient().dio.post('/admin/logout');
+    } on DioException catch (e) {
+      debugPrint('Logout API error: $e');
+    } catch (e) {
+      debugPrint('Logout API error: $e');
+    }
+
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('@token');

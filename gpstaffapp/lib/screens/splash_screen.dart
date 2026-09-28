@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
 import 'dashboard_screen.dart';
 import 'login_screen.dart';
@@ -59,6 +60,9 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     if (auth.isAuthenticated) {
+      // Already signed in - make sure a device token is registered.
+      NotificationService.instance.init();
+
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           pageBuilder: (_, __, ___) => const DashboardScreen(),

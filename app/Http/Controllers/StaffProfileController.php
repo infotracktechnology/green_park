@@ -522,6 +522,43 @@ class StaffProfileController extends Controller
         ], 200);
     }
 
+    /**
+     * Store the FCM device token of the logged in staff member.
+     * Called by the staff app after it obtains the FCM registration token.
+     */
+    public function update_device_token(Request $request)
+    {
+        $request->validate([
+            'device_token' => 'required|string|max:255',
+        ]);
+
+        $user = auth()->user();
+        $staff = null;
+
+        if ($user instanceof Staff) {
+            $staff = $user;
+        } elseif ($user && !empty($user->username)) {
+            $staff = Staff::where('username', $user->username)
+                ->orWhere('biometric_no', $user->username)
+                ->first();
+        }
+
+        if (!$staff) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Staff profile not identified. Please login again.',
+            ], 404);
+        }
+
+        $staff->device_token = $request->device_token;
+        $staff->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Device token updated successfully.',
+        ], 200);
+    }
+
     public function leave_list(Request $request)
     {
         $user = auth()->user();

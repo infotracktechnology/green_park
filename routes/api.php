@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier, StudentLog, NeetAchievements, Medical};
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Collection;
+use App\Providers\UserLogServiceProvider;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -26,9 +27,18 @@ Route::group(['prefix' => 'v2'], function () {
             $student->last_login = now();
             $student->device = $request->device;
             $student->save();
+            UserLogServiceProvider::storelog($student->student_id,'Student','Login Successful',$request->device);
             return response()->json(['message' => 'Login successful', 'student_id' => $student->id], 200);
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
+    });
+
+    Route::post('/logout', function (Request $request) {
+        $student = Student::where('student_id', $request->student_id)->first();
+        if ($student) {
+            UserLogServiceProvider::storelog((int) $student->student_id,'Student','Logout Successful',$request->device);
+        }
+        return response()->json(['status' => true, 'message' => 'Logout successful'], 200);
     });
 
     Route::get('/student_profile/{student_id}', function ($student_id, Student $attendanceService) {

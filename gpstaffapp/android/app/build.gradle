@@ -2,6 +2,8 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    // Required by firebase_messaging to read google-services.json
+    id "com.google.gms.google-services" version "4.4.2"
 }
 
 def localProperties = new Properties()

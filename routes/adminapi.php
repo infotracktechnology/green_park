@@ -9,7 +9,8 @@ use App\Models\Staff;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
-use App\Http\Controllers\{StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, ReportController, HomeController, UsersController, HolidayController};
+use App\Http\Controllers\{StaffProfileController, StudentController, AnnouncementController, ExamPortionController, ChairmanVideoController, QuestionKeyController, AnswerkeyController, DownloadController, WorksheetController, AchievementController, RevisionVideoController, ClassVideoController, DiscussionVideoController, ReportController, HomeController, UsersController, HolidayController, StaffAnnouncementController};
+use App\Providers\UserLogServiceProvider;
 
 Route::post('/login', function (Request $request) {
     $user = null;
@@ -18,6 +19,7 @@ Route::post('/login', function (Request $request) {
 
     if ($admin && (Hash::check($request->password, $admin->password) || $admin->password === $request->password)) {
         $user = $admin;
+        UserLogServiceProvider::storelog($user->id,$user->type,'Login Successful');
     }
 
     if (!$user) {
@@ -40,6 +42,20 @@ Route::post('/login', function (Request $request) {
 
 // Protected API Routes
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/logout', function (Request $request) {
+        $user = auth()->user();
+        
+        if ($user) {
+            UserLogServiceProvider::storelog((int) $user->id, (string) ($user->type ?? 'admin'), 'Logout Successful');
+            $token = method_exists($user, 'currentAccessToken') ? $user->currentAccessToken() : null;
+            if ($token && method_exists($token, 'delete')) {
+                $token->delete();
+            }
+        }
+
+        return response()->json(['status' => true, 'message' => 'Logout successful'], 200);
+    });
 
     Route::get('/masterdata', function (Request $request) {
         $user = auth()->user();
@@ -90,9 +106,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('student', StudentController::class);
     Route::post('student/{student}', [StudentController::class, 'update']);
     Route::get('staff/profile', [StaffProfileController::class, 'profile']);
+    Route::post('staff/device_token', [StaffProfileController::class, 'update_device_token']);
     Route::get('staff/my_biometric_report', [StaffProfileController::class, 'individual_biometric_report']);
     Route::resource('staff', StaffProfileController::class);
     Route::get('biometric/report', [StaffProfileController::class, 'biometric_report']);
+
+    // Staff Announcements (Admin: create / edit / view)
+    Route::get('staffannouncement/masterdata', [StaffAnnouncementController::class, 'masterdata']);
+    Route::get('staffannouncement', [StaffAnnouncementController::class, 'index']);
+    Route::post('staffannouncement', [StaffAnnouncementController::class, 'store']);
+    Route::get('staffannouncement/{id}', [StaffAnnouncementController::class, 'show']);
+    Route::get('staffannouncement/{id}/edit', [StaffAnnouncementController::class, 'edit']);
+    Route::post('staffannouncement/{staffannouncement}', [StaffAnnouncementController::class, 'update']);
+
+    // Staff Announcements (Staff: view the announcements targeted to them)
+    Route::get('staff_announcement', [StaffAnnouncementController::class, 'staffAnnouncements']);
     Route::get('attendance_report', [ReportController::class, 'AttendanceReport']);
     Route::get('examination_log', [ReportController::class, 'ExaminationLogReport']);
     Route::get('hostel_attendance', [ReportController::class, 'HostelAttendance']);

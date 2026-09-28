@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Matches AppColors.primary (#2B66A2) used by FcmServiceProvider -->
+    <color name="notification_color">#2B66A2</color>
 </resources>

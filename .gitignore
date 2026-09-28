@@ -18,3 +18,4 @@ yarn-error.log
 /vendor
 composer.lock
 *.md
+config/greenpark-e1595-firebase-adminsdk-fbsvc-68c4979730.json

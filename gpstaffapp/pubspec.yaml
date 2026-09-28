@@ -43,6 +43,10 @@ dependencies:
   path_provider: ^2.1.2
   open_filex: ^4.4.0
   pdf: ^3.10.11
+  # Pinned to the last releases compatible with the installed Dart 3.3.0 /
+  # Flutter 3.19.2 SDK. Newer majors require Dart >= 3.4.
+  firebase_core: ^2.10.0
+  firebase_messaging: ^14.6.4
 
 dev_dependencies:
   flutter_test:

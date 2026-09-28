@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "290120253133",
+    "project_id": "greenpark-e1595",
+    "storage_bucket": "greenpark-e1595.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290120253133:android:881fb7cb9359cd372c3384",
+        "android_client_info": {
+          "package_name": "com.gpcc.gpcc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxyU7r1QMyRRg3irnQzFBBrTa9lwCzGgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290120253133:android:0fc2a7b9b9ddc59f2c3384",
+        "android_client_info": {
+          "package_name": "com.gpccnamakkal.gpstaffapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxyU7r1QMyRRg3irnQzFBBrTa9lwCzGgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

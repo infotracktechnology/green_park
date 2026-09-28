@@ -26,6 +26,7 @@ import 'chairman_report_screen.dart';
 import 'admin_dashboard_overview_screen.dart';
 import 'staff_leave_screen.dart';
 import 'individual_biometric_screen.dart';
+import 'staff_announcement_list_screen.dart';
 
 class MenuItemModel {
   final String id;
@@ -80,6 +81,18 @@ class DashboardScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AnnouncementListScreen()),
+            ),
+          ),
+          MenuItemModel(
+            id: 'staff_announcement',
+            title: 'Staff Announcement',
+            subtitle: 'Notices for staff',
+            icon: Icons.campaign_outlined,
+            color: AppColors.fanta,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const StaffAnnouncementListScreen()),
             ),
           ),
           MenuItemModel(
@@ -322,6 +335,19 @@ class DashboardScreen extends StatelessWidget {
       }
 
       return [
+        MenuItemModel(
+          id: 'announcements',
+          title: 'Announcements',
+          subtitle: 'Notices from management',
+          icon: Icons.campaign_outlined,
+          color: AppColors.primary,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) =>
+                    const StaffAnnouncementListScreen(canManage: false)),
+          ),
+        ),
         MenuItemModel(
           id: 'profile',
           title: 'My Profile',
