@@ -62,7 +62,13 @@
                     <h4 class="fw-bold text-dark mb-1">{{ auth()->user()->student_name }}</h4>
                     <p class="text-muted mb-1">{{ auth()->user()->student_id ?? 'Student' }}</p>
                     <p class="text-muted mb-1">Course:  {{ auth()->user()->course ?? 'Course' }}</p>
+                    @if(auth()->user()->sec_batch_flg == '1')
+                    <p class="text-muted mb-1">Old Section: {{ auth()->user()->old_section ?? 'Section' }}</p>
+                    @endif
                     <p class="text-muted mb-1">Section: {{ auth()->user()->section ?? 'Section' }}</p>
+                    @if(auth()->user()->course == 'NEET' && auth()->user()->sec_batch_flg == '1')
+                    <p class="text-muted mb-1">Old Batch: {{ auth()->user()->old_batch ?? 'Batch' }}</p>
+                    @endif
                     @if(auth()->user()->course == 'NEET' && auth()->user()->coaching_type == 'OFFLINE')
                     <p class="text-muted mb-3">Batch: {{ auth()->user()->batch ?? 'Batch' }}</p>
                     @endif
@@ -136,6 +142,10 @@
                         <div class="col-md-6">
                             <div class="label-text">XII Board of Study</div>
                             <div class="value-text">{{ auth()->user()->board_of_study_XII_std }}</div>
+                            @if(auth()->user()->course == 'NEET' && auth()->user()->sec_batch_flg == '1')
+                             <div class="label-text">Old Batch </div>
+                            <div class="value-text">{{ auth()->user()->old_batch }}</div>   
+                            @endif
                         </div>
                         
                         <!-- Marks Chips -->
