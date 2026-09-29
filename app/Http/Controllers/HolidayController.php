@@ -268,6 +268,7 @@ class HolidayController extends Controller
                     ];
                 } else {
                     $attendanceData[] = [
+                        'id' => null,
                         'academic_year' => $academicYear,
                         'branch_id' => $branchId,
                         'attendance_date' => $attendanceDate,
@@ -279,7 +280,7 @@ class HolidayController extends Controller
                 }
             }
 
-            Attendance::upsert($attendanceData, ['id'], ['status']);
+            Attendance::upsert($attendanceData,['student_id', 'attendance_date', 'timing'], ['status', 'updated_at']);
 
             return response()->json([
                 'status' => true,
