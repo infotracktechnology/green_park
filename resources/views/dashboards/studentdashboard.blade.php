@@ -209,7 +209,7 @@ $isExamUpcoming = $exam && $exam->start_at > now();
                 <p class="mb-0 text-sm mt-2"><span class="text-nowrap"><strong>Course:</strong> {{ $user->course }}</span></p>
                 @if($user->sec_batch_flg == '1')
                 <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Old Section:</strong> {{ $user->old_section }}</span></p>
-                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>NewSection:</strong> {{ $user->section }}</span></p>
+                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>New Section:</strong> {{ $user->section }}</span></p>
                 @else
                 <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Section:</strong> {{ $user->section }}</span></p>
                 @endif
