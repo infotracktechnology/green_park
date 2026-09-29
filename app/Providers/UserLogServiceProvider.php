@@ -11,6 +11,7 @@ class UserLogServiceProvider
      */
     public static function storelog(int $userId, string $role, string $action, ?string $device = null): bool
     {
+    try {
         $deviceInfo = $device ?? request()->userAgent() ?? 'Unknown Device';
 
         return DB::table('user_logs')->insert([
@@ -21,5 +22,15 @@ class UserLogServiceProvider
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        } catch (\Throwable $e) {
+             \Log::error('User log insert failed', [
+            'user_id' => $userId,
+            'role' => $role,
+            'action' => $action,
+            'error' => $e->getMessage(),
+        ]);
+           
+            return false;
+        }
     }
 }

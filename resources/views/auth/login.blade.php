@@ -422,7 +422,7 @@
             </div>
             @endif
           </div>
-          <form method="POST" action="{{ route('auth.login') }}" enctype="multipart/form-data">
+          <form method="POST" action="{{ route('auth.login') }}" enctype="multipart/form-data" id="loginForm">
             @csrf
             <div class="form-row">
               <label for="username">Username</label>
@@ -432,7 +432,7 @@
               <label for="password">Password</label>
               <input id="password" name="password" type="password" placeholder="Enter Password" required>
             </div>
-            <button class="btn-login" type="submit">LOGIN</button>
+            <button class="btn-login" type="submit" id="loginBtn">LOGIN</button>
           </form>
           <div class="dived"></div>
           <hr>

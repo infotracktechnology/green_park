@@ -193,5 +193,18 @@
                const c = btn.nextElementSibling; if(c) c.style.maxHeight = c.scrollHeight + 'px';
              });
            });
-         
          })();
+
+        (function () {
+              const loginForm = document.getElementById('loginForm');
+              const loginBtn = document.getElementById('loginBtn');
+
+              if (loginForm && loginBtn) {
+                  loginForm.addEventListener('submit', function () {
+                      // Prevent multiple clicks
+                      loginBtn.disabled = true;
+                      // Change button text
+                      loginBtn.innerText = 'LOGGING IN...';
+                  });
+              }
+          })(); 
