@@ -18,7 +18,19 @@
   <link rel="shortcut icon" href="{{asset('img/favicon.png')}}" type="image/png')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+.course-btn {
+    color: #000 !important;
+    text-decoration: none !important;
+}
 
+.course-btn:hover,
+.course-btn:focus,
+.course-btn:active {
+    color: #000 !important;
+    text-decoration: none !important;
+}
+</style>
 </head>
 
 <body>
@@ -266,7 +278,7 @@
                 </div>
                 <!-- Slide -->
                 <div class="slide">
-                  <img src="{{asset('img/silde/slide-13.webp')}}" alt="slide 1">
+                  <img src="{{asset('img/silde/slide-13a.webp')}}" alt="slide 1">
                   <div class="slide-info">
                     <div class="slide-text">Batch 2026</div>
                     <!-- data-light contains the image to show in lightbox -->
@@ -481,7 +493,7 @@
       <div class="gp-footer-col">
         <h4 class="gp-footer-title">Courses</h4>
         <ul class="gp-footer-list">
-          <li>LONGTERM ONE YEAR PROGRAM</li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/018-019.jpg')}}">LONGTERM ONE YEAR PROGRAM </a></li>
           <li>LONGTERM ONLINE RECORDED VIDEO CLASS</li>
           <li>LONGTERM ONLINE LIVE CLASS</li>
           <li>LONGTERM ONLINE TEST SERIES</li>
@@ -523,9 +535,9 @@
             <img src="{{asset('img/silde/google-play.png')}}" alt="Google Play" style="width:100px">
           </a>
 
-          <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank" class="app-img">
+           <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank" class="app-img">
             <img src="{{asset('img/silde/app-store.png')}}" alt="App Store" style="width:100px">
-          </a>
+          </a> 
         </div>
       </div>
     </div>
