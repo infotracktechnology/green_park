@@ -429,7 +429,7 @@
             <div class="small">Get on your mobile - Download now</div>
             <div class="download-links">
               <a href="https://play.google.com/store/apps/details?id=com.gpcc.gpcc" target="_blank"><img src="{{asset('img/silde/google-play.png')}}" alt="Google Play"></a>
-                {{-- <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank"><img src="{{asset('img/silde/app-store.png')}}" alt="App Store"></a> --}}
+                <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank"><img src="{{asset('img/silde/app-store.png')}}" alt="App Store"></a>
             </div>
           </div>
 
@@ -523,9 +523,9 @@
             <img src="{{asset('img/silde/google-play.png')}}" alt="Google Play" style="width:100px">
           </a>
 
-          {{-- <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank" class="app-img">
+          <a href="https://apps.apple.com/us/app/gpcc/id6748722000" target="_blank" class="app-img">
             <img src="{{asset('img/silde/app-store.png')}}" alt="App Store" style="width:100px">
-          </a> --}}
+          </a>
         </div>
       </div>
     </div>
