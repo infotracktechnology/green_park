@@ -106,7 +106,7 @@
 
                   <div class="form-group col-lg-2">
                     <label>Section</label>
-                    <select name="section" id="section" class="form-control form-control-sm">
+                    <select name="section" id="section" class="form-control form-control-sm select2" multiple>
                       <option value="">Select Section</option>
                       <option value="{{ implode(',', $section)}}" @selected(implode(',', $section)==$chairmanvideo->section)>All</option>
                       @foreach ($section as $row)

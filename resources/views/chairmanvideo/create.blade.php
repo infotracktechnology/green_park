@@ -98,7 +98,7 @@
 
                    <div class="form-group col-lg-2">
                      <label>Section</label>
-                     <select name="section" id="section" class="form-control form-control-sm">
+                     <select name="section" id="section" class="form-control form-control-sm select2" multiple>
                      </select>
                    </div>
 
