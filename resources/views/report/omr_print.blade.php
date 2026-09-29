@@ -92,8 +92,8 @@
       </tbody>
     </table>
     
-    @if(!@empty($key_correction) && $key_correction != 0)
-      <p>Key Correction: Q.NO: {{ $key_correction }}</p>
+    @if($key_correction->isNotEmpty())
+      <p>Key Correction: Q.NO: {{ $key_correction->implode(', ') }}</p>
     @endif
 
     </div>
