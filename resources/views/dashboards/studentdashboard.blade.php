@@ -207,7 +207,21 @@ $isExamUpcoming = $exam && $exam->start_at > now();
               <div class="card-content">
                 <h4 class="card-title">Branch : {{ $user->branch?->name }}</h4>
                 <p class="mb-0 text-sm mt-2"><span class="text-nowrap"><strong>Course:</strong> {{ $user->course }}</span></p>
+                @if($user->sec_batch_flg == '1')
+                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Old Section:</strong> {{ $user->old_section }}</span></p>
+                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>New Section:</strong> {{ $user->section }}</span></p>
+                @else
                 <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Section:</strong> {{ $user->section }}</span></p>
+                @endif
+                @if($user->course == 'NEET' && $user->sec_batch_flg == '1')
+                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Old Batch:</strong> {{ $user->old_batch }}</span></p>
+                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>New Batch:</strong> {{ $user->batch }}</span></p>
+                @else
+                @if($user->course == 'NEET' && $user->coaching_type == 'OFFLINE')
+                <p class="mb-0 text-sm"><span class="text-nowrap"><strong>Batch:</strong> {{ $user->batch }}</span></p>
+                @endif
+                @endif
+                
               </div>
             </div>
           </div>

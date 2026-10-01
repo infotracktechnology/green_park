@@ -198,7 +198,29 @@
                   <label>Microsoft Teams Password</label>
                   <input type="text" name="teams_password" value="{{ old('teams_password', $Student->teams_password) }}" class="form-control form-control-sm ">
                 </div>
-                
+
+                @if ($Student->hostel_dayscholar == 'HOSTEL')
+                <div class="form-group col-lg-3">
+                    <label for="hostel_id">Hostel Name</label>
+                    <select name="hostel_id" class="form-control form-control-sm" id="hostel-select">
+                        <option value="" disabled>Select Hostel</option>
+                        @foreach ($hostels as $hostel)
+                            <option value="{{ $hostel->id }}"@if($hostel->id == $Student->hostel_id) selected @endif> {{ $hostel->name }} </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label>Room No</label>
+                  <input type="text" name="room_no" value="{{ old('room_no', $Student->room_no) }}" class="form-control form-control-sm ">
+                </div>
+
+                <div class="form-group col-lg-3">
+                  <label>Cots No</label>
+                  <input type="text" name="cots_no" value="{{ old('cots_no', $Student->cots_no) }}" class="form-control form-control-sm ">
+                </div>           
+                @endif
+
                 <div class="form-group col-lg-3">
                   <label>description</label>
                   <textarea name="description" id="description" cols="30" rows="3" class="form-control form-control-sm" >{{ old('description', $Student->description) }}</textarea>
