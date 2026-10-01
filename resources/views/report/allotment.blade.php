@@ -63,15 +63,18 @@
                       <th>S. No</th>
                       <th>Student ID</th>
                       <th>Student Name</th>
-                      <th>Course</th>
+                      {{-- <th>Course</th> --}}
                       <th>Campus</th>
                       <th>Coaching Type</th>
-                      <th>H/D</th>
+                      {{-- <th>H/D</th> --}}
                       <th>Section</th>
-                      <th>Batch</th>
+                      {{-- <th>Batch</th> --}}
                       <th>User Name</th>
                       <th>Gender</th>
-                      <th>Father No</th>
+                      {{-- <th>Father No</th> --}}
+                      <th>Hostel Name</th>
+                      <th>Room No</th>
+                      <th>Cots No</th>
                       <th>Login Detials </th>
                       <th>Hostel Verified </th>
                       <th> Hostel Allotment</th>
@@ -84,15 +87,18 @@
                       <td>{{$loop->iteration}}</td>
                       <td>{{$student->student_id}}</td>
                       <td>{{$student->student_name}}</td>
-                      <td>{{$student->course}}</td>
+                      {{-- <td>{{$student->course}}</td> --}}
                       <td>{{$student->branch->name}}</td>
                       <td>{{$student->coaching_type}}</td>
-                      <td>{{$student->hostel_dayscholar}}</td>
+                      {{-- <td>{{$student->hostel_dayscholar}}</td> --}}
                       <td>{{$student->section}}</td>
-                      <td>{{$student->batch}}</td>
+                      {{-- <td>{{$student->batch}}</td> --}}
                       <td>{{$student->user_name}}</td>
                       <td>{{$student->gender}}</td>
-                      <td>{{$student->father_ph_no}}</td>
+                      <td>{{ $student->hostel?->name  }}</td>
+                      <td>{{ $student->room_no }}</td>
+                      <td>{{ $student->cots_no }}</td>
+                      {{-- <td>{{$student->father_ph_no}}</td> --}}
                       <td>
                          <a href="{{ route('report.allotment', ['view' => 'website_login','student_id' => $student->id]) }}"
                             class="btn btn-primary btn-sm">

@@ -18,6 +18,7 @@ use App\Models\StudentLog;
 use App\Models\HostelCourier;
 use App\Models\InOutRegister;
 use App\Models\Branch;
+use App\Models\Hostel;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -130,6 +131,7 @@ class StudentController extends Controller
                     }
                     $branches_list = Branch::whereIn('id', $branchIds)->get();
                 }
+                $hostels = Hostel::orderBy('name')->get();
         if ($request->wantsJson() || $request->is('api/*')) {
             $Student->load('branch');
             return response()->json([
@@ -142,7 +144,7 @@ class StudentController extends Controller
             ], 200);
         }
 
-        return view('student.edit', compact('districts', 'states', 'pincodes', 'Student', 'branches_list'));
+        return view('student.edit', compact('districts', 'states', 'pincodes', 'Student', 'branches_list','hostels'));
     }
 
 
