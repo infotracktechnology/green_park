@@ -113,7 +113,7 @@
                             </div>
 
                             <!-- Reset / Submit -->
-                            <div class="col-lg-2 d-flex align-items-end">
+                            <div class="col-lg-2 mt-4">
                                 <button type="submit" class="btn btn-primary btn-block btn-sm">Submit Filters</button>
                             </div>
                         </div>
