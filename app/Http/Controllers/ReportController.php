@@ -1833,7 +1833,7 @@ class ReportController extends Controller
             ->where('user_logs.role', 'Student')
             ->where('user_logs.action', 'login successful')
             ->whereDate('user_logs.created_at', today())
-            ->where('user_logs.device', 'Andriod')
+            ->where('user_logs.device', 'Android')
             ->where('student.academic_year', $this->academic_year)
             ->when(auth()->user()->branch, function ($q) {
                 $q->where('student.campus', auth()->user()->branch);
