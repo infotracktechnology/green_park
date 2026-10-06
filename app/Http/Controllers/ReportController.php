@@ -457,7 +457,7 @@ class ReportController extends Controller
             ->whereBetween('attendance_date', [$request->start_date, $request->end_date]);
 
         if ($request->filled('section')) {
-            $query->where('section', $request->section);
+            $query->whereIn('section', $request->section);
         }
 
         if ($request->filled('course')) {
@@ -582,7 +582,7 @@ class ReportController extends Controller
                     $totalStudentQuery->where('course', $request->course);
                 }
                 if ($request->filled('section')) {
-                    $totalStudentQuery->where('section', $request->section);
+                    $totalStudentQuery->whereIn('section', $request->section);
                 }
 
                 $total_students = $totalStudentQuery->count();
@@ -642,8 +642,36 @@ class ReportController extends Controller
                 }
         $branch = $request->branch ?? 0;
         $course = $request->course ?? 0;
-        $data = Student::join('branch as b', 'student.campus', '=', 'b.id')->selectRaw("b.name as campus,batch,section,COUNT(*) as total,b.id,concat(gender,'-',hostel_dayscholar)gender,sum(ac_nonac='AC')ac,sum(ac_nonac='NON AC')nonac,sum(board_of_study_XII_std='SB')sb,sum(board_of_study_XII_std='CBSE')cbse,hostel_dayscholar, coaching_type")->where('academic_year', $this->academic_year)->where('b.id', $branch)->where('course', $course)->groupBy('section', 
-        'coaching_type')->orderBy('hostel_dayscholar')->orderByRaw("FIELD(gender, 'Male', 'Female')")->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")->get();
+       $data = Student::join('branch as b', 'student.campus', '=', 'b.id')
+    ->selectRaw("
+        b.name as campus,
+        batch,
+        section,
+        COUNT(*) as total,
+        b.id,
+        concat(gender,'-',hostel_dayscholar) gender,
+
+        SUM(ac_nonac='AC') as ac,
+        SUM(ac_nonac='NON AC') as nonac,
+
+        SUM(board_of_study_XII_std='SB') as sb,
+        SUM(board_of_study_XII_std='CBSE') as cbse,
+
+        SUM(gender='Male') as boys,
+        SUM(gender='Female') as girls,
+
+        hostel_dayscholar,
+        coaching_type
+    ")
+    ->where('academic_year', $this->academic_year)
+    ->where('b.id', $branch)
+    ->where('course', $course)
+    ->groupBy('section', 'coaching_type')
+    ->orderBy('hostel_dayscholar')
+    ->orderByRaw("FIELD(gender, 'Male', 'Female')")
+    ->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")
+    ->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")
+    ->get();
 
         $offline = $data->where('coaching_type', 'OFFLINE')->groupBy('gender');
         $online = $data->whereIn('coaching_type', [
