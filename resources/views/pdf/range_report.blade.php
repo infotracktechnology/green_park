@@ -127,6 +127,29 @@
             color: #0070c0;
             font-size: 16px;
         }
+        .footer-section {
+            margin-top: 9px;
+            width: 100%;
+            border-collapse: collapse;
+            border: none !important;
+            page-break-inside: avoid;
+        }
+
+        .footer-section tr,
+        .footer-section td {
+            border: none !important;
+        }
+        .sign-img {
+            max-height: 35px;
+            display: block;
+            margin-left: auto;
+        }
+
+        .chairman-text {
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
     </style>
 </head>
 
@@ -190,7 +213,16 @@
                     </tbody>
                 </table>
             </div>
-
+            {{-- ================= FOOTER / SIGNATURE ================= --}}
+            <table class="footer-section">
+            <tr>
+                <td style="width: 70%;"></td>
+                <td style="width: 30%; padding: 20px; text-align: center;">
+                 <img class="chairman-logo" src="data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/chairman_sign.jpeg'))) }}" style="width: 80px;">
+                    <div class="chairman-text">CHAIRMAN</div>
+                </td>   
+            </tr>
+        </table>
         </div>
     </div>
 

@@ -360,16 +360,14 @@
             </tr>
         </table>
     @endif
-
-    {{-- ================= 6. SIGNATURE FOOTER ================= --}}
+    {{-- ================= FOOTER / CHAIRMAN SIGNATURE ================= --}}
     <table class="footer-table">
-        <tr>
-            <td>
-                <div style="font-family: cursive; font-size: 17px; color: #0000a0; margin-bottom: 2px;">
-                    Mng. Sign
-                </div>
-                <div class="sign-text">CHAIRMAN</div>
-            </td>
+       <tr>
+            <td style="width: 70%;"></td>
+            <td style="width: 30%; padding: 20px; text-align: center;">
+                <img class="chairman-logo" src="data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/chairman_sign.jpeg'))) }}" style="width: 80px;">
+                <div class="chairman-text">CHAIRMAN</div>
+            </td>   
         </tr>
     </table>
 
