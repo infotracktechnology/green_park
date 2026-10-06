@@ -58,7 +58,7 @@
       <div class="acc-item">
         <button class="acc-btn" aria-expanded="false">
           <span class="acc-text">
-            <strong>OFFLINE ADMISSION</strong>
+            <strong>OFFLINE & ONLINE ADMISSION, NAMAKKAL</strong>
             <small>Office numbers</small>
           </span>
           <span class="acc-meta">
@@ -89,11 +89,146 @@
               </svg>
               <a href="tel:+919342440024">9342440024</a>
             </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919080274132">9080274132</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-btn" aria-expanded="false">
+          <span class="acc-text">
+            <strong>OFFLINE ADMISSION, COIMBATORE</strong>
+            <small>Office numbers</small>
+          </span>
+          <span class="acc-meta">
+            <svg class="call-icon" viewBox="0 0 24 24">
+              <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+            </svg>
+            <i class="chev"></i>
+          </span>
+        </button>
+        <div class="acc-content">
+          <p></p>
+          <ul class="contact-list">
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919944631172">9944631172</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+917604950938">7604950938</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-btn" aria-expanded="false">
+          <span class="acc-text">
+            <strong>OFFLINE ADMISSION, KARUR</strong>
+            <small>Office numbers</small>
+          </span>
+          <span class="acc-meta">
+            <svg class="call-icon" viewBox="0 0 24 24">
+              <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+            </svg>
+            <i class="chev"></i>
+          </span>
+        </button>
+        <div class="acc-content">
+          <p></p>
+          <ul class="contact-list">
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919843192355">9843192355</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+917695974012">7695974012</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+
+      <div class="acc-item">
+        <button class="acc-btn" aria-expanded="false">
+          <span class="acc-text">
+            <strong>OFFLINE ADMISSION, ERODE</strong>
+            <small>Office numbers</small>
+          </span>
+          <span class="acc-meta">
+            <svg class="call-icon" viewBox="0 0 24 24">
+              <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+            </svg>
+            <i class="chev"></i>
+          </span>
+        </button>
+        <div class="acc-content">
+          <p></p>
+          <ul class="contact-list">
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+917358887541">7358887541</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+917358889417">7358889417</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+            <div class="acc-item">
+        <button class="acc-btn" aria-expanded="false">
+          <span class="acc-text">
+            <strong>OFFLINE ADMISSION, CHENNAI</strong>
+            <small>Office numbers</small>
+          </span>
+          <span class="acc-meta">
+            <svg class="call-icon" viewBox="0 0 24 24">
+              <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+            </svg>
+            <i class="chev"></i>
+          </span>
+        </button>
+        <div class="acc-content">
+          <p></p>
+          <ul class="contact-list">
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919499906121">9499906121</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919499008007">9499008007</a>
+            </li>
           </ul>
         </div>
       </div>
       <!-- ONLINE ADMISSION -->
-      <div class="acc-item">
+      {{-- <div class="acc-item">
         <button class="acc-btn" aria-expanded="false">
           <span class="acc-text">
             <strong>ONLINE ADMISSION</strong>
@@ -116,7 +251,7 @@
             </li>
           </ul>
         </div>
-      </div>
+      </div> --}}
 
        {{-- <!-- Regarding Online Exam -->
       <div class="acc-item">
@@ -493,7 +628,7 @@
       <div class="gp-footer-col">
         <h4 class="gp-footer-title">Courses</h4>
         <ul class="gp-footer-list">
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/018-019.jpg')}}">LONGTERM ONE YEAR PROGRAM </a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-1.jpg')}}">LONGTERM ONE YEAR PROGRAM </a></li>
           <li>LONGTERM ONLINE RECORDED VIDEO CLASS</li>
           <li>LONGTERM ONLINE LIVE CLASS</li>
           <li>LONGTERM ONLINE TEST SERIES</li>
