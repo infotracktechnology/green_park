@@ -1703,61 +1703,66 @@ class ReportController extends Controller
     public function UserLoginReport(Request $request)
     {
         $branches = Branch::all();
-        $students = DB::table('student')->leftJoin('user_logs', function ($join) {
-            $join->on('student.student_id', '=', 'user_logs.user_id')
-             ->where('user_logs.role', 'Student');
-        })
-        ->leftJoin('branch', 'branch.id', '=', 'student.campus')
-        ->where('student.academic_year', $this->academic_year)
-        ->when(auth()->user()->branch, function ($q) {
-            $q->where('student.campus', auth()->user()->branch);
-        })
-        ->when($request->filled('student_branch'), function ($q) use ($request) {
-            $q->where('student.campus', $request->student_branch);
-        })
-        ->when($request->filled('course'), function ($q) use ($request) {
-            $q->where('student.course', $request->course);
-        })
-        ->when($request->filled('hostel_dayscholar'), function ($q) use ($request) {
-            $q->where('student.hostel_dayscholar',$request->hostel_dayscholar);
-        })
-        ->when($request->filled('coaching_type'), function ($q) use ($request) {
-            $q->where('student.coaching_type',$request->coaching_type);
-        })
-        ->when($request->filled('device'), function ($q) use ($request) {
-            $q->where('user_logs.device', $request->device);
-        })
-        ->when($request->filled('status'), function ($q) use ($request) {
-            if ($request->status === 'login successful') {
-                $q->where('user_logs.action', 'login successful');
-            } elseif ($request->status === 'logout successful') {
-                $q->where('user_logs.action', 'logout successful');
-            } elseif ($request->status === 'not_accessed') {
-        $q->whereNotExists(function ($sub) {
-            $sub->select(DB::raw(1))
-                ->from('user_logs')
-                ->whereColumn('user_logs.user_id','student.student_id')
-                ->where('user_logs.role', 'Student');
-        });
-    }
-        })
-        ->when($request->filled('from_date'), function ($q) use ($request) {
-            $q->whereDate('user_logs.created_at','>=', $request->from_date);
-        })
-        ->when($request->filled('to_date'), function ($q) use ($request) {$q
-            ->whereDate('user_logs.created_at','<=',$request->to_date);
-        })
-        ->when($request->filled('search'), function ($q) use ($request) {
-            $search = $request->search;
-            $q->where(function ($subQuery) use ($search) {$subQuery
-                    ->where('student.student_id','LIKE',"%{$search}%")
-                    ->orWhere('student.student_name','LIKE',"%{$search}%")
-                    ->orWhere('student.user_name','LIKE',"%{$search}%");
-            });
-        })
-        ->select('student.student_id','student.student_name','branch.campus as campus','student.course','student.section','student.hostel_dayscholar', 'student.coaching_type','user_logs.action','user_logs.device','user_logs.created_at as login_time')
-        ->orderByDesc('user_logs.created_at')
-        ->get();
+        $students = collect();
+
+        if ( $request->filled('student_branch') || $request->filled('course') || $request->filled('hostel_dayscholar') || $request->filled('coaching_type') || $request->filled('device') || $request->filled('status') || $request->filled('from_date') || $request->filled('to_date') || $request->filled('search')) {
+            $students = DB::table('student')
+                ->leftJoin('user_logs', function ($join) {
+                    $join->on('student.student_id', '=', 'user_logs.user_id')
+                        ->where('user_logs.role', 'Student');
+                })
+                ->leftJoin('branch', 'branch.id', '=', 'student.campus')
+                ->where('student.academic_year', $this->academic_year)
+                ->when(auth()->user()->branch, function ($q) {
+                    $q->where('student.campus', auth()->user()->branch);
+                })
+                ->when($request->filled('student_branch'), function ($q) use ($request) {
+                    $q->where('student.campus', $request->student_branch);
+                })
+                ->when($request->filled('course'), function ($q) use ($request) {
+                    $q->where('student.course', $request->course);
+                })
+                ->when($request->filled('hostel_dayscholar'), function ($q) use ($request) {
+                    $q->where('student.hostel_dayscholar', $request->hostel_dayscholar);
+                })
+                ->when($request->filled('coaching_type'), function ($q) use ($request) {
+                    $q->where('student.coaching_type', $request->coaching_type);
+                })
+                ->when($request->filled('device'), function ($q) use ($request) {
+                    $q->where('user_logs.device', $request->device);
+                })
+                ->when($request->filled('status'), function ($q) use ($request) {
+                    if ($request->status === 'login successful') {
+                        $q->where('user_logs.action', 'login successful');
+                    } elseif ($request->status === 'logout successful') {
+                        $q->where('user_logs.action', 'logout successful');
+                    } elseif ($request->status === 'not_accessed') {
+                        $q->whereNotExists(function ($sub) {
+                            $sub->select(DB::raw(1))->from('user_logs')->whereColumn('user_logs.user_id', 'student.student_id')->where('user_logs.role', 'Student');
+                        });
+                    }
+                })
+                ->when($request->filled('from_date'), function ($q) use ($request) {
+                    $q->whereDate('user_logs.created_at','>=', $request->from_date);
+                })
+                ->when($request->filled('to_date'), function ($q) use ($request) {
+                    $q->whereDate('user_logs.created_at','<=',$request->to_date);
+                })
+                ->when($request->filled('search'), function ($q) use ($request) {
+                    $search = $request->search;
+                    $q->where(function ($subQuery) use ($search) {$subQuery
+                        ->where('student.student_id','LIKE',"%{$search}%")
+                        ->orWhere('student.student_name','LIKE',"%{$search}%")
+                        ->orWhere('student.user_name','LIKE',"%{$search}%");
+                    });
+                })
+                ->select('student.student_id','student.student_name','branch.campus as campus','student.course','student.section','student.hostel_dayscholar','student.coaching_type','user_logs.action','user_logs.device','user_logs.created_at as login_time')
+                ->orderByDesc('user_logs.created_at')
+                ->get();
+        }
+
+            $adminLogs = collect();
+            if ( $request->filled('admin_user') || $request->filled('admin_branch') || $request->filled('admin_from_date') || $request->filled('admin_to_date')) {
 
         $adminLogs = DB::table('user_logs')
             ->leftJoin('users', 'users.id', '=', 'user_logs.user_id')
@@ -1779,7 +1784,7 @@ class ReportController extends Controller
             ->select('user_logs.*','users.username as user_name','branch.name as user_branch')
             ->orderByDesc('user_logs.created_at')
             ->get();
-
+    }
 
             $totalStudents = Student::where('academic_year',$this->academic_year)
                 ->when(auth()->user()->branch, function ($q) {
@@ -2983,4 +2988,26 @@ $displayCategory = $categoryName;
 
         return view('report.allotment', compact('students'));
     }
+public function visitorVerification(Request $request)
+{
+    $students = collect();
+    $selectedStudent = null;
+    $visitors = collect();
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $students = Student::where(function ($q) use ($search) {
+                $q->where('student_id', 'like', "%{$search}%")
+                  ->orWhere('student_name', 'like', "%{$search}%");
+            })->where('academic_year', $this->academic_year)->where('coaching_type', 'OFFLINE')->get();
+    }
+    if ($request->filled('student_id')) {
+        $selectedStudent = Student::where('student_id', $request->student_id)->where('academic_year', $this->academic_year)->first();
+        if ($selectedStudent) {
+            $visitors = collect([$selectedStudent]);
+        }
+    }
+
+    return view('report.verification',compact('students', 'selectedStudent', 'visitors'));
+}
 }
