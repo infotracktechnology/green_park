@@ -90,10 +90,10 @@
                             <!-- Section Filter -->
                             <div class="col-lg-2">
                                 <label>Section</label>
-                                <select name="section" class="form-control form-control-sm">
+                                <select name="section[]" class="form-control form-control-sm select2" multiple>
                                     <option value="">All Sections</option>
                                     @foreach($sections as $section)
-                                    <option value="{{ $section }}" @selected($section == request('section'))>
+                                    <option value="{{ $section }}" @selected(in_array($section, request('section', [])))>
                                         {{ $section }}
                                     </option>
                                     @endforeach
