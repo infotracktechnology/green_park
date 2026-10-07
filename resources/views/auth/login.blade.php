@@ -628,13 +628,13 @@
       <div class="gp-footer-col">
         <h4 class="gp-footer-title">Courses</h4>
         <ul class="gp-footer-list">
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course - 1.webp')}}">LONGTERM ONE YEAR PROGRAM </a></li>
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-2.webp')}}">LONGTERM ONLINE RECORDED VIDEO CLASS</li>
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-3.webp')}}">LONGTERM ONLINE LIVE CLASS</li>
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-4.webp')}}">LONGTERM ONLINE TEST SERIES</li>
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-5.webp')}}">TWO YEARS OFFLINE CLASSROOM PROGRAM</li>
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-6.webp')}}">TWO YEARS ONLINE CLASSROOM PROGRAM</li>
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-7.webp')}}">CRASH COURSE PROGRAM</li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course - 1.webp')}}">LONGTERM ONE YEAR PROGRAM</a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-2.webp')}}">LONGTERM ONLINE RECORDED VIDEO CLASS</a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-3.webp')}}">LONGTERM ONLINE LIVE CLASS</a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-4.webp')}}">LONGTERM ONLINE TEST SERIES</a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-5.webp')}}">TWO YEARS OFFLINE CLASSROOM PROGRAM</a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-6.webp')}}">TWO YEARS ONLINE CLASSROOM PROGRAM</a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-7.webp')}}">CRASH COURSE PROGRAM</a></li>
         </ul>
       </div>
 
