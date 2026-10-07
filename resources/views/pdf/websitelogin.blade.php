@@ -204,7 +204,7 @@
         <tr>
             <td class="lbl-left">XII BOARD</td>
             <td class="colon">:</td>
-            <td class="val-left">{{ $student->XII_BOARD }}</td>
+            <td class="val-left">{{ $student->board_of_study_XII_std }}</td>
 
             <td class="lbl-right">HOS/DAY</td>
             <td class="colon">:</td>
@@ -228,7 +228,7 @@
         <tr>
             <td>
                 <div class="website-title">
-                    Website URL : www.app.gpccnamakkal.com
+                    Website URL : app.gpccnamakkal
                 </div>
 
                 <table class="cred-table">
