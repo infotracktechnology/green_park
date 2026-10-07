@@ -123,7 +123,7 @@ Route::group(['prefix' => 'v2'], function () {
 
         $subject = $request->input('subject');
 
-        $subjectexam = ExamSubjectReport::where('category', 'like', "%{$subject}%")
+        $subjectexam = ExamSubjectReport::where('category', $subject)
             ->where('stuid', $student_id)
             ->whereNotIn('subject', function ($query) use ($student_id) {
                 $query->select('testname')
