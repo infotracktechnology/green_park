@@ -228,7 +228,7 @@
         <tr>
             <td>
                 <div class="website-title">
-                    Website URL : app.gpccnamakkal
+                    Weblogin URL : app.gpccnamakkal.com
                 </div>
 
                 <table class="cred-table">
