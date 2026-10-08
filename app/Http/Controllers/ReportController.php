@@ -1239,8 +1239,7 @@ class ReportController extends Controller
                     $totalQuestions = DB::table('exam_answer')
                         ->where('academic_year', $this->academic_year)
                         ->where('testname', $test_name)
-                        ->distinct('q_no')
-                        ->count('q_no');
+                        ->count('mark');
 
                     $totalMarks = $totalQuestions * 4;
 
