@@ -302,8 +302,8 @@
               { content: 'R', styles: { fillColor: [238, 236, 225] } },
               { content: 'W', styles: { fillColor: [238, 236, 225] } },
               { content: 'L', styles: { fillColor: [238, 236, 225] } },
-              @if(!$isSingleSubject),
-              { content: 'TOT', styles: { fillColor: [238, 236, 225] } }
+              @if(!$isSingleSubject)
+              ,{ content: 'TOT', styles: { fillColor: [238, 236, 225] } }
               @endif
           );
       @endforeach
@@ -343,8 +343,7 @@
                   {{ $mark->w ?? 0 }},
                   {{ $mark->l ?? 0 }},
                   @if(!$isSingleSubject)
-                ,
-                  { content: {{ $mark->tot ?? 0 }}, isTot: true }   
+                  ,{ content: {{ $mark->tot ?? 0 }}, isTot: true }   
                     @endif
               @endforeach
               { content: {{ $result->mark ?? 0 }}, isNet: true }
