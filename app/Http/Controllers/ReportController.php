@@ -1236,12 +1236,17 @@ class ReportController extends Controller
                 );
 
                 if (!empty($testIdArray)) {
-                    $totalQuestions = DB::table('exam_answer')
-                        ->where('academic_year', $this->academic_year)
-                        ->where('testname', $test_name)
-                        ->count('mark');
+                    $firstStudentId = $results->first()?->student_id;
 
-                    $totalMarks = $totalQuestions * 4;
+                    if ($firstStudentId) {
+                        $totalQuestions = DB::table('exam_answer')
+                            ->where('academic_year', $this->academic_year)
+                            ->where('testname', $test_name)
+                            ->where('student_id', $firstStudentId)
+                            ->count('mark');
+
+                        $totalMarks = $totalQuestions * 4;
+                    }
 
                     $marks = DB::table('exam_answer')->where('academic_year', $this->academic_year)->where('testname', $test_name)->select('student_id', 'subject')->selectRaw('SUM(mark = 4) as r')->selectRaw('SUM(mark = -1) as w')->selectRaw('SUM(mark = 0) as l')->selectRaw('SUM(mark) as tot')->groupBy('student_id', 'subject')->get()
                         ->keyBy(function ($row) {
