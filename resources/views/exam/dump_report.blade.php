@@ -196,6 +196,8 @@
                   'TEST BATCH'
               ]);
           });
+        $subjectCount = count($subjects);
+        $isSingleSubject = $subjectCount === 1;
       @endphp
   
       const examName = @json($test_name ?? '');
@@ -279,7 +281,7 @@
       @foreach($subjects as $subject)
           headRow1.push({
               content: @json(strtoupper(trim($subject))),
-              colSpan: 4,
+              colSpan: {{ $isSingleSubject ? 3 : 4 }},
               styles: {
                   fillColor: [255, 255, 255],
                   font: 'times',
@@ -300,7 +302,9 @@
               { content: 'R', styles: { fillColor: [238, 236, 225] } },
               { content: 'W', styles: { fillColor: [238, 236, 225] } },
               { content: 'L', styles: { fillColor: [238, 236, 225] } },
+              @if(!$isSingleSubject),
               { content: 'TOT', styles: { fillColor: [238, 236, 225] } }
+              @endif
           );
       @endforeach
   
@@ -338,7 +342,10 @@
                   {{ $mark->r ?? 0 }},
                   {{ $mark->w ?? 0 }},
                   {{ $mark->l ?? 0 }},
-                  { content: {{ $mark->tot ?? 0 }}, isTot: true },
+                  @if(!$isSingleSubject)
+                ,
+                  { content: {{ $mark->tot ?? 0 }}, isTot: true }   
+                    @endif
               @endforeach
               { content: {{ $result->mark ?? 0 }}, isNet: true }
           ]);
