@@ -1709,8 +1709,7 @@ class ReportController extends Controller
         $students = collect();
 
         if ( $request->filled('student_branch') || $request->filled('course') || $request->filled('hostel_dayscholar') || $request->filled('coaching_type') || $request->filled('device') || $request->filled('status') || $request->filled('from_date') || $request->filled('to_date') || $request->filled('search')) {
-            $students = DB::table('student')
-                ->leftJoin('user_logs', function ($join) {
+            $students = Student::leftJoin('user_logs', function ($join) {
                     $join->on('student.student_id', '=', 'user_logs.user_id')
                         ->where('user_logs.role', 'Student');
                 })
@@ -1824,8 +1823,8 @@ class ReportController extends Controller
             ->when(auth()->user()->branch, function ($q) {
                 $q->where('student.campus', auth()->user()->branch);
             })
-            ->when($request->filled('branch'), function ($q) use ($request) {
-                $q->where('student.campus', $request->branch);
+            ->when($request->filled('student_branch'), function ($q) use ($request) {
+                $q->where('student.campus', $request->student_branch);
             })
             ->distinct('user_logs.user_id')
             ->count('user_logs.user_id');
@@ -1841,8 +1840,8 @@ class ReportController extends Controller
             ->when(auth()->user()->branch, function ($q) {
                 $q->where('student.campus', auth()->user()->branch);
             })
-            ->when($request->filled('branch'), function ($q) use ($request) {
-                $q->where('student.campus', $request->branch);
+            ->when($request->filled('student_branch'), function ($q) use ($request) {
+                $q->where('student.campus', $request->student_branch);
             })
             ->distinct('user_logs.user_id')
             ->count('user_logs.user_id');
@@ -1858,8 +1857,8 @@ class ReportController extends Controller
             ->when(auth()->user()->branch, function ($q) {
                 $q->where('student.campus', auth()->user()->branch);
             })
-            ->when($request->filled('branch'), function ($q) use ($request) {
-                $q->where('student.campus', $request->branch);
+            ->when($request->filled('student_branch'), function ($q) use ($request) {
+                $q->where('student.campus', $request->student_branch);
             })
             ->distinct('user_logs.user_id')
             ->count('user_logs.user_id');

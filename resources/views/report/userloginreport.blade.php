@@ -286,9 +286,9 @@
                                                         </td>
                                                     </tr>
                                                 @empty
-                                                    <tr>
-                                                        <td colspan="13" class="text-center">No login reports found.</td>
-                                                    </tr>
+                                                    {{-- <tr>
+                                                        <td colspan="12" class="text-center">No login reports found.</td>
+                                                    </tr> --}}
                                                 @endforelse
                                             </tbody>
                                         </table>
@@ -457,9 +457,9 @@
                                                         <td>{{ date('h:i A', strtotime($log->created_at)) }}</td>
                                                     </tr>
                                                 @empty
-                                                    <tr>
-                                                        <td colspan="7" class="text-center">No admin login reports found.</td>
-                                                    </tr>
+                                                    {{-- <tr>
+                                                        <td colspan="8" class="text-center">No admin login reports found.</td>
+                                                    </tr> --}}
                                                 @endforelse
                                             </tbody>
                                         </table>
@@ -490,6 +490,9 @@
             info: true,
             lengthChange: true,
             pageLength: 15,
+             language: {
+                emptyTable: "No login reports found."
+            },
             lengthMenu: [[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]]
         });
 
@@ -502,6 +505,9 @@
             info: true,
             lengthChange: true,
             pageLength: 15,
+            language: {
+                emptyTable: "No admin login reports found."
+            },
             lengthMenu: [[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]]
         });
     });
