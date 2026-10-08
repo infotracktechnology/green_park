@@ -1237,7 +1237,6 @@ class ReportController extends Controller
 
                 if (!empty($testIdArray)) {
                     $firstStudentId = $results->first()?->student_id;
-
                     if ($firstStudentId) {
                         $totalQuestions = DB::table('exam_answer')
                             ->where('academic_year', $this->academic_year)
