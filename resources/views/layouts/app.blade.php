@@ -254,6 +254,11 @@
                 <li><a href="{{ route('report.monthlyattendance') }}" class="nav-link">Monthly Attendance Report</a></li>
               </ul>
             </li>
+            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file"></i><span>Visitor Management</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('report.verification') }}" class="nav-link">Visitor Verification</a></li>
+              </ul>
+            </li>
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('bank.create') }}" class="nav-link">Banks</a></li>
@@ -342,7 +347,7 @@
     const gender   = $('#gender');
     const students = $('#students');
     
-    const fetchData = (params) => $.get('{{ route("filter",[],false) }}', params);
+    const fetchData = (params) => $.get('{{ route("filter") }}', params);
     
     const populate = ($el, data=[], {placeholder='', addAll=false}={})=>{
       let html = placeholder ? `<option value="">${placeholder}</option>` : '';
