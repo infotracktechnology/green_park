@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Download;
 use App\Models\Student;
 use App\Models\AcademicYear;
+use App\Models\StudentLog;
 
 class DownloadController extends Controller
 {
@@ -183,6 +184,10 @@ class DownloadController extends Controller
                         }
                     }
                 }
+                StudentLog::where('module', 'Download')->where(function ($query) use ($download) {
+                    $query->where('action', 'Seen Download - ' . $download->id)
+                          ->orWhere('action', 'Downloaded Download - ' . $download->id);
+                })->delete();
                 $download->delete();
             }
         }

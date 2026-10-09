@@ -7,6 +7,7 @@ use App\Models\DiscussionVideo;
 use App\Models\Branch;
 use App\Models\AcademicYear;
 use App\Models\Student;
+use App\Models\StudentLog;
 
 class DiscussionVideoController extends Controller
 {
@@ -118,6 +119,9 @@ class DiscussionVideoController extends Controller
 
     public function destroy(Request $request, DiscussionVideo $discussionvideo)
     {
+        StudentLog::where('module', 'Discussion Video')->where(function ($query) use ($discussionvideo) {
+            $query->where('action', 'seen Discussion Video - ' . $discussionvideo->id);
+        })->delete();
         $discussionvideo->delete();
 
         if ($request->wantsJson()) {
@@ -129,10 +133,23 @@ class DiscussionVideoController extends Controller
     public function bulkDelete(Request $request)
     {
         $ids = $request->ids;
+            if (is_string($ids)) {
+                $ids = explode(',', $ids);
+            }
+
+            $ids = array_values(array_filter(
+                array_map('intval', (array) $ids)
+            ));
         if (!$ids) {
             return response()->json(['message' => 'No videos selected'], 400);
         }
-        DiscussionVideo::whereIn('id', explode(",", $ids))->delete();
+        foreach ($ids as $discussionvideoId) {
+            StudentLog::where('module', 'Discussion Video')->where(function ($query) use ($discussionvideoId) {
+                            $query->where('action', 'seen Discussion Video - ' . $discussionvideoId);
+                        })
+                        ->delete();
+            }
+        DiscussionVideo::whereIn('id', $ids)->delete();
 
         return response()->json(['message' => 'Selected discussion videos deleted successfully!'], 200);
     }

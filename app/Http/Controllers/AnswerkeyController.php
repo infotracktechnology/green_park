@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\AnswerKey;
 use App\Models\Branch;
 use App\Models\Student;
+use App\Models\StudentLog;
 use App\Models\AcademicYear;
 
 class AnswerkeyController extends Controller
@@ -182,6 +183,10 @@ class AnswerkeyController extends Controller
                         }
                     }
                 }
+                StudentLog::where('module', 'Answer Key')->where(function ($query) use ($answerkey) {
+                    $query->where('action', 'Seen Answer Key - ' . $answerkey->id)
+                        ->orWhere('action', 'Downloaded Answer Key - ' . $answerkey->id);
+                })->delete();
                 $answerkey->delete();
             }
         }

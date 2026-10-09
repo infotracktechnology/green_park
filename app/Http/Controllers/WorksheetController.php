@@ -5,6 +5,7 @@ use App\Models\Worksheet;
 use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Models\Student;
+use App\Models\StudentLog;
 use App\Models\AcademicYear;
 
 class WorksheetController extends Controller
@@ -179,6 +180,10 @@ class WorksheetController extends Controller
 
                     }
                 } 
+                StudentLog::where('module', 'Worksheet')->where(function ($query) use ($worksheet) {
+                    $query->where('action', 'Seen Worksheet - ' . $worksheet->id)
+                        ->orWhere('action', 'Downloaded Worksheet - ' . $worksheet->id);
+                })->delete();
                 $worksheet->delete();
             }
         }

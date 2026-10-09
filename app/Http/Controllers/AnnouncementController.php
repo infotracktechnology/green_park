@@ -12,6 +12,7 @@ use App\Providers\FcmServiceProvider;
 use App\Http\Controllers\HomeController;
 use App\Jobs\SendAnnouncementNotification;
 use Illuminate\Support\Facades\Log;
+use App\Models\StudentLog;
 
 class AnnouncementController extends Controller
 {
@@ -45,7 +46,7 @@ class AnnouncementController extends Controller
         return redirect()->route('announcement.index');
     }
 
-    public function store(Request $request, FcmServiceProvider $fcm)
+    public function store(Request $request)
     {
         $data = $request->except(['_token', '_method', 'existing_attachment']);
 
@@ -195,11 +196,45 @@ class AnnouncementController extends Controller
     }
 
 
+    // public function destroy(Request $request, $id = null)
+    // {
+    //     if ($request->has('ids')) {
+    //         Announcement::whereIn('id', $request->ids)->delete();
+    //     }
+    //     return redirect()->back()->with('success', 'Announcement deleted successfully.');
+    // }
+
     public function destroy(Request $request, $id = null)
     {
         if ($request->has('ids')) {
-            Announcement::whereIn('id', $request->ids)->delete();
+            $ids = $request->ids;
+            foreach ($ids as $announcementId) {
+                $announcement = Announcement::find($announcementId);
+                if ($announcement) {
+                    if (!empty($announcement->attachment)) {
+                        $attachments = is_array($announcement->attachment) ? $announcement->attachment : json_decode($announcement->attachment, true);
+                        if (is_array($attachments)) {
+                            foreach ($attachments as $attachment) {
+                                $filePath = public_path($attachment);
+                                if (file_exists($filePath)) {
+                                    unlink($filePath);
+                                }
+                            }
+                        }
+                    }
+
+                    StudentLog::where('module', 'Announcements')->where(function ($query) use ($announcementId) {
+                            $query->where('action', 'Seen Announcements - ' . $announcementId)
+                                ->orWhere('action', 'Seen Announcements -' . $announcementId)
+                                ->orWhere('action', 'Downloaded Announcements - ' . $announcementId);
+                        })
+                        ->delete();
+
+                    $announcement->delete();
+                }
+            }
         }
+
         return redirect()->back()->with('success', 'Announcement deleted successfully.');
     }
 
