@@ -184,7 +184,7 @@
 <body>
 
 <div class="page-container">
-
+@foreach($students as $student)
     {{-- HEADER --}}
     <table class="header-table">
         <tr>
@@ -322,7 +322,10 @@
             <td style="text-align: right; width: 50%;">Incharge</td>
         </tr>
     </table>
-
+    @if(!$loop->last)
+        <div style="page-break-after: always;"></div>
+    @endif
+@endforeach
 </div>
 
 </body>

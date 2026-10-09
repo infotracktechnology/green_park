@@ -177,6 +177,8 @@
                 <div class="col-md-4">
                   <form method="post" class="no-loader" action="{{ route('report.sectionlist') }}" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="branch" value="{{ request('branch') }}">
+                    <input type="hidden" name="course" value="{{ request('course') }}">
                     <div class="form-group col-lg-12">
                       <label>Sections</label>
                       <input type="hidden" name="branchname" value="{{ $grouped->first()?->first()?->campus }}">
@@ -193,7 +195,7 @@
                       <label>Reports</label>
                       <select name="view" class="form-control form-control-sm" required>
                       <option value="">Select Report</option>
-                      @foreach(["Attendance List"=>"attendancelist","Phone Number"=>"phonelist","Door List"=>"doorlist","ACINON AC LIST"=>"acnonaclist","SIGN LIST"=>"signlist","Photo List"=>"photolist"] as $key => $link)                
+                      @foreach(["Attendance List"=>"attendancelist","Phone Number"=>"phonelist","Door List"=>"doorlist","ACINON AC LIST"=>"acnonaclist","SIGN LIST"=>"signlist","Photo List"=>"photolist","weblogin Details"=>"websitelogin","Hostel verification"=>"hostelverification","Hostel Allotment"=>"hostelallotment"] as $key => $link)                
                         <option value="{{ $link }}">{{ $key }}</option>
                       @endforeach
                       </select>

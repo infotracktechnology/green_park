@@ -684,13 +684,16 @@ class ReportController extends Controller
 
         $grouped = $data->groupBy(['gender']);
 
-        if ($request->isMethod('post')) {
-            $section = $request->section;
-            $students = Student::where('section', $section)->where('academic_year', $this->academic_year)->get();
-            $branchname = $request->branchname;
-            $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'section'));
-            return $pdf->download("$section-$request->view.pdf");
-        }
+    if ($request->isMethod('post')) {
+        $section = $request->section;
+        $branchId = $request->branch;
+        $courseName = $request->course;
+        $branch = Branch::findOrFail($branchId);
+        $branchname = $branch->name;
+        $students = Student::where('campus', $branchId)->where('course', $courseName)->where('section', $section)->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
+        $pdf = Pdf::loadView("pdf.$request->view",compact('students', 'branchname', 'section'));
+        return $pdf->download("$section-$request->view.pdf");
+    }
 
         return view('report.sectionlist', compact('grouped', 'offline', 'online','branches_list'));
     }
@@ -3001,20 +3004,24 @@ $displayCategory = $categoryName;
                         ->orWhere('section', 'like', "%{$search}%");
                 });
             });
-
+               
     if ($request->view == 'website_login' && $request->filled('student_id')) {
         $student = $query->where('student.id', $request->student_id)->firstOrFail();
-        $pdf = Pdf::loadView('pdf.websitelogin', compact('student') );
-        return $pdf->download('Website_Login_Details' . $student->student_id . '.pdf');
+        $students = collect([$student]);
+        $branchname = $student->branch->name ?? '';
+        $pdf = Pdf::loadView('pdf.websitelogin',compact('students', 'branchname'));
+        return $pdf->download('Website_Login_Details_' . $student->student_id . '.pdf');
     }
     if ($request->view == 'hostel_verification' && $request->filled('student_id')) {
         $student = $query->where('student.id', $request->student_id)->firstOrFail();
-        $pdf = Pdf::loadView('pdf.hostelverification',compact('student'));
+        $students = collect([$student]);
+        $pdf = Pdf::loadView('pdf.hostelverification',compact('students'));
         return $pdf->download('Hostel_Verification' . $student->student_id . '.pdf');
     }
     if ($request->view == 'hostel_allotment' && $request->filled('student_id')) {
         $student = $query->where('student.id', $request->student_id)->firstOrFail();
-        $pdf = Pdf::loadView('pdf.hostelallotment',compact('student'));
+        $students = collect([$student]);
+        $pdf = Pdf::loadView('pdf.hostelallotment',compact('students'));
         return $pdf->download('hostel_allotment' . $student->student_id . '.pdf');
 
     }

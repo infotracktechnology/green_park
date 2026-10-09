@@ -158,7 +158,7 @@
 <body>
 
 <div class="card-container">
-
+@foreach($students as $student)
     {{-- HEADER --}}
     <table class="header-table">
         <tr>
@@ -246,7 +246,10 @@
             </td>
         </tr>
     </table>
-
+    @if(!$loop->last)
+        <div style="page-break-after: always;"></div>
+    @endif
+@endforeach
 </div>
 
 </body>
