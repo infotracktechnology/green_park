@@ -46,7 +46,7 @@ class AnnouncementController extends Controller
         return redirect()->route('announcement.index');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, FcmServiceProvider $fcm)
     {
         $data = $request->except(['_token', '_method', 'existing_attachment']);
 
