@@ -1890,8 +1890,44 @@ class ReportController extends Controller
         })->whereNotNull('hostel_dayscholar')->whereRaw("TRIM(hostel_dayscholar) != ''")->select('hostel_dayscholar')->distinct()->orderBy('hostel_dayscholar')->pluck('hostel_dayscholar');
         
         $coaching_type = Student::where('academic_year',$this->academic_year)->select('coaching_type')->distinct()->get();
-
-        return view('report.userloginreport',compact('students','branches','courses','coaching_type','hosteldayscolor','totalStudents','todayLogin','webLogin','androidLogin','iosLogin','adminLogs','adminbranchtotal','adminTodayLogin','webAdminTodayLogin','andriodadmin','iosadmin'));
+        $summary = DB::table('student')
+            ->leftJoin('branch', 'branch.id', '=', 'student.campus')
+            ->where('student.academic_year', $this->academic_year)
+            ->whereNull('student.deleted_at')
+            ->when($request->filled('summary_branch'), function ($q) use ($request) {
+                $q->where('student.campus', $request->summary_branch);
+            })
+            ->when($request->filled('summary_course'), function ($q) use ($request) {
+                $q->where('student.course', $request->summary_course);
+            })
+            ->when($request->filled('summary_hostel_dayscholar'), function ($q) use ($request) {
+                $q->where(
+                    'student.hostel_dayscholar',
+                    $request->summary_hostel_dayscholar
+                );
+            })
+            ->when($request->filled('summary_coaching_type'), function ($q) use ($request) {
+                $q->where(
+                    'student.coaching_type',
+                    $request->summary_coaching_type
+                );
+            })
+            ->when(auth()->user()->branch, function ($q) {
+                $q->where('student.campus', auth()->user()->branch);
+            })
+            ->when($request->filled('branch'), function ($q) use ($request) {
+                $q->where('student.campus', $request->branch);
+            })
+            ->select('student.campus','branch.name as branch_name')
+            ->selectRaw('COUNT(DISTINCT student.student_id) as total_students')
+            ->selectRaw("COUNT(DISTINCT CASE WHEN EXISTS (SELECT 1 FROM user_logs ul WHERE ul.user_id = student.student_id AND ul.role = 'Student' AND ul.action = 'login successful' AND ul.device = 'Web') THEN student.student_id END) as web")
+            ->selectRaw("COUNT(DISTINCT CASE WHEN EXISTS ( SELECT 1 FROM user_logs ul WHERE ul.user_id = student.student_id AND ul.role = 'Student' AND ul.action = 'login successful' AND ul.device = 'Android') THEN student.student_id END) as android")
+            ->selectRaw("COUNT(DISTINCT CASE WHEN EXISTS ( SELECT 1 FROM user_logs ul WHERE ul.user_id = student.student_id AND ul.role = 'Student' AND ul.action = 'login successful' AND LOWER(ul.device) = 'ios') THEN student.student_id END) as ios")
+            ->selectRaw("COUNT(DISTINCT CASE WHEN NOT EXISTS ( SELECT 1 FROM user_logs ul WHERE ul.user_id = student.student_id AND ul.role = 'Student') THEN student.student_id END) as not_accessed ")
+            ->groupBy('student.campus', 'branch.name')
+            ->orderBy('branch.name')
+            ->get();
+        return view('report.userloginreport',compact('students','branches','courses','coaching_type','hosteldayscolor','totalStudents','todayLogin','webLogin','androidLogin','iosLogin','adminLogs','adminbranchtotal','adminTodayLogin','webAdminTodayLogin','andriodadmin','iosadmin','summary','branches'));
     }
     public function individualStudentReport(Request $request)
     {

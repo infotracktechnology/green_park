@@ -45,6 +45,10 @@
                                         <i class="fas fa-user-shield"></i> Admin Login
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request('tab') === 'summary' ? 'active' : '' }}"id="summary-tab" data-toggle="tab" href="#loginSummary" role="tab">
+                                        <i class="fas fa-chart-bar"></i> Login Summary </a>
+                                </li>
                             </ul>
                           
                             <div class="tab-content mt-4">
@@ -465,6 +469,105 @@
                                         </table>
                                     </div>
                                 </div>
+
+                                    <div class="tab-pane fade {{ request('tab') === 'summary' ? 'show active' : '' }}" id="loginSummary" role="tabpanel">
+                                        <div class="row mb-3">
+                                            <div class="col-md-12">
+                                                <h6 class="col-deep-purple"> Overall Login Summary</h6>
+                                            </div>
+                                        </div>
+                                        <form action="{{ url()->current() }}" method="get" id="summaryFilterForm">
+
+                                            <input type="hidden" name="tab" value="summary">
+                                            <div class="row">
+                                                @if(!auth()->user()->branch)
+                                                    <div class="col-md-3 col-sm-6 form-group">
+                                                        <label>Branch</label>
+                                                        <select name="summary_branch" class="form-control form-control-sm" onchange="document.getElementById('summaryFilterForm').submit();">
+                                                            <option value="">All Branches</option>
+                                                            @foreach($branches as $branch)
+                                                                <option value="{{ $branch->id }}" @selected(request('summary_branch') == $branch->id)>{{ $branch->name }} </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                @endif
+
+
+                                                <div class="col-md-3 col-sm-6 form-group">
+                                                    <label>Course</label>
+                                                    <select name="summary_course" class="form-control form-control-sm" onchange="document.getElementById('summaryFilterForm').submit();">
+                                                        <option value="">All Courses</option>
+                                                        @foreach($courses as $course)
+                                                            <option value="{{ $course }}" @selected(request('summary_course') == $course)>{{ $course }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-3 col-sm-6 form-group">
+                                                    <label>Coaching Type</label>
+                                                    <select name="summary_coaching_type" class="form-control form-control-sm" onchange="document.getElementById('summaryFilterForm').submit();">
+                                                        <option value="">All Coaching Type</option>
+                                                        @foreach($coaching_type as $type)
+                                                            <option value="{{ $type->coaching_type }}" @selected(request('summary_coaching_type') == $type->coaching_type)>
+                                                                {{ $type->coaching_type }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-3 col-sm-6 form-group">
+                                                    <label>H/D</label>
+                                                    <select name="summary_hostel_dayscholar" class="form-control form-control-sm" onchange="document.getElementById('summaryFilterForm').submit();">
+                                                        <option value="">All H/D</option>
+                                                        @foreach($hosteldayscolor as $hd)
+                                                            <option value="{{ $hd }}" @selected(request('summary_hostel_dayscholar') == $hd)> {{ $hd }} </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                
+                                            </div>
+                                        </form>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-sm" id="loginSummaryTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Branch</th>
+                                                        <th>Total Students</th>
+                                                        <th>Web</th>
+                                                        <th>Android</th>
+                                                        <th>IOS</th>
+                                                        <th>Not Accessed</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($summary as $row)
+                                                        <tr>
+                                                            <td>{{ $loop->iteration }}</td>
+                                                            <td>{{ $row->branch_name }}</td>
+                                                            <td>{{ $row->total_students }}</td>
+                                                            <td>{{ $row->web }}</td>
+                                                            <td>{{ $row->android }}</td>
+                                                            <td>{{ $row->ios }}</td>
+                                                            <td>{{ $row->not_accessed }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="2">TOTAL</th>
+                                                        <th>{{ $summary->sum('total_students') }}</th>
+                                                        <th>{{ $summary->sum('web') }}</th>
+                                                        <th>{{ $summary->sum('android') }}</th>
+                                                        <th>{{ $summary->sum('ios') }}</th>
+                                                        <th>{{ $summary->sum('not_accessed') }}</th>
+                                                    </tr>
+                                                </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -509,6 +612,28 @@
                 emptyTable: "No admin login reports found."
             },
             lengthMenu: [[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]]
+        });
+        $('#loginSummaryTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    title: 'Overall_Login_Summary'
+                }
+            ],
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            lengthChange: true,
+            pageLength: 15,
+            language: {
+                emptyTable: "No login summary found."
+            },
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"]
+            ]
         });
     });
     </script>
