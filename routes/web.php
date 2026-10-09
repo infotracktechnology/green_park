@@ -255,6 +255,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('examination/subject-range-subjects',[ReportController::class, 'getSubjectRangeSubjects'])->name('subjectrangesubjects');
         Route::get('examination/dump', [ReportController::class, 'Dump_Report'])->name('dump');
         Route::get('student/allotment', [ReportController::class, 'allotment'])->name('allotment');
+        Route::match(['get', 'post'],'/student/visitorverification',[ReportController::class, 'visitorVerification'])->name('verification');
     });
 });
 
