@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ClassVideo;
 use App\Models\Student;
+use App\Models\StudentLog;
 use App\Models\RevisionVideo;
 use App\Models\AcademicYear;
 use Carbon\Carbon;
@@ -72,6 +73,9 @@ class ClassVideoController extends Controller
 
     public function destroy(Request $request, ClassVideo $classvideo)
     {
+        StudentLog::where('module', 'Class Video')->where(function ($query) use ($classvideo) {
+            $query->where('action', 'Seen Class Video - ' . $classvideo->id);
+        })->delete();
         $classvideo->delete();
 
         if ($request->wantsJson()) {
@@ -88,6 +92,12 @@ class ClassVideoController extends Controller
         if (!$ids) {
             return response()->json(['success' => false, 'message' => 'No videos selected.'], 400);
         }
+        foreach ($ids as $classvideoId) {
+            StudentLog::where('module', 'Class Video')->where(function ($query) use ($classvideoId) {
+                            $query->where('action', 'Seen Class Video - ' . $classvideoId);
+                        })
+                        ->delete();
+            }
         ClassVideo::whereIn('id', $ids)->delete();
         return response()->json(['success' => true, 'message' => 'Videos deleted successfully.']);
     }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\QuestionKey;
 use App\Models\Branch;
 use App\Models\Student;
+use App\Models\StudentLog;
 use App\Models\AcademicYear;
 
 class QuestionKeyController extends Controller
@@ -183,6 +184,10 @@ class QuestionKeyController extends Controller
                         }
                     }
                 }
+                StudentLog::where('module', 'Question Key')->where(function ($query) use ($questionkey) {
+                    $query->where('action', 'Seen Question Key - ' . $questionkey->id)
+                        ->orWhere('action', 'Downloaded Question Key - ' . $questionkey->id);
+                })->delete();
                 $questionkey->delete();
             }
         }

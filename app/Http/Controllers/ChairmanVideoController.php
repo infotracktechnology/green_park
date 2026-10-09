@@ -11,6 +11,7 @@ use App\Models\Chairmanvideo;
 use App\Providers\FcmServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\StudentLog;
 
 class ChairmanVideoController extends Controller
 {
@@ -146,8 +147,15 @@ class ChairmanVideoController extends Controller
     public function destroy(Request $request, $id = null)
     {
         if ($request->has('ids')) {
-            Chairmanvideo::whereIn('id', $request->ids)->delete();
-        }
+            $ids = $request->ids;
+            foreach ($ids as $chairmanvideoId) {
+            StudentLog::where('module', 'Chairman Video')->where(function ($query) use ($chairmanvideoId) {
+                            $query->where('action', 'seen Chairman Video - ' . $chairmanvideoId);
+                        })
+                        ->delete();
+            }
+        Chairmanvideo::whereIn('id', $request->ids)->delete();
+        }       
         return redirect()->back()->with('success', 'Chairman video deleted successfully.');
     }
     public function chairmanvideo(Request $request)

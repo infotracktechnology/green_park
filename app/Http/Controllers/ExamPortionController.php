@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Examportion;
 use App\Models\Branch;
 use App\Models\Student;
+use App\Models\StudentLog;
 use App\Models\AcademicYear;
 use Illuminate\Support\Facades\DB;
 
@@ -184,6 +185,10 @@ class ExamPortionController extends Controller
                         }
                     }
                 }
+                StudentLog::where('module', 'Exam Portions')->where(function ($query) use ($examportion) {
+                    $query->where('action', 'seen Exam Portions - ' . $examportion->id)
+                        ->orWhere('action', 'Downloaded Exam Portion - ' . $examportion->id);
+                })->delete();
                 $examportion->delete();
             }
         }
