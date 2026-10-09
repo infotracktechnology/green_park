@@ -628,7 +628,7 @@
       <div class="gp-footer-col">
         <h4 class="gp-footer-title">Courses</h4>
         <ul class="gp-footer-list">
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course - 1.webp')}}">LONGTERM ONE YEAR PROGRAM</a></li>
+          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-1.webp')}}">LONGTERM ONE YEAR PROGRAM</a></li>
           <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-2.webp')}}">LONGTERM ONLINE RECORDED VIDEO CLASS</a></li>
           <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-3.webp')}}">LONGTERM ONLINE LIVE CLASS</a></li>
           <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-4.webp')}}">LONGTERM ONLINE TEST SERIES</a></li>
