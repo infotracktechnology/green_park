@@ -41,17 +41,32 @@ class HomeController extends Controller
                 });
         }])->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
 
-       $data->each(function ($branch) use ($today) {
+        $offlineByCampus = Student::where('academic_year', $this->academic_year)
+            ->whereIn('campus', $data->pluck('id'))
+            ->where('coaching_type', 'OFFLINE')
+            ->get()
+            ->groupBy('campus');
 
-            $todayLogins = $branch->student->filter(function ($student) use ($today) {
-                return $student->last_login
-                    && date('Y-m-d', strtotime($student->last_login)) === $today;
+        $onlineByCampus = Student::where('academic_year', $this->academic_year)
+            ->whereIn('campus', $data->pluck('id'))
+            ->where('coaching_type', '!=', 'OFFLINE')
+            ->get()
+            ->groupBy('campus');
+       
+            $data->each(function ($branch) use ( $today, $offlineByCampus, $onlineByCampus) {
+                $branch->setRelation('offlineStudents', $offlineByCampus->get($branch->id, collect())->values());
+                $branch->setRelation('onlineStudents', $onlineByCampus->get($branch->id, collect())->values());
+                $todayLogins = $branch->student->filter(function ($student) use ($today) {
+                    return $student->last_login
+                        && date('Y-m-d', strtotime($student->last_login)) === $today;
+                });
+
+                $branch->login_web = $todayLogins->where('device', 'Web')->count();
+                $branch->login_android = $todayLogins->where('device', 'Android')->count();
+                $branch->login_ios = $todayLogins->where('device', 'Ios')->count();
+                $branch->login_total = $todayLogins->count();
             });
-            $branch->login_web = $todayLogins->where('device', 'Web')->count();
-            $branch->login_android = $todayLogins->where('device', 'Android')->count();
-            $branch->login_ios = $todayLogins->where('device', 'Ios')->count();
-            $branch->login_total = $todayLogins->count();
-        });
+
         $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
 
         $boys = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'MALE')->count();

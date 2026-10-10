@@ -206,10 +206,11 @@
                   @forelse($data as $branch)
                       @php
                           $targetId = 'offline-branch-' . $branch->id;
-                          $offlineStudents = $branch->student->filter(function ($student) {
-                              return strtoupper(trim($student->coaching_type ?? '')) === 'OFFLINE';
-                          });
+                        //   $offlineStudents = $branch->student->filter(function ($student) {
+                        //       return strtoupper(trim($student->coaching_type ?? '')) === 'OFFLINE';
+                        //   });
 
+                          $offlineStudents = $branch->offlineStudents;
                           $offlineCount = $offlineStudents->count();
                           $totalCount = $offlineCount;
                       @endphp
@@ -459,14 +460,14 @@
             @forelse($data as $branch)
                 @php
                     $targetId = 'online-branch-' . $branch->id;
-                    $onlineStudents = $branch->student->filter(function ($student) {
-                        return strtoupper(trim($student->coaching_type ?? '')) !== 'OFFLINE';
-                    });
-
+                    // $onlineStudents = $branch->student->filter(function ($student) {
+                    //     return strtoupper(trim($student->coaching_type ?? '')) !== 'OFFLINE';
+                    // });
+                    $onlineStudents = $branch->onlineStudents;
                     $onlineCount = $onlineStudents->count();
                     $totalCount = $onlineCount;
                 @endphp
-
+                @if($onlineCount > 0)
                 <!-- Branch Card Item -->
                 <div class="group border border-slate-100 rounded-2xl p-1 hover:bg-violet-50/30 transition-all [&[aria-expanded=true]]:bg-violet-50/20 [&[aria-expanded=true]]:border-violet-100">
                     <!-- Accordion Trigger Header -->
@@ -545,6 +546,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             @empty
                 <div class="py-10 text-center text-xs font-medium text-slate-400">
                     <i class="fas fa-globe text-2xl text-slate-300 mb-2 block"></i>
