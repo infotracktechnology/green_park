@@ -1761,7 +1761,7 @@ class ReportController extends Controller
                         ->orWhere('student.user_name','LIKE',"%{$search}%");
                     });
                 })
-                ->select('student.student_id','student.student_name','branch.campus as campus','student.course','student.section','student.hostel_dayscholar','student.coaching_type','user_logs.action','user_logs.device','user_logs.created_at as login_time')
+                ->select('student.student_id','student.student_name','branch.campus as campus','student.course','student.section','student.hostel_dayscholar','student.coaching_type', 'student.father_ph_no', 'student.mother_ph_no','user_logs.action','user_logs.device','user_logs.created_at as login_time')
                 ->orderByDesc('user_logs.created_at')
                 ->get();
         }

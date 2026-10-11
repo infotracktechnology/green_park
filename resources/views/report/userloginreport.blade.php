@@ -243,8 +243,8 @@
                                                     <th>Course</th>
                                                     <th>Section</th>
                                                     <th>H/D</th>
-                                                    {{-- <th>Father Number</th>
-                                                    <th>Mother Number</th> --}}
+                                                    <th>Father Number</th>
+                                                    <th>Mother Number</th>
                                                     <th>Device</th>
                                                     <th>Status</th>
                                                     <th>Date</th>
@@ -262,8 +262,8 @@
                                                         <td>{{ $student->course }}</td>
                                                         <td>{{ $student->section }}</td>
                                                         <td>{{ $student->hostel_dayscholar }}</td>
-                                                        {{-- <td>{{ $student->father_ph_no }}</td> --}}
-                                                        {{-- <td>{{ $student->mother_ph_no }}</td> --}}
+                                                        <td>{{ $student->father_ph_no }}</td>
+                                                        <td>{{ $student->mother_ph_no }}</td>
                                                         <td>{{ $student->device ?? 'N/A' }}</td>
                                                         <td>
                                                             @if(str_contains(strtolower($student->action), 'login successful'))
