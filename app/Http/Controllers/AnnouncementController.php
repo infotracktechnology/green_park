@@ -50,7 +50,7 @@ class AnnouncementController extends Controller
     {
         $data = $request->except(['_token', '_method', 'existing_attachment']);
 
-        foreach (['coaching_type', 'branch', 'batch', 'category'] as $field) {
+        foreach (['coaching_type', 'branch', 'batch', 'category', 'section'] as $field) {
             if (isset($data[$field])) {
                 $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
             } else {
@@ -133,7 +133,7 @@ class AnnouncementController extends Controller
     {
         $data = $request->except(['_token', '_method', 'existing_attachment']);
 
-        foreach (['coaching_type', 'branch', 'batch', 'category'] as $field) {
+        foreach (['coaching_type', 'branch', 'batch', 'category', 'section'] as $field) {
             if (isset($data[$field])) {
                 $data[$field] = is_array($data[$field]) ? implode(',', $data[$field]) : $data[$field];
             } else {
