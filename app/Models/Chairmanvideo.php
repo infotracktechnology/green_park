@@ -44,7 +44,7 @@ public static function ForStudent(Student $student)
                             }
                             $sq->where('batch', 'like', "%{$student->batch}%");
                         }
-                        $sq->where('section', 'like', "%{$student->section}%");
+                        $sq->whereRaw("FIND_IN_SET(?, section)", [$student->section]);
                     })->whereIn('gender', [$student->gender, 'All'])->where('start_at', '<=', date('Y-m-d H:i:s'))
                   ->where('end_at', '>=', date('Y-m-d H:i:s'));
             });
