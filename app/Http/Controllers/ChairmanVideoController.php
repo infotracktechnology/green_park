@@ -48,7 +48,7 @@ class ChairmanVideoController extends Controller
     {
         $data = $request->all();
 
-        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+        foreach (['coaching_type', 'branch', 'category', 'batch','section'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
@@ -110,7 +110,7 @@ class ChairmanVideoController extends Controller
     {
         $data = $request->all();
 
-        foreach (['coaching_type', 'branch', 'category', 'batch'] as $field) {
+        foreach (['coaching_type', 'branch', 'category', 'batch', 'section'] as $field) {
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
 
