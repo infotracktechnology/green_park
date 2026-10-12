@@ -50,6 +50,16 @@
                   </div>
 
                   <div class="form-group col-lg-2">
+                      <label>Branch </label>
+                      <select name="branch_id" id="branch_id" class="select2">
+                          <option value="">All Branches</option>
+                          @foreach ($branches as $branch)
+                              <option value="{{ $branch->id }}" @selected(($branch_id ?? '') == $branch->id)> {{ $branch->campus }}</option>
+                          @endforeach
+                      </select>
+                  </div>
+
+                  <div class="form-group col-lg-2">
                     <label>&nbsp;</label>
                     <button type="submit" class="btn btn-primary btn-block">Submit</button>
                   </div>
@@ -180,7 +190,7 @@
       const isSingleSubject = {{ $isSingleSubject ? 'true' : 'false' }};
 
       const doc = new jsPDF({
-          orientation: subjectCount === 1 ? 'portrait' : 'landscape',
+          orientation: subjectCount === 2 ? 'portrait' : 'landscape',
           unit: 'mm',
           format: 'a4'
       });

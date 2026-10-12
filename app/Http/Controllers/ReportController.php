@@ -1204,6 +1204,8 @@ class ReportController extends Controller
     public function Dump_Report(Request $request)
     {
         $tests = Exam::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($query) { $query->where('branch_id','like','%' . auth()->user()->branch . '%'); })->select('name')->distinct()->orderBy('name')->get();
+        $branches = Branch::orderBy('name')->get();
+        $branch_id = $request->input('branch_id');
 
         $test_name = $request->test_name ?? null;
         $test_ids = '';
@@ -1227,6 +1229,9 @@ class ReportController extends Controller
                     ->leftJoin('branch as b','b.id','=','s.campus')
                     ->where('ea.testname', $test_name)
                     ->where('ea.academic_year', $this->academic_year)
+                    ->when($branch_id, function ($query) use ($branch_id) {
+                            $query->where('s.campus', $branch_id);
+                        })
                     ->select('ea.test_id','ea.student_id','ea.mode as stmode','s.student_name','s.gender','s.coaching_type','s.section','s.batch',
                     DB::raw("SUBSTRING_INDEX(b.campus, ',', 1) as campus"))
                     ->selectRaw('SUM(COALESCE(ea.mark, 0)) as mark')
@@ -1298,7 +1303,7 @@ class ReportController extends Controller
             ]);
         }
 
-        return view('exam.dump_report', compact( 'tests','test_name','test_ids','results','subjects','marks', 'totalMarks', 'allOffline'));
+        return view('exam.dump_report', compact( 'tests','test_name','test_ids','results','subjects','marks', 'totalMarks', 'allOffline', 'branches', 'branch_id'));
     }
     
     public function RoomAllocation(Request $request)
