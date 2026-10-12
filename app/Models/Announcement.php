@@ -52,7 +52,7 @@ public static function ForStudent(Student $student)
                             }
                             $q->where('batch', 'like', "%{$student->batch}%");
                         }
-                        $q->where('section', 'like', "%{$student->section}%");
+                        $q->whereRaw("FIND_IN_SET(?, section)", [$student->section]);
                     })->whereIn('gender', [$student->gender, 'All']);
             });
         })
