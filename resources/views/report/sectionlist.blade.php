@@ -134,8 +134,8 @@
                             <th>AC</th>
                             <th>NON AC</th>
                         @else
-                            <th>CBSE</th>
-                            <th>SB</th>
+                            <th>Boys</th>
+                            <th>Girls</th>
                         @endif
 
                         <th>TOTAL</th>
@@ -152,8 +152,8 @@
                             <td>{{ $row->ac }}</td>
                             <td>{{ $row->nonac }}</td>
                         @else
-                            <td>{{ $row->cbse }}</td>
-                            <td>{{ $row->sb }}</td>
+                            <td>{{ $row->boys }}</td>
+                            <td>{{ $row->girls }}</td>
                         @endif
 
                         <td>{{ $row->total }}</td>
