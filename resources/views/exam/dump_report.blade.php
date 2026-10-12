@@ -145,7 +145,14 @@
                                 @if(!$hideCampus)
                                   <td>{{ $result->campus }}</td>
                                 @endif
-                                <td>{{ $result->section }}</td>
+                                <td>
+                                    @if(in_array(strtoupper(trim($result->section ?? '')), ['XII-OB', 'XI-OB']))
+                                        {{ $result->coaching_type ?? '-' }}
+                                    @else
+                                        {{ $result->section ?? '-' }}
+                                    @endif
+                                </td>
+                                
                                 @foreach ($subjects as $subject)
                                   @php
                                     $mark = $marks->get($result->student_id . '|' . strtoupper(trim($subject)));
@@ -310,7 +317,11 @@
               @if(!$hideCampus)
                   { content: @json($result->campus ?? ''), isCampus: true },
               @endif
-              @json($result->section ?? ''),
+              @php
+                $courseValue = strtoupper(trim($result->section ?? ''));
+                $sectionOrType = (in_array($courseValue, ['XI-OB', 'XII-OB'])) ? ($result->coaching_type ?? '-') : ($result->section ?? '-');
+            @endphp
+            @json($sectionOrType),
               @foreach($subjects as $subject)
                   @php
                       $key = $result->student_id . '|' . strtoupper(trim($subject));
@@ -346,7 +357,7 @@
           colStyles[colIdx] = { cellWidth: 18, halign: 'left' };
           colIdx++;
       }
-      colStyles[colIdx] = { cellWidth: 12, halign: 'center' };
+      colStyles[colIdx] = { cellWidth: 15, halign: 'center' };
 
       // 5. AUTOTABLE GENERATION
       doc.autoTable({
