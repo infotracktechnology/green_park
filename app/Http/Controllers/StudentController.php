@@ -300,7 +300,7 @@ class StudentController extends Controller
             ->values();
         $subjectexam = collect();
         if ($request->exam) {
-            $subjectexam = ExamSubjectReport::where("category", $request->exam)->where("stuid", $sid)->whereNotIn('subject', function ($query) use ($sid) { $query->select('testname')->from('exam_answer')->where('student_id', $sid); })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+            $subjectexam = ExamSubjectReport::where('category', $request->exam)->where('stuid', $sid)->whereNotExists(function ($query) use ($sid) {$query->selectRaw('1')->from('exam_answer as ea')->where('ea.student_id', $sid)->whereColumn('ea.testname', 'examsubjectreport.subject');})->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') DESC")->get();
         }
         return view('student.marksheet', compact('exams', 'subjectexam', 'category'));
     }
@@ -609,5 +609,30 @@ class StudentController extends Controller
 
         return $pdf->stream($student->student_id . '_ConsolidatedReport.pdf');
     }
-   
+    public function hostelArrivalDetails(Request $request)
+    {
+        $user = Auth::guard('student')->user();
+
+        $studentId = $user->student_id;
+        $student = DB::table('hostel_arrival_detials')->where('student_id', $studentId)->where('academic_year', $user->academic_year)->first();
+
+        if (!$student) {
+            return view('student.hostelarrivaldetails', compact('student'));
+        }
+      
+        $studentType = strtoupper( trim($student->hostel_dayscholar ?? ''));
+        $isHosteler = in_array($studentType, ['HOSTEL', 'HOSTELER', 'HOSTELLER']);
+
+        if ($request->has('download')) {
+            if ($isHosteler) {
+                $pdf = Pdf::loadView('pdf.hostel_arrival_details', compact('student') )->setPaper('a4', 'portrait');
+                return $pdf->download('Hostel_Allotment_Details_' . $student->student_id . '.pdf');
+            }
+
+            $pdf = Pdf::loadView('pdf.classroom_allotment',compact('student'))->setPaper('a4', 'portrait');
+            return $pdf->download('Class_Room_Allotment_' .$student->student_id . '.pdf');
+        }
+
+        return view('student.hostelarrivaldetails',compact('student'));
+    }
 }
