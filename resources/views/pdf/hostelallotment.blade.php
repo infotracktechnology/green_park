@@ -185,6 +185,16 @@
 
 <div class="page-container">
 @foreach($students as $student)
+    @php
+        $branchName = $student->branch?->name ?? '';
+        $parts = explode(',', $branchName, 2);
+
+        $city = trim($parts[1] ?? $parts[0]);
+
+        if (strtoupper($city) === 'NKL') {
+            $city = 'NAMAKKAL';
+        }
+    @endphp
     {{-- HEADER --}}
     <table class="header-table">
         <tr>
@@ -192,7 +202,13 @@
                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/favicon.png'))) }}" alt="Logo">
             </td>
             <td class="title-cell">
-                <div class="college-title">GREEN PARK INSTITUTE, NAMAKKAL</div>
+                @if($student->campus == 1 && $student->gender == 'MALE')
+                    <div class="college-title">GREEN PARK COACHING CENTRE, NAMAKKAL</div>
+                @elseif($student->campus == 1 && $student->gender == 'FEMALE')
+                    <div class="college-title">GREEN PARK INSTITUTE, NAMAKKAL</div>
+                @else
+                <div class="college-title">GREEN PARK CAREER INSTITUTE, {{ $city }}</div>
+                @endif
                 <div class="report-subtitle">HOSTEL ALLOTMENT LETTER (LONGTERM - {{ $student->academic_year ?? '2026-2027' }})</div>
             </td>
         </tr>
