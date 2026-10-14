@@ -262,7 +262,7 @@ class StudentController extends Controller
             ->join('exam_answer as a', 'a.testname', '=', 'b.name')
             ->where('a.student_id', $sid)
             ->where('b.publish', 'Yes')
-            ->selectRaw("b.exam_date, b.name, b.test_id, SUM(a.mark) as mark, (COUNT(a.mark) * 4) as total, b.markrange_file")
+            ->selectRaw("b.exam_date, b.name, b.testid, SUM(a.mark) as mark, (COUNT(a.mark) * 4) as total, b.markrange_file")
             ->groupBy('b.test_id', 'b.name', 'b.exam_date', 'b.markrange_file')
             ->orderBy('b.exam_date', 'desc')
             ->limit(5)
