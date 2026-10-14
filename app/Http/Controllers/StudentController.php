@@ -30,14 +30,14 @@ class StudentController extends Controller
         $query = Student::with('branch')
             ->when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))
             ->when($user && strtolower(trim($user->type ?? '')) !== 'admin', function ($q) use ($user) {
-                    $branchIds = array_filter(
-                        explode(',', $user->branch_ids ?? '')
-                    );
-                    if (empty($branchIds) && $user->branch) {
-                        $branchIds = [$user->branch];
-                    }
-                    $q->whereIn('campus', $branchIds);
-                })
+                $branchIds = array_filter(
+                    explode(',', $user->branch_ids ?? '')
+                );
+                if (empty($branchIds) && $user->branch) {
+                    $branchIds = [$user->branch];
+                }
+                $q->whereIn('campus', $branchIds);
+            })
             ->when($request->filled('branch_id') || $request->filled('campus'), function ($q) use ($request) {
                 $branch = $request->branch_id ?? $request->campus;
                 $q->where('campus', $branch);
@@ -122,16 +122,16 @@ class StudentController extends Controller
         $pincodes = DB::table('district_list')->where('District', $Student->district)->select('Pincode')->get();
         $user = auth()->user();
         $userType = strtolower(trim($user->type ?? ''));
-                if ($userType === 'admin') {
-                    $branches_list = Branch::all();
-                } else {
-                    $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
-                    if (empty($branchIds) && $user->branch) {
-                        $branchIds = [$user->branch];
-                    }
-                    $branches_list = Branch::whereIn('id', $branchIds)->get();
-                }
-                $hostels = Hostel::orderBy('name')->get();
+        if ($userType === 'admin') {
+            $branches_list = Branch::all();
+        } else {
+            $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
+            if (empty($branchIds) && $user->branch) {
+                $branchIds = [$user->branch];
+            }
+            $branches_list = Branch::whereIn('id', $branchIds)->get();
+        }
+        $hostels = Hostel::orderBy('name')->get();
         if ($request->wantsJson() || $request->is('api/*')) {
             $Student->load('branch');
             return response()->json([
@@ -144,7 +144,7 @@ class StudentController extends Controller
             ], 200);
         }
 
-        return view('student.edit', compact('districts', 'states', 'pincodes', 'Student', 'branches_list','hostels'));
+        return view('student.edit', compact('districts', 'states', 'pincodes', 'Student', 'branches_list', 'hostels'));
     }
 
 
@@ -252,56 +252,92 @@ class StudentController extends Controller
 
     function marksheet(Request $request)
     {
-        $sid = auth()->user()->student_id;
-        $batch = auth()->user()->batch;
-        $type = auth()->user()->coaching_type;
+        $sid    = auth()->user()->student_id;
+        $batch  = auth()->user()->batch;
+        $type   = auth()->user()->coaching_type;
         $course = auth()->user()->course;
-        $exams = Exam::from("exam as b")->join('exam_answer as a', 'a.testname', '=', 'b.name')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(a.mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.exam_date', 'desc')->limit(5)->get()->map(function ($test) use ($batch, $type, $course) {
-            if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
-                $markrange = isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null;
-            } else {
-                $markrange = isset($test->markrange_file['online']) ? $test->markrange_file['online'] : null;
-            }
-            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total, 'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark, 'markrange' => $markrange];
-        });
 
-        $category = ExamSubjectReport::where([
-                ['stuid', $sid],
-                ['category', '!=', '']
-            ])
+        // 1. Fetch only 5 exams for this student
+        $exams = Exam::from("exam as b")
+            ->join('exam_answer as a', 'a.testname', '=', 'b.name')
+            ->where('a.student_id', $sid)
+            ->where('b.publish', 'Yes')
+            ->selectRaw("b.exam_date, b.name, b.test_id, SUM(a.mark) as mark, (COUNT(a.mark) * 4) as total, b.markrange_file")
+            ->groupBy('b.test_id', 'b.name', 'b.exam_date', 'b.markrange_file')
+            ->orderBy('b.exam_date', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($test) use ($batch, $type, $course) {
+
+                // Markrange check
+                $markrange = null;
+                if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
+                    $markrange = $test->markrange_file[$batch] ?? null;
+                } else {
+                    $markrange = $test->markrange_file['online'] ?? null;
+                }
+
+                // OPTIMIZATION: Cache first_mark for 24 hours (86400 seconds)
+                $first_mark = cache()->remember("first_mark_{$test->name}", 86400, function () use ($test) {
+                    return ExamAnswer::where('testname', $test->name)
+                        ->selectRaw('SUM(mark) as total_mark')
+                        ->groupBy('student_id')
+                        ->orderBy('total_mark', 'desc')
+                        ->value('total_mark') ?? 0;
+                });
+
+                return [
+                    'exam_date'  => $test->exam_date,
+                    'name'       => $test->name,
+                    'test_id'    => $test->test_id,
+                    'mark'       => $test->mark,
+                    'total'      => $test->total,
+                    'first_mark' => $first_mark,
+                    'markrange'  => $markrange
+                ];
+            });
+
+        // 2. Category list
+        $category = ExamSubjectReport::where('stuid', $sid)
+            ->where('category', '!=', '')
             ->pluck('category')
             ->unique()
             ->sortBy(function ($category) {
-            if (str_starts_with($category, 'CUMULATIVE TEST')) {
-                $groupOrder = 1;
-            } elseif (str_starts_with($category, 'GRAND TEST')) {
-                $groupOrder = 2;
-            } elseif (str_starts_with($category, 'WEEKEND TEST')) {
-                $groupOrder = 3;
-            } elseif (str_starts_with($category, 'UNIT TEST')) {
-                $groupOrder = 4;
-            } else {
-                $groupOrder = 99;
-            }
-                if (str_contains($category, 'PHY')) {
-                    $subjectOrder = 1;
-                } elseif (str_contains($category, 'CHE')) {
-                    $subjectOrder = 2;
-                } elseif (str_contains($category, 'BOT')) {
-                    $subjectOrder = 3;
-                } elseif (str_contains($category, 'ZOO')) {
-                    $subjectOrder = 4;
-                } else {
-                    $subjectOrder = 0;
-                }
+                $groupOrder = match (true) {
+                    str_starts_with($category, 'CUMULATIVE TEST') => 1,
+                    str_starts_with($category, 'GRAND TEST')      => 2,
+                    str_starts_with($category, 'WEEKEND TEST')    => 3,
+                    str_starts_with($category, 'UNIT TEST')       => 4,
+                    default                                       => 99,
+                };
+
+                $subjectOrder = match (true) {
+                    str_contains($category, 'PHY') => 1,
+                    str_contains($category, 'CHE') => 2,
+                    str_contains($category, 'BOT') => 3,
+                    str_contains($category, 'ZOO') => 4,
+                    default                        => 0,
+                };
 
                 return [$groupOrder, $subjectOrder];
             })
             ->values();
+
+        // 3. Subject Exam
         $subjectexam = collect();
         if ($request->exam) {
-            $subjectexam = ExamSubjectReport::where('category', $request->exam)->where('stuid', $sid)->whereNotExists(function ($query) use ($sid) {$query->selectRaw('1')->from('exam_answer as ea')->where('ea.student_id', $sid)->whereColumn('ea.testname', 'examsubjectreport.subject');})->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') DESC")->get();
+            $subjectexam = ExamSubjectReport::where('category', $request->exam)
+                ->where('stuid', $sid)
+                ->whereNotExists(function ($query) use ($sid) {
+                    $query->selectRaw('1')
+                        ->from('exam_answer as ea')
+                        ->where('ea.student_id', $sid)
+                        ->whereColumn('ea.testname', 'examsubjectreport.subject');
+                })
+                ->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') DESC")
+                ->get();
         }
+
         return view('student.marksheet', compact('exams', 'subjectexam', 'category'));
     }
 
@@ -315,7 +351,7 @@ class StudentController extends Controller
     {
         $sid = auth()->user()->student_id;
         $answers = ExamAnswer::where('testname', $name)->where('student_id', $sid)->orderBy('q_no')->get();
-        $testId = $answers->value('test_id'); 
+        $testId = $answers->value('test_id');
         $answers = $answers->chunk(45);
         $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
         $pdf = Pdf::loadView('pdf.marksheet', compact('answers', 'exam', 'testId'));
@@ -348,19 +384,19 @@ class StudentController extends Controller
             ->get();
 
         $attendance = $dailyAttendance->groupBy('month')->map(function ($days, $month) {
-                $total_days = $days->sum(function ($day) {
-                    return $day->timing_count >= 2 ? 1 : 0.5;
-                });
-                $present_days = $days->sum('present_days');
-                $absent_days = $days->sum('absent_days');
-                return (object) [
-                    'student_id'   => $days->first()->student_id,
-                    'month'        => $month,
-                    'total_days'   => $total_days,
-                    'present_days' => $present_days,
-                    'absent_days'  => $absent_days,
-                ];
-            })->values();
+            $total_days = $days->sum(function ($day) {
+                return $day->timing_count >= 2 ? 1 : 0.5;
+            });
+            $present_days = $days->sum('present_days');
+            $absent_days = $days->sum('absent_days');
+            return (object) [
+                'student_id'   => $days->first()->student_id,
+                'month'        => $month,
+                'total_days'   => $total_days,
+                'present_days' => $present_days,
+                'absent_days'  => $absent_days,
+            ];
+        })->values();
 
         $total_present = $attendance->sum('present_days');
         $total_days = $attendance->sum('total_days');
@@ -395,10 +431,10 @@ class StudentController extends Controller
 
     public function logActivity(Request $request)
     {
-        if($request->module == 'Mark Details' || $request->module == 'MBBS/BDS Counselling' || $request->module == 'Student Download') {
-            return response()->json(['error' => 'Invalid Module'],404);
+        if ($request->module == 'Mark Details' || $request->module == 'MBBS/BDS Counselling' || $request->module == 'Student Download') {
+            return response()->json(['error' => 'Invalid Module'], 404);
         }
-        
+
         $exists = StudentLog::where('module', $request->module)
             ->where('student_id', $request->student_id)
             ->where('action', $request->action)
@@ -475,31 +511,31 @@ class StudentController extends Controller
         $hostelcouriers = HostelCourier::where('student_id', $student->student_id)->latest()->get();
         return view('student.hostelcourier', compact('hostelcouriers'));
     }
-    
+
     public function NeetScorecard(Request $request)
-{
-    $student = auth()->user();
+    {
+        $student = auth()->user();
 
-    if ($request->isMethod('post')) {
+        if ($request->isMethod('post')) {
 
-        if ($request->hasFile('neet_file')) {
-            $file = $request->file('neet_file');
-            $filename = "scorecard-" . $student->student_id . "." . $file->getClientOriginalExtension();
-            $path = 'assets/neetscorecard/' . $filename;
-            $file->move('assets/neetscorecard', $filename);
-            $student->neet_file = $path;
-            $student->neetappno = $request->neetappno;
-            $student->neetrollno = $request->neetrollno;
-            $student->neetcomm = $request->neetcomm;
-            $student->neetmark = $request->neetmark;
-            $student->neetspecialcategory = $request->neetspecialcategory;
-            $student->save();
+            if ($request->hasFile('neet_file')) {
+                $file = $request->file('neet_file');
+                $filename = "scorecard-" . $student->student_id . "." . $file->getClientOriginalExtension();
+                $path = 'assets/neetscorecard/' . $filename;
+                $file->move('assets/neetscorecard', $filename);
+                $student->neet_file = $path;
+                $student->neetappno = $request->neetappno;
+                $student->neetrollno = $request->neetrollno;
+                $student->neetcomm = $request->neetcomm;
+                $student->neetmark = $request->neetmark;
+                $student->neetspecialcategory = $request->neetspecialcategory;
+                $student->save();
+            }
+            return redirect()->back()->with('success', 'Scorecard uploaded successfully.');
         }
-        return redirect()->back()->with('success', 'Scorecard uploaded successfully.');
-    }
 
-    return view('student.neetscorecard', compact('student'));
-}
+        return view('student.neetscorecard', compact('student'));
+    }
     public function InOutRegister(Request $request)
     {
         $student = auth()->user();
@@ -510,7 +546,7 @@ class StudentController extends Controller
     {
         $contactOption = Options::where('type', 'admin_contacts')->first();
         $contacts = $contactOption ? $contactOption->value : [];
-        
+
         return view('student.contact', compact('contacts'));
     }
     public function report()
@@ -533,43 +569,45 @@ class StudentController extends Controller
         $studentId = $student->student_id;
         $marks = ExamSubjectReport::where('stuid', $studentId)->get();
         $allExams = ExamSubjectReport::select('category', 'subject', 'exdate')->where('stuid', $studentId)->groupBy('category', 'subject', 'exdate', 'sec')->get()->sortBy(function ($exam) {
-                $category = $exam->category;
+            $category = $exam->category;
 
-                if (str_starts_with($category, 'CUMULATIVE TEST')) {
-                    $groupOrder = 1;
-                } elseif (str_starts_with($category, 'GRAND TEST')) {
-                    $groupOrder = 2;
-                } elseif (str_starts_with($category, 'WEEKEND TEST')) {
-                    $groupOrder = 3;
-                } elseif (str_starts_with($category, 'UNIT TEST')) {
-                    $groupOrder = 4;
-                } else {
-                    $groupOrder = 99;
-                }
+            if (str_starts_with($category, 'CUMULATIVE TEST')) {
+                $groupOrder = 1;
+            } elseif (str_starts_with($category, 'GRAND TEST')) {
+                $groupOrder = 2;
+            } elseif (str_starts_with($category, 'WEEKEND TEST')) {
+                $groupOrder = 3;
+            } elseif (str_starts_with($category, 'UNIT TEST')) {
+                $groupOrder = 4;
+            } else {
+                $groupOrder = 99;
+            }
 
-                if (str_contains($category, 'PHY')) {
-                    $subjectOrder = 1;
-                } elseif (str_contains($category, 'CHE')) {
-                    $subjectOrder = 2;
-                } elseif (str_contains($category, 'BOT')) {
-                    $subjectOrder = 3;
-                } elseif (str_contains($category, 'ZOO')) {
-                    $subjectOrder = 4;
-                } elseif (str_contains($category, 'BIO')) {
-                    $subjectOrder = 5;
-                } else {
-                    $subjectOrder = 0;
-                }
-                if ($category === 'CUMULATIVE TEST') {
-                    $subjectOrder = 0;
-                }
-                $date = \Carbon\Carbon::createFromFormat(
-                    'd-m-Y',
-                    $exam->exdate
-                );
-                return [($groupOrder * 100) + $subjectOrder,$date->timestamp
-                ];
-            })->values();
+            if (str_contains($category, 'PHY')) {
+                $subjectOrder = 1;
+            } elseif (str_contains($category, 'CHE')) {
+                $subjectOrder = 2;
+            } elseif (str_contains($category, 'BOT')) {
+                $subjectOrder = 3;
+            } elseif (str_contains($category, 'ZOO')) {
+                $subjectOrder = 4;
+            } elseif (str_contains($category, 'BIO')) {
+                $subjectOrder = 5;
+            } else {
+                $subjectOrder = 0;
+            }
+            if ($category === 'CUMULATIVE TEST') {
+                $subjectOrder = 0;
+            }
+            $date = \Carbon\Carbon::createFromFormat(
+                'd-m-Y',
+                $exam->exdate
+            );
+            return [
+                ($groupOrder * 100) + $subjectOrder,
+                $date->timestamp
+            ];
+        })->values();
 
         $examSubjects = $allExams->pluck('subject')->unique()->values();
 
@@ -580,7 +618,7 @@ class StudentController extends Controller
         $report = collect();
         foreach ($allExams as $exam) {
             $mark = $marks->firstWhere('subject', $exam->subject);
-            $subjectFields = ['phy', 'che', 'bot', 'zoo', 'bio' ];
+            $subjectFields = ['phy', 'che', 'bot', 'zoo', 'bio'];
             $subjectData = [];
             foreach ($subjectFields as $key) {
                 $subjectData[$key . '_r'] = $mark->{$key . '_r'} ?? 0;
@@ -605,7 +643,7 @@ class StudentController extends Controller
         }
 
         $average = ['phy'   => round($marks->avg('phy_tot')), 'che'   => round($marks->avg('che_tot')), 'bot'   => round($marks->avg('bot_tot')), 'zoo'   => round($marks->avg('zoo_tot')), 'bio'   => round($marks->avg('bio_tot')), 'total' => round($marks->avg('nettot')),];
-        $pdf = PDF::loadView('pdf.consolidated',compact('student','marks','average','report' ));
+        $pdf = PDF::loadView('pdf.consolidated', compact('student', 'marks', 'average', 'report'));
 
         return $pdf->stream($student->student_id . '_ConsolidatedReport.pdf');
     }
@@ -619,20 +657,20 @@ class StudentController extends Controller
         if (!$student) {
             return view('student.hostelarrivaldetails', compact('student'));
         }
-      
-        $studentType = strtoupper( trim($student->hostel_dayscholar ?? ''));
+
+        $studentType = strtoupper(trim($student->hostel_dayscholar ?? ''));
         $isHosteler = in_array($studentType, ['HOSTEL', 'HOSTELER', 'HOSTELLER']);
 
         if ($request->has('download')) {
             if ($isHosteler) {
-                $pdf = Pdf::loadView('pdf.hostel_arrival_details', compact('student') )->setPaper('a4', 'portrait');
+                $pdf = Pdf::loadView('pdf.hostel_arrival_details', compact('student'))->setPaper('a4', 'portrait');
                 return $pdf->download('Hostel_Allotment_Details_' . $student->student_id . '.pdf');
             }
 
-            $pdf = Pdf::loadView('pdf.classroom_allotment',compact('student'))->setPaper('a4', 'portrait');
-            return $pdf->download('Class_Room_Allotment_' .$student->student_id . '.pdf');
+            $pdf = Pdf::loadView('pdf.classroom_allotment', compact('student'))->setPaper('a4', 'portrait');
+            return $pdf->download('Class_Room_Allotment_' . $student->student_id . '.pdf');
         }
 
-        return view('student.hostelarrivaldetails',compact('student'));
+        return view('student.hostelarrivaldetails', compact('student'));
     }
 }

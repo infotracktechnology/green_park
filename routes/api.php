@@ -3,19 +3,16 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache; // Cache Facade Added
 use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo, TimetableAssign, SickRoomEntry, Exam, ClassVideo, QuestionKey, AnswerKey, DiscussionVideo, Download, Worksheet, Achievement, ExamSubjectReport, HostelAttendance, InOutRegister, ExamAnswer, MockTest, Attendance, Document, Options, HostelCourier, StudentLog, NeetAchievements, Medical};
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Collection;
 use App\Providers\UserLogServiceProvider;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
 */
 
 Route::group(['prefix' => 'v2'], function () {
@@ -27,7 +24,7 @@ Route::group(['prefix' => 'v2'], function () {
             $student->last_login = now();
             $student->device = $request->device;
             $student->save();
-            UserLogServiceProvider::storelog($student->student_id,'Student','Login Successful',$request->device);
+            UserLogServiceProvider::storelog($student->student_id, 'Student', 'Login Successful', $request->device);
             return response()->json(['message' => 'Login successful', 'student_id' => $student->id], 200);
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
@@ -36,7 +33,7 @@ Route::group(['prefix' => 'v2'], function () {
     Route::post('/logout', function (Request $request) {
         $student = Student::where('student_id', $request->student_id)->first();
         if ($student) {
-            UserLogServiceProvider::storelog((int) $student->student_id,'Student','Logout Successful',$request->device);
+            UserLogServiceProvider::storelog((int) $student->student_id, 'Student', 'Logout Successful', $request->device);
         }
         return response()->json(['status' => true, 'message' => 'Logout successful'], 200);
     });
@@ -98,60 +95,137 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($examportion);
     });
 
+    // =========================================================================
+    // OPTIMIZED: Exam Result API
+    // =========================================================================
     Route::get('/examresult/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
-        $sid = $student->student_id;
-        $batch = $student->batch;
-        $type = $student->coaching_type;
+        if (!$student) {
+            return response()->json(['results' => [], 'testgroup' => []]);
+        }
+
+        $sid    = $student->student_id;
+        $batch  = $student->batch;
+        $type   = $student->coaching_type;
         $course = $student->course;
-        $results = Exam::from("exam as b")->join('exam_answer as a', 'a.testname', '=', 'b.name')->where('a.student_id', $sid)->where('b.publish', 'Yes')->selectRaw("exam_date,b.name,test_id,sum(mark)mark,(count(mark)*4)total,markrange_file")->groupBy('test_id')->orderBy('b.id', 'desc')->get()->map(function ($test) use ($batch, $type, $course) {
-            if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
-                $markrange = isset($test->markrange_file[$batch]) ? $test->markrange_file[$batch] : null;
-            } else {
-                $markrange = isset($test->markrange_file['online']) ? $test->markrange_file['online'] : null;
-            }
-            return ['exam_date' => $test->exam_date, 'name' => $test->name, 'test_id' => $test->test_id, 'mark' => $test->mark, 'total' => $test->total, 'first_mark' => ExamAnswer::where('testname', $test->name)->selectRaw('SUM(mark) as mark')->groupBy('student_id')->orderBy('mark', 'desc')->first()?->mark, 'markrange' => $markrange];
-        });
 
-        $testgroup = ExamSubjectReport::where([['category', '!=', ''], ['stuid', $student_id]])->pluck('category')->filter()->unique()->values();
+        $results = Exam::from("exam as b")
+            ->join('exam_answer as a', 'a.testname', '=', 'b.name')
+            ->where('a.student_id', $sid)
+            ->where('b.publish', 'Yes')
+            ->selectRaw("b.exam_date, b.name, b.test_id, SUM(a.mark) as mark, (COUNT(a.mark) * 4) as total, b.markrange_file")
+            ->groupBy('b.test_id', 'b.name', 'b.exam_date', 'b.markrange_file', 'b.id')
+            ->orderBy('b.id', 'desc')
+            ->get()
+            ->map(function ($test) use ($batch, $type, $course) {
+                if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
+                    $markrange = $test->markrange_file[$batch] ?? null;
+                } else {
+                    $markrange = $test->markrange_file['online'] ?? null;
+                }
 
-        $results = count($results) > 0 ? $results : [];
-        return response()->json(['results' => $results, 'testgroup' => $testgroup]);
+                $first_mark = Cache::remember("first_mark_" . md5($test->name), 86400, function () use ($test) {
+                    return ExamAnswer::where('testname', $test->name)
+                        ->selectRaw('SUM(mark) as total_mark')
+                        ->groupBy('student_id')
+                        ->orderBy('total_mark', 'desc')
+                        ->value('total_mark') ?? 0;
+                });
+
+                return [
+                    'exam_date'  => $test->exam_date,
+                    'name'       => $test->name,
+                    'test_id'    => $test->test_id,
+                    'mark'       => $test->mark,
+                    'total'      => $test->total,
+                    'first_mark' => $first_mark,
+                    'markrange'  => $markrange
+                ];
+            });
+
+        $testgroup = ExamSubjectReport::where('stuid', $student_id)
+            ->where('category', '!=', '')
+            ->pluck('category')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return response()->json([
+            'results'   => $results,
+            'testgroup' => $testgroup
+        ]);
     });
 
-    Route::post('/perviousexamresult/{student_id}', function (Request $request, $student_id) {
 
+
+    Route::post('/perviousexamresult/{student_id}', function (Request $request, $student_id) {
         $subject = $request->input('subject');
 
-        $subjectexam = ExamSubjectReport::where('category', $subject)
-            ->where('stuid', $student_id)
-            ->whereNotIn('subject', function ($query) use ($student_id) {
-                $query->select('testname')
-                    ->from('exam_answer')
-                    ->where('student_id', $student_id);
-            })->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
+        $attendedTests = ExamAnswer::where('student_id', $student_id)
+            ->pluck('testname')
+            ->unique()
+            ->toArray();
+
+        $query = ExamSubjectReport::where('category', $subject)
+            ->where('stuid', $student_id);
+
+        if (!empty($attendedTests)) {
+            $query->whereNotIn('subject', $attendedTests);
+        }
+
+        $subjectexam = $query->orderByRaw("STR_TO_DATE(exdate, '%d-%m-%Y') desc")->get();
 
         return response()->json(['results' => $subjectexam]);
     });
 
+    // =========================================================================
+    // OPTIMIZED: Marksheet API
+    // =========================================================================
     Route::get('/marksheet/{student_id}/{testname}', function (Request $request, $student_id, $testname) {
-        $student = Student::where('student_id', $student_id)->select('student_name', 'user_name', 'academic_year')->first();
-        $exam = Exam::where(['name' => $testname, 'academic_year' => $student->academic_year])->first();
-        $answers = ExamAnswer::where(['testname' => $exam->name, 'student_id' => $student_id])->orderBy('q_no')->get()->map(function ($answer) {
-            return [
-                'q_no' => $answer->q_no,
-                'answer_key' => $answer->answer_key,
-                'answer' => $answer->answer,
-                'mark' => $answer->answer_key == 'DEL' ? 'DEL' : ($answer->mark == 4 ? 'C' : ($answer->mark == -1 ? 'W' : 'L'))
-            ];
-        })->chunk(45);
+        $student = Student::where('student_id', $student_id)
+            ->select('student_name', 'user_name', 'academic_year')
+            ->first();
 
-        return response()->json(['answers' => $answers, 'subject' => $exam->name, 'exam_date' => $exam->exam_date, 'testname' => $testname, 'student' => $student]);
+        if (!$student) {
+            return response()->json(['status' => false, 'message' => 'Student not found'], 404);
+        }
+
+        $exam = Exam::where(['name' => $testname, 'academic_year' => $student->academic_year])->first();
+        if (!$exam) {
+            return response()->json(['status' => false, 'message' => 'Exam not found'], 404);
+        }
+
+        $answers = ExamAnswer::where('testname', $exam->name)
+            ->where('student_id', $student_id)
+            ->orderBy('q_no')
+            ->get(['q_no', 'answer_key', 'answer', 'mark'])
+            ->map(function ($answer) {
+                return [
+                    'q_no'       => $answer->q_no,
+                    'answer_key' => $answer->answer_key,
+                    'answer'     => $answer->answer,
+                    'mark'       => $answer->answer_key == 'DEL' ? 'DEL' : ($answer->mark == 4 ? 'C' : ($answer->mark == -1 ? 'W' : 'L'))
+                ];
+            })
+            ->chunk(45);
+
+        return response()->json([
+            'answers'    => $answers,
+            'subject'    => $exam->name,
+            'exam_date'  => $exam->exam_date,
+            'testname'   => $testname,
+            'student'    => $student
+        ]);
     });
 
-
     Route::get('/mark_subject/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
-        $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject")->where('test_id', $testid)->where('student_id', $student_id)->groupBy('subject')->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")->get();
+        $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject")
+            ->where('test_id', $testid)
+            ->where('student_id', $student_id)
+            ->groupBy('subject')
+            ->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")
+            ->get();
+
         return response()->json($subjects);
     });
 
@@ -185,7 +259,6 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($subjects);
     });
 
-
     Route::get('/discussionvideo/{student_id}', function ($student_id) {
         $student = Student::where('student_id', $student_id)->first();
         $discussionvideos = DiscussionVideo::ForStudent($student);
@@ -193,9 +266,7 @@ Route::group(['prefix' => 'v2'], function () {
         return response()->json($discussionvideos);
     });
 
-
     Route::get('revisionvideos/{student_id}', function ($student_id) {
-        $datetime = date('Y-m-d H:i:s');
         $student = Student::where('student_id', $student_id)->first();
         $revisionvideos = RevisionVideo::ForStudent($student);
         return response()->json($revisionvideos);
@@ -218,7 +289,6 @@ Route::group(['prefix' => 'v2'], function () {
         $neetachievements = NeetAchievements::ForStudent($student);
         return response()->json($neetachievements);
     });
-
 
     Route::get('/timetable/{branch_id}/{section}', function ($branch_id, $section) {
         $periods = TimetableAssign::where('branch_id', $branch_id)->where('section', $section)->first();
@@ -246,8 +316,6 @@ Route::group(['prefix' => 'v2'], function () {
         $parent_concern = DB::table('parent_concern')->where('student_id', $student_id)->get();
         return response()->json($parent_concern ?? []);
     });
-
-
 
     Route::get('/document/{student_id}', function (Request $request, $student_id) {
         $documents = Document::where('student_id', $student_id)->latest()->get();
@@ -281,6 +349,7 @@ Route::group(['prefix' => 'v2'], function () {
         $sickroomentry = SickRoomEntry::where('student_id', $student_id)->latest()->get();
         return response()->json($sickroomentry);
     });
+
     Route::get('/medicalentry/{student_id}', function ($student_id) {
         $medical = Medical::where('student_id', $student_id)->latest()->get();
         return response()->json($medical);
@@ -346,14 +415,19 @@ Route::group(['prefix' => 'v2'], function () {
     });
 
     Route::get('/visitors/{student_id}', function ($student_id) {
-        $student = Student::where('student_id', $student_id)->select('academic_year', 'student_id', 'student_name', 'course', 'section', 'dob', 'aadhar_card_no', 'door_no', 'street_name', 'city', 'district', 'state', 'pincode', 'blood_group', 'father_name', 'father_ph_no', 'mother_name', 'guardian_name', 'guardian_ph_no')->first();
+        $student = Student::where('student_id', $student_id)
+            ->select('academic_year', 'student_id', 'student_name', 'course', 'section', 'dob', 'aadhar_card_no', 'door_no', 'street_name', 'city', 'district', 'state', 'pincode', 'blood_group', 'father_name', 'father_ph_no', 'mother_name', 'guardian_name', 'guardian_ph_no')
+            ->first();
+
+        if (!$student) {
+            return response()->json(['status' => false, 'message' => 'Student not found'], 404);
+        }
+
         $student->photo = file_exists(base_path("assets/profilepic/{$student->student_id}.jpg")) ? asset("profilepic/{$student->student_id}.jpg") : asset('img/avather.png');
         $student->fatherphoto = file_exists(base_path("assets/fatherpic/{$student->student_id}.jpg")) ? asset("fatherpic/{$student->student_id}.jpg") : asset('img/avather.png');
         $student->motherphoto = file_exists(base_path("assets/motherpic/{$student->student_id}.jpg")) ? asset("motherpic/{$student->student_id}.jpg") : asset('img/avather.png');
         $student->guardianphoto = file_exists(base_path("assets/guardianpic/{$student->student_id}.jpg")) ? asset("guardianpic/{$student->student_id}.jpg") : asset('img/avather.png');
-        if (!$student) {
-            return response()->json(['status' => false, 'message' => 'Student not found'], 404);
-        }
+
         return response()->json(['status' => true, 'data' => $student]);
     });
 
@@ -416,15 +490,15 @@ Route::group(['prefix' => 'v2'], function () {
             return response()->json(['status' => false, 'message' => 'Student not found'], 404);
         }
         $counts = [
-            'announcement' => calculateUnseenCount($student, Announcement::class, 'Announcements'),
-            'chairman_video' => calculateUnseenCount($student, Chairmanvideo::class, 'Chairman Video'),
-            'class_video' => calculateUnseenCount($student, Classvideo::class, 'Class Video'),
+            'announcement'     => calculateUnseenCount($student, Announcement::class, 'Announcements'),
+            'chairman_video'   => calculateUnseenCount($student, Chairmanvideo::class, 'Chairman Video'),
+            'class_video'      => calculateUnseenCount($student, Classvideo::class, 'Class Video'),
             'discussion_video' => calculateUnseenCount($student, Discussionvideo::class, 'Discussion Video'),
-            'revision_video' => calculateUnseenCount($student, Revisionvideo::class, 'Revision Video'),
-            'question_Key' => calculateUnseenCount($student, QuestionKey::class, 'Question Key'),
-            'answer_Key' => calculateUnseenCount($student, AnswerKey::class, 'Answer Key'),
-            'worksheet' => calculateUnseenCount($student, Worksheet::class, 'Worksheet'),
-            'download' => calculateUnseenCount($student, Download::class, 'Download'),
+            'revision_video'   => calculateUnseenCount($student, Revisionvideo::class, 'Revision Video'),
+            'question_Key'     => calculateUnseenCount($student, QuestionKey::class, 'Question Key'),
+            'answer_Key'       => calculateUnseenCount($student, AnswerKey::class, 'Answer Key'),
+            'worksheet'        => calculateUnseenCount($student, Worksheet::class, 'Worksheet'),
+            'download'         => calculateUnseenCount($student, Download::class, 'Download'),
         ];
         return response()->json($counts);
     });
@@ -433,5 +507,5 @@ Route::group(['prefix' => 'v2'], function () {
         $contactOption = Options::where('type', 'admin_contacts')->first();
         $contacts = $contactOption ? $contactOption->value : [];
         return response()->json($contacts);
-    }); 
+    });
 });
