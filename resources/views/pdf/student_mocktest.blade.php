@@ -80,9 +80,86 @@
         .col-res {
             width: 60%;
         }
+    .exam-summary {
+        width: 70%;
+        border-collapse: collapse;
+        margin-top: 18px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+
+    }
+
+    .exam-summary th,
+    .exam-summary td {
+        border: 2px solid #000;
+        padding: 7px 5px;
+    }
+
+    .exam-summary th {
+        background-color: #d1d5db;
+        font-weight: bold;
+    }
+
+    .exam-summary td:first-child {
+        text-align: left;
+        font-weight: bold;
+    }
+
+    .exam-summary .summary-total {
+        background-color: #f3f4f6;
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
+@php
+    $subjectSummary = [];
+
+    $summaryTotals = [
+        'questions' => 0,
+        'answered' => 0,
+        'notAnswered' => 0,
+    ];
+
+    $questionNo = 1;
+
+    foreach (explode(',', $exam->subject_name ?? '') as $subject) {
+        $subject = trim($subject);
+        if ($subject === '') {
+            continue;
+        }
+        $subjectKey = strtolower($subject);
+        $questionCount = (int) (
+            $exam->{"{$subjectKey}_questions"} ?? 0
+        );
+        $answered = 0;
+        for ($i = 1; $i <= $questionCount; $i++) {
+            $answer = $answers[$questionNo] ?? 0;
+
+            if (in_array((string) $answer, ['1', '2', '3', '4'], true)) {
+                $answered++;
+            }
+
+            $questionNo++;
+        }
+
+        $notAnswered = $questionCount - $answered;
+
+        $subjectSummary[] = [
+            'subject' => strtoupper($subject),
+            'questions' => $questionCount,
+            'answered' => $answered,
+            'notAnswered' => $notAnswered,
+        ];
+
+        $summaryTotals['questions'] += $questionCount;
+        $summaryTotals['answered'] += $answered;
+        $summaryTotals['notAnswered'] += $notAnswered;
+    }
+@endphp
 
     <div class="header-title">GREEN PARK COACHING CENTRE, NAMAKKAL</div>
     <div class="header-subtitle">CHECK THE ANSWERS THAT YOU MARKED</div>
@@ -134,6 +211,37 @@
                 </td>
             @endfor
         </tr>
+    </table>
+
+    <h3 style="text-align:center; margin-top:20px; font-size:15px;"> Exam Summary </h3>
+        <table class="exam-summary">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>No of Questions</th>
+                    <th>Answered</th>
+                    <th>Not Answered</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach ($subjectSummary as $summary)
+                    <tr>
+                        <td>{{ $summary['subject'] }}</td>
+                        <td>{{ $summary['questions'] }}</td>
+                        <td>{{ $summary['answered'] }}</td>
+                        <td>{{ $summary['notAnswered'] }}</td>
+                    </tr>
+                @endforeach
+                @if(count($subjectSummary) > 1)
+                <tr class="summary-total">
+                    <td>TOTAL</td>
+                    <td>{{ $summaryTotals['questions'] }}</td>
+                    <td>{{ $summaryTotals['answered'] }}</td>
+                    <td>{{ $summaryTotals['notAnswered'] }}</td>
+                </tr>
+                @endif
+            </tbody>
     </table>
 </body>
 </html>
