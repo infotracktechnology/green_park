@@ -277,14 +277,7 @@ class StudentController extends Controller
                     $markrange = $test->markrange_file['online'] ?? null;
                 }
 
-                // OPTIMIZATION: Cache first_mark for 24 hours (86400 seconds)
-                $first_mark = cache()->remember("first_mark_{$test->name}", 86400, function () use ($test) {
-                    return ExamAnswer::where('testname', $test->name)
-                        ->selectRaw('SUM(mark) as total_mark')
-                        ->groupBy('student_id')
-                        ->orderBy('total_mark', 'desc')
-                        ->value('total_mark') ?? 0;
-                });
+                $first_mark = Exam::where('name', $test->name)->value('first_mark');       
 
                 return [
                     'exam_date'  => $test->exam_date,
@@ -292,7 +285,7 @@ class StudentController extends Controller
                     'test_id'    => $test->test_id,
                     'mark'       => $test->mark,
                     'total'      => $test->total,
-                    'first_mark' => $first_mark,
+                    'first_mark' => $first_mark ?? 0,
                     'markrange'  => $markrange
                 ];
             });

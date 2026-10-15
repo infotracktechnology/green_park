@@ -801,6 +801,8 @@ class ExamController extends Controller
                 );
             }
         }
+        $higestMarks = ExamSubjectReport::where('subject', $exam->name)->max('nettot');
+        $exam->update(['first_mark' => $higestMarks]);
     }
 
     public function ClearOldExamAnswers($type, $course, $limit)
