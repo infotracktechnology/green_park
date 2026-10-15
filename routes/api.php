@@ -8,7 +8,6 @@ use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Collection;
 use App\Providers\UserLogServiceProvider;
-use App\Http\Middleware\EnsureActiveStudentLogin;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,48 +20,26 @@ Route::group(['prefix' => 'v2'], function () {
     Route::post('/login', function (Request $request) {
         $student = Student::where('user_name', $request->username)->where('password', $request->password)->first();
         if ($student) {
-            $loginKey = \Illuminate\Support\Str::random(64);
             $student->active = 1;
             $student->last_login = now();
             $student->device = $request->device;
-            $student->active_session_id = $loginKey;
             $student->save();
-            Cache::put('student_active_session:' . $student->getKey(), $loginKey, now()->addDays(7));
             UserLogServiceProvider::storelog($student->student_id, 'Student', 'Login Successful', $request->device);
-            return response()->json(['message' => 'Login successful', 'student_id' => $student->id, 'active_session_id' => $loginKey], 200);
+            return response()->json(['message' => 'Login successful', 'student_id' => $student->id], 200);
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
     });
-    Route::middleware([EnsureActiveStudentLogin::class])->group(function () {
+
     Route::post('/logout', function (Request $request) {
-        $student = $request->attributes->get('authenticated_student');
-        $loginKey = $request->header('X-Active-Login-Key');
-        $updated = Student::whereKey($student->getKey())
-            ->where('active_session_id', $loginKey)
-            ->update(['active_session_id' => null, 'active' => 0,]);
-        if (!$updated) {
-            return response()->json(['status' => false,'message' => 'Session expired. Please login again.', 'force_logout' => true, ], 401);
+        $student = Student::where('student_id', $request->student_id)->first();
+        if ($student) {
+            UserLogServiceProvider::storelog((int) $student->student_id, 'Student', 'Logout Successful', $request->device);
         }
-
-        Cache::forget(
-            'student_active_session:' . $student->getKey()
-        );
-
-        UserLogServiceProvider::storelog(
-            $student->student_id,
-            'Student',
-            'Logout Successful',
-            $request->device
-        );
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Logout successful',
-        ], 200);
+        return response()->json(['status' => true, 'message' => 'Logout successful'], 200);
     });
 
     Route::get('/student_profile/{student_id}', function ($student_id, Student $attendanceService) {
-        $student = Student::where('student_id', $student_id)->firstOrFail();
+        $student = Student::findOrFail($student_id);
         $student->photo = file_exists(base_path("assets/profilepic/{$student->student_id}.jpg")) ? asset("profilepic/{$student->student_id}.jpg") : asset('img/avather.png');
         $attendanceStats = $attendanceService->calculateCurrentMonthStats($student->student_id);
         $student->total_attendance_days = $attendanceStats->total_days;
@@ -147,7 +124,13 @@ Route::group(['prefix' => 'v2'], function () {
                     $markrange = $test->markrange_file['online'] ?? null;
                 }
 
-                $first_mark = Exam::where('name', $test->name)->value('first_mark');
+                $first_mark = Cache::remember("first_mark_" . md5($test->name), 86400, function () use ($test) {
+                    return ExamAnswer::where('testname', $test->name)
+                        ->selectRaw('SUM(mark) as total_mark')
+                        ->groupBy('student_id')
+                        ->orderBy('total_mark', 'desc')
+                        ->value('total_mark') ?? 0;
+                });
 
                 return [
                     'exam_date'  => $test->exam_date,
@@ -155,7 +138,7 @@ Route::group(['prefix' => 'v2'], function () {
                     'test_id'    => $test->test_id,
                     'mark'       => $test->mark,
                     'total'      => $test->total,
-                    'first_mark' => $first_mark ?? 0,
+                    'first_mark' => $first_mark,
                     'markrange'  => $markrange
                 ];
             });
@@ -525,5 +508,4 @@ Route::group(['prefix' => 'v2'], function () {
         $contacts = $contactOption ? $contactOption->value : [];
         return response()->json($contacts);
     });
-});
 });
