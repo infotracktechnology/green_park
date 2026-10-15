@@ -124,13 +124,7 @@ Route::group(['prefix' => 'v2'], function () {
                     $markrange = $test->markrange_file['online'] ?? null;
                 }
 
-                $first_mark = Cache::remember("first_mark_" . md5($test->name), 86400, function () use ($test) {
-                    return ExamAnswer::where('testname', $test->name)
-                        ->selectRaw('SUM(mark) as total_mark')
-                        ->groupBy('student_id')
-                        ->orderBy('total_mark', 'desc')
-                        ->value('total_mark') ?? 0;
-                });
+                $first_mark = Exam::where('name', $test->name)->value('first_mark');
 
                 return [
                     'exam_date'  => $test->exam_date,
@@ -138,7 +132,7 @@ Route::group(['prefix' => 'v2'], function () {
                     'test_id'    => $test->test_id,
                     'mark'       => $test->mark,
                     'total'      => $test->total,
-                    'first_mark' => $first_mark,
+                    'first_mark' => $first_mark ?? 0,
                     'markrange'  => $markrange
                 ];
             });
