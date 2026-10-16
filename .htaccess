@@ -18,9 +18,52 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
 
-  <FilesMatch "\.(ttf|ttc|otf|eot|woff|font.css|css|woff2|webp)$">
-    Header set Access-Control-Allow-Origin "*"
-  </FilesMatch>
+# ------------------------------------------------------------------------------
+# 1. CORS & Cache-Control Headers (CDN மற்றும் Font-Awesome Icons-க்கு)
+# ------------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Fonts, CSS, JS block ஆகாமல் இருக்க CORS அனுமதி
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font.css|css|js|webp|svg)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
 
+    # CDN & Browser Cache Control (1 Month Cache)
+    <FilesMatch "\.(ico|pdf|jpg|jpeg|png|gif|webp|js|css|svg|woff|woff2)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# 2. Browser Caching / Expires (Assets-ஐ Browser-ல் Store செய்ய)
+# ------------------------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # CSS & JavaScript (1 மாதம்)
+    ExpiresByType text/css                  "access plus 1 month"
+    ExpiresByType text/javascript           "access plus 1 month"
+    ExpiresByType application/javascript    "access plus 1 month"
+
+    # படங்கள் / Images (1 மாதம்)
+    ExpiresByType image/jpeg                "access plus 1 month"
+    ExpiresByType image/png                 "access plus 1 month"
+    ExpiresByType image/gif                 "access plus 1 month"
+    ExpiresByType image/webp                "access plus 1 month"
+    ExpiresByType image/svg+xml             "access plus 1 month"
+    ExpiresByType image/x-icon              "access plus 1 year"
+
+    # Web Fonts / Icons (1 வருடம்)
+    ExpiresByType font/ttf                  "access plus 1 year"
+    ExpiresByType font/woff                 "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+    ExpiresByType application/font-woff     "access plus 1 year"
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# 3. Gzip Compression (ஃபைல் அளவை சுருக்கி வேகத்தை அதிகரிக்க)
+# ------------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/xml application/xhtml+xml application/rss+xml application/javascript application/x-javascript font/ttf application/font-woff font/woff2
 </IfModule>
