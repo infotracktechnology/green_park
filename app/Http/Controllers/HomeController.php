@@ -27,79 +27,95 @@ class HomeController extends Controller
             return redirect()->back()->with('success', 'Academic year changed successfully.');
         }
 
-        $branchId = auth()->user()->branch;
-        $today = date('Y-m-d');
+        $branchId  = auth()->user()->branch;
+        $branchIds = !empty($branchId) ? array_filter(explode(',', $branchId)) : [];
+        $today     = date('Y-m-d');
         $academic_years = AcademicYear::all();
-        $active_year = $this->academic_year;
+        $active_year    = $this->academic_year;
 
         $data = Branch::with(['student' => function ($query) {
-            $query->where('academic_year', $this->academic_year);
-        }, 'attendance' => function ($query) use ($today) {
-            $query->where('attendance_date', $today)
-                ->whereIn('student_id', function ($q) {
-                    $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
-                });
-        }])->when($branchId, fn($q) => $q->whereIn('id', explode(',', $branchId)))->get();
+                $query->where('academic_year', $this->academic_year)
+                      ->select('id', 'campus', 'coaching_type', 'gender', 'last_login', 'device');
+            },
+            'attendance' => function ($query) use ($today) {
+                $query->where('attendance_date', $today)
+                      ->whereIn('student_id', function ($q) {
+                          $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
+                      });
+            }
+        ])
+        ->when(!empty($branchIds), fn($q) => $q->whereIn('id', $branchIds))
+        ->get();
 
-        $offlineByCampus = Student::where('academic_year', $this->academic_year)
-            ->whereIn('campus', $data->pluck('id'))
-            ->where('coaching_type', 'OFFLINE')
-            ->get()
-            ->groupBy('campus');
+        $data->each(function ($branch) use ($today) {
+            $branchStudents = $branch->student;
 
-        $onlineByCampus = Student::where('academic_year', $this->academic_year)
-            ->whereIn('campus', $data->pluck('id'))
-            ->where('coaching_type', '!=', 'OFFLINE')
-            ->get()
-            ->groupBy('campus');
-       
-            $data->each(function ($branch) use ( $today, $offlineByCampus, $onlineByCampus) {
-                $branch->setRelation('offlineStudents', $offlineByCampus->get($branch->id, collect())->values());
-                $branch->setRelation('onlineStudents', $onlineByCampus->get($branch->id, collect())->values());
-                $todayLogins = $branch->student->filter(function ($student) use ($today) {
-                    return $student->last_login
-                        && date('Y-m-d', strtotime($student->last_login)) === $today;
-                });
+            $branch->setRelation('offlineStudents', $branchStudents->where('coaching_type', 'OFFLINE')->values());
+            $branch->setRelation('onlineStudents', $branchStudents->where('coaching_type', '!=', 'OFFLINE')->values());
 
-                $branch->login_web = $todayLogins->where('device', 'Web')->count();
-                $branch->login_android = $todayLogins->where('device', 'Android')->count();
-                $branch->login_ios = $todayLogins->where('device', 'Ios')->count();
-                $branch->login_total = $todayLogins->count();
+            $todayLogins = $branchStudents->filter(function ($student) use ($today) {
+                return $student->last_login && str_starts_with($student->last_login, $today);
             });
 
-        $students = Student::where('academic_year', $this->academic_year)->when($branchId, fn($q) => $q->whereIn('campus', explode(',', $branchId)))->get();
+            $branch->login_web     = $todayLogins->where('device', 'Web')->count();
+            $branch->login_android = $todayLogins->where('device', 'Android')->count();
+            $branch->login_ios     = $todayLogins->where('device', 'Ios')->count();
+            $branch->login_total   = $todayLogins->count();
+        });
 
-        $boys = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'MALE')->count();
-        $girls = $students->filter(fn($student) => strtoupper(trim($student->gender)) == 'FEMALE')->count();
-        $total = $students->count();
+        $genderStats = Student::where('academic_year', $this->academic_year)
+            ->when(!empty($branchIds), fn($q) => $q->whereIn('campus', $branchIds))
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN UPPER(TRIM(gender)) = 'MALE' THEN 1 ELSE 0 END) as boys,
+                SUM(CASE WHEN UPPER(TRIM(gender)) = 'FEMALE' THEN 1 ELSE 0 END) as girls
+            ")
+            ->first();
 
-        $present = Attendance::when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))
+        $boys  = (int) ($genderStats->boys ?? 0);
+        $girls = (int) ($genderStats->girls ?? 0);
+        $total = (int) ($genderStats->total ?? 0);
+
+        $present = Attendance::when(!empty($branchIds), fn($q) => $q->whereIn('branch_id', $branchIds))
             ->where('status', 'P')
             ->where('attendance_date', $today)
             ->whereIn('student_id', function ($q) {
                 $q->select('student_id')->from('student')->where('academic_year', $this->academic_year);
             })
             ->distinct('student_id')
-            ->count();
+            ->count('student_id');
 
-        $staffs = collect(Staff::select('department')->when($branchId, fn($q) => $q->whereIn('branch_id', explode(',', $branchId)))->get())->groupBy('department');
+        $staffs = Staff::select('id', 'branch_id', 'department')
+            ->when(!empty($branchIds), fn($q) => $q->whereIn('branch_id', $branchIds))
+            ->get()
+            ->toBase()
+            ->groupBy('department');
 
         $concerns = ParentConcern::all();
 
+        $allAnnouncements = Announcement::where('academic_year', $this->academic_year)
+            ->select('id', 'branch')
+            ->get();
+
         $announcement = $data->map(fn($item) => [
             'branch' => $item->name,
-            'count'  => Announcement::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count()
+            'count'  => $allAnnouncements->filter(fn($a) => str_contains($a->branch, (string)$item->id))->count()
         ]);
+
+        $allChairmanVideos = Chairmanvideo::where('academic_year', $this->academic_year)
+            ->select('id', 'branch')
+            ->get();
 
         $chairman = $data->map(fn($item) => [
             'branch' => $item->name,
-            'count'  => Chairmanvideo::where('academic_year', $this->academic_year)->where('branch', 'like', "%{$item->id}%")->count()
+            'count'  => $allChairmanVideos->filter(fn($c) => str_contains($c->branch, (string)$item->id))->count()
         ]);
 
         $exams = Exam::where('academic_year', $this->academic_year)
-            ->when(auth()->user()->branch, function ($query) {
-                $query->where('branch', 'like', '%' . auth()->user()->branch . '%');
-            })->orderBy('start_at', 'desc')->take(7)->get();
+            ->when($branchId, fn($query) => $query->where('branch', 'like', "%{$branchId}%"))
+            ->orderBy('start_at', 'desc')
+            ->take(7)
+            ->get();
 
         return view('home', compact('data', 'boys', 'girls', 'total', 'staffs', 'present', 'concerns', 'announcement', 'chairman', 'academic_years', 'active_year', 'exams'));
     }
