@@ -35,7 +35,7 @@ class HomeController extends Controller
 
         $data = Branch::with(['student' => function ($query) {
                 $query->where('academic_year', $this->academic_year)
-                      ->select('id', 'campus', 'coaching_type', 'gender', 'last_login', 'device');
+                      ->select('id', 'campus', 'coaching_type', 'gender','section', 'last_login', 'device');
             },
             'attendance' => function ($query) use ($today) {
                 $query->where('attendance_date', $today)
