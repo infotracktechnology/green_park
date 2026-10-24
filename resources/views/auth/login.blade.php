@@ -634,7 +634,7 @@
           <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-4.webp')}}">LONGTERM ONLINE TEST SERIES</a></li>
           <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-5.webp')}}">TWO YEARS OFFLINE CLASSROOM PROGRAM</a></li>
           <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-6.webp')}}">TWO YEARS ONLINE CLASSROOM PROGRAM</a></li>
-          <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-7.webp')}}">CRASH COURSE PROGRAM</a></li>
+          {{-- <li><a href="#" class="course-btn open-lightbox" data-light="{{asset('img/silde/course-7.webp')}}">CRASH COURSE PROGRAM</a></li> --}}
         </ul>
       </div>
 
