@@ -413,27 +413,31 @@
   }
 
   function setStatus(qno, status, ans) {
-      document.getElementById('status-'+qno).value = status;
-      var subject = $(`[name="subject[${qno}]`).val();
-      $.ajax({
-          url: "{{ route('exam.save',[],false) }}",
-          headers: {
-              'X-CSRF-TOKEN': '{{ csrf_token() }}'
-          },
-          method: 'POST',
-          data: {
-              test_id: testid,
-              testname: testname,
-              q_no: qno,
-              subject: subject,
-              status: status,
-              answer: ans
-          },
-          success: function (data) {
-              //console.log(data);
-          },
-      });
-  }
+    document.getElementById('status-' + qno).value = status;
+        var subject = $(`[name="subject[${qno}]"]`).val();
+        return $.ajax({
+            url: "{{ route('exam.save',[],false) }}",
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            method: 'POST',
+            data: {
+                test_id: testid,
+                testname: testname,
+                q_no: qno,
+                subject: subject,
+                status: status,
+                answer: ans
+            }
+        }).then(
+            function (data) {
+                return true;
+            },
+            function (xhr, status, error) {
+                return false;
+            }
+        );
+    }
 
   function clearLog(testid, qno) {
       $.ajax({
@@ -571,44 +575,102 @@ function calculateSubjectWiseStats() {
   });
 }
 
+$('.btn-save').click(function () {
+    const index = $(this).data('index');
+    const radio = $(`#question-${index} input[type="radio"]`);
 
-  $('.btn-save').click(function () {
-      const index = $(this).data('index');
-      const radio = $(`#question-${index} input[type="radio"]`);
-      if (!radio.is(':checked')) {
-          alert('Please select an answer first.');
-          return;
-      }
-      var answer = $(`#question-${index} input[type="radio"]:checked`).val();
-      if(answer == 0){
+    if (!radio.is(':checked')) {
+        alert('Please select an answer first.');
+        return;
+    }
+
+    var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+    if(answer == 0){
         alert('Please select an answer first.');
         return;
       }
-      setStatus(index, 'que-save',answer);
-      $(`.pagination li[data-seq="${index}"] a`)
-          .removeClass('not-answered que-mark que-save-mark')
-          .addClass('que-save');
-      NextQuestion(index);
-  });
+    setStatus(index, 'que-save', answer).then(function (result) {
+        const link = $(`.pagination li[data-seq="${index}"] a`);
+        if (result) {
+            link.removeClass('not-answered que-mark que-save-mark')
+                .addClass('que-save');
+            NextQuestion(index);
+        } else {
+            link.removeClass('que-save que-save-mark que-mark')
+                .addClass('not-answered');
+            alert('Your Internet connection is slow. Please try again.');
+        }
+    });
+});
 
-  $('.btn-save-mark-answer').click(function () {
-      const index = $(this).data('index');
-      const radio = $(`#question-${index} input[type="radio"]`);
-      if (!radio.is(':checked')) {
-          alert('Please select an answer first.');
-          return;
-      }
-      var answer = $(`#question-${index} input[type="radio"]:checked`).val();
-      if(answer == 0){
+$('.btn-save-mark-answer').click(function () {
+    const index = $(this).data('index');
+    const radio = $(`#question-${index} input[type="radio"]`);
+
+    if (!radio.is(':checked')) {
         alert('Please select an answer first.');
         return;
-      }
-      setStatus(index, 'que-save-mark',answer);
-      $(`.pagination li[data-seq="${index}"] a`)
-          .removeClass('not-answered que-mark que-save')
-          .addClass('que-save-mark');
-      NextQuestion(index);
-  });
+    }
+
+    var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+    if(answer == 0){
+      alert('Please select an answer first.');
+      return;
+    }
+      
+    setStatus(index, 'que-save-mark', answer).then(function (result) {
+        const link = $(`.pagination li[data-seq="${index}"] a`);
+      
+        if (result) {
+            link.removeClass('not-answered que-mark que-save')
+                .addClass('que-save-mark');
+            NextQuestion(index);
+        } else {
+            link.removeClass('que-save que-save-mark que-mark')
+                .addClass('not-answered');
+            alert('Your Internet connection is slow. Please try again.');
+        }
+    });
+});
+
+
+  // $('.btn-save').click(function () {
+  //     const index = $(this).data('index');
+  //     const radio = $(`#question-${index} input[type="radio"]`);
+  //     if (!radio.is(':checked')) {
+  //         alert('Please select an answer first.');
+  //         return;
+  //     }
+  //     var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+  //     if(answer == 0){
+  //       alert('Please select an answer first.');
+  //       return;
+  //     }
+  //     setStatus(index, 'que-save',answer);
+  //     $(`.pagination li[data-seq="${index}"] a`)
+  //         .removeClass('not-answered que-mark que-save-mark')
+  //         .addClass('que-save');
+  //     NextQuestion(index);
+  // });
+
+  // $('.btn-save-mark-answer').click(function () {
+  //     const index = $(this).data('index');
+  //     const radio = $(`#question-${index} input[type="radio"]`);
+  //     if (!radio.is(':checked')) {
+  //         alert('Please select an answer first.');
+  //         return;
+  //     }
+  //     var answer = $(`#question-${index} input[type="radio"]:checked`).val();
+  //     if(answer == 0){
+  //       alert('Please select an answer first.');
+  //       return;
+  //     }
+  //     setStatus(index, 'que-save-mark',answer);
+  //     $(`.pagination li[data-seq="${index}"] a`)
+  //         .removeClass('not-answered que-mark que-save')
+  //         .addClass('que-save-mark');
+  //     NextQuestion(index);
+  // });
 
   $('.btn-mark').click(function () {
       const index = $(this).data('index');
