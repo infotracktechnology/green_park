@@ -64,6 +64,9 @@
       @if($offline->isNotEmpty())  
       <h4 class="mt-3">OFFLINE</h4>
         @foreach($offline as $key => $section)
+          @if((int) request('branch') === 1 && strtolower(trim($key)) === 'female-hostel')
+          @continue
+      @endif
         
         <div class="table-responsive mt-3">
             <table class="table">
@@ -116,6 +119,55 @@
         </div>
         @endforeach
         @endif
+             
+@if((int) request('branch') === 1)
+    @foreach(['STATE BOARD' => $stateBoardData, 'CBSE' => $cbseData] as $boardName => $boardRows)
+        <div class="table-responsive mt-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th colspan="5" class="text-center">
+                            FEMALE-HOSTEL - {{ $boardName }}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>SECTION</th>
+                        <th>BATCH</th>
+                        <th>AC</th>
+                        <th>NON AC</th>
+                        <th>TOTAL</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse($boardRows as $row)
+                        <tr>
+                            <td>{{ $row->section }}</td>
+                            <td>{{ $row->batch }}</td>
+                            <td>{{ $row->ac }}</td>
+                            <td>{{ $row->nonac }}</td>
+                            <td>{{ $row->total }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                No students found
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+                <tfoot>
+                    <tr class="bg-secondary fw-bold">
+                        <td colspan="4">NET TOTAL</td>
+                        <td>{{ $boardRows->sum('total') }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    @endforeach
+@endif
+
         @if($online->isNotEmpty())
       <h4 class="mt-4">ONLINE</h4>
         @foreach($online as $key => $section)

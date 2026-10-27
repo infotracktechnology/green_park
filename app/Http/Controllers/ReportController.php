@@ -655,7 +655,7 @@ class ReportController extends Controller
         SUM(ac_nonac='NON AC') as nonac,
 
         SUM(board_of_study_XII_std='SB') as sb,
-        SUM(board_of_study_XII_std='CBSE') as cbse,
+        SUM(board_of_study_XII_std!= 'SB') as cbse,
 
         SUM(gender='Male') as boys,
         SUM(gender='Female') as girls,
@@ -682,6 +682,25 @@ class ReportController extends Controller
     ])
     ->groupBy('gender');
 
+    $boardTables = collect();
+    if ((int) $branch === 1) {
+        $boardTables = Student::query()
+            ->selectRaw("section, batch, CASE WHEN board_of_study_XII_std = 'SB' THEN 'SB' ELSE 'CBSE' END as board, SUM(ac_nonac = 'AC') as ac, SUM(ac_nonac = 'NON AC') as nonac, COUNT(*) as total")
+            ->where('campus', 1)
+            ->where('academic_year', $this->academic_year)
+            ->where('course', $course)
+            ->where('coaching_type', 'OFFLINE')
+            ->where('gender', 'Female')
+            ->where('hostel_dayscholar', 'HOSTEL')
+            ->groupBy('section', 'batch', 'board')
+            ->orderBy('section')
+            ->get()
+            ->groupBy('board');
+    }
+
+    $stateBoardData = $boardTables->get('SB', collect());
+    $cbseData = $boardTables->get('CBSE', collect());
+
         $grouped = $data->groupBy(['gender']);
 
     if ($request->isMethod('post')) {
@@ -695,7 +714,7 @@ class ReportController extends Controller
         return $pdf->download("$section-$request->view.pdf");
     }
 
-        return view('report.sectionlist', compact('grouped', 'offline', 'online','branches_list'));
+        return view('report.sectionlist', compact('grouped', 'offline', 'online','branches_list','stateBoardData','cbseData'));
     }
     public function ExaminationAnalysis(Request $request)
     {
