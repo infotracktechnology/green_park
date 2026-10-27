@@ -175,18 +175,18 @@
                 </div>
 
                 <div class="form-group col-lg-3">
-                  <label>Institution Bill Type</label>
-                  <select name="institution_bill_type" id="bill_type" class="form-control form-control-sm">
-                    <option value="">Select Bill Type </option>
-                    <option value="GPI,NKL" @selected($Student->institution_bill_type == 'GPI,NKL')>GPI,NKL</option>
-                    <option value="GPCC,NKL" @selected($Student->institution_bill_type == 'GPCC,NKL')>GPCC,NKL</option>
-                    <option value="GPCI,NKL" @selected($Student->institution_bill_type == 'GPCI,NKL')>GPCI,NKL</option>
-                    <option value="GPCA,NKL" @selected($Student->institution_bill_type == 'GPCA,NKL')>GPCA,NKL</option>
-                    <option value="GPCI,KARUR" @selected($Student->institution_bill_type == 'GPCI,KARUR')>GPCI,KARUR</option>
-                    <option value="GPCI,ERODE" @selected($Student->institution_bill_type == 'GPCI,ERODE')>GPCI,ERODE</option>
-                    <option value="GPCA,COIMBATORE" @selected($Student->institution_bill_type == 'GPCA,COIMBATORE')>GPCA,COIMBATORE</option>
-                    <option value="GPA,CHENNAI" @selected($Student->institution_bill_type == 'GPA,CHENNAI')>GPA,CHENNAI</option>
-                  </select>
+                    <label>Institution Bill Type</label>
+                    <select name="institution_bill_type" id="bill_type" class="form-control form-control-sm">
+                        <option value="">Select Bill Type</option>
+                        <option value="GPI,NKL" @if($Student->institution_bill_type == 'GPI,NKL') selected @endif>GPI,NKL</option>
+                        <option value="GPCC,NKL" @if($Student->institution_bill_type == 'GPCC,NKL') selected @endif>GPCC,NKL</option>
+                        <option value="GPCI,NKL" @if($Student->institution_bill_type == 'GPCI,NKL') selected @endif>GPCI,NKL</option>
+                        <option value="GPCA,NKL" @if($Student->institution_bill_type == 'GPCA,NKL') selected @endif>GPCA,NKL</option>
+                        <option value="GPCI,KARUR" @if($Student->institution_bill_type == 'GPCI,KARUR') selected @endif>GPCI,KARUR</option>
+                        <option value="GPCI,ERODE" @if($Student->institution_bill_type == 'GPCI,ERODE') selected @endif>GPCI,ERODE</option>
+                        <option value="GPCA,COIMBATORE" @if($Student->institution_bill_type == 'GPCA,COIMBATORE') selected @endif>GPCA,COIMBATORE</option>
+                        <option value="GPA,CHENNAI" @if($Student->institution_bill_type == 'GPA,CHENNAI') selected @endif>GPA,CHENNAI</option>
+                    </select>
                 </div>
 
                 <div class="form-group col-lg-3">
