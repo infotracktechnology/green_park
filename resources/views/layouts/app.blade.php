@@ -242,9 +242,9 @@
                 </li>
               </ul>
             </li>
-            <li class="dropdown">
+            {{-- <li class="dropdown">
               <a href="{{ route('timetable.index') }}" class="nav-link"><i data-feather="clock"></i><span>TimeTable</span></a>
-            </li>
+            </li> --}}
 
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="save"></i><span>Attendance</span></a>
               <ul class="dropdown-menu">
@@ -259,7 +259,7 @@
                 <li><a href="{{ route('report.verification') }}" class="nav-link">Visitor Verification</a></li>
               </ul>
             </li>
-            <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
+            {{-- <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="dollar-sign"></i><span>Finance</span></a>
               <ul class="dropdown-menu">
                 <li><a href="{{ route('bank.create') }}" class="nav-link">Banks</a></li>
                 <li><a href="{{ route('feetype') }}" class="nav-link">Fee Types</a></li>
@@ -272,7 +272,7 @@
                 <li><a href="{{ route('fees.report.collection') }}" class="nav-link">Collection Report</a></li>
                 <li><a href="{{ route('fees.report.due') }}" class="nav-link">Due Report</a></li>
               </ul>
-            </li>
+            </li> --}}
             <li class="dropdown"> <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="file-text"></i><span>Reports</span></a>
               <ul class="dropdown-menu">
                 {{-- <li><a href="{{ route('report.log') }}" class="nav-link">Logs Report</a></li> --}}
