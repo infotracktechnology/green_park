@@ -80,7 +80,9 @@
                       <th>Password</th>
                       <th>MS Teams ID</th>
                       <th>Gender</th>
+                      <th>Father Name</th>
                       <th>Father No</th>
+                      <th>Mother Name</th>
                       <th>Mother No</th>
                       <th>Edit </th>
                       <th>Inactive</th>
@@ -104,7 +106,9 @@
                       <td>{{$student->password}}</td>
                       <td>{{$student->teams_id}}</td>
                       <td>{{$student->gender}}</td>
+                      <td>{{$student->father_name}}</td>
                       <td>{{$student->father_ph_no}}</td>
+                      <td>{{$student->mother_name}}</td>
                       <td>{{$student->mother_ph_no}}</td>
                       <td>
                         <a href="{{route('student.edit', $student->id)}}" class="btn btn-warning text-white"><i class="fas fa-edit"></i></a>
