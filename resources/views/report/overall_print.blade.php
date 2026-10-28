@@ -19,7 +19,7 @@
   <div class="container">
     <div style="text-align:center;">
       {{-- <h3 style="margin:0;"></h3> --}}
-      <h2 style="margin:5px 0;color:#f40808;">OMR CHEAKING PRINT - {{ $test_name }}</h2>
+      <h2 style="margin:5px 0;color:#f40808;">OMR CHECKING PRINT - {{ $test_name }}</h2>
       <h3 style="margin-left: 600px;">Section - {{ $section }}</h3>
     </div>
 
