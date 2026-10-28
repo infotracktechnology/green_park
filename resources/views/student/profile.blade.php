@@ -87,7 +87,7 @@
                         
                         <div class="mb-3">
                             <div class="label-text">Mobile</div>
-                            <div class="value-text">{{ auth()->user()->ph_no1 }}</div>
+                            <div class="value-text">{{ auth()->user()->father_ph_no }}</div>
                         </div>
                         {{-- <div class="mb-3">
                             <div class="label-text">Email</div>
