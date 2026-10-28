@@ -31,16 +31,23 @@
           <th>Q Type</th>
           <th class="name-cell">Name</th>
           @foreach($subjects as $subject)
-            <th colspan="4">{{ $subject }}</th>
+              <th colspan="{{ count($subjects) > 1 ? 4 : 3 }}">
+                  {{ $subject }}
+              </th>
           @endforeach
           <th>Total</th>
         </tr>
         <tr>
           <th></th><th></th><th></th><th class="name-cell"></th>
           @foreach($subjects as $subject)
-            <th>R</th><th>W</th><th>L</th><th>T</th>
+            <th>R</th>
+            <th>W</th>
+            <th>L</th>
+            @if(count($subjects) > 1)
+            <th>T</th>
+            @endif
           @endforeach
-          <th></th>
+          <th>{{ $max_mark }}</th>
         </tr>
       </thead>
 
@@ -57,7 +64,9 @@
             <td>{{ $sub['right'] }}</td>
             <td>{{ $sub['wrong'] }}</td>
             <td>{{ $sub['left'] }}</td>
+            @if(count($subjects) > 1)
             <td>{{ $sub['total'] }}</td>
+            @endif
           @endforeach
 
           <td>{{ $student['total'] }}</td>

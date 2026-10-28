@@ -18,33 +18,78 @@ class ReportController extends Controller
         $exams = [];
 
         if ($request->has('testcategory')) {
-            $exams = Exam::where('testcategory', $request->testcategory)->where("academic_year", $this->academic_year)->select('name')->distinct()->orderByDesc('exam_date')->get()->pluck('name');
+           $exams = Exam::where('testcategory', $request->testcategory)
+            ->where('academic_year', $this->academic_year)
+            ->distinct()
+            ->orderByDesc('exam_date')
+            ->pluck('name');
         }
 
         $test_name = $request->test_name ?? 0;
 
-        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')->where([['a.testname', $test_name], ['section', '!=', ''], ['section', '!=', null]])->when(auth()->user()->branch, fn($q) => $q->where('student.campus', auth()->user()->branch))->select('section')->distinct()->orderBy('section')->get();
+        $branch = auth()->user()->branch;
+
+        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')
+            ->where('a.testname', $test_name)
+            ->whereNotNull('student.section')
+            ->where('student.section', '!=', '')
+            ->when($branch, fn($q) => $q->where('student.campus', $branch))
+            ->select('student.section')
+            ->distinct()
+            ->orderBy('student.section')
+            ->get();
 
         if ($request->query('type') == 'overall') {
             $section = $request->section;
+            $branch = auth()->user()->branch;
+            $answers = ExamAnswer::join('student as a', 'exam_answer.student_id', '=', 'a.student_id')
+                ->where('exam_answer.testname', $test_name)
+                ->where('a.section', $section)
+                ->where('a.coaching_type', 'OFFLINE')
+                ->when($branch, fn($q) => $q->where('a.campus', $branch))
+                ->select('exam_answer.student_id','exam_answer.test_id','exam_answer.subject','exam_answer.mark','a.student_name')
+                ->orderBy('exam_answer.test_id')
+                ->orderBy('a.student_name')
+                ->get();
 
-            $answers = ExamAnswer::selectRaw("exam_answer.*,a.student_name")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section], ['coaching_type', 'OFFLINE']])->when(auth()->user()->branch, fn($q) => $q->where('a.campus', auth()->user()->branch))->orderBy('test_id')->orderBy('student_name')->get();
 
             $subjects = $answers->pluck('subject')->unique()->values()->toArray();
             $results = $answers->groupBy('student_id')->map(function ($logs) use ($subjects) {
-                $student = $logs->first()->student;
+                $student = $logs->first();
                 $subjectStats = collect($subjects)->mapWithKeys(function ($subject) use ($logs) {
                     $sub = $logs->where('subject', $subject);
-                    return [$subject => ['right' => $sub->where('mark', 4)->count(), 'wrong' => $sub->where('mark', -1)->count(), 'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark')]];
+                    return [$subject => ['right' => $sub->where('mark', 4)->count(), 'wrong' => $sub->where('mark', -1)->count(), 'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark'), 'max_mark' => $sub->count() * 4]];
                 });
-                return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total')];
+                return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total'), 'max_mark' => $subjectStats->sum('max_mark')];
             })->values();
-            return view('report.overall_print', compact('results', 'subjects', 'test_name', 'section'));
+            $max_mark = $results->first()['max_mark'] ?? 0;
+            return view('report.overall_print', compact('results', 'subjects', 'test_name', 'section', 'max_mark'));
         }
 
         if ($request->query('type') == 'omr') {
             $section = $request->section;
-            $answers = ExamAnswer::selectRaw("q_no,answer,answer_key,mark,exam_answer.student_id,a.student_name,subject")->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')->where([['testname', $test_name], ['section', $section], ['coaching_type', 'OFFLINE']])->when(auth()->user()->branch, fn($q) => $q->where('a.campus', auth()->user()->branch))->orderBy('test_id')->orderBy('student_name')->get();
+            $branch = auth()->user()->branch;
+
+            $answers = ExamAnswer::query()
+                ->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')
+                ->where('exam_answer.testname', $test_name)
+                ->where('a.section', $section)
+                ->where('a.coaching_type', 'OFFLINE')
+                ->when($branch, fn($q) => $q->where('a.campus', $branch))
+                ->select([
+                    'exam_answer.q_no',
+                    'exam_answer.answer',
+                    'exam_answer.answer_key',
+                    'exam_answer.mark',
+                    'exam_answer.student_id',
+                    'a.student_name',
+                    'exam_answer.subject',
+                    'exam_answer.test_id',
+                ])
+                ->orderBy('exam_answer.test_id')
+                ->orderBy('a.student_name')
+                ->orderBy('exam_answer.q_no')
+                ->get();
             $testIds = $answers->pluck('test_id')->unique();
             $key_correction = DB::table('key_corrections')->where('academic_year', $this->academic_year)->whereIn('testid', $testIds)->pluck('key_correction', 'testid');
             return view('report.omr_print', compact('answers', 'test_name','key_correction'));
@@ -1777,6 +1822,9 @@ class ReportController extends Controller
                 })
                 ->when($request->filled('to_date'), function ($q) use ($request) {
                     $q->where('user_logs.created_at', '<=', $request->to_date);
+                })
+                ->when($request->filled('student'), function ($q) use ($request) {
+                    $q->where('student.student_id', $request->student);
                 })
                 ->when($request->filled('search'), function ($q) use ($request) {
                     $search = $request->search;

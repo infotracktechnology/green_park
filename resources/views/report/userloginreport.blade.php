@@ -226,6 +226,11 @@
                                                 <label>To Date</label>
                                                 <input type="date" name="to_date" class="form-control form-control-sm" value="{{ request('to_date') }}" onchange="document.getElementById('filterForm').submit();">
                                             </div>
+
+                                            <div class="col-md-2 col-sm-6 form-group mb-4">
+                                                <label>Student </label>
+                                                <input type="student" name="student" class="form-control form-control-sm" value="{{ request('student') }}" onchange="document.getElementById('filterForm').submit();">
+                                            </div>
                                         </div>
                                     </form>
 
