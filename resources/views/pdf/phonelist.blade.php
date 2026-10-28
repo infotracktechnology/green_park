@@ -71,10 +71,10 @@
     <tr>
       <td style="text-align: center;font-weight: bold;">{{ $key+1 }}</td>
       <td style="text-align: center;font-weight: bold;">{{ $item->student_id }}</td>
-      <td style="width: 40%;">{{ $item->student_name }}</td>
+      <td style="width: 30%;">{{ $item->student_name }}</td>
       <td>{{ $item->father_name }}</td>
-      <td>{{ $item->ph_no1 }}</td>
-      <td> {{ $item->ph_no2 }}</td>
+      <td>{{ $item->father_ph_no }}</td>
+      <td> {{ $item->mother_ph_no }}</td>
     </tr>
     @endforeach
   </table>
