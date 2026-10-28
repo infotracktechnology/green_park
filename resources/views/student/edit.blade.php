@@ -409,7 +409,7 @@
                   <label>Board of Study (XII std)</label>
                   <select name="board_of_study_XII_std" id="board_of_study_XII_std" class="form-control form-control-sm">
                     <option value="">Select Board</option>
-                    <option value="STATEBOARD" {{ $Student->board_of_study_XII_std == 'STATEBOARD' ? 'selected' : '' }}>STATEBOARD</option>
+                    <option value="SB" {{ $Student->board_of_study_XII_std == 'SB' ? 'selected' : '' }}>STATEBOARD</option>
                     <option value="CBSE" {{ $Student->board_of_study_XII_std == 'CBSE' ? 'selected' : '' }}>CBSE</option>
                     <option value="ICSE" {{ $Student->board_of_study_XII_std == 'ICSE' ? 'selected' : '' }}>ICSE</option>
                     <option value="IGCSE" {{ $Student->board_of_study_XII_std == 'IGCSE' ? 'selected' : '' }}>IGCSE</option>
