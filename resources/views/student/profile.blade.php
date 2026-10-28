@@ -89,10 +89,10 @@
                             <div class="label-text">Mobile</div>
                             <div class="value-text">{{ auth()->user()->ph_no1 }}</div>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <div class="label-text">Email</div>
                             <div class="value-text">{{ auth()->user()->email }}</div>
-                        </div>
+                        </div> --}}
                         <div class="mb-3">
                             <div class="label-text">Address</div>
                             <div class="value-text">
