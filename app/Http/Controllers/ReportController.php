@@ -1782,7 +1782,7 @@ class ReportController extends Controller
 
         if ($request->filled('student_branch') || $request->filled('course') || $request->filled('hostel_dayscholar') || 
             $request->filled('coaching_type') || $request->filled('device') || $request->filled('status') || 
-            $request->filled('from_date') || $request->filled('to_date') || $request->filled('search')) {
+            $request->filled('from_date') || $request->filled('to_date') || $request->filled('student') || $request->filled('search')) {
             
             $students = Student::leftJoin('user_logs', function ($join) {
                     $join->on('student.student_id', '=', 'user_logs.user_id')
@@ -1824,7 +1824,7 @@ class ReportController extends Controller
                     $q->where('user_logs.created_at', '<=', $request->to_date);
                 })
                 ->when($request->filled('student'), function ($q) use ($request) {
-                    $q->where('student.student_id', $request->student);
+                    $q->where('user_logs.user_id', $request->student);
                 })
                 ->when($request->filled('search'), function ($q) use ($request) {
                     $search = $request->search;
