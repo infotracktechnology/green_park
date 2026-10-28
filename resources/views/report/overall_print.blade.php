@@ -18,8 +18,9 @@
 <body>
   <div class="container">
     <div style="text-align:center;">
-      <h3 style="margin:0;">GREEN PARK COACHING CENTRE, NAMAKKAL</h3>
-      <h4 style="margin:5px 0;color:#f40808;">{{ $test_name }}</h4>
+      {{-- <h3 style="margin:0;"></h3> --}}
+      <h2 style="margin:5px 0;color:#f40808;">OMR CHEAKING PRINT - {{ $test_name }}</h2>
+      <h3 style="margin-left: 600px;">Section - {{ $section }}</h3>
     </div>
 
     <table>
