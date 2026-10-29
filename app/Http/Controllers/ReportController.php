@@ -92,7 +92,7 @@ class ReportController extends Controller
                 ->get();
             $testIds = $answers->pluck('test_id')->unique();
             $key_correction = DB::table('key_corrections')->where('academic_year', $this->academic_year)->whereIn('testid', $testIds)->pluck('key_correction', 'testid');
-            return view('report.omr_print', compact('answers', 'test_name','key_correction'));
+            return view('report.omr_print', compact('answers', 'test_name','key_correction', 'section'));
         }
 
         return view('report.section_exam', compact('sections', 'test_name', 'category', 'exams'));
