@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>{{ $section }} - OMR PRINT</title>
+  <title>{{ $section }}_omr print</title>
   <style>
      body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; padding: 0; }
     .title { text-align: center; font-weight: bold; margin-bottom: 10px; }
