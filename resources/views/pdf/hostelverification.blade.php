@@ -277,7 +277,7 @@
                     <tr>
                         <td class="info-lbl">CLASS & SECTION</td>
                         <td class="info-colon">:</td>
-                        <td class="info-val">{{ $student->class_section ?? 'LONGTERM - RSH11' }}</td>
+                        <td class="info-val">{{ $student->section ?? 'LONGTERM - RSH11' }}</td>
                     </tr>
                     <tr>
                         <td class="info-lbl">BATCH</td>
