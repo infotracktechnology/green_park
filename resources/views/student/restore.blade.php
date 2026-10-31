@@ -52,6 +52,9 @@
                         <th>H/D</th>
                         <th>Section</th>
                         <th>Batch</th>
+                        <th>Father Name</th>
+                        <th>Father No</th>
+                        <th>Mother NO</th>
                         <th>Inactive Date & Time</th>
                         <th>Reason/Remarks</th>
                         <th>Reactive</th>
@@ -70,6 +73,9 @@
                         <td>{{$student->hostel_dayscholar}}</td>
                         <td>{{$student->section}}</td>
                         <td>{{$student->batch}}</td>
+                        <td>{{$student->father_name}}</td>
+                        <td>{{$student->father_ph_no}}</td>
+                        <td>{{$student->mother_ph_no}}</td>
                         <td>{{$student->deleted_at->format('d-m-Y h:i A')}}</td>
                         <td>{{$student->remarks}}</td>
                         <td>
@@ -108,9 +114,17 @@
 <script src="{{asset('bundles/datatables/datatables.min.js')}}"></script>
 <script src="{{asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
 <script>
-  const table = $('#myTable').DataTable({
-    // searching: false,
-    paging: false,
+    const table = $('#myTable').DataTable({
+    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+     "drawCallback": function () {
+        var api = this.api();
+
+        api.column(0, { search: 'applied', order: 'applied' })
+            .nodes()
+            .each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+    }
   });
 </script>
 @endsection
