@@ -93,18 +93,18 @@
         th {
             background-color: #f5cdb4;
             color: #000;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: bold;
             padding: 9px 5px;
             border: 1px solid black;
             text-align: center;
             vertical-align: middle;
-            line-height: 1.3;
+            line-height: 2;
         }
 
         td {
             text-align: center;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: bold;
             padding: 8px 6px;
             border: 1px solid #000000;
@@ -146,7 +146,7 @@
         }
 
         .chairman-text {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             margin-top: 2px;
         }
