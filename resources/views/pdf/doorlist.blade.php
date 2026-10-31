@@ -12,8 +12,9 @@
     }
 
      @page {
-      margin: 15px 30px 40px 30px !important;
-    }
+      size: legal;
+      margin: 15px 30px 40px 30px;
+      }
 
 
     h2,
@@ -33,12 +34,12 @@
     .table td {
       border: 1px solid #222;
       padding: 1px 3px;
-      font-size: 12px !important;
+      font-size: 14px !important;
     }
 
    th {
       background-color: #c2c7cc !important;
-      font-size: 14px !important;
+      font-size: 18px !important;
       padding: 5px !important;
     }
     
