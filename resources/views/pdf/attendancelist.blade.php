@@ -12,6 +12,7 @@
     }
 
     @page {
+      size: legal;
       margin: 15px 30px 40px 30px !important;
     }
 
@@ -30,7 +31,7 @@
     .table th,.table thead th,.table td {
       border: 1px solid #222;
       padding: 1px 3px;
-      font-size: 12px !important;
+      font-size: 14px !important;
     }
 
     th {
