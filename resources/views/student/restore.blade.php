@@ -54,7 +54,7 @@
                         <th>Batch</th>
                         <th>Father Name</th>
                         <th>Father No</th>
-                        <th>Mother NO</th>
+                        <th>Mother No</th>
                         <th>Inactive Date & Time</th>
                         <th>Reason/Remarks</th>
                         <th>Reactive</th>
