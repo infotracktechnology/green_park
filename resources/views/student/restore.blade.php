@@ -55,6 +55,7 @@
                         <th>Father Name</th>
                         <th>Father No</th>
                         <th>Mother No</th>
+                        <th>Student WP No</th>
                         <th>Inactive Date & Time</th>
                         <th>Reason/Remarks</th>
                         <th>Reactive</th>
@@ -76,6 +77,7 @@
                         <td>{{$student->father_name}}</td>
                         <td>{{$student->father_ph_no}}</td>
                         <td>{{$student->mother_ph_no}}</td>
+                        <td>{{$student->student_whatsapp_no}}</td>
                         <td>{{$student->deleted_at->format('d-m-Y h:i A')}}</td>
                         <td>{{$student->remarks}}</td>
                         <td>
