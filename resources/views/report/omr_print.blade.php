@@ -91,9 +91,12 @@
         </tr>
       </tbody>
     </table>
-    
+    @php
+        $testId = $answer->first()->test_id;
+        $studentKeyCorrection = $key_correction->get($testId);
+    @endphp
     @if($key_correction->isNotEmpty())
-      <p>Key Correction: Q.NO: {{ $key_correction->implode(', ') }}</p>
+      <p>Key Correction: Q.NO: {{ $studentKeyCorrection }}</p>
     @endif
 
     </div>
