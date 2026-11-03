@@ -10,9 +10,14 @@
     .table { border-collapse: collapse; width: 100%; }
     .table th, .table td { border: 1px solid #000; padding: 2px; text-align: center; }
     .page { page-break-after: always; }
-     @page {margin: 15px 30px 40px 30px !important;}
+     @page {margin: 0px 30px 20px 30px !important;}
     .bold { font-weight: bold; background: #f7f7f7; }
-    .header { display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px; }
+    .header { display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px; font-size: 16px; }
+    .size { font-size: 11px; }
+    .sub { font-size: 12px; }
+    .summary { font-size: 15px; font-weight: bold; }
+    .total { font-size: 18px; font-weight: bold; }
+    .key { font-size: 14px;}
   </style>
 </head>
 
@@ -38,9 +43,9 @@
         <tbody>
           @foreach($col as $a)
           <tr>
-            <td>{{ $a->q_no }}</td>
-            <td>{{ $a->answer_key ?? '-' }}</td>
-            <td>{{ $a->answer }}</td>
+            <td class="size">{{ $a->q_no }}</td>
+            <td class="size">{{ $a->answer_key ?? '-' }}</td>
+            <td class="size">{{ $a->answer }}</td>
             <td>
               @if($a->answer_key === 'DEL') DEL
               @elseif($a->mark == 4) C
@@ -79,21 +84,21 @@
         });
       @endphp
         @foreach($validAnswers->pluck('subject')->unique() as $sub)
-        <tr>
-            <td>{{ $sub }}</td>
-            <td>{{ $validAnswers->where('subject', $sub)->where('mark', 4)->count() }}</td>
-            <td>{{ $validAnswers->where('subject', $sub)->where('mark', -1)->count() }}</td>
-            <td>{{ $validAnswers->where('subject', $sub)->where('mark', 0)->count() }}</td>
-            <td>{{ $validAnswers->where('subject', $sub)->sum('mark') }}/{{ $validAnswers->where('subject', $sub)->count() * 4 }}
+        <tr class="bold">
+            <td class="sub">{{ $sub }}</td>
+            <td class="summary">{{ $validAnswers->where('subject', $sub)->where('mark', 4)->count() }}</td>
+            <td class="summary">{{ $validAnswers->where('subject', $sub)->where('mark', -1)->count() }}</td>
+            <td class="summary">{{ $validAnswers->where('subject', $sub)->where('mark', 0)->count() }}</td>
+            <td class="summary">{{ $validAnswers->where('subject', $sub)->sum('mark') }} / {{ $validAnswers->where('subject', $sub)->count() * 4 }}
             </td>
         </tr>
         @endforeach
         <tr class="bold">
           <td>Total</td>
-          <td>{{ $validAnswers->where('mark', 4)->count() }}</td>
-          <td>{{ $validAnswers->where('mark', -1)->count() }}</td>
-          <td>{{ $validAnswers->where('mark', 0)->count() }}</td>
-          <td>{{ $validAnswers->sum('mark') }} / {{ $validAnswers->count() * 4 }}</td>
+          <td class="summary">{{ $validAnswers->where('mark', 4)->count() }}</td>
+          <td class="summary">{{ $validAnswers->where('mark', -1)->count() }}</td>
+          <td class="summary">{{ $validAnswers->where('mark', 0)->count() }}</td>
+          <td class="total">{{ $validAnswers->sum('mark') }} / {{ $validAnswers->count() * 4 }}</td>
         </tr>
       </tbody>
     </table>
@@ -102,7 +107,7 @@
         $studentKeyCorrection = $key_correction->get($testId);
     @endphp
     @if($key_correction->isNotEmpty())
-      <p>Key Correction: Q.NO: {{ $studentKeyCorrection }}</p>
+      <p class="key">Key Correction: Q.NO: {{ $studentKeyCorrection }}</p>
     @endif
 
     </div>
