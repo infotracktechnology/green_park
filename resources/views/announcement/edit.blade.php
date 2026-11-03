@@ -142,7 +142,7 @@
                                         @foreach($announcement->attachment as $idx => $file)
                                             <div class="d-flex align-items-center justify-content-between bg-light rounded px-2 py-1 my-1" id="existing_file_{{ $idx }}">
                                                 <input type="hidden" name="existing_attachment[]" value="{{ $file }}">
-                                                <a href="{{ url($file) }}" target="_blank" class="text-truncate mr-2" style="max-width: 180px;">
+                                                <a href="{{ $file }}" target="_blank" class="text-truncate mr-2" style="max-width: 180px;">
                                                     <i class="fas fa-paperclip"></i> {{ basename($file) }}
                                                 </a>
                                                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="document.getElementById('existing_file_{{ $idx }}').remove();">
