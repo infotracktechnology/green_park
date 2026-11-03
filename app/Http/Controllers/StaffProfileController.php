@@ -331,7 +331,7 @@ class StaffProfileController extends Controller
             }
 
             $staffs = Staff::where('branch_id', $branchId)->get()->map(function ($staff) use ($date, $suffix) {
-                $logs = DB::connection('epushserver')->table("DeviceLogs_$suffix")->where('UserId', $staff->biometric_no)->whereDate('LogDate', $date)->selectRaw("TIME(LogDate) as log_time, LogDate")->get();
+                $logs = DB::connection('epushserver')->table("DeviceLogs_$suffix")->where('UserId', $staff->biometric_no)->whereDate('LogDate', $date)->selectRaw("TIME(LogDate) as log_time, LogDate")->orderBy('DeviceLogId', 'asc')->get();
 
                 $firstIn = $logs->first()?->log_time ?? '-';
                 $lastOut = $logs->count() > 1 ? $logs->last()->log_time : '-';
