@@ -197,7 +197,7 @@
       const isSingleSubject = {{ $isSingleSubject ? 'true' : 'false' }};
 
       const doc = new jsPDF({
-          orientation: subjectCount === 2 ? 'portrait' : 'landscape',
+          orientation: subjectCount <= 2 ? 'portrait' : 'landscape',
           unit: 'mm',
           format: 'a4'
       });
