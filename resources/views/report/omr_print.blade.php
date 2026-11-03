@@ -73,21 +73,27 @@
         </tr>
       </thead>
       <tbody>
-        @foreach($answer->pluck('subject')->unique() as $sub)
+      @php
+      $validAnswers = $answer->filter(function ($a) {
+        return $a->answer_key !== 'DEL';
+        });
+      @endphp
+        @foreach($validAnswers->pluck('subject')->unique() as $sub)
         <tr>
-          <td>{{ $sub }}</td>
-          <td>{{ $answer->where('subject', $sub)->where('mark', 4)->count() }}</td>
-          <td>{{ $answer->where('subject', $sub)->where('mark', -1)->count() }}</td>
-          <td>{{ $answer->where('subject', $sub)->where('mark', 0)->count() }}</td>
-          <td>{{ $answer->where('subject', $sub)->sum('mark') }}</td>
+            <td>{{ $sub }}</td>
+            <td>{{ $validAnswers->where('subject', $sub)->where('mark', 4)->count() }}</td>
+            <td>{{ $validAnswers->where('subject', $sub)->where('mark', -1)->count() }}</td>
+            <td>{{ $validAnswers->where('subject', $sub)->where('mark', 0)->count() }}</td>
+            <td>{{ $validAnswers->where('subject', $sub)->sum('mark') }}/{{ $validAnswers->where('subject', $sub)->count() * 4 }}
+            </td>
         </tr>
         @endforeach
         <tr class="bold">
           <td>Total</td>
-          <td>{{ $answer->where('mark', 4)->count() }}</td>
-          <td>{{ $answer->where('mark', -1)->count() }}</td>
-          <td>{{ $answer->where('mark', 0)->count() }}</td>
-          <td>{{ $answer->sum('mark') }} / {{ $answer->count() * 4 }}</td>
+          <td>{{ $validAnswers->where('mark', 4)->count() }}</td>
+          <td>{{ $validAnswers->where('mark', -1)->count() }}</td>
+          <td>{{ $validAnswers->where('mark', 0)->count() }}</td>
+          <td>{{ $validAnswers->sum('mark') }} / {{ $validAnswers->count() * 4 }}</td>
         </tr>
       </tbody>
     </table>
