@@ -7,7 +7,7 @@
 <?php
 $details = [
     'Personal Details' => 'student_id,user_name,password,admission_date,academic_year,campus,course,coaching_type,hostel_dayscholar,section,batch,student_name,gender,dob,father_name,father_ph_no,mother_name,mother_ph_no,admission_opted_for,ac_nonac,blood_group,age,aadhar_card_no,nationality,religion,community,caste,student_whatsapp_no,teams_id,teams_password,hostel_id,room_no,cots_no',
-    'Address Details' => 'door_no,street_name,city,state,pincode,parent_whatsapp_no,email',
+    'Address Details' => 'door_no,street_name,city,district,state,pincode,parent_whatsapp_no,email',
     'Parent Details' => 'father_qualification,father_occupation,father_designation,fathers_place_of_work,mother_qualification,mother_occupation,mother_annual_income,mother_designation,mother_place_of_work',
     'Academic Details' => 'board_of_study_X_std,school_name_X_std,district_name_school_X_std,total_marks_X_std,board_of_study_XII_std,school_name_XII_std,district_name_school_XII_std,total_marks_XII_std',
     'Mark Details' => 'S1,S1_max_marks,S1_obtained_mark,S2,S2_max_marks,S2_obtained_mark,S3,S3_max_marks,S3_obtained_mark,S4,S4_max_marks,S4_obtained_mark,total_marks',
