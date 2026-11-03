@@ -147,7 +147,7 @@
       <tr>
         <th style="width: 4%;" rowspan="2">S.NO</th>
         <th style="width: 24%;" rowspan="2" class="text-left" style="padding-left: 6px;">STUDENT NAME</th>
-        <th style="width: 5%;" rowspan="2">ROOM NO</th>
+        <th style="width: 5%;" rowspan="2">Section</th>
         <th style="width: 7%;" rowspan="2">COT NO</th>
         <th colspan="14" style="height: 16px; font-size: 9px; letter-spacing: 1px;">
           ATTENDANCE DATES
@@ -169,7 +169,7 @@
           <td class="text-left uppercase font-bold" style="padding-left: 6px;">
             {{ $student->student_name }}
           </td>
-          <td class="text-center">{{ $student->room_no }}</td>
+          <td class="text-center">{{ $student->section }}</td>
           <td class="text-center font-bold">{{ $student->cots_no }}</td>
 
           @for($col = 1; $col <= 14; $col++)
