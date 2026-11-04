@@ -77,7 +77,7 @@ class AnswerkeyController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
-                    $path = $file->storeAs('anwerkey', $fileName, 's3_commucication');
+                    $path = $file->storeAs('answerkey', $fileName, 's3_commucication');
                     $file_path[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
@@ -155,7 +155,7 @@ class AnswerkeyController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
-                   $path = $file->storeAs('anwerkey', $fileName, 's3_commucication');
+                   $path = $file->storeAs('answerkey', $fileName, 's3_commucication');
                     $attachments[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
