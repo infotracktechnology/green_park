@@ -11,6 +11,7 @@ use App\Models\Student;
 use App\Models\StudentLog;
 use App\Models\AcademicYear;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ExamPortionController extends Controller
 {
@@ -79,8 +80,8 @@ class ExamPortionController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
-                    $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/examportion/' . $fileName;
+                    $path = $file->storeAs('examportion', $fileName, 's3_commucication');
+                    $attachments[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
         }
@@ -156,8 +157,8 @@ class ExamPortionController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
-                    $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/examportion/' . $fileName;
+                    $path = $file->storeAs('examportion', $fileName, 's3_commucication');
+                    $attachments[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
         }
@@ -178,10 +179,16 @@ class ExamPortionController extends Controller
             foreach ($examportions as $examportion) {
                 if (!empty($examportion->attachment)) {
                     foreach ($examportion->attachment as $attachment) {
-                        if (file_exists($attachment)) {
-                            unlink($attachment);
-                        } elseif (file_exists($attachment)) {
-                            unlink($attachment);
+                        if (str_contains($attachment, 'amazonaws.com')) {
+                            $path = parse_url($attachment, PHP_URL_PATH);
+                            $s3Path = ltrim($path, '/');
+                            Storage::disk('s3_commucication')->delete($s3Path);
+                        } else {
+                            $filePath = public_path($attachment);
+
+                            if (file_exists($filePath)) {
+                                unlink($filePath);
+                            }
                         }
                     }
                 }

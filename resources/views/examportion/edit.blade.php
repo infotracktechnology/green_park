@@ -138,7 +138,7 @@
                       <storng>Current Attachment</storng>
                       @foreach ($examportion->attachment as  $file )
                         <div>
-                          <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                          <a href="{{ $file }}" target="_blank"> {{ basename($file) }} </a>
                         </div>
                       @endforeach
                     </div>
