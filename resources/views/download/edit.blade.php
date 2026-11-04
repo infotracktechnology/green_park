@@ -141,7 +141,7 @@
                     <small id="fileName">
                       @if($download->file_path)
                       @foreach ($download->file_path as $file)
-                       <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                       <a href="{{ $file }}" target="_blank"> {{ basename($file) }} </a>
                       @endforeach
                       @endif
                     </small>
