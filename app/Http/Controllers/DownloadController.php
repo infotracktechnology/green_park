@@ -8,6 +8,7 @@ use App\Models\Download;
 use App\Models\Student;
 use App\Models\AcademicYear;
 use App\Models\StudentLog;
+use Illuminate\Support\Facades\Storage;
 
 class DownloadController extends Controller
 {
@@ -77,8 +78,8 @@ class DownloadController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '_' . $originalName;
-                    $file->move($destinationPath, $fileName);
-                    $file_path[] = 'download/'.$fileName;
+                     $path = $file->storeAs('download', $fileName, 's3_commucication');
+                    $file_path[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
         }
@@ -155,8 +156,8 @@ class DownloadController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '_' . $originalName;
-                    $file->move($destinationPath, $fileName);
-                    $file_path[] = 'download/'.$fileName;
+                    $path = $file->storeAs('download', $fileName, 's3_commucication');
+                    $file_path[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
         }
@@ -177,10 +178,16 @@ class DownloadController extends Controller
             foreach ($downloads as $download) {
                 if (!empty($download->file_path)) {
                     foreach ($download->file_path as $file_path) {
-                        if (file_exists($file_path)) {
-                            unlink($file_path);
-                        } elseif (file_exists($file_path)) {
-                            unlink($file_path);
+                        if (str_contains($file_path, 'amazonaws.com')) {
+                            $path = parse_url($file_path, PHP_URL_PATH);
+                            $s3Path = ltrim($path, '/');
+                            Storage::disk('s3_commucication')->delete($s3Path);
+                        } else {
+                            $filePath = public_path($file_path);
+
+                            if (file_exists($filePath)) {
+                                unlink($filePath);
+                            }
                         }
                     }
                 }
