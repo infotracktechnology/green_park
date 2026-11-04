@@ -143,7 +143,7 @@
                     <small id="fileName">
                       @if($worksheet->file_path)
                       @foreach ($worksheet->file_path as $file)
-                       <a href="{{ url($file) }}" target="_blank"> {{ basename($file) }} </a>
+                       <a href="{{ $file }}" target="_blank"> {{ basename($file) }} </a>
                       @endforeach
                       @endif
                     </small>
