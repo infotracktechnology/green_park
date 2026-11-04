@@ -28,7 +28,7 @@
                         <td>
                           @if($examportion->attachment)
                            @foreach($examportion->attachment as $file)
-                                <a href="{{ url($file) }}" data-action="seen Exam Portions - {{ $examportion->id }}" target="_blank" class="btn btn-primary">
+                                <a href="{{ $file }}" data-action="seen Exam Portions - {{ $examportion->id }}" target="_blank" class="btn btn-primary">
                                     <i class="fas fa-file-download"></i> Download
                                 </a>
                             @endforeach
