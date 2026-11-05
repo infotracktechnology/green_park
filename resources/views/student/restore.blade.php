@@ -44,6 +44,7 @@
                   <table class="table table-striped table-sm" id="myTable">
                     <thead>
                       <tr role="row">
+                        <th>S.NO</th>
                         <th>Student ID</th>
                         <th>Student Name</th>
                         <th>Course</th>
@@ -66,6 +67,7 @@
                     <tbody>
                       @foreach ($students as $student)
                       <tr>
+                        <td>{{$loop->iteration}}</td>
                         <td>{{$student->student_id}}</td>
                         <td>{{$student->student_name}}</td>
                         <td>{{$student->course}}</td>
