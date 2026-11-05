@@ -80,7 +80,7 @@ class NeetAchievementController extends Controller
             $videoName = time() . '_' . $videoFile->getClientOriginalName();
             // $videoFile->move('neet_achievements', $videoName);
             // $data['video'] = 'neet_achievements/' . $videoName;
-            $path = $videoFile->storeAs('achievement', $videoName, 's3_commucication');
+            $path = $videoFile->storeAs('neetachievements', $videoName, 's3_commucication');
             $data['video'] = Storage::disk('s3_commucication')->url($path);
         }
 
@@ -91,7 +91,7 @@ class NeetAchievementController extends Controller
                 $imageName = time() . '_' . $image->getClientOriginalName();
                     // $image->move('neet_achievements', $imageName);
                     // $images[] = 'neet_achievements/' . $imageName;
-                    $path = $image->storeAs('achievement', $imageName, 's3_commucication');
+                    $path = $image->storeAs('neetachievements', $imageName, 's3_commucication');
                     $images[] = Storage::disk('s3_commucication')->url($path);
             }
             $data['images'] = $images;
@@ -102,7 +102,7 @@ class NeetAchievementController extends Controller
             $pdfName = time() . '_' . $pdfFile->getClientOriginalName();
             // $pdfFile->move('neet_achievements', $pdfName);
             // $data['pdf'] = 'neet_achievements/' . $pdfName;
-            $path = $pdfFile->storeAs('achievement', $pdfName, 's3_commucication');
+            $path = $pdfFile->storeAs('neetachievements', $pdfName, 's3_commucication');
             $data['pdf'] = Storage::disk('s3_commucication')->url($path);
         }
 
@@ -154,7 +154,7 @@ class NeetAchievementController extends Controller
         if ($request->hasFile('video')) {
             $videoFile = $request->file('video');
             $videoName = time() . '_' . $videoFile->getClientOriginalName();
-            $path = $videoFile->storeAs('achievement', $videoName, 's3_commucication');
+            $path = $videoFile->storeAs('neetachievements', $videoName, 's3_commucication');
             $data['video'] = Storage::disk('s3_commucication')->url($path);
         } elseif ($request->has('video')) {
             $data['video'] = $request->input('video') ?: null;
@@ -173,7 +173,7 @@ class NeetAchievementController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $imageName = time() . '_' . $image->getClientOriginalName();
-                $path = $image->storeAs('achievement', $imageName, 's3_commucication');
+                $path = $image->storeAs('neetachievements', $imageName, 's3_commucication');
                 $images[] = Storage::disk('s3_commucication')->url($path);
             }
         }
@@ -186,7 +186,7 @@ class NeetAchievementController extends Controller
         if ($request->hasFile('pdf')) {
             $pdfFile = $request->file('pdf');
             $pdfName = time() . '_' . $pdfFile->getClientOriginalName();
-            $path = $pdfFile->storeAs('achievement', $pdfName, 's3_commucication');
+            $path = $pdfFile->storeAs('neetachievements', $pdfName, 's3_commucication');
             $data['pdf'] = Storage::disk('s3_commucication')->url($path);
         } elseif ($request->has('pdf')) {
             $data['pdf'] = $request->input('pdf') ?: null;
