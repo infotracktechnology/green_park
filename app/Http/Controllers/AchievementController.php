@@ -7,6 +7,7 @@ use App\Models\Achievement;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\AcademicYear;
+use Illuminate\Support\Facades\Storage;
 
 class AchievementController extends Controller
 {
@@ -76,8 +77,10 @@ class AchievementController extends Controller
         if ($request->hasFile('video')) {
             $videoFile = $request->file('video');
             $videoName = time() . '_' . $videoFile->getClientOriginalName();
-            $videoFile->move('achievement', $videoName);
-            $data['video'] = 'achievement/' . $videoName;
+            // $videoFile->move('achievement', $videoName);
+            // $data['video'] = 'achievement/' . $videoName;
+            $path = $videoFile->storeAs('achievement', $videoName, 's3_commucication');
+            $data['video'] = Storage::disk('s3_commucication')->url($path);
         }
 
         // Image Upload
@@ -85,8 +88,10 @@ class AchievementController extends Controller
             $images = [];
             foreach ($request->file('images') as $image) {
                 $imageName = time() . '_' . $image->getClientOriginalName();
-                $image->move('achievement', $imageName);
-                $images[] = 'achievement/' . $imageName;
+                // $image->move('achievement', $imageName);
+                // $images[] = 'achievement/' . $imageName;
+                    $path = $image->storeAs('achievement', $imageName, 's3_commucication');
+                    $images[] = Storage::disk('s3_commucication')->url($path);
             }
             $data['images'] = $images;
         }
@@ -94,8 +99,10 @@ class AchievementController extends Controller
         if ($request->hasFile('pdf')) {
             $pdfFile = $request->file('pdf');
             $pdfName = time() . '_' . $pdfFile->getClientOriginalName();
-            $pdfFile->move('achievement', $pdfName);
-            $data['pdf'] = 'achievement/' . $pdfName;
+            // $pdfFile->move('achievement', $pdfName);
+            // $data['pdf'] = 'achievement/' . $pdfName;
+             $path = $pdfFile->storeAs('achievement', $pdfName, 's3_commucication');
+                $data['pdf'] = Storage::disk('s3_commucication')->url($path);
         }
 
         $achievement = Achievement::create($data);
@@ -146,8 +153,8 @@ class AchievementController extends Controller
         if ($request->hasFile('video')) {
             $videoFile = $request->file('video');
             $videoName = time() . '_' . $videoFile->getClientOriginalName();
-            $videoFile->move('achievement', $videoName);
-            $data['video'] = 'achievement/' . $videoName;
+            $path = $videoFile->storeAs('achievement', $videoName, 's3_commucication');
+            $data['video'] = Storage::disk('s3_commucication')->url($path);
         } elseif ($request->has('video')) {
             $data['video'] = $request->input('video') ?: null;
         }
@@ -165,8 +172,8 @@ class AchievementController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $imageName = time() . '_' . $image->getClientOriginalName();
-                $image->move('achievement', $imageName);
-                $images[] = 'achievement/' . $imageName;
+                $path = $image->storeAs('achievement', $imageName, 's3_commucication');
+                $images[] = Storage::disk('s3_commucication')->url($path);
             }
         }
         if (!empty($images)) {
@@ -178,8 +185,8 @@ class AchievementController extends Controller
         if ($request->hasFile('pdf')) {
             $pdfFile = $request->file('pdf');
             $pdfName = time() . '_' . $pdfFile->getClientOriginalName();
-            $pdfFile->move('achievement', $pdfName);
-            $data['pdf'] = 'achievement/' . $pdfName;
+            $path = $pdfFile->storeAs('achievement', $pdfName, 's3_commucication');
+            $data['pdf'] = Storage::disk('s3_commucication')->url($path);
         } elseif ($request->has('pdf')) {
             $data['pdf'] = $request->input('pdf') ?: null;
         }
@@ -200,20 +207,49 @@ class AchievementController extends Controller
 
     public function destroy(Request $request, $id = null)
     {
-        if($request->has('ids')) {
-        $achievements = Achievement::whereIn('id', $request->ids)->get();
-        foreach ($achievements as $achievement) {
-        if ($achievement->video && file_exists($achievement->video)) unlink($achievement->video);
-        if ($achievement->images) {
-            foreach (($achievement->images) as $img) {
-                if (file_exists($img)) unlink($img);
+        if ($request->has('ids')) {
+            $achievements = Achievement::whereIn('id', $request->ids)->get();
+            foreach ($achievements as $achievement) {
+                if ($achievement->video) {
+                    $file = $achievement->video;
+                    if (str_contains($file, 'amazonaws.com')) {
+                        $path = ltrim(rawurldecode(parse_url($file, PHP_URL_PATH) ?: ''), '/');
+                        Storage::disk('s3_commucication')->delete($path);
+                    } else {
+                        $localPath = public_path($file);
+                        if (file_exists($localPath)) {
+                            unlink($localPath);
+                        }
+                    }
+                }
+                if ($achievement->images) {
+                    foreach ($achievement->images as $img) {
+                        if (str_contains($img, 'amazonaws.com')) {
+                            $path = ltrim(rawurldecode(parse_url($img, PHP_URL_PATH) ?: ''), '/');
+                            Storage::disk('s3_commucication')->delete($path);
+                        } else {
+                            $localPath = public_path($img);
+                            if (file_exists($localPath)) {
+                                unlink($localPath);
+                            }
+                        }
+                    }
+                }
+                if ($achievement->pdf) {
+                    $file = $achievement->pdf;
+                    if (str_contains($file, 'amazonaws.com')) {
+                        $path = ltrim(rawurldecode(parse_url($file, PHP_URL_PATH) ?: ''), '/');
+                        Storage::disk('s3_commucication')->delete($path);
+                    } else {
+                        $localPath = public_path($file);
+                        if (file_exists($localPath)) {
+                            unlink($localPath);
+                        }
+                    }
+                }
+                $achievement->delete();
             }
         }
-        if ($achievement->pdf && file_exists($achievement->pdf)) unlink($achievement->pdf);
-        $achievement->delete();
-        }
-        }
-        
         return redirect()->back()->with('success', 'Achievement deleted successfully!');
     }
 }
