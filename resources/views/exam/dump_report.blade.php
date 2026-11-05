@@ -347,14 +347,14 @@
               cellWidth: subjectCount > 1
                   ? (hideCampus ? 60 : 58)
                   : (hideCampus ? 48 : 38),
-              halign: 'left'
+              halign: 'center'
           },
           4: { cellWidth: 8,  halign: 'center' }
       };
 
       let colIdx = 5;
       if (!hideCampus) {
-          colStyles[colIdx] = { cellWidth: 18, halign: 'left' };
+          colStyles[colIdx] = { cellWidth: 18, halign: 'center' };
           colIdx++;
       }
       colStyles[colIdx] = { cellWidth: 15, halign: 'center' };
@@ -408,7 +408,7 @@
               const raw = data.cell.raw;
 
               if (raw && (raw.isName || raw.isCampus)) {
-                  data.cell.styles.halign = 'left';
+                  data.cell.styles.halign = 'center';
               }
               if (raw && raw.isOmr) {
                   data.cell.styles.fillColor = [253, 224, 136];
