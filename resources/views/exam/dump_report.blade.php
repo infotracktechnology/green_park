@@ -407,8 +407,8 @@
 
               const raw = data.cell.raw;
 
-              if (raw && (raw.isName || raw.isCampus)) {
-                  data.cell.styles.halign = 'center';
+              if (raw && (raw.isName )) {
+                  data.cell.styles.halign = 'left';
               }
               if (raw && raw.isOmr) {
                   data.cell.styles.fillColor = [253, 224, 136];
