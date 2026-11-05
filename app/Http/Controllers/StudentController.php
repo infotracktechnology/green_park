@@ -21,6 +21,7 @@ use App\Models\Branch;
 use App\Models\Hostel;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -514,9 +515,8 @@ class StudentController extends Controller
             if ($request->hasFile('neet_file')) {
                 $file = $request->file('neet_file');
                 $filename = "scorecard-" . $student->student_id . "." . $file->getClientOriginalExtension();
-                $path = 'assets/neetscorecard/' . $filename;
-                $file->move('assets/neetscorecard', $filename);
-                $student->neet_file = $path;
+                $path = $file->storeAs('neetscorecard', $filename, 's3_commucication');
+                $student->neet_file = Storage::disk('s3_commucication')->url($path);
                 $student->neetappno = $request->neetappno;
                 $student->neetrollno = $request->neetrollno;
                 $student->neetcomm = $request->neetcomm;
