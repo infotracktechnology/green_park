@@ -185,7 +185,10 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
         formData.fields.add(MapEntry('students', filters.student));
       } else {
         formData.fields.add(MapEntry('gender', filters.gender.isNotEmpty ? filters.gender : 'All'));
-        formData.fields.add(MapEntry('section', filters.section));
+        final secVal = filters.sections.isNotEmpty
+            ? filters.sections.join(',')
+            : (filters.sectionOptions.isNotEmpty ? filters.sectionOptions.join(',') : 'All');
+        formData.fields.add(MapEntry('section', secVal));
       }
 
       formData.fields.add(MapEntry('title', title));
@@ -649,48 +652,51 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
                               labelStyle: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: filters.section.isEmpty
+                                color: filters.sections.isEmpty
                                     ? Colors.white
                                     : AppColors.textPrimary,
                               ),
-                              selected: filters.section.isEmpty,
+                              selected: filters.sections.isEmpty,
                               selectedColor: AppColors.primary,
                               backgroundColor: const Color(0xFFF8FAFC),
                               side: BorderSide(
-                                color: filters.section.isEmpty
+                                color: filters.sections.isEmpty
                                     ? AppColors.primary
                                     : AppColors.border,
                               ),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
-                              onSelected: (_) => filters.setSection(''),
+                              onSelected: (_) => filters.selectAllSections(),
                             ),
                           ),
                           ...filters.sectionOptions.map(
-                            (sec) => Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: ChoiceChip(
-                                label: Text(sec),
-                                labelStyle: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: filters.section == sec
-                                      ? Colors.white
-                                      : AppColors.textPrimary,
+                            (sec) {
+                              final isSelected = filters.sections.contains(sec);
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: ChoiceChip(
+                                  label: Text(sec),
+                                  labelStyle: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppColors.textPrimary,
+                                  ),
+                                  selected: isSelected,
+                                  selectedColor: AppColors.primary,
+                                  backgroundColor: const Color(0xFFF8FAFC),
+                                  side: BorderSide(
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : AppColors.border,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  onSelected: (_) => filters.toggleSection(sec),
                                 ),
-                                selected: filters.section == sec,
-                                selectedColor: AppColors.primary,
-                                backgroundColor: const Color(0xFFF8FAFC),
-                                side: BorderSide(
-                                  color: filters.section == sec
-                                      ? AppColors.primary
-                                      : AppColors.border,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20)),
-                                onSelected: (_) => filters.setSection(sec),
-                              ),
-                            ),
+                              );
+                            },
                           ),
                         ],
                       ),

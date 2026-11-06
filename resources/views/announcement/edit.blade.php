@@ -105,11 +105,13 @@
 
                    <div class="form-group col-lg-2">
                     <label>Section</label>
+                    @php
+                      $selectedSections = explode(',', $announcement->section ?? '');
+                    @endphp
                     <select name="section[]" id="section" class="form-control form-control-sm select2" multiple>
-                    <option value="">Select Section</option>
-                    <option value="{{ implode(',', $section)}}" @selected(implode(',', $section) == $announcement->section)>All</option>
+                    <option value="{{ implode(',', $section)}}" @selected(implode(',', $section) == $announcement->section || in_array('All', $selectedSections))>All</option>
                     @foreach ($section as $row)
-                      <option value="{{$row}}" @selected($row == $announcement->section)>{{$row}}</option>
+                      <option value="{{$row}}" @selected(in_array($row, $selectedSections))>{{$row}}</option>
                     @endforeach
                     </select>
                   </div>

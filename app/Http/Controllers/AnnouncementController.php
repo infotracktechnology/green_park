@@ -46,6 +46,7 @@ class AnnouncementController extends Controller
         return redirect()->route('announcement.index');
     }
 
+
     public function store(Request $request, FcmServiceProvider $fcm)
     {
         $data = $request->except(['_token', '_method', 'existing_attachment']);
@@ -117,9 +118,10 @@ class AnnouncementController extends Controller
     {
         $type = Student::StudentFilterQuery($announcement->branch, $announcement->course, null, null, null)->select('coaching_type')->distinct()->get()->pluck('coaching_type')->toArray();
 
-        $section = Student::StudentFilterQuery($announcement->branch, $announcement->course, $announcement->type, $announcement->category, $announcement->batch, $announcement->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
+        $coachingType = $announcement->coaching_type ?? $announcement->type;
+        $section = Student::StudentFilterQuery($announcement->branch, $announcement->course, $coachingType, $announcement->category, $announcement->batch, $announcement->gender)->select('section')->distinct()->orderBy('section')->get()->pluck('section')->toArray();
 
-        $students = Student::StudentFilterQuery($announcement->branch, $announcement->course, $announcement->type, null, null)->get()->pluck('student_name', 'student_id')->toArray();
+        $students = Student::StudentFilterQuery($announcement->branch, $announcement->course, $coachingType, null, null)->get()->pluck('student_name', 'student_id')->toArray();
 
         if ($request->wantsJson()) {
             return response()->json(['status' => true, 'announcement' => $announcement, 'type' => $type, 'section' => $section, 'students' => $students]);

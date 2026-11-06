@@ -18,6 +18,7 @@ class AnnouncementFilterProvider with ChangeNotifier {
   List<String> _batch = [];
   String _gender = 'All';
   String _section = '';
+  List<String> _sections = [];
   String _student = '';
 
   // Dynamic Options
@@ -47,6 +48,7 @@ class AnnouncementFilterProvider with ChangeNotifier {
   List<String> get batch => _batch;
   String get gender => _gender;
   String get section => _section;
+  List<String> get sections => _sections;
   String get student => _student;
 
   List<BranchItem> get availableBranches {
@@ -182,7 +184,16 @@ class AnnouncementFilterProvider with ChangeNotifier {
       _gender = data['gender'].toString();
     }
     if (data['section'] != null) {
-      _section = data['section'].toString();
+      final secVal = data['section'].toString().trim();
+      _section = secVal;
+      if (secVal.isEmpty || secVal.toLowerCase() == 'all') {
+        _sections = [];
+      } else {
+        _sections = secVal.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+      }
+    } else {
+      _section = '';
+      _sections = [];
     }
     if (data['students'] != null) {
       _student = data['students'].toString();
@@ -299,6 +310,29 @@ class AnnouncementFilterProvider with ChangeNotifier {
 
   void setSection(String sec) {
     _section = sec;
+    if (sec.isEmpty || sec.toLowerCase() == 'all') {
+      _sections = [];
+    } else {
+      _sections = [sec];
+    }
+    if (_usertype == 'INDIVIDUAL') fetchStudents();
+    notifyListeners();
+  }
+
+  void toggleSection(String sec) {
+    if (_sections.contains(sec)) {
+      _sections.remove(sec);
+    } else {
+      _sections.add(sec);
+    }
+    _section = _sections.join(',');
+    if (_usertype == 'INDIVIDUAL') fetchStudents();
+    notifyListeners();
+  }
+
+  void selectAllSections() {
+    _sections.clear();
+    _section = '';
     if (_usertype == 'INDIVIDUAL') fetchStudents();
     notifyListeners();
   }
@@ -356,7 +390,10 @@ class AnnouncementFilterProvider with ChangeNotifier {
     if (!_showGender) _gender = '';
     if (!_showCategory) _category = [];
     if (!_showBatch) _batch = [];
-    if (!_showSection && _usertype != 'INDIVIDUAL') _section = '';
+    if (!_showSection && _usertype != 'INDIVIDUAL') {
+      _section = '';
+      _sections = [];
+    }
   }
 
   // Fetch Coaching Types (Matching JS branch.change / fetchData)
@@ -464,6 +501,7 @@ class AnnouncementFilterProvider with ChangeNotifier {
     _batch = [];
     _gender = 'All';
     _section = '';
+    _sections = [];
     _student = '';
     _availableCoachingTypes = _master?.coachingTypes != null
         ? List<String>.from(_master!.coachingTypes)

@@ -467,6 +467,7 @@
     
     gender.change(updateSections);
     batch.change(updateSections);
+    category.change(updateSections);
     
     window.onload = updateVisibility;
   </script>

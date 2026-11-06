@@ -52,7 +52,14 @@ public static function ForStudent(Student $student)
                             }
                             $q->where('batch', 'like', "%{$student->batch}%");
                         }
-                        $q->whereRaw("FIND_IN_SET(?, section)", [$student->section]);
+                        if (!empty($student->section)) {
+                            $q->where(function ($sq) use ($student) {
+                                $sq->whereRaw("FIND_IN_SET(?, section)", [$student->section])
+                                   ->orWhere('section', 'All')
+                                   ->orWhereNull('section')
+                                   ->orWhere('section', '');
+                            });
+                        }
                     })->whereIn('gender', [$student->gender, 'All']);
             });
         })
@@ -89,7 +96,10 @@ public function StudentList()
         ->whereIn('coaching_type', $coachingTypes);
 
     if (in_array('OFFLINE', $coachingTypes)) {
-        $query->whereIn('section', $sections);
+        $validSections = array_filter($sections, fn($s) => $s !== '' && $s !== null);
+        if (!empty($validSections) && !in_array('All', $validSections)) {
+            $query->whereIn('section', $validSections);
+        }
         if (in_array($this->course, ['NEET', 'JEE'])) {
             if (array_intersect([1, 4, 5], $branches)) {
                 $query->whereIn('hostel_dayscholar', $category);
