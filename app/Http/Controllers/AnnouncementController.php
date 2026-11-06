@@ -13,6 +13,7 @@ use App\Http\Controllers\HomeController;
 use App\Jobs\SendAnnouncementNotification;
 use Illuminate\Support\Facades\Log;
 use App\Models\StudentLog;
+use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
@@ -86,8 +87,8 @@ class AnnouncementController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
-                    $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/attachments/' . $fileName;
+                    $path = $file->storeAs('announcement', $fileName, 's3_commucication');
+                    $attachments[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
         }
@@ -181,8 +182,8 @@ class AnnouncementController extends Controller
                 if ($file && $file->isValid()) {
                     $originalName = $file->getClientOriginalName();
                     $fileName = time() . '-' . uniqid() . '-' . $originalName;
-                    $file->move($destinationPath, $fileName);
-                    $attachments[] = 'assets/attachments/' . $fileName;
+                    $path = $file->storeAs('announcement', $fileName, 's3_commucication');
+                    $attachments[] = Storage::disk('s3_commucication')->url($path);
                 }
             }
         }
@@ -217,9 +218,15 @@ class AnnouncementController extends Controller
                         $attachments = is_array($announcement->attachment) ? $announcement->attachment : json_decode($announcement->attachment, true);
                         if (is_array($attachments)) {
                             foreach ($attachments as $attachment) {
-                                $filePath = public_path($attachment);
-                                if (file_exists($filePath)) {
-                                    unlink($filePath);
+                                if (str_contains($attachment, 'amazonaws.com')) {
+                                    $path = parse_url($attachment, PHP_URL_PATH);
+                                    $s3Path = ltrim($path, '/');
+                                    Storage::disk('s3_commucication')->delete($s3Path);
+                                } else {
+                                    $filePath = public_path($attachment);
+                                    if (file_exists($filePath)) {
+                                        unlink($filePath);
+                                    }
                                 }
                             }
                         }

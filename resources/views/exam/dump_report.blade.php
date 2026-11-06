@@ -197,7 +197,7 @@
       const isSingleSubject = {{ $isSingleSubject ? 'true' : 'false' }};
 
       const doc = new jsPDF({
-          orientation: subjectCount === 2 ? 'portrait' : 'landscape',
+          orientation: subjectCount <= 2 ? 'portrait' : 'landscape',
           unit: 'mm',
           format: 'a4'
       });
@@ -347,14 +347,14 @@
               cellWidth: subjectCount > 1
                   ? (hideCampus ? 60 : 58)
                   : (hideCampus ? 48 : 38),
-              halign: 'left'
+              halign: 'center'
           },
           4: { cellWidth: 8,  halign: 'center' }
       };
 
       let colIdx = 5;
       if (!hideCampus) {
-          colStyles[colIdx] = { cellWidth: 18, halign: 'left' };
+          colStyles[colIdx] = { cellWidth: 18, halign: 'center' };
           colIdx++;
       }
       colStyles[colIdx] = { cellWidth: 15, halign: 'center' };
@@ -407,7 +407,7 @@
 
               const raw = data.cell.raw;
 
-              if (raw && (raw.isName || raw.isCampus)) {
+              if (raw && (raw.isName )) {
                   data.cell.styles.halign = 'left';
               }
               if (raw && raw.isOmr) {

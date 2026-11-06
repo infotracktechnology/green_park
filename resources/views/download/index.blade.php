@@ -79,7 +79,7 @@
                           <td>
                             @if($download->file_path)
                             @foreach($download->file_path as $file)
-                            <a href="{{ env('APP_URL').'/'.$file }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
+                            <a href="{{ $file }}" class="btn btn-primary" target="_blank"><i class="fas fa-download"></i></a>
                             @endforeach
                             @endif
                           </td>

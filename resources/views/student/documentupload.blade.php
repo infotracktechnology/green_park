@@ -93,7 +93,7 @@
                           <td>{{ $loop->iteration }}</td>
                           <td>{{ $doc->document_name }}</td>
                           <td>
-                            <a href="{{ env('APP_URL').$doc->file }}" class="btn btn-primary text-white" download>
+                            <a href="{{ 'https://gp-studentupload.s3.ap-south-1.amazonaws.com/'.$doc->file }}" class="btn btn-primary text-white" download>
                               <i class="fas fa-download"></i>
                             </a>
                           </td>
@@ -108,7 +108,7 @@
                             </form>
                           </td> --}}
                           <td>
-                              <a href="{{ asset($doc->file) }}" target="_blank" class="btn btn-primary text-white">
+                              <a href="{{ 'https://gp-studentupload.s3.ap-south-1.amazonaws.com/'.$doc->file }}" target="_blank" class="btn btn-primary text-white">
                               <i class="fas fa-eye"></i>
                               </a>
                           </td>

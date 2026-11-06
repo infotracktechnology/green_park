@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Models\Student;
+use Illuminate\Support\Facades\Storage;
 
 class NeetScorecardController extends Controller
 {
@@ -18,13 +19,16 @@ class NeetScorecardController extends Controller
 
             $student = Student::where('student_id', $request->student_id)->first();
             if ($student) {
-                if ($student->neet_file && file_exists(base_path($student->neet_file))) {
-                    unlink(base_path($student->neet_file));
+
+            if ($student->neet_file) {
+                $path = $student->neet_file;
+                if (str_contains($path, 'amazonaws.com')) {
+                    $path = ltrim(rawurldecode(parse_url($path, PHP_URL_PATH) ?: ''), '/');
                 }
-                $student->update([
-                    'neet_file' => null,
-                ]);
+                Storage::disk('s3_commucication')->delete($path);
+                $student->update(['neet_file' => null,]);
             }
+        }
 
             return redirect()->route('neetscorecard.index')
                 ->with('success', 'Student can now upload the NEET scorecard again.');

@@ -44,16 +44,24 @@ return [
             'throw' => false,
         ],
 
-        's3' => [
+        's3_commucication' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
+            'region' => env('AWS_DEFAULT_REGION', 'ap-south-1'),
+            'bucket' => env('AWS_BUCKET_ANNOUNCEMENT', 'gp-commucication'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
+            'throw' => true,
+        ],
+
+        's3_studentupload' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'ap-south-1'),
+            'bucket' => env('AWS_BUCKET_STUDENTUPLOAD', 'gp-studentupload'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => true,
         ],
 
     ],

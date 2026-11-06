@@ -113,7 +113,7 @@
 
                                         @if($student->neet_file)
                                             <div class="mt-2">
-                                                <a href="{{ url($student->neet_file) }}" target="_blank" class="btn btn-sm">
+                                                <a href="{{ $student->neet_file }}" target="_blank" class="btn btn-sm">
                                                     <i class="fas fa-eye"></i> View Uploaded Scorecard
                                                 </a>
                                             </div>

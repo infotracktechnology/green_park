@@ -1152,7 +1152,7 @@ class ReportController extends Controller
         }
         return response()->json(['status' => true,'subjects' => $subjects ]);
     } 
-       public function SubjectRangeReport(Request $request)
+    public function SubjectRangeReport(Request $request)
     {
         $test_name = $request->test_name;
 
@@ -1164,35 +1164,72 @@ class ReportController extends Controller
         if (!$exam) {
             return back()->with('error', 'Exam not found.');
         }
+        $subjects = collect(explode(',', $exam->subject_name))
+            ->map(fn($subject) => trim($subject))
+            ->filter()
+            ->unique()
+            ->values();
 
-        $validQuestions = DB::table('exam_answer')->where('testname', $test_name)->where('academic_year', $this->academic_year)->where(function ($query) {
-                $query->whereNull('answer_key')->orWhere('answer_key', '!=', 'DEL');
-            })
-            ->select('q_no')
-            ->distinct()
-            ->pluck('q_no');
+        $hasSubject = fn($subject) => $subjects->contains($subject);
 
-        $calcTotal = function ($start, $end) use ($validQuestions) {
-            if ($start === null || $end === null) return 0;
-            return $validQuestions->filter(fn($q) => $q >= $start && $q <= $end)->count() * 4;
-        };
+        $subjectTotals = DB::table('exam_answer')
+    ->where('test_id', $exam->testid)
+    ->where('academic_year', $this->academic_year)
+    ->where(function ($query) {
+        $query->whereNull('answer_key')
+              ->orWhere('answer_key', '!=', 'DEL');
+    })
+    ->whereNotNull('mark')
+    ->selectRaw('subject, COUNT(DISTINCT q_no) * 4 AS total')
+    ->groupBy('subject')
+    ->pluck('total', 'subject');
 
-        $physicsTotal   = $calcTotal($exam->phy_start, $exam->phy_end);
-        $chemistryTotal = $calcTotal($exam->chem_start, $exam->chem_end);
-        $botanyTotal    = $calcTotal($exam->bot_start, $exam->bot_end);
-        $zoologyTotal   = $calcTotal($exam->zoo_start, $exam->zoo_end);
-        $biologyTotal   = $calcTotal($exam->bio_start, $exam->bio_end);
+        $physicsTotal = $hasSubject('Physics')
+    ? ($subjectTotals['PHYSICS'] ?? 0)
+    : 0;
+
+$chemistryTotal = $hasSubject('Chemistry')
+    ? ($subjectTotals['CHEMISTRY'] ?? 0)
+    : 0;
+
+$botanyTotal = $hasSubject('Botany')
+    ? ($subjectTotals['BOTANY'] ?? 0)
+    : 0;
+
+$zoologyTotal = $hasSubject('Zoology')
+    ? ($subjectTotals['ZOOLOGY'] ?? 0)
+    : 0;
+
+$biologyTotal = $hasSubject('Biology')
+    ? ($subjectTotals['BIOLOGY'] ?? 0)
+    : 0;
+
+
         
         $overallTotal   = $physicsTotal + $chemistryTotal + $botanyTotal + $zoologyTotal + $biologyTotal;
 
-        $makeCondition = fn($start, $end) => ($start !== null && $end !== null) ? "ea.q_no BETWEEN {$start} AND {$end}" : "1 = 0";
+        $makeCondition = fn($subject) =>
+    "ea.subject = '{$subject}'";
 
-        $phyCond  = $makeCondition($exam->phy_start, $exam->phy_end);
-        $chemCond = $makeCondition($exam->chem_start, $exam->chem_end);
-        $botCond  = $makeCondition($exam->bot_start, $exam->bot_end);
-        $zooCond  = $makeCondition($exam->zoo_start, $exam->zoo_end);
-        $bioCond  = $makeCondition($exam->bio_start, $exam->bio_end);
+        $phyCond = $hasSubject('Physics')
+            ? $makeCondition('PHYSICS')
+            : "1 = 0";
 
+        $chemCond = $hasSubject('Chemistry')
+            ? $makeCondition('CHEMISTRY')
+            : "1 = 0";
+
+        $botCond = $hasSubject('Botany')
+            ? $makeCondition('BOTANY')
+            : "1 = 0";
+
+        $zooCond = $hasSubject('Zoology')
+            ? $makeCondition('ZOOLOGY')
+            : "1 = 0";
+
+        $bioCond = $hasSubject('Biology')
+            ? $makeCondition('BIOLOGY')
+            : "1 = 0";
         $students = DB::table('exam_answer as ea')->join('student as s', 's.student_id', '=', 'ea.student_id')->where('ea.testname', $test_name)->where('ea.academic_year', $this->academic_year)->where(function ($query) {
                 $query->whereNull('ea.answer_key')->orWhere('ea.answer_key', '!=', 'DEL');
             })
