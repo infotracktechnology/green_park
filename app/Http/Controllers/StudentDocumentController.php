@@ -27,11 +27,11 @@ class StudentDocumentController extends Controller
         if ($request->hasFile('document_file')) {
             $file = $request->file('document_file');
             $fileName = $studentId.'_'.$request->document_name.'.'.$file->getClientOriginalExtension();
-            $file->move('uploads/documents', $fileName);
+            $path = $file->storeAs('uploads/documents', $fileName, 's3_studentupload');
             Document::create([
                 'student_id' => $studentId,
                 'document_name' => $request->document_name,
-                'file' => 'uploads/documents/'.$fileName,
+                'file' => 'uploads/documents/'.$path,
             ]);
         }
 

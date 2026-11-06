@@ -8,7 +8,7 @@ use App\Models\{Student, Chairmanvideo, Announcement, Examportion, RevisionVideo
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Collection;
 use App\Providers\UserLogServiceProvider;
-
+use Illuminate\Support\Facades\Storage;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -323,11 +323,11 @@ Route::group(['prefix' => 'v2'], function () {
         if ($request->hasFile('document_file')) {
             $file = $request->file('document_file');
             $fileName = $studentId . '_' . $request->document_name . '.' . $file->getClientOriginalExtension();
-            $file->move('uploads/documents', $fileName);
+            $path = $file->storeAs('uploads/documents', $fileName, 's3_studentupload');
             Document::create([
                 'student_id' => $studentId,
                 'document_name' => $request->document_name,
-                'file' => 'uploads/documents/' . $fileName,
+                'file' => 'uploads/documents/' . $path,
             ]);
         }
         return response()->json(['message' => 'Document uploaded successfully.']);
@@ -447,9 +447,10 @@ Route::group(['prefix' => 'v2'], function () {
         if ($request->hasFile('neet_file')) {
             $file = $request->file('neet_file');
             $fileName = "scorecard-" . $student->student_id . "." . $file->getClientOriginalExtension();
-            $file->move('assets/neetscorecard', $fileName);
+            $path = $file->storeAs('neetscorecard', $fileName, 's3_commucication');
+            $student->neet_file = Storage::disk('s3_commucication')->url($path);
             $student->update([
-                'neet_file'   => 'assets/neetscorecard/' . $fileName,
+                'neet_file'   => $student->neet_file,
                 'neetappno'   => $request->neetappno,
                 'neetrollno'  => $request->neetrollno,
                 'neetcomm'    => $request->neetcomm,
