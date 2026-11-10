@@ -59,10 +59,11 @@
                       @endforeach
                     </select>
                   </div>
-                  
+
                   <div class="form-group col-lg-2">
                     <button type="submit" class="btn btn-primary btn-block">Filter</button>
                   </div>
+                  
                 </div>
               </form>
 
