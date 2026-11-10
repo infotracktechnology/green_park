@@ -66,6 +66,7 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
         Route::get('import/student', 'index')->name('import.student');
         Route::post('import/upload/student', 'upload')->name('import.student.upload');
         Route::match(['get', 'post'], 'import/studentupdate', 'StudentUpdate')->name('import.studentupdate');
+        Route::match(['get', 'post'],'import/hostelarrival','HostelArrivalUpload')->name('import.hostelarrival');
     });
     Route::get('export/student', [ExportController::class, 'student_export'])->name('export.student');
 
@@ -274,6 +275,8 @@ Route::prefix('student')->middleware('auth:student')->group(function () {
         Route::match(['get', 'post'], 'neetdocument', 'NeetDocument')->name('student.neetdocument');
         Route::match(['get', 'post'], 'neetscorecard', 'NeetScorecard')->name('student.neetscorecard');
         Route::get('studentdownload', 'StudentDownload')->name('student.studentdownload');
+        Route::get('hostel-arrival-details','hostelArrivalDetails')->name('student.hostel-arrival-details');
+        Route::get('hostel-arrival-details/download','hostelArrivalDetailsDownload')->name('student.hostel-arrival-details.download');
         Route::get('courierentry', 'CourierEntry')->name('student.courierentry');
         Route::get('inoutregister', 'InOutRegister')->name('student.inoutregister');
         Route::get('contact', 'Contact')->name('student.contact');

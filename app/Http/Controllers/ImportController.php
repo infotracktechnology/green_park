@@ -137,4 +137,95 @@ class ImportController extends Controller
             }
         }
     }
+    public function HostelArrivalUpload(Request $request)
+    {
+        if ($request->isMethod('get')) {
+            return view('import.hostelarrival');
+        }
+
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
+        ]);
+
+        $filePath = $request->file('csv_file')->getRealPath();
+        $data = $this->parseCSV($filePath);
+
+        if (empty($data)) {
+            return back()->with('error', 'No data found in CSV.');
+        }
+
+        $table = 'hostel_arrival_detials';
+
+        $allowedColumns = [
+            'student_id', 'admission_date', 'academic_year',
+            'campus', 'course', 'section', 'batch',
+            'coaching_type', 'hostel_dayscholar', 'student_name',
+            'initial', 'roll_no', 'neetmark', 'gender',
+            'father_name', 'father_ph_no', 'mother_name',
+            'mother_ph_no', 'ac_nonac', 'door_no',
+            'street_name', 'permanent_address', 'city',
+            'district', 'state', 'pincode',
+            'board_of_study_x_std', 'board_of_study_xii_std',
+            'hostel_id', 'room_no', 'cots_no', 'allocation_date',
+        ];
+
+        $inserted = 0;
+        $skipped = 0;
+        $processedIds = [];
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($data as $row) {
+                $row = array_change_key_case($row, CASE_LOWER);
+                $record = [];
+
+                foreach ($allowedColumns as $column) {
+                    if (array_key_exists($column, $row)) {
+                        $value = trim((string) $row[$column]);
+                        $record[$column] = $value === '' ? null : $value;
+                    }
+                }
+
+                if (empty($record['student_id'])) {
+                    $skipped++;
+                    continue;
+                }
+
+                $studentId = $record['student_id'];
+
+                if (isset($processedIds[$studentId])) {
+                    $skipped++;
+                    continue;
+                }
+                $processedIds[$studentId] = true;
+                if (DB::table($table)->where('student_id', $studentId)->exists()) {
+                    $skipped++;
+                    continue;
+                }
+
+                foreach (['admission_date', 'allocation_date'] as $dateColumn) {
+                    if (!empty($record[$dateColumn])) {
+                        $record[$dateColumn] = $this->parseDate($record[$dateColumn]);
+
+                        if (!$record[$dateColumn]) {
+                            throw new \Exception("Invalid {$dateColumn} for student {$studentId}");
+                        }
+                    }
+                }
+                $record['created_at'] = now();
+                $record['updated_at'] = now();
+                DB::table($table)->insert($record);
+                $inserted++;
+            }
+            DB::commit();
+            return back()->with('success', "Import completed. Inserted: {$inserted}, Skipped: {$skipped}");
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Hostel arrival CSV import failed', ['message' => $e->getMessage()]);
+
+            return back()->with('error', 'CSV import failed. Check the CSV format and database columns.');
+        }
+    }
 }
