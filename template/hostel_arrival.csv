@@ -1,0 +1,2 @@
+student_id,admission_date,academic_year,course,section,batch,coaching_type,hostel_dayscholar,student_name,gender,father_name,father_ph_no,mother_name,mother_ph_no,ac_nonac,door_no,street_name,city,district,state,pincode,board_of_study_X_std,board_of_study_XII_std,hostel_id,room_no,cots_no,allocation_date
+STU26001,2026-06-01,2026-2027,NEET,A,2026-A,OFFLINE,HOSTEL,Arun Kumar,Male,Ramesh Kumar,9876543210,Lakshmi,9876501234,AC,12,Gandhi Street,Pollachi,Coimbatore,Tamil Nadu,642001,CBSE,CBSE,1,101,1,2026-06-01
