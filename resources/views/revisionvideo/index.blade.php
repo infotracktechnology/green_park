@@ -50,6 +50,16 @@
                       @endforeach
                     </select>
                   </div>
+
+                  <div class="form-group col-lg-3">
+                    <select name="course" class="select2" required>
+                      <option value="">Select Course</option>
+                      @foreach ($course as $row)
+                      <option value="{{$row}}" @selected(request('course')==$row)>{{$row}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  
                   <div class="form-group col-lg-2">
                     <button type="submit" class="btn btn-primary btn-block">Filter</button>
                   </div>
