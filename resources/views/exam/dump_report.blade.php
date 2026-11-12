@@ -90,6 +90,10 @@
                       <button type="button" class="btn btn-primary m-b-20" id="exportpdf">
                         <i class="fa fa-download"></i> Export to PDF
                       </button>
+
+                      <button type="button" class="btn btn-success m-b-20" id="exportexcel">
+                          <i class="fa fa-file-excel"></i> Export to Excel
+                      </button>
                     </div>
 
                     <div class="col-lg-12">
@@ -115,7 +119,11 @@
                                 <th rowspan="2">SEC</th>
                               @endif
                               @foreach ($subjects as $subject)
-                                <th colspan="4">{{ $subject }}</th>
+                                @if(!$subjectCount)
+                                  <th colspan="4">{{ $subject }}</th>
+                                @else
+                                  <th colspan="3">{{ $subject }}</th>
+                              @endif
                               @endforeach
                               <th rowspan="2">Total <br> {{ $totalMarks }}</th>
                             </tr>
@@ -124,7 +132,9 @@
                                 <th>R</th>
                                 <th>W</th>
                                 <th>L</th>
+                                @if(!$subjectCount)
                                 <th>TOT</th>
+                                @endif
                               @endforeach
                             </tr>
                           </thead>
@@ -160,7 +170,9 @@
                                   <td>{{ $mark->r ?? 0 }}</td>
                                   <td>{{ $mark->w ?? 0 }}</td>
                                   <td>{{ $mark->l ?? 0 }}</td>
+                                   @if(!$subjectCount)
                                   <td>{{ $mark->tot ?? 0 }}</td>
+                                  @endif
                                 @endforeach
                                 <td>{{ $result->mark ?? 0 }}</td>
                               </tr>
@@ -187,6 +199,7 @@
 <script src="{{ asset('bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 @if(!empty($test_name) && count($results) > 0)
 <script>
@@ -440,6 +453,27 @@
       e.preventDefault();
       exportTable();
   });
+
+  $('#exportexcel').click(function (e) {
+    e.preventDefault();
+    const table = document.getElementById('export');
+    if (!table) {
+        alert('No data available');
+        return;
+    }
+    const workbook = XLSX.utils.table_to_book(table, {
+        sheet: 'Dump Report'
+    });
+    const worksheet = workbook.Sheets['Dump Report'];
+    const range = XLSX.utils.decode_range(worksheet['!ref']);
+    worksheet['!cols'] = [];
+    for (let i = 0; i <= range.e.c; i++) {
+        worksheet['!cols'].push({ wch: 15 });
+    }
+    const testName = @json($test_name ?? 'Dump_Report');
+    const fileName = testName.replace(/[\\/:*?"<>|]/g, '_');
+    XLSX.writeFile(workbook, fileName + '_Dump_Report.xlsx');
+});
 </script>
 @endif
 @endsection
