@@ -472,7 +472,7 @@
     }
     const testName = @json($test_name ?? 'Dump_Report');
     const fileName = testName.replace(/[\\/:*?"<>|]/g, '_');
-    XLSX.writeFile(workbook, fileName + '_Dump_Report.xlsx');
+    XLSX.writeFile(workbook, fileName + '_Chairman\'s Report.xlsx');
 });
 </script>
 @endif
