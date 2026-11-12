@@ -1135,19 +1135,19 @@ class ReportController extends Controller
             return response()->json(['status' => false,'subjects' => [] ]);
         }
         $subjects = [];
-        if ($exam->phy_start !== null && $exam->phy_end !== null) {
+        if ($exam->physics_questions !== null ) {
             $subjects[] = 'physics';
         }
-        if ($exam->chem_start !== null && $exam->chem_end !== null) {
+        if ($exam->chemistry_questions !== null ) {
             $subjects[] = 'chemistry';
         }
-        if ($exam->bot_start !== null && $exam->bot_end !== null) {
+        if ($exam->botany_questions !== null ) {
             $subjects[] = 'botany';
         }
-        if ($exam->zoo_start !== null && $exam->zoo_end !== null) {
+        if ($exam->zoology_questions !== null ) {
             $subjects[] = 'zoology';
         }
-        if ($exam->bio_start !== null && $exam->bio_end !== null) {
+        if ($exam->biology_questions !== null ) {
             $subjects[] = 'biology';
         }
         return response()->json(['status' => true,'subjects' => $subjects ]);
