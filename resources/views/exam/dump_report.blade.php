@@ -119,7 +119,7 @@
                                 <th rowspan="2">SEC</th>
                               @endif
                               @foreach ($subjects as $subject)
-                                @if(!$subjectCount)
+                                @if(!$isSingleSubject)
                                   <th colspan="4">{{ $subject }}</th>
                                 @else
                                   <th colspan="3">{{ $subject }}</th>
@@ -132,7 +132,7 @@
                                 <th>R</th>
                                 <th>W</th>
                                 <th>L</th>
-                                @if(!$subjectCount)
+                                @if(!$isSingleSubject)
                                 <th>TOT</th>
                                 @endif
                               @endforeach
@@ -170,7 +170,7 @@
                                   <td>{{ $mark->r ?? 0 }}</td>
                                   <td>{{ $mark->w ?? 0 }}</td>
                                   <td>{{ $mark->l ?? 0 }}</td>
-                                   @if(!$subjectCount)
+                                   @if(!$isSingleSubject)
                                   <td>{{ $mark->tot ?? 0 }}</td>
                                   @endif
                                 @endforeach
