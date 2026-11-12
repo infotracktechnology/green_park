@@ -10,7 +10,7 @@
 
         body {
             font-family: 'DejaVu Sans', Arial, sans-serif;
-            font-size: 11px;
+            /* font-size: 11px; */
             color: #111;
             margin: 0;
             padding: 0;
@@ -19,25 +19,26 @@
         .banner-container {
             width: 100%;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 2px;
         }
 
         .banner-container img {
-            width: 100%;
-            height: auto;
+            width: 70%;
+            height: 90px;
+            object-fit: fill;
             display: block;
         }
 
         .report-heading {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .report-main-title {
             color: #cc0000;
             font-size: 14px;
             font-weight: bold;
-            margin: 0 0 4px 0;
+            margin: 0 0 2px 0;
             text-transform: uppercase;
         }
 
@@ -53,7 +54,7 @@
             width: 100%;
             border-collapse: collapse;
             border: none;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .grid-table td {
@@ -117,7 +118,7 @@
         .data-table tbody td {
             color: #164282;
             font-weight: bold;
-            font-size: 10.5px;
+            font-size: 11.5px;
         }
 
         .sno-col {
@@ -134,7 +135,7 @@
 
         .footer-table {
             width: 100%;
-            margin-top: 25px;
+            /* margin-top: 5px; */
             border-collapse: collapse;
             border: none;
         }
@@ -147,10 +148,10 @@
         }
 
         .sign-text {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
             color: #000;
-            margin-top: 4px;
+            margin-top: 1px;
         }
     </style>
 </head>
@@ -364,7 +365,7 @@
     <table class="footer-table">
        <tr>
             <td style="width: 70%;"></td>
-            <td style="width: 30%; padding: 20px; text-align: center;">
+            <td style="width: 30%; padding-top: 2px; text-align: center;">
                 <img class="chairman-logo" src="data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/chairman_sign.jpeg'))) }}" style="width: 80px;">
                 <div class="chairman-text">CHAIRMAN</div>
             </td>   
