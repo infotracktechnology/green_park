@@ -694,7 +694,10 @@ class ReportController extends Controller
         section,
         COUNT(*) as total,
         b.id,
-        concat(gender,'-',hostel_dayscholar) gender,
+        CASE
+            WHEN b.id = 4 THEN CONCAT(gender, '-HOSTEL')
+            ELSE CONCAT(gender, '-', hostel_dayscholar)
+        END AS gender,
 
         SUM(ac_nonac='AC') as ac,
         SUM(ac_nonac='NON AC') as nonac,
@@ -712,7 +715,9 @@ class ReportController extends Controller
     ->where('b.id', $branch)
     ->where('course', $course)
     ->groupBy('section', 'coaching_type')
-    ->orderBy('hostel_dayscholar')
+    ->when((int) $branch !== 4, function ($query) {
+        $query->orderBy('hostel_dayscholar');
+    })
     ->orderByRaw("FIELD(gender, 'Male', 'Female')")
     ->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")
     ->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")
