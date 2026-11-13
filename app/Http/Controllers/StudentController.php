@@ -278,27 +278,34 @@ class StudentController extends Controller
                 ->get()
                 ->map(function ($test) use ($batch, $type, $course) {
 
-                    // Markrange check
-                    $markrange = null;
+                // Decode markrange_file JSON
+                $markrangeData = $test->markrange_file;
 
-                    if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
-                        $markrange = $test->markrange_file[$batch] ?? null;
-                    } else {
-                        $markrange = $test->markrange_file['online'] ?? null;
-                    }
+                if (is_string($markrangeData)) {
+                    $markrangeData = json_decode($markrangeData, true);
+                }
 
-                    return [
-                        'exam_date'  => $test->exam_date,
-                        'name'       => $test->name,
-                        'test_id'    => $test->test_id,
-                        'mark'       => $test->mark,
-                        'total'      => $test->total,
-                        'first_mark' => $test->first_mark ?? 0,
-                        'markrange'  => $markrange
-                    ];
-                });
+                $markrangeData = is_array($markrangeData) ? $markrangeData : [];
 
+                // Markrange check
+                if ($type === "OFFLINE" && in_array($course, ["NEET", "JEE"])) {
+                    $markrange = $markrangeData[$batch] ?? null;
+                } else {
+                    $markrange = $markrangeData['online'] ?? null;
+                }
 
+                return [
+                    'exam_date'  => $test->exam_date,
+                    'name'       => $test->name,
+                    'test_id'    => $test->test_id,
+                    'mark'       => $test->mark,
+                    'total'      => $test->total,
+                    'first_mark' => $test->first_mark ?? 0,
+                    'markrange'  => $markrange
+                ];
+            });
+
+            
         // 2. Category list
         $category = ExamSubjectReport::where('stuid', $sid)
             ->where('category', '!=', '')
