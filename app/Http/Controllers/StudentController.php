@@ -258,38 +258,46 @@ class StudentController extends Controller
         $type   = auth()->user()->coaching_type;
         $course = auth()->user()->course;
 
-        // 1. Fetch only 5 exams for this student
-        $exams = Exam::from("exam as b")
-            ->join('exam_answer as a', 'a.testname', '=', 'b.name')
-            ->where('a.student_id', $sid)
-            ->where('b.publish', 'Yes')
-            ->selectRaw("b.exam_date, b.name, a.test_id, SUM(a.mark) as mark, (COUNT(a.mark) * 4) as total, b.markrange_file")
-            ->groupBy('a.test_id', 'b.name', 'b.exam_date', 'b.markrange_file')
-            ->orderBy('b.exam_date', 'desc')
-            ->limit(5)
-            ->get()
-            ->map(function ($test) use ($batch, $type, $course) {
 
-                // Markrange check
-                $markrange = null;
-                if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
-                    $markrange = $test->markrange_file[$batch] ?? null;
-                } else {
-                    $markrange = $test->markrange_file['online'] ?? null;
-                }
+            // 1. Fetch latest 5 exams from examsubjectreport
+            $exams = ExamSubjectReport::from('examsubjectreport as esr')
+                ->leftJoin('exam as b', 'b.name', '=', 'esr.subject')
+                ->where('esr.stuid', $sid)
+                ->where('b.publish', 'Yes')
+                ->select([
+                    'esr.exdate as exam_date',
+                    'esr.subject as name',
+                    'esr.testid as test_id',
+                    'esr.nettot as mark',
+                    'esr.totmark as total',
+                    'b.first_mark',
+                    'b.markrange_file'
+                ])
+                ->orderByRaw("STR_TO_DATE(esr.exdate, '%d-%m-%Y') DESC")
+                ->limit(5)
+                ->get()
+                ->map(function ($test) use ($batch, $type, $course) {
 
-                $first_mark = Exam::where('name', $test->name)->value('first_mark');       
+                    // Markrange check
+                    $markrange = null;
 
-                return [
-                    'exam_date'  => $test->exam_date,
-                    'name'       => $test->name,
-                    'test_id'    => $test->test_id,
-                    'mark'       => $test->mark,
-                    'total'      => $test->total,
-                    'first_mark' => $first_mark ?? 0,
-                    'markrange'  => $markrange
-                ];
-            });
+                    if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
+                        $markrange = $test->markrange_file[$batch] ?? null;
+                    } else {
+                        $markrange = $test->markrange_file['online'] ?? null;
+                    }
+
+                    return [
+                        'exam_date'  => $test->exam_date,
+                        'name'       => $test->name,
+                        'test_id'    => $test->test_id,
+                        'mark'       => $test->mark,
+                        'total'      => $test->total,
+                        'first_mark' => $test->first_mark ?? 0,
+                        'markrange'  => $markrange
+                    ];
+                });
+
 
         // 2. Category list
         $category = ExamSubjectReport::where('stuid', $sid)
@@ -335,12 +343,45 @@ class StudentController extends Controller
         return view('student.marksheet', compact('exams', 'subjectexam', 'category'));
     }
 
-    function mark_subject(Request $request, $testid)
-    {
-        $sid = auth()->user()->student_id;
-        $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(mark)*4)total,subject")->where('test_id', $testid)->where('student_id', $sid)->groupBy('subject')->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")->get();
-        return view('student.mark_subject', compact('subjects'));
-    }
+    public function mark_subject(Request $request, $testid)
+        {
+            $sid = auth()->user()->student_id;
+            $exam = ExamSubjectReport::where('testid', $testid)->where('stuid', $sid)->first();
+
+            if (!$exam) {
+                return back()->with('error', 'Exam details not found.');
+            }
+            $subjects = collect();
+            $subjectColumns = ['BIOLOGY' => ['r'   => 'bio_r', 'w'   => 'bio_w', 'l'   => 'bio_l', 'tot' => 'bio_tot',],
+                'PHYSICS' => ['r'   => 'phy_r', 'w'   => 'phy_w', 'l'   => 'phy_l', 'tot' => 'phy_tot',],
+                'CHEMISTRY' => ['r'   => 'che_r', 'w'   => 'che_w', 'l'   => 'che_l', 'tot' => 'che_tot',],
+                'BOTANY' => [ 'r'   => 'bot_r', 'w'   => 'bot_w', 'l'   => 'bot_l', 'tot' => 'bot_tot',],
+                'ZOOLOGY' => ['r'   => 'zoo_r', 'w'   => 'zoo_w', 'l'   => 'zoo_l', 'tot' => 'zoo_tot',],
+            ];
+
+            foreach ($subjectColumns as $subject => $cols) {
+
+                $right = (int) $exam->{$cols['r']};
+                $wrong = (int) $exam->{$cols['w']};
+                $left  = (int) $exam->{$cols['l']};
+
+                $attempted = $right + $wrong + $left;
+
+                if ($attempted > 0) {
+                    $subjects->push((object) [
+                        'subject' => $subject,
+                        'r'       => $right,
+                        'w'       => $wrong,
+                        'l'       => $left,
+                        'tot'     => (int) $exam->{$cols['tot']},
+                        'total'   => $attempted * 4,
+                    ]);
+                }
+            }
+
+            return view('student.mark_subject', compact('subjects'));
+        }
+
     function mark_download(Request $request, $name)
     {
         $sid = auth()->user()->student_id;
