@@ -109,33 +109,43 @@ Route::group(['prefix' => 'v2'], function () {
         $type   = $student->coaching_type;
         $course = $student->course;
 
-        $results = Exam::from("exam as b")
-            ->join('exam_answer as a', 'a.testname', '=', 'b.name')
-            ->where('a.student_id', $sid)
-            ->where('b.publish', 'Yes')
-            ->selectRaw("b.exam_date, b.name, a.test_id, SUM(a.mark) as mark, (COUNT(a.mark) * 4) as total, b.markrange_file")
-            ->groupBy('a.test_id', 'b.name', 'b.exam_date', 'b.markrange_file', 'b.id')
-            ->orderBy('b.id', 'desc')
-            ->get()
-            ->map(function ($test) use ($batch, $type, $course) {
-                if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
-                    $markrange = $test->markrange_file[$batch] ?? null;
-                } else {
-                    $markrange = $test->markrange_file['online'] ?? null;
-                }
+        $results = ExamSubjectReport::from('examsubjectreport as esr')
+                ->leftJoin('exam as b', 'b.name', '=', 'esr.subject')
+                ->where('esr.stuid', $sid)
+                ->where('b.publish', 'Yes')
+                ->select([
+                    'esr.exdate as exam_date',
+                    'esr.subject as name',
+                    'esr.testid as test_id',
+                    'esr.nettot as mark',
+                    'esr.totmark as total',
+                    'b.first_mark',
+                    'b.markrange_file'
+                ])
+                ->orderByRaw("STR_TO_DATE(esr.exdate, '%d-%m-%Y') DESC")
+                ->limit(5)
+                ->get()
+                ->map(function ($test) use ($batch, $type, $course) {
 
-                $first_mark = Exam::where('name', $test->name)->value('first_mark');
+                    // Markrange check
+                    $markrange = null;
 
-                return [
-                    'exam_date'  => $test->exam_date,
-                    'name'       => $test->name,
-                    'test_id'    => $test->test_id,
-                    'mark'       => $test->mark,
-                    'total'      => $test->total,
-                    'first_mark' => $first_mark ?? 0,
-                    'markrange'  => $markrange
-                ];
-            });
+                    if ($type === "OFFLINE" && ($course === "NEET" || $course === "JEE")) {
+                        $markrange = $test->markrange_file[$batch] ?? null;
+                    } else {
+                        $markrange = $test->markrange_file['online'] ?? null;
+                    }
+
+                    return [
+                        'exam_date'  => $test->exam_date,
+                        'name'       => $test->name,
+                        'test_id'    => $test->test_id,
+                        'mark'       => $test->mark,
+                        'total'      => $test->total,
+                        'first_mark' => $test->first_mark ?? 0,
+                        'markrange'  => $markrange
+                    ];
+                });
 
         $testgroup = ExamSubjectReport::where('stuid', $student_id)
             ->where('category', '!=', '')
@@ -212,16 +222,84 @@ Route::group(['prefix' => 'v2'], function () {
         ]);
     });
 
-    Route::get('/mark_subject/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
-        $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject")
-            ->where('test_id', $testid)
-            ->where('student_id', $student_id)
-            ->groupBy('subject')
-            ->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")
-            ->get();
+    // Route::get('/mark_subject/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
+    //     $subjects = ExamAnswer::selectRaw("sum(mark=4)r,sum(mark=-1)w,sum(mark=0)l,sum(mark)tot,(count(q_no)*4)total,subject")
+    //         ->where('test_id', $testid)
+    //         ->where('student_id', $student_id)
+    //         ->groupBy('subject')
+    //         ->orderByRaw("FIELD(subject, 'Physics', 'Chemistry', 'Botany', 'Zoology')")
+    //         ->get();
 
-        return response()->json($subjects);
-    });
+    //     return response()->json($subjects);
+    // });
+
+
+Route::get('/mark_subject/{student_id}/{testid}', function (Request $request, $student_id, $testid) {
+
+    $report = ExamSubjectReport::where('stuid', $student_id)
+        ->where('testid', $testid)
+        ->first();
+
+    if (!$report) {
+        return response()->json([]);
+    }
+
+    $columns = [
+        'Physics' => [
+            'r' => 'phy_r',
+            'w' => 'phy_w',
+            'l' => 'phy_l',
+            'tot' => 'phy_tot'
+        ],
+        'Chemistry' => [
+            'r' => 'che_r',
+            'w' => 'che_w',
+            'l' => 'che_l',
+            'tot' => 'che_tot'
+        ],
+        'Botany' => [
+            'r' => 'bot_r',
+            'w' => 'bot_w',
+            'l' => 'bot_l',
+            'tot' => 'bot_tot'
+        ],
+        'Zoology' => [
+            'r' => 'zoo_r',
+            'w' => 'zoo_w',
+            'l' => 'zoo_l',
+            'tot' => 'zoo_tot'
+        ],
+        'Biology' => [
+            'r' => 'bio_r',
+            'w' => 'bio_w',
+            'l' => 'bio_l',
+            'tot' => 'bio_tot'
+        ]
+    ];
+
+    $subjects = collect();
+
+    foreach ($columns as $subject => $col) {
+
+        $right = (int) $report->{$col['r']};
+        $wrong = (int) $report->{$col['w']};
+        $left = (int) $report->{$col['l']};
+
+        if (($right + $wrong + $left) > 0) {
+            $subjects->push([
+                'subject' => $subject,
+                'r' => $right,
+                'w' => $wrong,
+                'l' => $left,
+                'tot' => (int) $report->{$col['tot']},
+                'total' => ($right + $wrong + $left) * 4
+            ]);
+        }
+    }
+
+    return response()->json($subjects->values());
+
+});
 
     Route::get('/questionkey/{student_id}', function (Request $request, $student_id) {
         $student = Student::where('student_id', $student_id)->first();
