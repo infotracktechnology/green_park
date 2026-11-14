@@ -503,6 +503,13 @@ class ExamController extends Controller
                 $testname = $answer['test_name'] ?? $exam->name;
                 $uniqueTests[$testId] = $testname;
 
+                $examDate = $answer['examdate'] ?? $answer['exdate'] ?? null;
+                $formattedDate = $examDate ? \Carbon\Carbon::createFromFormat('d/m/Y', trim($examDate))->format('Y-m-d') : $exam->exam_date;
+                DB::table('answer_key_upload_details')->updateOrInsert(
+                    ['academic_year' => $this->academic_year, 'test_id' => $testId,], 
+                    ['test_name' => $testname, 'exdate' => $formattedDate, 'qtype' => $answer['qtype'] ?? null, 'qorder' => $answer['qorder'] ?? null, 'updated_at' => now(),]
+                );
+
                 $this->insertMissingAnswers($testId,$testname, $exam);
 
 
