@@ -1033,11 +1033,32 @@ class ReportController extends Controller
 
         $expr = collect($subjects)->map(fn($s) => "SUM(IF(subject='$s' AND mark=4,1,0)) AS `{$s}_CORRECT`,SUM(IF(subject='$s' AND mark=-1,1,0)) AS `{$s}_WRONG`,SUM(IF(subject='$s' AND mark=0,1,0)) AS `{$s}_UNATTEMPTED`,SUM(IF(subject='$s',mark,0)) AS `{$s}_MARK`")->implode(',');
 
-        $answers = ExamAnswer::where('testname', $request->test_name)->selectRaw("student_id,mode,SUM(IF(mark=4,1,0)) AS overall_correct,SUM(IF(mark=-1,1,0)) AS overall_wrong,SUM(IF(mark=0,1,0)) AS overall_unattempted,COUNT(*) AS overall_total,SUM(mark) AS total,$expr")->groupBy('student_id')->orderByDesc('total')->get();
+        $answers = ExamAnswer::from('exam_answer as ea')
+            ->leftJoin('answer_key_upload_details as ak', function ($join) use ($request) {
+                $join->on('ak.test_id', '=', 'ea.test_id')
+                    ->where('ak.test_name', '=', $request->test_name);
+            })
+            ->where('ea.testname', $request->test_name)
+            ->selectRaw("
+                ea.student_id,
+                ea.mode,
+                SUM(IF(ea.mark=4,1,0)) AS overall_correct,
+                SUM(IF(ea.mark=-1,1,0)) AS overall_wrong,
+                SUM(IF(ea.mark=0,1,0)) AS overall_unattempted,
+                COUNT(*) AS overall_total,
+                SUM(ea.mark) AS total,
+                ea.test_id,
+                MAX(ak.qtype) AS question_type,
+                MAX(ak.qorder) AS question_order,
+                $expr
+            ")
+            ->groupBy('ea.student_id', 'ea.test_id', 'ea.mode')
+            ->orderByDesc('total')
+            ->get();
 
 
 
-        $csvHeaders = ['SID', 'MODE', 'STUDENT NAME', 'CAMPUS','GENDER','CTYPE','OVERALL CORRECT', 'OVERALL WRONG', 'OVERALL UNATTEMPTED', 'OVERALL TOTAL'];
+        $csvHeaders = ['SID', 'MODE', 'STUDENT NAME', 'CAMPUS','GENDER','CTYPE', 'SEC', 'BATCH', 'TESTID', 'QUESTION TYPE', 'QUESTION ORDER', 'TOTAL QUESTIONS', 'EXAM DATE', 'NET TOTAL'];
 
         foreach ($subjects as $s) {
             $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total"]);
@@ -1045,7 +1066,7 @@ class ReportController extends Controller
 
         $csvData = [['Title', 'Subject Wise Marks'], ['Exam Name', $exam->name], [], $csvHeaders];
         foreach ($answers as $a) {
-            $row = [$a->student_id, $a->mode, $a->student?->student_name, $a->student?->branch?->name,$a->student?->gender, $a->student?->coaching_type,$a->overall_correct, $a->overall_wrong, $a->overall_unattempted, $a->total];
+            $row = [$a->student_id, $a->mode, $a->student?->student_name, $a->student?->branch?->name,$a->student?->gender, $a->student?->coaching_type,$a->student?->section,$a->student?->batch,$a->test_id,$a->question_type, $a->question_order,$exam->total_questions, $exam->exam_date,$a->total];
             foreach ($subjects as $s) {
                 $row = array_merge($row, [$a->{"{$s}_CORRECT"} ?? 0, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $a->{"{$s}_MARK"} ?? 0]);
             }
