@@ -504,7 +504,7 @@ class ExamController extends Controller
                 $uniqueTests[$testId] = $testname;
 
                 $examDate = $answer['examdate'] ?? $answer['exdate'] ?? null;
-                $formattedDate = $examDate ? \Carbon\Carbon::createFromFormat('d/m/Y', trim($examDate))->format('Y-m-d') : $exam->exam_date;
+                $formattedDate = $examDate ? \Carbon\Carbon::createFromFormat('d-m-y', trim($examDate))->format('Y-m-d') : $exam->exam_date;
                 DB::table('answer_key_upload_details')->updateOrInsert(
                     ['academic_year' => $this->academic_year, 'test_id' => $testId,], 
                     ['test_name' => $testname, 'exdate' => $formattedDate, 'qtype' => $answer['qtype'] ?? null, 'qorder' => $answer['qorder'] ?? null, 'updated_at' => now(),]
