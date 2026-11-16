@@ -9,6 +9,7 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 
 class Student extends Authenticatable
@@ -41,7 +42,10 @@ class Student extends Authenticatable
     protected function photo(): Attribute
     {
         return Attribute::make(
-            get: fn() => file_exists(base_path("assets/profilepic/{$this->student_id}.jpg")) ? asset("profilepic/{$this->student_id}.jpg") : asset('img/avather.png'),
+            get: function () {
+                $path = "profilepic/{$this->student_id}.jpg";
+                return Storage::disk('s3_studentupload')->exists($path) ? Storage::disk('s3_studentupload')->url($path) : asset('img/avather.png');
+            }
         );
     }
 
