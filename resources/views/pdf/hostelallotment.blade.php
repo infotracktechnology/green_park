@@ -274,7 +274,7 @@
         <tr>
             <td class="lbl-col">AC/NONAC</td>
             <td class="colon-col">:</td>
-            <td class="val-col">{{ $student->AC_NON_AC ?? 'NON AC' }}</td>
+            <td class="val-col">{{ $student->ac_nonac ?? '-' }}</td>
         </tr>
         <tr>
             <td class="lbl-col">DATE OF ARRIVAL</td>
