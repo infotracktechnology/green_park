@@ -26,9 +26,35 @@ class HolidayController extends Controller
     public function create(Request $request)
     {
         if ($request->has('branch')) {
-            $section = Student::whereIn('campus', explode(',', $request->branch))->where('section', '!=', '')->whereNotNull('section')->select('section')->distinct()->get();
+            $branches = is_array($request->branch)
+                ? array_filter($request->branch)
+                : array_filter(explode(',', (string) $request->branch));
+
+            $genders = is_array($request->gender)
+                ? array_filter($request->gender)
+                : array_filter(explode(',', (string) $request->gender));
+
+            $hostels = is_array($request->hostel)
+                ? array_filter($request->hostel)
+                : array_filter(explode(',', (string) $request->hostel));
+
+            $section = Student::whereIn('campus', $branches)
+                ->when(!empty($genders), function ($query) use ($genders) {
+                    $query->whereIn('gender', $genders);
+                })
+                ->when(!empty($hostels), function ($query) use ($hostels) {
+                    $query->whereIn('hostel_dayscholar', $hostels);
+                })
+                ->whereNotNull('section')
+                ->where('section', '!=', '')
+                ->select('section')
+                ->distinct()
+                ->orderBy('section')
+                ->get();
+
             return response()->json($section);
         }
+
         return view('holiday.create');
     }
 
@@ -70,17 +96,28 @@ class HolidayController extends Controller
             $data['branch_id'] = implode(',', $request->branch_id);
         }
 
+        if ($request->has('hostel')) {
+            $data['hostel'] = implode(',', $request->hostel);
+        }
+
+        if ($request->has('gender')) {
+            $data['gender'] = implode(',', $request->gender);
+        }
+
         Holiday::create($data);
         return redirect()->route('holiday.index')->with('success', 'Holiday added successfully!');
     }
 
 
-    public function edit(Holiday $holiday)
+  public function edit(Holiday $holiday)
     {
-        $section_ids = explode(',', $holiday->section);
-        $branch_ids = explode(',', $holiday->branch_id);
-        $sections = Student::where('gender', $holiday->gender)->whereIn('campus', $branch_ids)->where('hostel_dayscholar', $holiday->hostel)->select('section')->distinct()->get();
-        return view('holiday.edit', compact('holiday', 'section_ids', 'sections', 'branch_ids'));
+        $section_ids = array_filter(explode(',', $holiday->section));
+        $branch_ids = array_filter(explode(',', $holiday->branch_id));
+        $genders = array_filter(explode(',', $holiday->gender));
+        $hostels = array_filter(explode(',', $holiday->hostel));
+        $sections = Student::whereIn('gender', $genders)->whereIn('campus', $branch_ids)->whereIn('hostel_dayscholar', $hostels)->whereNotNull('section')->where('section', '!=', '')->select('section')->distinct()->orderBy('section')->get();
+
+        return view('holiday.edit', compact('holiday', 'section_ids', 'sections', 'branch_ids', 'genders', 'hostels'));
     }
 
     public function update(Request $request, Holiday $holiday)
@@ -104,6 +141,14 @@ class HolidayController extends Controller
 
         if ($request->has('branch_id')) {
             $data['branch_id'] = implode(',', $request->branch_id);
+        }
+
+        if ($request->has('hostel')) {
+            $data['hostel'] = implode(',', $request->hostel);
+        }
+
+        if ($request->has('gender')) {
+            $data['gender'] = implode(',', $request->gender);
         }
 
         $holiday->update($data);
