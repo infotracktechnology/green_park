@@ -161,8 +161,9 @@ class ClassVideoController extends Controller
     {
         return view('classvideo.upload');
     }
-    public function upload(Request $request)
+    public function upload(Request $request,ImportController $import)
     {
+    try {
         $data = $request->except('file', '_token');
         $classVideos = [];
 
@@ -170,17 +171,13 @@ class ClassVideoController extends Controller
             $data[$field] = isset($data[$field]) ? implode(',', $data[$field]) : null;
         }
         $file = $request->file('file');
-        $csvData = array_map('str_getcsv', file($file->getRealPath()));
+        $csvData = $import->parseCSV($file->getRealPath());
 
         if (empty($csvData)) {
             return back()->with('error', 'CSV file is empty.');
         }
-
-        $header = array_map('trim', array_shift($csvData));
-
-        foreach ($csvData as $row) {
-            $row = array_map('trim', $row);
-            $record = array_combine($header, $row);
+          
+        foreach ($csvData as $record) {
             if (empty($record['subject']) || empty($record['video_id'])) {
                 return back()->with('error', 'Subject and Video ID fields are required.');
             }
@@ -198,6 +195,9 @@ class ClassVideoController extends Controller
 
         ClassVideo::insert($classVideos);
         return redirect()->route('classvideo.index')->with('success', 'Class videos uploaded successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', "Upload Failed: " . $e->getMessage());
+        }
     }
 
     public function schedule(Request $request)
