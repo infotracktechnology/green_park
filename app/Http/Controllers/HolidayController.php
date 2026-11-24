@@ -163,7 +163,7 @@ class HolidayController extends Controller
         return redirect()->route('holiday.index')->with('success', 'Holiday deleted successfully!');
     }
 
-    public function attendance(Request $request)
+public function attendance(Request $request)
     {
         $user = auth()->user();
         $branchId = $request->branch_id ?? ($user ? ($user->branch_id ?? $user->branch) : null);
@@ -219,18 +219,10 @@ class HolidayController extends Controller
         }
 
         $isHoliday = false;
-        if ($branchId && $selectedSection) {
-            $isHoliday = Holiday::isHoliday($date, $branchId, $timing, $selectedSection);
-        }
+        $students = collect();
+        $attendance = collect();
 
-        $students = [];
-        $attendance = [];
         if ($branchId && $selectedSection) {
-            $attendance = Attendance::where('attendance_date', $date)
-                ->where('branch_id', $branchId)
-                ->where('section', $selectedSection)
-                ->get();
-
             $academicYear = $this->academic_year ?? AcademicYear::where('active', 1)->value('academic_year');
 
             $students = Student::whereIn('campus', explode(',', $branchId))
@@ -239,6 +231,38 @@ class HolidayController extends Controller
                 ->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
                 ->where('admission_date', '<=', $date)
                 ->get();
+
+            // Check if any holiday applies to this date + branch + section
+            if (Holiday::isHoliday($date, $branchId, null, null, $selectedSection)) {
+                // Reject students whose hostel / gender fall under the holiday
+                $students = $students->reject(function ($student) use ($date, $branchId, $selectedSection) {
+                    return Holiday::isHoliday(
+                        $date,
+                        $branchId,
+                        $student->hostel_dayscholar,
+                        $student->gender,
+                        $selectedSection
+                    );
+                })->values();
+
+                if ($students->isEmpty()) {
+                    $isHoliday = true;
+
+                    if (!$request->wantsJson() && !$request->is('api/*')) {
+                        if ($request->filled('attendance_date')) {
+                            return redirect()->back()->with('error', "Selected date ($date) is a Holiday! Attendance cannot be marked.");
+                        }
+                        session()->flash('error', "Today ($date) is a Holiday! Attendance cannot be marked.");
+                    }
+                }
+            }
+
+            if (!$isHoliday) {
+                $attendance = Attendance::where('attendance_date', $date)
+                    ->where('branch_id', $branchId)
+                    ->where('section', $selectedSection)
+                    ->get();
+            }
         }
 
         if ($request->wantsJson() || $request->is('api/*')) {
@@ -265,6 +289,7 @@ class HolidayController extends Controller
 
             return response()->json([
                 'status' => true,
+                'message' => $isHoliday ? "Selected date ($date) is a Holiday!" : 'Attendance data fetched successfully.',
                 'academic_year' => $this->academic_year,
                 'branch_id' => $branchId,
                 'branches' => Branch::all(),
@@ -280,7 +305,7 @@ class HolidayController extends Controller
         }
 
         $sections = Student::whereIn('campus', explode(',', $branchId ?? ''))->select('section')->distinct()->get();
-        return view('holiday.attendance', compact('sections', 'students', 'attendance'));
+        return view('holiday.attendance', compact('sections', 'students', 'attendance', 'isHoliday'));
     }
 
     public function attendance_store(Request $request)
