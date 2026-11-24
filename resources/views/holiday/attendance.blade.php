@@ -196,7 +196,7 @@
      enableTime: false,
      allowInput: true,
      dateFormat: "Y-m-d",
-     maxDate: "today",
+    //  maxDate: "today",
      plugins: [
          new confirmDatePlugin({
              confirmText: "OK",
