@@ -396,7 +396,8 @@ class StudentController extends Controller
         $testId = $answers->value('test_id');
         $answers = $answers->chunk(45);
         $exam = Exam::where('name', $name)->where('academic_year', $this->academic_year)->first();
-        $pdf = Pdf::loadView('pdf.marksheet', compact('answers', 'exam', 'testId'));
+        $qorder = DB::table('answer_key_upload_details')->where('test_name', $name)->where('test_id', $testId)->where('academic_year', $this->academic_year)->first();
+        $pdf = Pdf::loadView('pdf.marksheet', compact('answers', 'exam', 'testId', 'qorder'));
         return $pdf->download("$exam->name - $sid.pdf");
     }
 
