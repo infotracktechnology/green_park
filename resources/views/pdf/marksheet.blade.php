@@ -62,7 +62,7 @@
         </tr>
         <tr>
             <td width="50%">Test ID: {{ $testId }}</td>
-            <td width="50%">Question Order: <?php echo $exam->subject_name; ?></td>
+            <td width="50%">Question Order: <?php echo $qorder->qorder; ?></td>
         </tr>
     </table>
     
