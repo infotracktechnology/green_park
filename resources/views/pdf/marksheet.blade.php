@@ -6,7 +6,7 @@
     <title>Mark Sheet</title>
     <style type="text/css">
         body {
-            font-family:Arial, Helvetica, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             margin: 0;
             padding: 0;
         }
@@ -34,10 +34,21 @@
             text-align: center;
         }
      
+        /* Centered Student Info Table */
         .student-info {
-            font-size: 14px;
-            margin: 10px auto; 
-            width: 90%; 
+            font-size: 13px;
+            width: 80% !important;
+            margin: 10px 10% 15px 10% !important;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .student-info td {
+            border: 1px solid #2e2e2e;
+            padding: 5px 10px;
+            width: 50%;
+            text-align: left;
+            vertical-align: middle;
         }
 
         .answers-wrapper-table {
@@ -50,19 +61,19 @@
     <h2>GREEN PARK COACHING CENTRE, NAMAKKAL</h2>
     <h4>CHECK THE ANSWERS THAT YOU MARKED</h4>
     
-    <!-- Student Info Table (Centered) -->
-    <table class="student-info">
+    <!-- Student Info Table (Centered on Page) -->
+    <table class="student-info" align="center">
         <tr>
-            <td width="50%">Student Name: <?php echo auth()->user()->student_name; ?></td>
-            <td width="50%">Exam: <?php echo $exam->exam_date; ?></td>
+            <td><strong>Student Name:</strong> <?php echo auth()->user()->student_name; ?></td>
+            <td><strong>Exam:</strong> <?php echo !empty($exam->exam_date) ? date('d/m/Y', strtotime($exam->exam_date)) : ''; ?></td>
         </tr>
         <tr>
-            <td width="50%">Subject: <?php echo $exam->name; ?></td>
-            <td width="50%">User Name: <?php echo auth()->user()->user_name; ?></td>
+            <td><strong>Subject:</strong> <?php echo $exam->name; ?></td>
+            <td><strong>User Name:</strong> <?php echo auth()->user()->user_name; ?></td>
         </tr>
         <tr>
-            <td width="50%">Test ID: {{ $testId }}</td>
-            <td width="50%">Question Order: <?php echo $qorder->qorder; ?></td>
+            <td><strong>Test ID:</strong> {{ $testId }}</td>
+            <td><strong>Question Order:</strong> <?php echo $qorder->qorder; ?></td>
         </tr>
     </table>
     

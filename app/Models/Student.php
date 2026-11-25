@@ -44,7 +44,17 @@ class Student extends Authenticatable
         return Attribute::make(
             get: function () {
                 $path = "profilepic/{$this->student_id}.jpg";
-                return Storage::disk('s3_studentupload')->exists($path) ? Storage::disk('s3_studentupload')->url($path) : asset('img/avather.png');
+                try {
+                    if (Storage::disk('s3_studentupload')->exists($path)) {
+                        return Storage::disk('s3_studentupload')->url($path);
+                    }
+                } catch (\Throwable $e) {
+                    // Fallback when S3 is unreachable or credentials/permissions fail
+                }
+
+                return file_exists(base_path("assets/profilepic/{$this->student_id}.jpg"))
+                    ? asset("profilepic/{$this->student_id}.jpg")
+                    : asset('img/avather.png');
             }
         );
     }
