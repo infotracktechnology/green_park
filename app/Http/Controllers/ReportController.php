@@ -729,8 +729,7 @@ class ReportController extends Controller
         'ONLINE LIVE',
         'ONLINE RECORDED',
         'TEST BATCH'
-    ])
-    ->groupBy('gender');
+    ])->values();
 
     $boardTables = collect();
     if ((int) $branch === 1) {

@@ -168,62 +168,44 @@
     @endforeach
 @endif
 
-        @if($online->isNotEmpty())
-      <h4 class="mt-4">ONLINE</h4>
-        @foreach($online as $key => $section)
         
-        <div class="table-responsive mt-3">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th colspan="5" class="text-center fw-bold">{{ $key }}</th>
-                    </tr>
-                    <tr>
-                        <th>SECTION</th>
-                        <th>BATCH</th>
+@if($online->isNotEmpty())
+    <h4 class="mt-4">ONLINE</h4>
 
-                        @if($section[0]->hostel_dayscholar == 'HOSTEL')
-                            <th>AC</th>
-                            <th>NON AC</th>
-                        @else
-                            <th>Boys</th>
-                            <th>Girls</th>
-                        @endif
+    <div class="table-responsive mt-3">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>SECTION</th>
+                    {{-- <th>BATCH</th> --}}
+                    <th>Boys</th>
+                    <th>Girls</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
 
-                        <th>TOTAL</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach($section as $row)
+            <tbody>
+                @foreach($online as $row)
                     <tr>
                         <td>{{ $row->section }}</td>
-                        <td>{{ $row->batch }}</td>
-
-                        @if($row->hostel_dayscholar == 'HOSTEL')
-                            <td>{{ $row->ac }}</td>
-                            <td>{{ $row->nonac }}</td>
-                        @else
-                            <td>{{ $row->boys }}</td>
-                            <td>{{ $row->girls }}</td>
-                        @endif
-
+                        {{-- <td>{{ $row->batch ?? 'NULL' }}</td> --}}
+                        <td>{{ $row->boys }}</td>
+                        <td>{{ $row->girls }}</td>
                         <td>{{ $row->total }}</td>
                     </tr>
-                    @endforeach
-                </tbody>
+                @endforeach
+            </tbody>
 
-                <tfoot>
-                    <tr class="bg-secondary fw-bold">
-                        <td colspan="4">NET TOTAL</td>
-                        <td>{{ $section->sum('total') }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-        @endforeach
+            <tfoot>
+                <tr class="bg-secondary fw-bold">
+                    <td colspan="3">NET TOTAL</td>
+                    <td>{{ $online->sum('total') }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+@endif
 
-        @endif
 
     </div>
                 <div class="col-md-4">
