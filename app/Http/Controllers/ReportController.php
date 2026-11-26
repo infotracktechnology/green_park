@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
-use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, ExamName, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier,StudentLog,ExamSubjectReport, PhoneCard, Medical};
+use App\Models\{AcademicYear, Exam, ExamAnswer, Student, Announcement, Attendance, Branch, ExamName, Options, Hostel, HostelRoom, InOutRegister, SickRoomEntry, HostelAttendance, HostelCourier, StudentLog, ExamSubjectReport, PhoneCard, Medical};
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\CsvServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -14,64 +14,77 @@ class ReportController extends Controller
 {
     public function section_exam(Request $request)
     {
-        $category = Options::where('type', 'testcategory')->first()->value ?? [];
-        $exams = [];
-
-        if ($request->has('testcategory')) {
-           $exams = Exam::where('testcategory', $request->testcategory)
-            ->where('academic_year', $this->academic_year)
-            ->distinct()
-            ->orderByDesc('exam_date')
-            ->pluck('name');
-        }
-
+        $type = $request->query('type');
         $test_name = $request->test_name ?? 0;
-
         $branch = auth()->user()->branch;
-
-        $sections = Student::join('exam_answer as a', 'student.student_id', '=', 'a.student_id')
-            ->where('a.testname', $test_name)
-            ->whereNotNull('student.section')
-            ->where('student.section', '!=', '')
-            ->when($branch, fn($q) => $q->where('student.campus', $branch))
-            ->select('student.section')
-            ->distinct()
-            ->orderBy('student.section')
-            ->get();
-
-        if ($request->query('type') == 'overall') {
+        
+        if ($type === 'overall') {
             $section = $request->section;
-            $branch = auth()->user()->branch;
-            $answers = ExamAnswer::join('student as a', 'exam_answer.student_id', '=', 'a.student_id')
+            $answers = DB::table('exam_answer')
+                ->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')
                 ->where('exam_answer.testname', $test_name)
                 ->where('a.section', $section)
                 ->where('a.coaching_type', 'OFFLINE')
                 ->when($branch, fn($q) => $q->where('a.campus', $branch))
-                ->select('exam_answer.student_id','exam_answer.test_id','exam_answer.subject','exam_answer.mark','a.student_name')
+                ->select([
+                    'exam_answer.student_id',
+                    'a.student_name',
+                    'exam_answer.test_id',
+                    'exam_answer.subject',
+                    DB::raw('SUM(CASE WHEN exam_answer.mark = 4 THEN 1 ELSE 0 END) as right_count'),
+                    DB::raw('SUM(CASE WHEN exam_answer.mark = -1 THEN 1 ELSE 0 END) as wrong_count'),
+                    DB::raw('SUM(CASE WHEN exam_answer.mark = 0 THEN 1 ELSE 0 END) as left_count'),
+                    DB::raw('SUM(exam_answer.mark) as total_mark'),
+                    DB::raw('COUNT(*) * 4 as max_mark'),
+                ])
+                ->groupBy('exam_answer.student_id', 'a.student_name', 'exam_answer.test_id', 'exam_answer.subject')
                 ->orderBy('exam_answer.test_id')
                 ->orderBy('a.student_name')
                 ->get();
 
-
             $subjects = $answers->pluck('subject')->unique()->values()->toArray();
+
             $results = $answers->groupBy('student_id')->map(function ($logs) use ($subjects) {
                 $student = $logs->first();
-                $subjectStats = collect($subjects)->mapWithKeys(function ($subject) use ($logs) {
-                    $sub = $logs->where('subject', $subject);
-                    return [$subject => ['right' => $sub->where('mark', 4)->count(), 'wrong' => $sub->where('mark', -1)->count(), 'left'  => $sub->where('mark', 0)->count(), 'total' => $sub->sum('mark'), 'max_mark' => $sub->count() * 4]];
+                $bySubject = $logs->keyBy('subject');
+
+                $subjectStats = collect($subjects)->mapWithKeys(function ($subject) use ($bySubject) {
+                    $row = $bySubject->get($subject);
+                    return [
+                        $subject => [
+                            'right'    => (int) ($row->right_count ?? 0),
+                            'wrong'    => (int) ($row->wrong_count ?? 0),
+                            'left'     => (int) ($row->left_count ?? 0),
+                            'total'    => 0 + ($row->total_mark ?? 0),
+                            'max_mark' => (int) ($row->max_mark ?? 0),
+                        ],
+                    ];
                 });
-                return ['student_id' => $student->student_id, 'student_name' => $student->student_name, 'test_id' => $logs->first()->test_id, 'subjects' => $subjectStats, 'total' => $subjectStats->sum('total'), 'max_mark' => $subjectStats->sum('max_mark')];
+
+                return [
+                    'student_id'   => $student->student_id,
+                    'student_name' => $student->student_name,
+                    'test_id'      => $student->test_id,
+                    'subjects'     => $subjectStats,
+                    'total'        => $subjectStats->sum('total'),
+                    'max_mark'     => $subjectStats->sum('max_mark'),
+                ];
             })->values();
+
             $max_mark = $results->first()['max_mark'] ?? 0;
+
             return view('report.overall_print', compact('results', 'subjects', 'test_name', 'section', 'max_mark'));
         }
 
-        if ($request->query('type') == 'omr') {
+        if ($type === 'omr') {
             $section = $request->section;
-            $branch = auth()->user()->branch;
 
-            $answers = ExamAnswer::query()
+            $answers = DB::table('exam_answer')
                 ->join('student as a', 'exam_answer.student_id', '=', 'a.student_id')
+                ->leftJoin('answer_key_upload_details as b', function ($join) {
+                    $join->on('exam_answer.test_id', '=', 'b.test_id')
+                        ->on('exam_answer.testname', '=', 'b.test_name');
+                })
                 ->where('exam_answer.testname', $test_name)
                 ->where('a.section', $section)
                 ->where('a.coaching_type', 'OFFLINE')
@@ -85,19 +98,51 @@ class ReportController extends Controller
                     'a.student_name',
                     'exam_answer.subject',
                     'exam_answer.test_id',
+                    'b.qtype',
                 ])
                 ->orderBy('exam_answer.test_id')
                 ->orderBy('a.student_name')
                 ->orderBy('exam_answer.q_no')
                 ->get();
-            $testIds = $answers->pluck('test_id')->unique();
-            $key_correction = DB::table('key_corrections')->where('academic_year', $this->academic_year)->whereIn('testid', $testIds)->pluck('key_correction', 'testid');
-            return view('report.omr_print', compact('answers', 'test_name','key_correction', 'section'));
+
+            $testIds = $answers->pluck('test_id')->unique()->values();
+
+            $key_correction = $testIds->isNotEmpty()
+                ? DB::table('key_corrections')
+                ->where('academic_year', $this->academic_year)
+                ->whereIn('testid', $testIds)
+                ->pluck('key_correction', 'testid')
+                : collect();
+
+            return view('report.omr_print', compact('answers', 'test_name', 'key_correction', 'section'));
         }
 
-        return view('report.section_exam', compact('sections', 'test_name', 'category', 'exams'));
-    }
+        // 3. FILTER PAGE DATA (only runs when type is neither 'overall' nor 'omr')
+        $category = Options::where('type', 'testcategory')->value('value') ?? [];
 
+        $exams = $request->filled('testcategory')
+            ? Exam::where('testcategory', $request->testcategory)
+            ->where('academic_year', $this->academic_year)
+            ->distinct()
+            ->orderByDesc('exam_date')
+            ->pluck('name')
+            : [];
+
+        $sections = $test_name
+            ? DB::table('student')
+            ->join('exam_answer as a', 'student.student_id', '=', 'a.student_id')
+            ->where('a.testname', $test_name)
+            ->whereNotNull('student.section')
+            ->where('student.section', '!=', '')
+            ->when($branch, fn($q) => $q->where('student.campus', $branch))
+            ->select('student.section')
+            ->distinct()
+            ->orderBy('student.section')
+            ->get()
+            : collect();
+
+        return view('report.section_exam', compact('category', 'exams', 'sections', 'test_name'));
+    }
     public function LogReport(Request $request)
     {
         $students = [];
@@ -158,7 +203,7 @@ class ReportController extends Controller
                     ->groupBy('student_id')
                     ->havingRaw('count(*) = ?', [$exam->total_questions])
                     ->pluck('student_id')->toArray();
-                
+
                 $writingStudentIds = array_diff($startedStudentIds, $finishedStudentIds);
                 $absentStudentIds = array_diff($eligibleStudentIds, $totalOnlineIds);
 
@@ -181,12 +226,12 @@ class ReportController extends Controller
 
                 if ($request->filled('search')) {
 
-                $students = Student::whereIn('student_id', $eligibleStudentIds)
-                    ->where(function ($query) use ($request) {
-                        $query->where('student_id', 'like', '%' . $request->search . '%')
-                            ->orWhere('student_name', 'like', '%' . $request->search . '%');
-                    })
-                    ->get();
+                    $students = Student::whereIn('student_id', $eligibleStudentIds)
+                        ->where(function ($query) use ($request) {
+                            $query->where('student_id', 'like', '%' . $request->search . '%')
+                                ->orWhere('student_name', 'like', '%' . $request->search . '%');
+                        })
+                        ->get();
                 }
             }
         }
@@ -207,12 +252,12 @@ class ReportController extends Controller
 
     public function examLogReport(Request $request)
     {
-        $exams = ExamName::select('id', 'name')->where('coaching_type', '!=', 'OFFLINE')->orderBy('id','desc')->get();
-        
+        $exams = ExamName::select('id', 'name')->where('coaching_type', '!=', 'OFFLINE')->orderBy('id', 'desc')->get();
+
         if ($request->isMethod('post')) {
             $student = Student::where('student_id', $request->student_id)->first();
             if (!$student) {
-                return back()->with('error','Student not found');
+                return back()->with('error', 'Student not found');
             }
             $exam = ExamName::find($request->exam_id);
             $logs = StudentLog::where('student_id', $student->student_id)->whereRaw("action LIKE ?", ['%' . $exam->name . '%'])->orderBy('created_at')->get();
@@ -220,11 +265,11 @@ class ReportController extends Controller
             if ($logs->isEmpty()) {
                 return back()->with('error', 'This student did not attend the selected exam.');
             }
-            
+
             $pdf = PDF::loadView('pdf.examlog', compact('student', 'logs', 'exam'));
             return $pdf->download('examlog.pdf');
         }
-       return view('report.examlogreport', compact('exams'));
+        return view('report.examlogreport', compact('exams'));
     }
     public function StudentResponseDownload(Request $request)
     {
@@ -289,36 +334,34 @@ class ReportController extends Controller
 
     public function AttendanceReport(Request $request)
     {
-    $courses = collect();
-    $sections = collect();
+        $courses = collect();
+        $sections = collect();
 
-    if ($request->filled('branch_id')) {
+        if ($request->filled('branch_id')) {
 
-        $courses = Student::select('course')
-            ->where('academic_year', $this->academic_year)
-            ->where('campus', $request->branch_id)
-            ->whereNotNull('course')
-            ->where('course', '!=', '')
-            ->distinct()
-            ->orderBy('course')
-            ->get();
+            $courses = Student::select('course')
+                ->where('academic_year', $this->academic_year)
+                ->where('campus', $request->branch_id)
+                ->whereNotNull('course')
+                ->where('course', '!=', '')
+                ->distinct()
+                ->orderBy('course')
+                ->get();
 
 
-        $sections = Attendance::select('section')
-            ->where('academic_year', $this->academic_year)
-            ->where('branch_id', $request->branch_id)
-            ->whereNotNull('section')
-            ->where('section', '!=', '')
-            ->distinct()
-            ->orderBy('section')
-            ->get();
+            $sections = Attendance::select('section')
+                ->where('academic_year', $this->academic_year)
+                ->where('branch_id', $request->branch_id)
+                ->whereNotNull('section')
+                ->where('section', '!=', '')
+                ->distinct()
+                ->orderBy('section')
+                ->get();
+        }
 
- 
-    }
+        $attendances = collect([]);
 
-    $attendances = collect([]);
-
-    if ($request->filled('branch_id')) {
+        if ($request->filled('branch_id')) {
             $studentIds = Student::where('academic_year', $this->academic_year)
                 ->where('campus', $request->branch_id)
                 ->when($request->filled('course'), function ($q) use ($request) {
@@ -329,12 +372,12 @@ class ReportController extends Controller
                 })
                 ->pluck('student_id');
 
-                $attendanceQuery = Attendance::where('branch_id', $request->branch_id)
+            $attendanceQuery = Attendance::where('branch_id', $request->branch_id)
                 ->where('academic_year', $this->academic_year)
                 ->when($request->filled('section'), function ($q) use ($request) {
-                            $q->whereIn('section', (array) $request->section);
-                        });
-                    
+                    $q->whereIn('section', (array) $request->section);
+                });
+
 
             if ($request->filled('date')) {
                 $attendanceQuery->where('attendance_date', $request->date);
@@ -348,64 +391,63 @@ class ReportController extends Controller
             $attendances = $attendancesGrouped->map(function ($attendance, $section) use ($request) {
                 $present = $attendance->where('status', 'P')->unique('student_id')->count();
                 $absent = $attendance->where('status', 'A')->unique('student_id')->count();
-    
 
-                    $studentAttendance = $attendance->groupBy('student_id');
 
-                    $morningPresent = 0;
-                    $morningAbsent = 0;
-                    $afternoonPresent = 0;
-                    $afternoonAbsent = 0;
-                    $present = 0;
-                    $absent = 0;
+                $studentAttendance = $attendance->groupBy('student_id');
 
-                    $morningPresentStudentIds = [];
-                    $morningAbsentStudentIds = [];
-                    $afternoonPresentStudentIds = [];
-                    $afternoonAbsentStudentIds = [];
-                    $presentStudentIds = [];
-                    $absentStudentIds = [];
+                $morningPresent = 0;
+                $morningAbsent = 0;
+                $afternoonPresent = 0;
+                $afternoonAbsent = 0;
+                $present = 0;
+                $absent = 0;
 
-                    foreach ($studentAttendance as $studentId => $records) {
-                        $morning = $records->where('timing', 'Morning')->first();
-                        $afternoon = $records->where('timing', 'Afternoon')->first();
+                $morningPresentStudentIds = [];
+                $morningAbsentStudentIds = [];
+                $afternoonPresentStudentIds = [];
+                $afternoonAbsentStudentIds = [];
+                $presentStudentIds = [];
+                $absentStudentIds = [];
 
-                        if ($morning && $morning->status == 'P') {
-                            $morningPresent++;
-                            $morningPresentStudentIds[] = $studentId;
-                        }
+                foreach ($studentAttendance as $studentId => $records) {
+                    $morning = $records->where('timing', 'Morning')->first();
+                    $afternoon = $records->where('timing', 'Afternoon')->first();
 
-                        if ($morning && $morning->status == 'A') {
-                            $morningAbsent++;
-                            $morningAbsentStudentIds[] = $studentId;
-                        }
-                        if ($afternoon && $afternoon->status == 'P') {
-                            $afternoonPresent++;
-                            $afternoonPresentStudentIds[] = $studentId;
-                        }
-
-                        if ($afternoon && $afternoon->status == 'A') {
-                            $afternoonAbsent++;
-                            $afternoonAbsentStudentIds[] = $studentId;
-                        }
-                        if (
-                            ($morning && $morning->status == 'P') ||
-                            ($afternoon && $afternoon->status == 'P')
-                        ) {
-                            $present++;
-                            $presentStudentIds[] = $studentId;
-                        }
-                        elseif (
-                            $morning &&
-                            $afternoon &&
-                            $morning->status == 'A' &&
-                            $afternoon->status == 'A'
-                        ) {
-                            $absent++;
-                            $absentStudentIds[] = $studentId;
-                        }
+                    if ($morning && $morning->status == 'P') {
+                        $morningPresent++;
+                        $morningPresentStudentIds[] = $studentId;
                     }
-                    
+
+                    if ($morning && $morning->status == 'A') {
+                        $morningAbsent++;
+                        $morningAbsentStudentIds[] = $studentId;
+                    }
+                    if ($afternoon && $afternoon->status == 'P') {
+                        $afternoonPresent++;
+                        $afternoonPresentStudentIds[] = $studentId;
+                    }
+
+                    if ($afternoon && $afternoon->status == 'A') {
+                        $afternoonAbsent++;
+                        $afternoonAbsentStudentIds[] = $studentId;
+                    }
+                    if (
+                        ($morning && $morning->status == 'P') ||
+                        ($afternoon && $afternoon->status == 'P')
+                    ) {
+                        $present++;
+                        $presentStudentIds[] = $studentId;
+                    } elseif (
+                        $morning &&
+                        $afternoon &&
+                        $morning->status == 'A' &&
+                        $afternoon->status == 'A'
+                    ) {
+                        $absent++;
+                        $absentStudentIds[] = $studentId;
+                    }
+                }
+
 
                 $studentQuery = Student::where('section', $section)
                     ->where('academic_year', $this->academic_year)
@@ -451,12 +493,12 @@ class ReportController extends Controller
             });
             if ($request->filled('section')) {
 
-            $selectedSections = array_values((array) $request->section);
+                $selectedSections = array_values((array) $request->section);
 
-            $attendances = $attendances->sortBy(function ($row) use ($selectedSections) {
-                return array_search($row['section'], $selectedSections);
-            })->values();
-}
+                $attendances = $attendances->sortBy(function ($row) use ($selectedSections) {
+                    return array_search($row['section'], $selectedSections);
+                })->values();
+            }
         }
 
         if ($request->wantsJson() || $request->is('api/*')) {
@@ -483,212 +525,222 @@ class ReportController extends Controller
 
     public function MonthlyAttendanceReport(Request $request)
     {
-    $branches = Branch::all();
-    
-    $sections = Student::when($request->branch_id, function($q) use ($request) { 
-        return $q->where('campus', $request->branch_id); 
-    })->whereNotNull('section')->where('section', '!=', '')->distinct()->pluck('section');
+        $branches = Branch::all();
 
-    $courses = Student::where('academic_year', $this->academic_year)->where('course', '!=', '')->distinct()->pluck('course');
+        $sections = Student::when($request->branch_id, function ($q) use ($request) {
+            return $q->where('campus', $request->branch_id);
+        })->whereNotNull('section')->where('section', '!=', '')->distinct()->pluck('section');
 
-    $report_type = $request->input('report_type');
-    $data = [];
-    $summary = null;
+        $courses = Student::where('academic_year', $this->academic_year)->where('course', '!=', '')->distinct()->pluck('course');
 
-    if ($request->has('branch_id') && $request->filled('start_date') && $request->filled('end_date') && $report_type) {
-        
-        $query = Attendance::where('branch_id', $request->branch_id)
-            ->where('academic_year', $this->academic_year)
-            ->whereBetween('attendance_date', [$request->start_date, $request->end_date]);
+        $report_type = $request->input('report_type');
+        $data = [];
+        $summary = null;
 
-        if ($request->filled('section')) {
-            $query->whereIn('section', $request->section);
-        }
+        if ($request->has('branch_id') && $request->filled('start_date') && $request->filled('end_date') && $report_type) {
 
-        if ($request->filled('course')) {
-            $studentIds = Student::where('course', $request->course)
-                ->where('campus', $request->branch_id)
+            $query = Attendance::where('branch_id', $request->branch_id)
                 ->where('academic_year', $this->academic_year)
-                ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
-                ->pluck('student_id'); 
-            $query->whereIn('student_id', $studentIds);
-        }
+                ->whereBetween('attendance_date', [$request->start_date, $request->end_date]);
 
-     
-        // 1. Section Wise
-        if ($report_type == 'section') {
-            $attendances = $query->get()->groupBy('section');
-            $data = $attendances->map(function ($attendance, $section) use ($request) {
-                $present = $attendance->where('status', 'P')->count() * 0.5;
-                $absent = $attendance->where('status', 'A')->count() * 0.5;
+            if ($request->filled('section')) {
+                $query->whereIn('section', $request->section);
+            }
 
-                $boysQuery = Student::where('section', $section)
-                    ->where('academic_year', $this->academic_year)
+            if ($request->filled('course')) {
+                $studentIds = Student::where('course', $request->course)
                     ->where('campus', $request->branch_id)
-                    ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
-                    ->where('gender', 'Male')
-                    ->whereDate('admission_date', '<=', $request->end_date);
-                if ($request->filled('course')) $boysQuery->where('course', $request->course);
-                $boys = $boysQuery->count();
-
-                $girlsQuery = Student::where('section', $section)
                     ->where('academic_year', $this->academic_year)
-                    ->where('campus', $request->branch_id)
                     ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
-                    ->where('gender', 'Female')
-                    ->whereDate('admission_date', '<=', $request->end_date);
-                if ($request->filled('course')) $girlsQuery->where('course', $request->course);
-                $girls = $girlsQuery->count();
+                    ->pluck('student_id');
+                $query->whereIn('student_id', $studentIds);
+            }
 
-                $totalMarked = $present + $absent;
-                $present_percentage = $totalMarked > 0 ? round(($present * 100) / $totalMarked, 2) : 0;
-                $absent_percentage = $totalMarked > 0 ? round(($absent * 100) / $totalMarked, 2) : 0;
 
-                return [
-                    'section' => $section, 'boys' => $boys, 'girls' => $girls, 'total' => $boys + $girls,
-                    'present' => $present, 'absent' => $absent,
-                    'present_percentage' => $present_percentage, 'absent_percentage' => $absent_percentage
-                ];
-            });
+            // 1. Section Wise
+            if ($report_type == 'section') {
+                $attendances = $query->get()->groupBy('section');
+                $data = $attendances->map(function ($attendance, $section) use ($request) {
+                    $present = $attendance->where('status', 'P')->count() * 0.5;
+                    $absent = $attendance->where('status', 'A')->count() * 0.5;
+
+                    $boysQuery = Student::where('section', $section)
+                        ->where('academic_year', $this->academic_year)
+                        ->where('campus', $request->branch_id)
+                        ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
+                        ->where('gender', 'Male')
+                        ->whereDate('admission_date', '<=', $request->end_date);
+                    if ($request->filled('course')) $boysQuery->where('course', $request->course);
+                    $boys = $boysQuery->count();
+
+                    $girlsQuery = Student::where('section', $section)
+                        ->where('academic_year', $this->academic_year)
+                        ->where('campus', $request->branch_id)
+                        ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
+                        ->where('gender', 'Female')
+                        ->whereDate('admission_date', '<=', $request->end_date);
+                    if ($request->filled('course')) $girlsQuery->where('course', $request->course);
+                    $girls = $girlsQuery->count();
+
+                    $totalMarked = $present + $absent;
+                    $present_percentage = $totalMarked > 0 ? round(($present * 100) / $totalMarked, 2) : 0;
+                    $absent_percentage = $totalMarked > 0 ? round(($absent * 100) / $totalMarked, 2) : 0;
+
+                    return [
+                        'section' => $section,
+                        'boys' => $boys,
+                        'girls' => $girls,
+                        'total' => $boys + $girls,
+                        'present' => $present,
+                        'absent' => $absent,
+                        'present_percentage' => $present_percentage,
+                        'absent_percentage' => $absent_percentage
+                    ];
+                });
+            }
+
+            // 2. Student Wise
+            elseif ($report_type == 'student') {
+                $attendances = $query->get()->groupBy('student_id');
+                $studentIds = $attendances->keys();
+                $students = Student::withTrashed()->whereIn('student_id', $studentIds)->get()->keyBy('student_id');
+
+                $data = $attendances->map(function ($attendance, $student_id) use ($students) {
+                    $student = $students->get($student_id);
+                    $present = $attendance->where('status', 'P')->count() * 0.5;
+                    $absent = $attendance->where('status', 'A')->count() * 0.5;
+                    $holidays = $attendance->where('status', 'H')->count() * 0.5;
+                    $totalMarked = $present + $absent;
+
+                    return [
+                        'student_id' => $student_id,
+                        'student_name' => $student->student_name ?? 'N/A',
+                        'course' => $student->course ?? 'N/A',
+                        'section' => $student->section ?? 'N/A',
+                        'working_days' => $totalMarked,
+                        'present' => $present,
+                        'absent' => $absent,
+                        'holidays' => $holidays,
+                        'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
+                    ];
+                });
+            }
+
+            // 3. Course Wise
+            elseif ($report_type == 'course') {
+                $attendances = $query->get();
+                $student_ids = $attendances->pluck('student_id')->unique();
+                $students = Student::whereIn('student_id', $student_ids)->where('academic_year', $this->academic_year)->get()->keyBy('student_id');
+
+
+                $grouped = $attendances->filter(function ($item) use ($students) {
+                    return $students->has($item->student_id);
+                })->groupBy(function ($item) use ($students) {
+                    return $students[$item->student_id]->course;
+                });
+
+                $data = $grouped->map(function ($attendance, $course) use ($request) {
+                    $present = $attendance->where('status', 'P')->count() * 0.5;
+                    $absent = $attendance->where('status', 'A')->count() * 0.5;
+                    $totalMarked = $present + $absent;
+
+                    $total_students = Student::where('course', $course)
+                        ->where('campus', $request->branch_id)
+                        ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
+                        ->where('academic_year', $this->academic_year)
+                        ->count();
+
+                    return [
+                        'course' => $course,
+                        'total_students' => $total_students,
+                        'present' => $present,
+                        'absent' => $absent,
+                        'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
+                    ];
+                });
+            }
+
+            // 4. Branch Wise
+            elseif ($report_type == 'branch') {
+                $attendances = $query->get()->groupBy('branch_id');
+                $branchesMap = Branch::pluck('name', 'id');
+
+                $data = $attendances->map(function ($attendance, $branch_id) use ($branchesMap, $request) {
+                    $present = $attendance->where('status', 'P')->count() * 0.5;
+                    $absent = $attendance->where('status', 'A')->count() * 0.5;
+                    $totalMarked = $present + $absent;
+
+                    $totalStudentQuery = Student::where('campus', $branch_id)
+                        ->where('academic_year', $this->academic_year)
+                        ->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE']);
+
+                    if ($request->filled('course')) {
+                        $totalStudentQuery->where('course', $request->course);
+                    }
+                    if ($request->filled('section')) {
+                        $totalStudentQuery->whereIn('section', $request->section);
+                    }
+
+                    $total_students = $totalStudentQuery->count();
+
+                    return [
+                        'branch' => $branchesMap->get($branch_id) ?? 'N/A',
+                        'total_students' => $total_students,
+                        'present' => $present,
+                        'absent' => $absent,
+                        'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
+                    ];
+                });
+            }
+
+            // 5. Month Wise
+            elseif ($report_type == 'month') {
+                $attendances = $query->get()->groupBy('attendance_date');
+                $student_ids = $query->get()->pluck('student_id')->unique();
+                $studentNames = Student::whereIn('student_id', $student_ids)->pluck('student_name', 'student_id');
+
+                $data = $attendances->map(function ($attendance, $date) use ($studentNames) {
+                    $presentStudents = $attendance->where('status', 'P')->map(fn($a) => $studentNames->get($a->student_id) ?? $a->student_id)->unique()->values();
+                    $absentStudents = $attendance->where('status', 'A')->map(fn($a) => $studentNames->get($a->student_id) ?? $a->student_id)->unique()->values();
+
+                    return [
+                        'date' => $date,
+                        'present_count' => $attendance->where('status', 'P')->count() * 0.5,
+                        'absent_count' => $attendance->where('status', 'A')->count() * 0.5,
+                        'present_students' => json_encode($presentStudents),
+                        'absent_students' => json_encode($absentStudents)
+                    ];
+                });
+            }
         }
 
-        // 2. Student Wise
-        elseif ($report_type == 'student') {
-            $attendances = $query->get()->groupBy('student_id');
-            $studentIds = $attendances->keys();
-            $students = Student::withTrashed()->whereIn('student_id', $studentIds)->get()->keyBy('student_id');
-
-            $data = $attendances->map(function ($attendance, $student_id) use ($students) {
-                $student = $students->get($student_id);
-                $present = $attendance->where('status', 'P')->count() * 0.5;
-                $absent = $attendance->where('status', 'A')->count() * 0.5;
-                $holidays = $attendance->where('status', 'H')->count() * 0.5;
-                $totalMarked = $present + $absent ;
-
-                return [
-                    'student_id' => $student_id,
-                    'student_name' => $student->student_name ?? 'N/A',
-                    'course' => $student->course ?? 'N/A',
-                    'section' => $student->section ?? 'N/A',
-                    'working_days' => $totalMarked ,
-                    'present' => $present, 'absent' => $absent, 'holidays' => $holidays,
-                    'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
-                ];
-            });
-        }
-
-        // 3. Course Wise
-        elseif ($report_type == 'course') {
-            $attendances = $query->get();
-            $student_ids = $attendances->pluck('student_id')->unique();
-            $students = Student::whereIn('student_id', $student_ids)->where('academic_year', $this->academic_year)->get()->keyBy('student_id');
-            
-
-            $grouped = $attendances->filter(function ($item) use ($students) {
-                return $students->has($item->student_id);
-            })->groupBy(function ($item) use ($students) {
-                return $students[$item->student_id]->course;
-            });
-
-            $data = $grouped->map(function ($attendance, $course) use ($request) {
-                $present = $attendance->where('status', 'P')->count() * 0.5;
-                $absent = $attendance->where('status', 'A')->count() * 0.5;
-                $totalMarked = $present + $absent;
-
-                $total_students = Student::where('course', $course)
-                    ->where('campus', $request->branch_id)
-                    ->wherein('coaching_type', ['OFFLINE', 'ONLINE LIVE'])
-                    ->where('academic_year', $this->academic_year)
-                    ->count();
-
-                return [
-                    'course' => $course, 'total_students' => $total_students,
-                    'present' => $present, 'absent' => $absent,
-                    'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
-                ];
-            });
-        }
-
-        // 4. Branch Wise
-        elseif ($report_type == 'branch') {
-            $attendances = $query->get()->groupBy('branch_id');
-            $branchesMap = Branch::pluck('name', 'id');
-
-            $data = $attendances->map(function ($attendance, $branch_id) use ($branchesMap, $request) {
-                $present = $attendance->where('status', 'P')->count() * 0.5;
-                $absent = $attendance->where('status', 'A')->count() * 0.5;
-                $totalMarked = $present + $absent;
-
-                $totalStudentQuery = Student::where('campus', $branch_id)
-                    ->where('academic_year', $this->academic_year)
-                    ->whereIn('coaching_type', ['OFFLINE', 'ONLINE LIVE']);
-
-                if ($request->filled('course')) {
-                    $totalStudentQuery->where('course', $request->course);
-                }
-                if ($request->filled('section')) {
-                    $totalStudentQuery->whereIn('section', $request->section);
-                }
-
-                $total_students = $totalStudentQuery->count();
-
-                return [
-                    'branch' => $branchesMap->get($branch_id) ?? 'N/A',
-                    'total_students' => $total_students,
-                    'present' => $present, 'absent' => $absent,
-                    'attendance_percentage' => $totalMarked > 0 ? round(($present / $totalMarked) * 100, 2) : 0
-                ];
-            });
-        }
-
-        // 5. Month Wise
-        elseif ($report_type == 'month') {
-            $attendances = $query->get()->groupBy('attendance_date');
-            $student_ids = $query->get()->pluck('student_id')->unique();
-            $studentNames = Student::whereIn('student_id', $student_ids)->pluck('student_name', 'student_id');
-
-            $data = $attendances->map(function ($attendance, $date) use ($studentNames) {
-                $presentStudents = $attendance->where('status', 'P')->map(fn($a) => $studentNames->get($a->student_id) ?? $a->student_id)->unique()->values();
-                $absentStudents = $attendance->where('status', 'A')->map(fn($a) => $studentNames->get($a->student_id) ?? $a->student_id)->unique()->values();
-
-                return [
-                    'date' => $date,
-                    'present_count' => $attendance->where('status', 'P')->count() * 0.5,
-                    'absent_count' => $attendance->where('status', 'A')->count() * 0.5,
-                    'present_students' => json_encode($presentStudents),
-                    'absent_students' => json_encode($absentStudents)
-                ];
-            });
-        }
+        return view('report.monthlyattendancereport', compact('branches', 'sections', 'courses', 'report_type', 'summary', 'data'));
     }
-
-    return view('report.monthlyattendancereport', compact('branches', 'sections', 'courses', 'report_type','summary', 'data' ));
-}
 
     public function BatchList(Request $request)
     {
         $report = Student::join('branch as b', 'student.campus', '=', 'b.id')
-            ->selectRaw(" b.name as campus, UPPER(TRIM(hostel_dayscholar)) as hostel_dayscholar, UPPER(TRIM(gender)) as gender, batch,section,COUNT(*) as strength,b.id")->where('section', '!=', '')->where('hostel_dayscholar', '!=', '')->where('academic_year', $this->academic_year)->groupBy('b.name','hostel_dayscholar','gender','batch','section')->orderBy('b.id')->orderByRaw("FIELD( CONCAT(UPPER(TRIM(hostel_dayscholar)),'-',UPPER(TRIM(gender)) ),'DAYSCHOLAR-MALE','HOSTEL-MALE','DAYSCHOLAR-FEMALE','HOSTEL-FEMALE')")->orderBy('batch')->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")->get();
+            ->selectRaw(" b.name as campus, UPPER(TRIM(hostel_dayscholar)) as hostel_dayscholar, UPPER(TRIM(gender)) as gender, batch,section,COUNT(*) as strength,b.id")->where('section', '!=', '')->where('hostel_dayscholar', '!=', '')->where('academic_year', $this->academic_year)->groupBy('b.name', 'hostel_dayscholar', 'gender', 'batch', 'section')->orderBy('b.id')->orderByRaw("FIELD( CONCAT(UPPER(TRIM(hostel_dayscholar)),'-',UPPER(TRIM(gender)) ),'DAYSCHOLAR-MALE','HOSTEL-MALE','DAYSCHOLAR-FEMALE','HOSTEL-FEMALE')")->orderBy('batch')->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")->get();
 
         return view('report.batchlist', compact('report'));
     }
     public function SectionList(Request $request)
     {
-         $user = auth()->user();
+        $user = auth()->user();
         $userType = strtolower(trim($user->type ?? ''));
-                if ($userType === 'admin') {
-                    $branches_list = Branch::all();
-                } else {
-                    $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
-                    if (empty($branchIds) && $user->branch) {
-                        $branchIds = [$user->branch];
-                    }
-                    $branches_list = Branch::whereIn('id', $branchIds)->get();
-                }
+        if ($userType === 'admin') {
+            $branches_list = Branch::all();
+        } else {
+            $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
+            if (empty($branchIds) && $user->branch) {
+                $branchIds = [$user->branch];
+            }
+            $branches_list = Branch::whereIn('id', $branchIds)->get();
+        }
         $branch = $request->branch ?? 0;
         $course = $request->course ?? 0;
-       $data = Student::join('branch as b', 'student.campus', '=', 'b.id')
-    ->selectRaw("
+        $data = Student::join('branch as b', 'student.campus', '=', 'b.id')
+            ->selectRaw("
         b.name as campus,
         batch,
         section,
@@ -711,59 +763,59 @@ class ReportController extends Controller
         hostel_dayscholar,
         coaching_type
     ")
-    ->where('academic_year', $this->academic_year)
-    ->where('b.id', $branch)
-    ->where('course', $course)
-    ->groupBy('section', 'coaching_type')
-    ->when((int) $branch !== 4, function ($query) {
-        $query->orderBy('hostel_dayscholar');
-    })
-    ->orderByRaw("FIELD(gender, 'Male', 'Female')")
-    ->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")
-    ->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")
-    ->get();
+            ->where('academic_year', $this->academic_year)
+            ->where('b.id', $branch)
+            ->where('course', $course)
+            ->groupBy('section', 'coaching_type')
+            ->when((int) $branch !== 4, function ($query) {
+                $query->orderBy('hostel_dayscholar');
+            })
+            ->orderByRaw("FIELD(gender, 'Male', 'Female')")
+            ->orderByRaw("REGEXP_SUBSTR(section, '^[^0-9]+')")
+            ->orderByRaw("CAST(REGEXP_SUBSTR(section, '[0-9]+$') AS UNSIGNED)")
+            ->get();
 
         $offline = $data->where('coaching_type', 'OFFLINE')->groupBy('gender');
         $online = $data->whereIn('coaching_type', [
-        'ONLINE',
-        'ONLINE LIVE',
-        'ONLINE RECORDED',
-        'TEST BATCH'
-    ])->values();
+            'ONLINE',
+            'ONLINE LIVE',
+            'ONLINE RECORDED',
+            'TEST BATCH'
+        ])->values();
 
-    $boardTables = collect();
-    if ((int) $branch === 1) {
-        $boardTables = Student::query()
-            ->selectRaw("section, batch, CASE WHEN board_of_study_XII_std = 'SB' THEN 'SB' ELSE 'CBSE' END as board, SUM(ac_nonac = 'AC') as ac, SUM(ac_nonac = 'NON AC') as nonac, COUNT(*) as total")
-            ->where('campus', 1)
-            ->where('academic_year', $this->academic_year)
-            ->where('course', $course)
-            ->where('coaching_type', 'OFFLINE')
-            ->where('gender', 'Female')
-            ->where('hostel_dayscholar', 'HOSTEL')
-            ->groupBy('section', 'batch', 'board')
-            ->orderBy('section')
-            ->get()
-            ->groupBy('board');
-    }
+        $boardTables = collect();
+        if ((int) $branch === 1) {
+            $boardTables = Student::query()
+                ->selectRaw("section, batch, CASE WHEN board_of_study_XII_std = 'SB' THEN 'SB' ELSE 'CBSE' END as board, SUM(ac_nonac = 'AC') as ac, SUM(ac_nonac = 'NON AC') as nonac, COUNT(*) as total")
+                ->where('campus', 1)
+                ->where('academic_year', $this->academic_year)
+                ->where('course', $course)
+                ->where('coaching_type', 'OFFLINE')
+                ->where('gender', 'Female')
+                ->where('hostel_dayscholar', 'HOSTEL')
+                ->groupBy('section', 'batch', 'board')
+                ->orderBy('section')
+                ->get()
+                ->groupBy('board');
+        }
 
-    $stateBoardData = $boardTables->get('SB', collect());
-    $cbseData = $boardTables->get('CBSE', collect());
+        $stateBoardData = $boardTables->get('SB', collect());
+        $cbseData = $boardTables->get('CBSE', collect());
 
         $grouped = $data->groupBy(['gender']);
 
-    if ($request->isMethod('post')) {
-        $section = $request->section;
-        $branchId = $request->branch;
-        $courseName = $request->course;
-        $branch = Branch::findOrFail($branchId);
-        $branchname = $branch->name;
-        $students = Student::where('campus', $branchId)->where('course', $courseName)->where('section', $section)->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
-        $pdf = Pdf::loadView("pdf.$request->view",compact('students', 'branchname', 'section'));
-        return $pdf->download("$section-$request->view.pdf");
-    }
+        if ($request->isMethod('post')) {
+            $section = $request->section;
+            $branchId = $request->branch;
+            $courseName = $request->course;
+            $branch = Branch::findOrFail($branchId);
+            $branchname = $branch->name;
+            $students = Student::where('campus', $branchId)->where('course', $courseName)->where('section', $section)->where('academic_year', $this->academic_year)->orderBy('student_name')->get();
+            $pdf = Pdf::loadView("pdf.$request->view", compact('students', 'branchname', 'section'));
+            return $pdf->download("$section-$request->view.pdf");
+        }
 
-        return view('report.sectionlist', compact('grouped', 'offline', 'online','branches_list','stateBoardData','cbseData'));
+        return view('report.sectionlist', compact('grouped', 'offline', 'online', 'branches_list', 'stateBoardData', 'cbseData'));
     }
     public function ExaminationAnalysis(Request $request)
     {
@@ -1057,7 +1109,7 @@ class ReportController extends Controller
 
 
 
-        $csvHeaders = ['SID', 'MODE', 'STUDENT NAME', 'CAMPUS','GENDER','CTYPE', 'SEC', 'BATCH', 'TESTID', 'QUESTION TYPE', 'QUESTION ORDER', 'TOTAL QUESTIONS', 'EXAM DATE', 'NET TOTAL'];
+        $csvHeaders = ['SID', 'MODE', 'STUDENT NAME', 'CAMPUS', 'GENDER', 'CTYPE', 'SEC', 'BATCH', 'TESTID', 'QUESTION TYPE', 'QUESTION ORDER', 'TOTAL QUESTIONS', 'EXAM DATE', 'NET TOTAL'];
 
         foreach ($subjects as $s) {
             $csvHeaders = array_merge($csvHeaders, ["{$s} Correct", "{$s} Wrong", "{$s} UnAttempted", "{$s} Total"]);
@@ -1065,7 +1117,7 @@ class ReportController extends Controller
 
         $csvData = [['Title', 'Subject Wise Marks'], ['Exam Name', $exam->name], [], $csvHeaders];
         foreach ($answers as $a) {
-            $row = [$a->student_id, $a->mode, $a->student?->student_name, $a->student?->branch?->name,$a->student?->gender, $a->student?->coaching_type,$a->student?->section,$a->student?->batch,$a->test_id,$a->question_type, $a->question_order,$exam->total_questions, $exam->exam_date,$a->total];
+            $row = [$a->student_id, $a->mode, $a->student?->student_name, $a->student?->branch?->name, $a->student?->gender, $a->student?->coaching_type, $a->student?->section, $a->student?->batch, $a->test_id, $a->question_type, $a->question_order, $exam->total_questions, $exam->exam_date, $a->total];
             foreach ($subjects as $s) {
                 $row = array_merge($row, [$a->{"{$s}_CORRECT"} ?? 0, $a->{"{$s}_WRONG"} ?? 0, $a->{"{$s}_UNATTEMPTED"} ?? 0, $a->{"{$s}_MARK"} ?? 0]);
             }
@@ -1076,31 +1128,31 @@ class ReportController extends Controller
     }
     public function RangeReport(Request $request)
     {
-      $test_name = $request->test_name;
+        $test_name = $request->test_name;
 
-    if (!$test_name) {
-        return back()->with('error', 'Please select exam name.');
-    }
+        if (!$test_name) {
+            return back()->with('error', 'Please select exam name.');
+        }
 
-    $results = DB::table('exam_answer as ea')
-        ->join('student as s', 's.student_id', '=', 'ea.student_id')
-        ->where('ea.testname', $test_name)
-        ->where('ea.academic_year', $this->academic_year)
-        ->select('ea.student_id','s.student_name','s.coaching_type')
-        ->selectRaw('SUM(COALESCE(ea.mark, 0)) as total_mark')
-        ->groupBy('ea.student_id','s.student_name','s.coaching_type')
-        ->orderByDesc('total_mark')
-        ->get();
-        
+        $results = DB::table('exam_answer as ea')
+            ->join('student as s', 's.student_id', '=', 'ea.student_id')
+            ->where('ea.testname', $test_name)
+            ->where('ea.academic_year', $this->academic_year)
+            ->select('ea.student_id', 's.student_name', 's.coaching_type')
+            ->selectRaw('SUM(COALESCE(ea.mark, 0)) as total_mark')
+            ->groupBy('ea.student_id', 's.student_name', 's.coaching_type')
+            ->orderByDesc('total_mark')
+            ->get();
+
         $coachingTypes = $results
-        ->pluck('coaching_type')
-        ->filter()
-        ->map(function ($type) {
-            return strtoupper(trim($type));
-        })
-        ->unique()
-        ->implode(' / ');
-        
+            ->pluck('coaching_type')
+            ->filter()
+            ->map(function ($type) {
+                return strtoupper(trim($type));
+            })
+            ->unique()
+            ->implode(' / ');
+
         $firstMark = $results->max(function ($student) {
             return (float) $student->total_mark;
         });
@@ -1108,10 +1160,10 @@ class ReportController extends Controller
         $rangeMarks = $request->input('range_mark', []);
         $rangeMarks = collect($rangeMarks)->filter(function ($mark) {
             return is_numeric($mark);
-            })
-        ->map(function ($mark) {
-            return (float) $mark;
-        })->unique()->sortDesc()->values();
+        })
+            ->map(function ($mark) {
+                return (float) $mark;
+            })->unique()->sortDesc()->values();
 
         $exam = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->first();
 
@@ -1119,7 +1171,7 @@ class ReportController extends Controller
             return back()->with('error', 'Exam not found.');
         }
 
-         $questionCount = DB::table('exam_answer')->where('testname', $test_name)->where('academic_year', $this->academic_year)
+        $questionCount = DB::table('exam_answer')->where('testname', $test_name)->where('academic_year', $this->academic_year)
             ->where(function ($query) {
                 $query->whereNull('answer_key')
                     ->orWhere('answer_key', '!=', 'DEL');
@@ -1127,16 +1179,16 @@ class ReportController extends Controller
             ->distinct()
             ->count('q_no');
 
-            $totalMark = $questionCount * 4;
+        $totalMark = $questionCount * 4;
 
-                $rangeReport = collect();
-                    foreach ($rangeMarks as $range) {
-                        $count = $results
-                            ->filter(function ($student) use ($range) {
-                                return (float) $student->total_mark >= $range;
-                            })->count();
+        $rangeReport = collect();
+        foreach ($rangeMarks as $range) {
+            $count = $results
+                ->filter(function ($student) use ($range) {
+                    return (float) $student->total_mark >= $range;
+                })->count();
 
-                if ($range == $totalMark) {
+            if ($range == $totalMark) {
                 $rangeText = $range . ' / ' . $totalMark;
             } else {
                 $rangeText = $range . ' AND ABOVE';
@@ -1146,37 +1198,37 @@ class ReportController extends Controller
                 'range' => $rangeText,
                 'count' => $count,
             ]);
-    }
+        }
 
-    $pdf = Pdf::loadView('pdf.range_report', ['test_name'   => $test_name,'firstMark'   => $firstMark,'rangeReport' => $rangeReport,'totalMark'   => $totalMark, 'coachingTypes' => $coachingTypes ]);
+        $pdf = Pdf::loadView('pdf.range_report', ['test_name'   => $test_name, 'firstMark'   => $firstMark, 'rangeReport' => $rangeReport, 'totalMark'   => $totalMark, 'coachingTypes' => $coachingTypes]);
 
-    return $pdf->download('Range_Report_' . $test_name . '.pdf');    
+        return $pdf->download('Range_Report_' . $test_name . '.pdf');
     }
-   public function getSubjectRangeSubjects(Request $request)
+    public function getSubjectRangeSubjects(Request $request)
     {
         $exam = Exam::where('academic_year', $this->academic_year)->where('name', $request->test_name)->first();
 
         if (!$exam) {
-            return response()->json(['status' => false,'subjects' => [] ]);
+            return response()->json(['status' => false, 'subjects' => []]);
         }
         $subjects = [];
-        if ($exam->physics_questions !== null ) {
+        if ($exam->physics_questions !== null) {
             $subjects[] = 'physics';
         }
-        if ($exam->chemistry_questions !== null ) {
+        if ($exam->chemistry_questions !== null) {
             $subjects[] = 'chemistry';
         }
-        if ($exam->botany_questions !== null ) {
+        if ($exam->botany_questions !== null) {
             $subjects[] = 'botany';
         }
-        if ($exam->zoology_questions !== null ) {
+        if ($exam->zoology_questions !== null) {
             $subjects[] = 'zoology';
         }
-        if ($exam->biology_questions !== null ) {
+        if ($exam->biology_questions !== null) {
             $subjects[] = 'biology';
         }
-        return response()->json(['status' => true,'subjects' => $subjects ]);
-    } 
+        return response()->json(['status' => true, 'subjects' => $subjects]);
+    }
     public function SubjectRangeReport(Request $request)
     {
         $test_name = $request->test_name;
@@ -1198,43 +1250,43 @@ class ReportController extends Controller
         $hasSubject = fn($subject) => $subjects->contains($subject);
 
         $subjectTotals = DB::table('exam_answer')
-    ->where('test_id', $exam->testid)
-    ->where('academic_year', $this->academic_year)
-    ->where(function ($query) {
-        $query->whereNull('answer_key')
-              ->orWhere('answer_key', '!=', 'DEL');
-    })
-    ->whereNotNull('mark')
-    ->selectRaw('subject, COUNT(DISTINCT q_no) * 4 AS total')
-    ->groupBy('subject')
-    ->pluck('total', 'subject');
+            ->where('test_id', $exam->testid)
+            ->where('academic_year', $this->academic_year)
+            ->where(function ($query) {
+                $query->whereNull('answer_key')
+                    ->orWhere('answer_key', '!=', 'DEL');
+            })
+            ->whereNotNull('mark')
+            ->selectRaw('subject, COUNT(DISTINCT q_no) * 4 AS total')
+            ->groupBy('subject')
+            ->pluck('total', 'subject');
 
         $physicsTotal = $hasSubject('Physics')
-    ? ($subjectTotals['PHYSICS'] ?? 0)
-    : 0;
+            ? ($subjectTotals['PHYSICS'] ?? 0)
+            : 0;
 
-$chemistryTotal = $hasSubject('Chemistry')
-    ? ($subjectTotals['CHEMISTRY'] ?? 0)
-    : 0;
+        $chemistryTotal = $hasSubject('Chemistry')
+            ? ($subjectTotals['CHEMISTRY'] ?? 0)
+            : 0;
 
-$botanyTotal = $hasSubject('Botany')
-    ? ($subjectTotals['BOTANY'] ?? 0)
-    : 0;
+        $botanyTotal = $hasSubject('Botany')
+            ? ($subjectTotals['BOTANY'] ?? 0)
+            : 0;
 
-$zoologyTotal = $hasSubject('Zoology')
-    ? ($subjectTotals['ZOOLOGY'] ?? 0)
-    : 0;
+        $zoologyTotal = $hasSubject('Zoology')
+            ? ($subjectTotals['ZOOLOGY'] ?? 0)
+            : 0;
 
-$biologyTotal = $hasSubject('Biology')
-    ? ($subjectTotals['BIOLOGY'] ?? 0)
-    : 0;
+        $biologyTotal = $hasSubject('Biology')
+            ? ($subjectTotals['BIOLOGY'] ?? 0)
+            : 0;
 
 
-        
+
         $overallTotal   = $physicsTotal + $chemistryTotal + $botanyTotal + $zoologyTotal + $biologyTotal;
 
         $makeCondition = fn($subject) =>
-    "ea.subject = '{$subject}'";
+        "ea.subject = '{$subject}'";
 
         $phyCond = $hasSubject('Physics')
             ? $makeCondition('PHYSICS')
@@ -1256,8 +1308,8 @@ $biologyTotal = $hasSubject('Biology')
             ? $makeCondition('BIOLOGY')
             : "1 = 0";
         $students = DB::table('exam_answer as ea')->join('student as s', 's.student_id', '=', 'ea.student_id')->where('ea.testname', $test_name)->where('ea.academic_year', $this->academic_year)->where(function ($query) {
-                $query->whereNull('ea.answer_key')->orWhere('ea.answer_key', '!=', 'DEL');
-            })
+            $query->whereNull('ea.answer_key')->orWhere('ea.answer_key', '!=', 'DEL');
+        })
             ->select('ea.student_id', 's.student_name', 's.coaching_type')
             ->selectRaw("SUM(CASE WHEN {$phyCond} THEN COALESCE(ea.mark, 0) ELSE 0 END) AS physics_mark")
             ->selectRaw("SUM(CASE WHEN {$chemCond} THEN COALESCE(ea.mark, 0) ELSE 0 END) AS chemistry_mark")
@@ -1283,7 +1335,7 @@ $biologyTotal = $hasSubject('Biology')
             return $ranges->map(function ($range) use ($students, $field, $total) {
                 $count = $students->filter(function ($student) use ($range, $field) {
                     if ($field === 'overall') {
-                        $mark = $student->physics_mark +$student->chemistry_mark + $student->botany_mark + $student->zoology_mark + $student->biology_mark;
+                        $mark = $student->physics_mark + $student->chemistry_mark + $student->botany_mark + $student->zoology_mark + $student->biology_mark;
                         return $mark >= $range;
                     }
                     return $student->{$field} >= $range;
@@ -1291,7 +1343,7 @@ $biologyTotal = $hasSubject('Biology')
 
                 $rangeText = ($range == $total)  ? "{$range} / {$total}" : "{$range} AND ABOVE";
 
-                return ['range' => $rangeText,'count' => $count, ];
+                return ['range' => $rangeText, 'count' => $count,];
             });
         };
 
@@ -1329,7 +1381,9 @@ $biologyTotal = $hasSubject('Biology')
     }
     public function Dump_Report(Request $request)
     {
-        $tests = Exam::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($query) { $query->where('branch_id','like','%' . auth()->user()->branch . '%'); })->select('name')->distinct()->orderBy('name')->get();
+        $tests = Exam::where('academic_year', $this->academic_year)->when(auth()->user()->branch, function ($query) {
+            $query->where('branch_id', 'like', '%' . auth()->user()->branch . '%');
+        })->select('name')->distinct()->orderBy('name')->get();
         $branches = Branch::orderBy('name')->get();
         $branch_id = $request->input('branch_id');
 
@@ -1351,17 +1405,26 @@ $biologyTotal = $hasSubject('Biology')
                 $subjects = array_values(array_filter(array_map('trim', explode(',', $exam->subject_name ?? ''))));
                 $test_ids = Exam::where('academic_year', $this->academic_year)->where('name', $test_name)->pluck('testid')->implode(',');
 
-                $results = DB::table('exam_answer as ea')->join('student as s','s.student_id','=','ea.student_id')
-                    ->leftJoin('branch as b','b.id','=','s.campus')
+                $results = DB::table('exam_answer as ea')->join('student as s', 's.student_id', '=', 'ea.student_id')
+                    ->leftJoin('branch as b', 'b.id', '=', 's.campus')
                     ->where('ea.testname', $test_name)
                     ->where('ea.academic_year', $this->academic_year)
                     ->when($branch_id, function ($query) use ($branch_id) {
-                            $query->where('s.campus', $branch_id);
-                        })
-                    ->select('ea.test_id','ea.student_id','ea.mode as stmode','s.student_name','s.gender','s.coaching_type','s.section','s.batch',
-                    DB::raw("SUBSTRING_INDEX(b.campus, ',', 1) as campus"))
+                        $query->where('s.campus', $branch_id);
+                    })
+                    ->select(
+                        'ea.test_id',
+                        'ea.student_id',
+                        'ea.mode as stmode',
+                        's.student_name',
+                        's.gender',
+                        's.coaching_type',
+                        's.section',
+                        's.batch',
+                        DB::raw("SUBSTRING_INDEX(b.campus, ',', 1) as campus")
+                    )
                     ->selectRaw('SUM(COALESCE(ea.mark, 0)) as mark')
-                    ->groupBy('ea.test_id','ea.student_id','ea.mode','s.student_name','s.gender','s.coaching_type','s.section','b.campus','s.batch')
+                    ->groupBy('ea.test_id', 'ea.student_id', 'ea.mode', 's.student_name', 's.gender', 's.coaching_type', 's.section', 'b.campus', 's.batch')
                     ->orderByDesc('mark')
                     ->orderBy('s.student_name')
                     ->get();
@@ -1385,7 +1448,7 @@ $biologyTotal = $hasSubject('Biology')
                         ->keyBy(function ($row) {
                             return $row->student_id . '|' . strtoupper(trim($row->subject));
                         });
-                }   
+                }
             }
         }
 
@@ -1429,9 +1492,9 @@ $biologyTotal = $hasSubject('Biology')
             ]);
         }
 
-        return view('exam.dump_report', compact( 'tests','test_name','test_ids','results','subjects','marks', 'totalMarks', 'allOffline', 'branches', 'branch_id'));
+        return view('exam.dump_report', compact('tests', 'test_name', 'test_ids', 'results', 'subjects', 'marks', 'totalMarks', 'allOffline', 'branches', 'branch_id'));
     }
-    
+
     public function RoomAllocation(Request $request)
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
@@ -1458,12 +1521,16 @@ $biologyTotal = $hasSubject('Biology')
     {
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
-        $register = $request->room ? InOutRegister::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->when($request->filled('from_date'),
-         function ($q) use ($request) {$q->whereDate('created_at', '>=', $request->from_date); })->when($request->filled('to_date'), function ($q) use ($request) {
+        $register = $request->room ? InOutRegister::where('hostel_id', $request->hostel)->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))->when(
+            $request->filled('from_date'),
+            function ($q) use ($request) {
+                $q->whereDate('created_at', '>=', $request->from_date);
+            }
+        )->when($request->filled('to_date'), function ($q) use ($request) {
             $q->whereDate('created_at', '<=', $request->to_date);
         })
-        ->with('student')
-        ->get() : collect();
+            ->with('student')
+            ->get() : collect();
         return view('report.inoutregister', compact('hostels', 'room', 'register'));
     }
 
@@ -1473,17 +1540,17 @@ $biologyTotal = $hasSubject('Biology')
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
         $sickroom = $request->room
             ? SickRoomEntry::where('hostel_id', $request->hostel)
-                ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
-                ->when($request->filled('from_date'), function ($q) use ($request) {
-                    $q->whereDate('in_time', '>=', $request->from_date);
-                })
-                ->when($request->filled('to_date'), function ($q) use ($request) {
-                    $q->whereDate('in_time', '<=', $request->to_date);
-                })
-                ->with('student')
-                ->get()
-            : collect();       
-             return view('report.sickroom', compact('hostels', 'room', 'sickroom'));
+            ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
+            ->when($request->filled('from_date'), function ($q) use ($request) {
+                $q->whereDate('in_time', '>=', $request->from_date);
+            })
+            ->when($request->filled('to_date'), function ($q) use ($request) {
+                $q->whereDate('in_time', '<=', $request->to_date);
+            })
+            ->with('student')
+            ->get()
+            : collect();
+        return view('report.sickroom', compact('hostels', 'room', 'sickroom'));
     }
 
     public function Medical(Request $request)
@@ -1492,22 +1559,22 @@ $biologyTotal = $hasSubject('Biology')
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
         $medical = $request->room
             ? Medical::where('hostel_id', $request->hostel)
-                ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
-                ->when($request->filled('from_date'), function ($q) use ($request) {
-                    $q->whereDate('in_time', '>=', $request->from_date);
-                })
-                ->when($request->filled('to_date'), function ($q) use ($request) {
-                    $q->whereDate('in_time', '<=', $request->to_date);
-                })
-                ->with('student')
-                ->get()
-            : collect();       
-             return view('report.medical', compact('hostels', 'room', 'medical'));
+            ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
+            ->when($request->filled('from_date'), function ($q) use ($request) {
+                $q->whereDate('in_time', '>=', $request->from_date);
+            })
+            ->when($request->filled('to_date'), function ($q) use ($request) {
+                $q->whereDate('in_time', '<=', $request->to_date);
+            })
+            ->with('student')
+            ->get()
+            : collect();
+        return view('report.medical', compact('hostels', 'room', 'medical'));
     }
 
-   public function HostelAttendance(Request $request)
+    public function HostelAttendance(Request $request)
     {
-        $branches = Branch::all(); 
+        $branches = Branch::all();
         $hostels = collect();
         $section = collect();
         $rooms = collect();
@@ -1536,7 +1603,7 @@ $biologyTotal = $hasSubject('Biology')
                     ->where('academic_year', $this->academic_year)
                     ->whereBetween('attendance_date', [$request->from_date, $request->to_date])
                     ->get()
-                    ->groupBy(function($item) {
+                    ->groupBy(function ($item) {
                         return $item->student_id . '_' . $item->attendance_date;
                     });
             }
@@ -1544,7 +1611,7 @@ $biologyTotal = $hasSubject('Biology')
 
         if ($active_tab == 'room_tab') {
             $room_hostel_id = $request->room_hostel_id;
-            
+
             if ($room_hostel_id) {
                 $rooms = Student::where('hostel_id', $room_hostel_id)
                     ->where('hostel_dayscholar', 'HOSTEL')
@@ -1567,7 +1634,7 @@ $biologyTotal = $hasSubject('Biology')
                     ->whereBetween('attendance_date', [$request->from_date, $request->to_date])
                     ->where('academic_year', $this->academic_year)
                     ->get()
-                    ->groupBy(function($item) {
+                    ->groupBy(function ($item) {
                         return $item->student_id . '_' . $item->attendance_date;
                     });
             }
@@ -1608,8 +1675,8 @@ $biologyTotal = $hasSubject('Biology')
 
         return view('report.hostelattendance', compact('branches', 'hostels', 'section', 'rooms', 'attendance', 'active_tab'));
     }
-        public function HostelList(Request $request)
-       {
+    public function HostelList(Request $request)
+    {
         $branches = Branch::all();
         $hostels = collect();
         $sections = collect();
@@ -1648,7 +1715,7 @@ $biologyTotal = $hasSubject('Biology')
         if ($request->filled('branch') && $hostels->isEmpty()) {
             $hostels = Hostel::where('branch_id', $request->branch)->get();
         }
-        
+
         $room_hostels = collect();
         if ($request->filled('room_branch')) {
             $room_hostels = Hostel::where('branch_id', $request->room_branch)->get();
@@ -1691,12 +1758,12 @@ $biologyTotal = $hasSubject('Biology')
         $room = $request->room_no;
         $view = $request->view;
         $hostelName = Hostel::find($request->room_hostel)?->name ?? 'Hostel';
-        
+
 
         $students = Student::where('campus', $request->room_branch)
-            ->where('hostel_id', $request->room_hostel) 
+            ->where('hostel_id', $request->room_hostel)
             ->where('room_no', $room)
-        
+
             ->where('hostel_dayscholar', 'HOSTEL')
             ->where('academic_year', $this->academic_year)
             ->get();
@@ -1710,14 +1777,14 @@ $biologyTotal = $hasSubject('Biology')
         $hostels = $request->branch ? Hostel::where('branch_id', $request->branch)->get() : collect();
         $room = $request->hostel ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->pluck('room_no') : collect();
         $hostel_courier = $request->room
-        ? HostelCourier::where('hostel_id', $request->hostel)
+            ? HostelCourier::where('hostel_id', $request->hostel)
             ->when($request->room != 'all', fn($q) => $q->where('room_no', $request->room))
             ->when($request->filled('from_date'), function ($q) use ($request) {
-            $q->whereDate('datetime_arrival', '>=', $request->from_date);
-        })
+                $q->whereDate('datetime_arrival', '>=', $request->from_date);
+            })
             ->when($request->filled('to_date'), function ($q) use ($request) {
-            $q->whereDate('datetime_arrival', '<=', $request->to_date);
-        })
+                $q->whereDate('datetime_arrival', '<=', $request->to_date);
+            })
             ->with('student')
             ->get()
             : collect();
@@ -1765,91 +1832,93 @@ $biologyTotal = $hasSubject('Biology')
 
         if ($request->room) {
 
-        $vacate_log = DB::table('vacate_log')
-            ->where('hostel_id', $request->hostel)
-            ->when($request->room != 'all', function ($q) use ($request) {
-            $q->where('room_no', $request->room);
-            })
+            $vacate_log = DB::table('vacate_log')
+                ->where('hostel_id', $request->hostel)
+                ->when($request->room != 'all', function ($q) use ($request) {
+                    $q->where('room_no', $request->room);
+                })
                 ->when($request->filled('from_date'), function ($q) use ($request) {
-                $q->whereDate('datetime', '>=', $request->from_date);
-            })
+                    $q->whereDate('datetime', '>=', $request->from_date);
+                })
                 ->when($request->filled('to_date'), function ($q) use ($request) {
-                $q->whereDate('datetime', '<=', $request->to_date);
-            })
+                    $q->whereDate('datetime', '<=', $request->to_date);
+                })
                 ->orderBy('datetime', 'desc')
                 ->get();
         }
         return view('report.hostelvacate', compact('hostels', 'room', 'vacate_log'));
     }
     public function HostelVacancy(Request $request)
-        {
-            $branches = Branch::all();
-            $hostels = $request->filled('branch') ? Hostel::where('branch_id', $request->branch)->get() : collect();
-            $room = $request->filled('hostel') ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->orderBy('room_no')->pluck('room_no') : collect();
+    {
+        $branches = Branch::all();
+        $hostels = $request->filled('branch') ? Hostel::where('branch_id', $request->branch)->get() : collect();
+        $room = $request->filled('hostel') ? HostelRoom::where('hostel_id', $request->hostel)->distinct()->orderBy('room_no')->pluck('room_no') : collect();
 
-            $vacancy_log = collect();
+        $vacancy_log = collect();
 
-            if ($request->filled('branch') && $request->filled('hostel')) {
-                $occupiedCounts = Student::where('hostel_id', $request->hostel)
-                    ->when(auth()->user()->branch, fn($q) => $q->where('campus', auth()->user()->branch))
-                    ->whereNotNull('room_no')
-                    ->where('academic_year', $this->academic_year)
-                    ->where('room_no', '!=', '')
-                    ->groupBy('room_no')
-                    ->select('room_no', DB::raw('count(*) as count'))
-                    ->pluck('count', 'room_no')
-                    ->toArray();
+        if ($request->filled('branch') && $request->filled('hostel')) {
+            $occupiedCounts = Student::where('hostel_id', $request->hostel)
+                ->when(auth()->user()->branch, fn($q) => $q->where('campus', auth()->user()->branch))
+                ->whereNotNull('room_no')
+                ->where('academic_year', $this->academic_year)
+                ->where('room_no', '!=', '')
+                ->groupBy('room_no')
+                ->select('room_no', DB::raw('count(*) as count'))
+                ->pluck('count', 'room_no')
+                ->toArray();
 
-                $roomsQuery = HostelRoom::where('hostel_id', $request->hostel);
+            $roomsQuery = HostelRoom::where('hostel_id', $request->hostel);
 
-                if ($request->filled('room') && $request->room !== 'all') {
-                    $roomsQuery->where('room_no', $request->room);
-                }
+            if ($request->filled('room') && $request->room !== 'all') {
+                $roomsQuery->where('room_no', $request->room);
+            }
 
-                $roomsData = $roomsQuery->select(
-                    'room_no',
-                    DB::raw('MAX(cot_type) as cot_type'),
-                    DB::raw('MAX(no_of_cots) as no_of_cots')
-                )
-                ->groupBy('room_no','cot_type')
+            $roomsData = $roomsQuery->select(
+                'room_no',
+                DB::raw('MAX(cot_type) as cot_type'),
+                DB::raw('MAX(no_of_cots) as no_of_cots')
+            )
+                ->groupBy('room_no', 'cot_type')
                 ->orderByRaw('CAST(SUBSTRING(room_no, 3) AS UNSIGNED) ASC')
                 ->get();
 
-                $selectedHostel = Hostel::find($request->hostel);
-                $hostelName = $selectedHostel ? $selectedHostel->name : '';
+            $selectedHostel = Hostel::find($request->hostel);
+            $hostelName = $selectedHostel ? $selectedHostel->name : '';
 
-                $vacancy_log = $roomsData->map(function ($roomRecord) use ($occupiedCounts, $hostelName) {
-                    $roomNo = trim($roomRecord->room_no);
-                    $occupied = $occupiedCounts[$roomNo] ?? 0;
-                    $capacity = (int) $roomRecord->no_of_cots;
-                    $vacancy = max(0, $capacity - $occupied);
+            $vacancy_log = $roomsData->map(function ($roomRecord) use ($occupiedCounts, $hostelName) {
+                $roomNo = trim($roomRecord->room_no);
+                $occupied = $occupiedCounts[$roomNo] ?? 0;
+                $capacity = (int) $roomRecord->no_of_cots;
+                $vacancy = max(0, $capacity - $occupied);
 
-                    return (object) [
-                        'hostel_name' => $hostelName,
-                        'room_no'     => $roomRecord->room_no,
-                        'room_type'   => $roomRecord->cot_type ?? 'Standard',
-                        'capacity'    => $capacity,
-                        'occupied'    => $occupied,
-                        'vacancy'     => $vacancy
-                    ];
-                });
-            }
-
-            return view('report.hostelvacancy', compact('branches', 'hostels', 'room', 'vacancy_log'));
+                return (object) [
+                    'hostel_name' => $hostelName,
+                    'room_no'     => $roomRecord->room_no,
+                    'room_type'   => $roomRecord->cot_type ?? 'Standard',
+                    'capacity'    => $capacity,
+                    'occupied'    => $occupied,
+                    'vacancy'     => $vacancy
+                ];
+            });
         }
+
+        return view('report.hostelvacancy', compact('branches', 'hostels', 'room', 'vacancy_log'));
+    }
     public function UserLoginReport(Request $request)
     {
         $branches = Branch::all();
         $students = collect();
 
-        if ($request->filled('student_branch') || $request->filled('course') || $request->filled('hostel_dayscholar') || 
-            $request->filled('coaching_type') || $request->filled('device') || $request->filled('status') || 
-            $request->filled('from_date') || $request->filled('to_date') || $request->filled('student') || $request->filled('search')) {
-            
+        if (
+            $request->filled('student_branch') || $request->filled('course') || $request->filled('hostel_dayscholar') ||
+            $request->filled('coaching_type') || $request->filled('device') || $request->filled('status') ||
+            $request->filled('from_date') || $request->filled('to_date') || $request->filled('student') || $request->filled('search')
+        ) {
+
             $students = Student::leftJoin('user_logs', function ($join) {
-                    $join->on('student.student_id', '=', 'user_logs.user_id')
-                        ->where('user_logs.role', 'Student');
-                })
+                $join->on('student.student_id', '=', 'user_logs.user_id')
+                    ->where('user_logs.role', 'Student');
+            })
                 ->leftJoin('branch', 'branch.id', '=', 'student.campus')
                 ->where('student.academic_year', $this->academic_year)
                 ->when(auth()->user()->branch, function ($q) {
@@ -1896,7 +1965,7 @@ $biologyTotal = $hasSubject('Biology')
                             ->orWhere('student.user_name', 'LIKE', "%{$search}%");
                     });
                 })
-                ->select('student.student_id','student.student_name','branch.campus as campus','student.course','student.section','student.hostel_dayscholar','student.coaching_type','student.father_ph_no','student.mother_ph_no','user_logs.action','user_logs.device','user_logs.created_at as login_time')
+                ->select('student.student_id', 'student.student_name', 'branch.campus as campus', 'student.course', 'student.section', 'student.hostel_dayscholar', 'student.coaching_type', 'student.father_ph_no', 'student.mother_ph_no', 'user_logs.action', 'user_logs.device', 'user_logs.created_at as login_time')
                 ->orderByDesc('user_logs.created_at')
                 ->get();
         }
@@ -1951,10 +2020,10 @@ $biologyTotal = $hasSubject('Biology')
             ->selectRaw("COUNT(DISTINCT CASE WHEN LOWER(user_logs.device) = 'ios' THEN user_logs.user_id END) as iosLogin")
             ->first();
 
-            $todayLogin   = $studentTodayStats->todayLogin ?? 0;
-            $webLogin     = $studentTodayStats->webLogin ?? 0;
-            $androidLogin = $studentTodayStats->androidLogin ?? 0;
-            $iosLogin     = $studentTodayStats->iosLogin ?? 0;
+        $todayLogin   = $studentTodayStats->todayLogin ?? 0;
+        $webLogin     = $studentTodayStats->webLogin ?? 0;
+        $androidLogin = $studentTodayStats->androidLogin ?? 0;
+        $iosLogin     = $studentTodayStats->iosLogin ?? 0;
 
         $adminbranchtotal = DB::table('users')->whereIn('type', ['Admin', 'Branch Admin'])->count();
 
@@ -2005,7 +2074,7 @@ $biologyTotal = $hasSubject('Biology')
             ->distinct()
             ->get();
 
-        
+
         $userLogSub = DB::table('user_logs')
             ->where('role', 'Student')
             ->select('user_id')
@@ -2049,8 +2118,8 @@ $biologyTotal = $hasSubject('Biology')
             ->orderBy('branch.name')
             ->get();
 
-        return view('report.userloginreport', compact('students', 'branches', 'courses', 'coaching_type', 'hosteldayscolor','totalStudents', 'todayLogin', 'webLogin', 'androidLogin', 'iosLogin','adminLogs', 'adminbranchtotal', 'adminTodayLogin', 'webAdminTodayLogin','andriodadmin', 'iosadmin', 'summary'));
-    }   
+        return view('report.userloginreport', compact('students', 'branches', 'courses', 'coaching_type', 'hosteldayscolor', 'totalStudents', 'todayLogin', 'webLogin', 'androidLogin', 'iosLogin', 'adminLogs', 'adminbranchtotal', 'adminTodayLogin', 'webAdminTodayLogin', 'andriodadmin', 'iosadmin', 'summary'));
+    }
     public function individualStudentReport(Request $request)
     {
         $isApi = $request->is('api/*') || $request->wantsJson();
@@ -2064,7 +2133,7 @@ $biologyTotal = $hasSubject('Biology')
                     $s = $request->search;
                     $q->where(function ($qq) use ($s) {
                         $qq->where('student_id', 'like', "%{$s}%")
-                           ->orWhere('student_name', 'like', "%{$s}%");
+                            ->orWhere('student_name', 'like', "%{$s}%");
                     });
                 })
                 ->orderBy('student_name')
@@ -2075,17 +2144,19 @@ $biologyTotal = $hasSubject('Biology')
         $user = auth()->user();
 
         $students = Student::select('student_id', 'student_name')
-        ->where('academic_year', $this->academic_year)
-        ->when( $user && strtolower(trim($user->type ?? '')) !== 'admin', function ($q) use ($user) {
-                $branchIds = array_filter(  explode(',', $user->branch_ids ?? '') );
-                if (empty($branchIds) && $user->branch) {
-                    $branchIds = [$user->branch];
+            ->where('academic_year', $this->academic_year)
+            ->when(
+                $user && strtolower(trim($user->type ?? '')) !== 'admin',
+                function ($q) use ($user) {
+                    $branchIds = array_filter(explode(',', $user->branch_ids ?? ''));
+                    if (empty($branchIds) && $user->branch) {
+                        $branchIds = [$user->branch];
+                    }
+                    $q->whereIn('campus', $branchIds);
                 }
-                $q->whereIn('campus', $branchIds);
-            }
-        )
-        ->orderBy('student_name')
-        ->get();
+            )
+            ->orderBy('student_name')
+            ->get();
 
         if ($request->isMethod('post')) {
             $student = Student::where('student_id', $request->student_id)->first();
@@ -2096,87 +2167,87 @@ $biologyTotal = $hasSubject('Biology')
                 return back()->with('error', 'Student not found');
             }
             $allExams = ExamSubjectReport::select(
-        'category',
-        'subject',
-        'exdate'
-    )
-    ->where('stuid', $student->student_id)
-    ->groupBy('category', 'subject', 'exdate', 'sec')
-    ->get()
-    ->sortBy(function ($exam) {
+                'category',
+                'subject',
+                'exdate'
+            )
+                ->where('stuid', $student->student_id)
+                ->groupBy('category', 'subject', 'exdate', 'sec')
+                ->get()
+                ->sortBy(function ($exam) {
 
-        $category = $exam->category;
+                    $category = $exam->category;
 
-        // Main category order
-        if (str_starts_with($category, 'CUMULATIVE TEST')) {
-            $groupOrder = 1;
-        } elseif (str_starts_with($category, 'GRAND TEST')) {
-            $groupOrder = 2;
-        } elseif (str_starts_with($category, 'WEEKEND TEST')) {
-            $groupOrder = 3;
-        } elseif (str_starts_with($category, 'UNIT TEST')) {
-            $groupOrder = 4;
-        } else {
-            $groupOrder = 99;
-        }
+                    // Main category order
+                    if (str_starts_with($category, 'CUMULATIVE TEST')) {
+                        $groupOrder = 1;
+                    } elseif (str_starts_with($category, 'GRAND TEST')) {
+                        $groupOrder = 2;
+                    } elseif (str_starts_with($category, 'WEEKEND TEST')) {
+                        $groupOrder = 3;
+                    } elseif (str_starts_with($category, 'UNIT TEST')) {
+                        $groupOrder = 4;
+                    } else {
+                        $groupOrder = 99;
+                    }
 
-        // Subject order
-        if (str_contains($category, 'PHY')) {
-            $subjectOrder = 1;
-        } elseif (str_contains($category, 'CHE')) {
-            $subjectOrder = 2;
-        } elseif (str_contains($category, 'BOT')) {
-            $subjectOrder = 3;
-        } elseif (str_contains($category, 'ZOO')) {
-            $subjectOrder = 4;
-        } elseif (str_contains($category, 'BIO')) {
-            $subjectOrder = 5;
-        } else {
-            $subjectOrder = 0;
-        }
+                    // Subject order
+                    if (str_contains($category, 'PHY')) {
+                        $subjectOrder = 1;
+                    } elseif (str_contains($category, 'CHE')) {
+                        $subjectOrder = 2;
+                    } elseif (str_contains($category, 'BOT')) {
+                        $subjectOrder = 3;
+                    } elseif (str_contains($category, 'ZOO')) {
+                        $subjectOrder = 4;
+                    } elseif (str_contains($category, 'BIO')) {
+                        $subjectOrder = 5;
+                    } else {
+                        $subjectOrder = 0;
+                    }
 
-        // Plain CUMULATIVE TEST first
-        if ($category === 'CUMULATIVE TEST') {
-            $subjectOrder = 0;
-        }
-        $date = \Carbon\Carbon::createFromFormat('d-m-Y', $exam->exdate);
-        return [($groupOrder * 100) + $subjectOrder,$date->timestamp];
-    })
-    ->values();
+                    // Plain CUMULATIVE TEST first
+                    if ($category === 'CUMULATIVE TEST') {
+                        $subjectOrder = 0;
+                    }
+                    $date = \Carbon\Carbon::createFromFormat('d-m-Y', $exam->exdate);
+                    return [($groupOrder * 100) + $subjectOrder, $date->timestamp];
+                })
+                ->values();
 
-        $marks = ExamSubjectReport::where('stuid', $request->student_id)->get();
+            $marks = ExamSubjectReport::where('stuid', $request->student_id)->get();
 
-        $report = collect();
+            $report = collect();
 
-        foreach ($allExams as $exam) {
-            $mark = $marks->firstWhere('subject', $exam->subject);
+            foreach ($allExams as $exam) {
+                $mark = $marks->firstWhere('subject', $exam->subject);
 
-            $subjectFields = ['phy', 'che', 'bot', 'zoo', 'bio'];
-            $subjectData = [];
+                $subjectFields = ['phy', 'che', 'bot', 'zoo', 'bio'];
+                $subjectData = [];
 
-            foreach ($subjectFields as $key) {
-                $subjectData[$key . '_r'] = $mark->{$key . '_r'} ?? 0;
-                $subjectData[$key . '_w'] = $mark->{$key . '_w'} ?? 0;
-                $subjectData[$key . '_l'] = $mark->{$key . '_l'} ?? 0;
+                foreach ($subjectFields as $key) {
+                    $subjectData[$key . '_r'] = $mark->{$key . '_r'} ?? 0;
+                    $subjectData[$key . '_w'] = $mark->{$key . '_w'} ?? 0;
+                    $subjectData[$key . '_l'] = $mark->{$key . '_l'} ?? 0;
+                }
+
+                $data = [
+                    'category' => $exam->category,
+                    'subject'  => $exam->subject,
+                    'exdate'   => $exam->exdate,
+                    'phy_tot' => $mark->phy_tot ?? null,
+                    'che_tot' => $mark->che_tot ?? null,
+                    'bot_tot' => $mark->bot_tot ?? null,
+                    'zoo_tot' => $mark->zoo_tot ?? null,
+                    'bio_tot' => $mark->bio_tot ?? null,
+                    'nettot'  => $mark->nettot ?? null,
+                    'totmark' => $mark->totmark ?? 0,
+                ];
+
+                $data = array_merge($data, $subjectData);
+
+                $report->push((object) $data);
             }
-
-            $data = [
-                'category' => $exam->category,
-                'subject'  => $exam->subject,
-                'exdate'   => $exam->exdate,
-                'phy_tot' => $mark->phy_tot ?? null,
-                'che_tot' => $mark->che_tot ?? null,
-                'bot_tot' => $mark->bot_tot ?? null,
-                'zoo_tot' => $mark->zoo_tot ?? null,
-                'bio_tot' => $mark->bio_tot ?? null,
-                'nettot'  => $mark->nettot ?? null,
-                'totmark' => $mark->totmark ?? 0,
-            ];
-
-            $data = array_merge($data, $subjectData);
-
-            $report->push((object) $data);
-        }
             $average = [
                 'phy'   => round($marks->avg('phy_tot')),
                 'che'   => round($marks->avg('che_tot')),
@@ -2201,23 +2272,23 @@ $biologyTotal = $hasSubject('Biology')
                     }
                 }
                 // PDF binary for app download
-                $pdf = PDF::loadView('pdf.individualstudentreport', compact('student', 'marks', 'average', 'report') );
+                $pdf = PDF::loadView('pdf.individualstudentreport', compact('student', 'marks', 'average', 'report'));
                 $output = $pdf->output();
                 return response($output, 200, [
                     'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'attachment; filename="'.$student->student_id.'_IndividualStudentReport.pdf"',
+                    'Content-Disposition' => 'attachment; filename="' . $student->student_id . '_IndividualStudentReport.pdf"',
                 ]);
             }
 
-            $pdf = PDF::loadView('pdf.individualstudentreport', compact('student', 'marks', 'average', 'report') );
+            $pdf = PDF::loadView('pdf.individualstudentreport', compact('student', 'marks', 'average', 'report'));
 
-            return $pdf->download( $student->student_id . '_IndividualStudentReport.pdf');
+            return $pdf->download($student->student_id . '_IndividualStudentReport.pdf');
         }
         if ($isApi) {
             return response()->json(['status' => true, 'students' => $students], 200);
         }
         return view('report.individualstudent', compact('students'));
-    }   
+    }
     public function StudentExpense(Request $request)
     {
         $branches = Branch::orderBy('name')->get();
@@ -2227,16 +2298,16 @@ $biologyTotal = $hasSubject('Biology')
         $students = Student::where('academic_year', $this->academic_year)->where('hostel_dayscholar', 'HOSTEL')
             ->when($request->branch, function ($query) use ($request) {
                 $query->where('campus', $request->branch);
-                })
+            })
             ->when($request->hostel, function ($query) use ($request) {
                 $query->where('hostel_id', $request->hostel);
-                })
+            })
             ->when($request->room && $request->room != 'all', function ($query) use ($request) {
                 $query->where('room_no', $request->room);
-                })
+            })
             ->when($request->student_id, function ($query) use ($request) {
                 $query->where('student_id', $request->student_id);
-                })
+            })
             ->orderBy('student_name')
             ->get();
 
@@ -2275,12 +2346,12 @@ $biologyTotal = $hasSubject('Biology')
         }
         if ($request->filled('from_date') || $request->filled('to_date')) {
             $students = $students->filter(function ($student) use ($expenseData) {
-            $expense = $expenseData[$student->student_id] ?? null;
-            if (!$expense) {
-                return false;
-            }
-            return $expense['phone_card_total'] || $expense['sick_room_total'] ;
-        })->values();
+                $expense = $expenseData[$student->student_id] ?? null;
+                if (!$expense) {
+                    return false;
+                }
+                return $expense['phone_card_total'] || $expense['sick_room_total'];
+            })->values();
         }
         return view('report.studentexpance', compact('branches', 'hostels', 'room', 'students', 'expenseData'));
     }
@@ -2373,32 +2444,32 @@ $biologyTotal = $hasSubject('Biology')
         $reports = [];
 
         $allExamRows = DB::table('examsubjectreport')
-    ->join('student', 'student.student_id', '=', 'examsubjectreport.stuid')
-    ->where('student.academic_year', $this->academic_year)
-    ->where('student.campus', $request->branch)
-    ->where('student.course', $request->course)
-    ->where('student.section', $request->section)
-    ->where('student.coaching_type', $request->coaching_type)
-    ->where('examsubjectreport.batch', function ($query) use ($request) {
-        $query->select('batch')
-            ->from('student')
-            ->where('academic_year', $this->academic_year)
-            ->where('campus', $request->branch)
-            ->where('course', $request->course)
-            ->where('section', $request->section)
-            ->where('coaching_type', $request->coaching_type)
-            ->limit(1);
-    })
-    ->select(
-        'examsubjectreport.testid',
-        'examsubjectreport.category',
-        'examsubjectreport.subject',
-        'examsubjectreport.exdate',
-        'examsubjectreport.batch'
-    )
-    ->distinct()
-    ->orderBy('examsubjectreport.exdate')
-    ->get();
+            ->join('student', 'student.student_id', '=', 'examsubjectreport.stuid')
+            ->where('student.academic_year', $this->academic_year)
+            ->where('student.campus', $request->branch)
+            ->where('student.course', $request->course)
+            ->where('student.section', $request->section)
+            ->where('student.coaching_type', $request->coaching_type)
+            ->where('examsubjectreport.batch', function ($query) use ($request) {
+                $query->select('batch')
+                    ->from('student')
+                    ->where('academic_year', $this->academic_year)
+                    ->where('campus', $request->branch)
+                    ->where('course', $request->course)
+                    ->where('section', $request->section)
+                    ->where('coaching_type', $request->coaching_type)
+                    ->limit(1);
+            })
+            ->select(
+                'examsubjectreport.testid',
+                'examsubjectreport.category',
+                'examsubjectreport.subject',
+                'examsubjectreport.exdate',
+                'examsubjectreport.batch'
+            )
+            ->distinct()
+            ->orderBy('examsubjectreport.exdate')
+            ->get();
 
         $fromDate = $request->filled('from_date') ? Carbon::parse($request->from_date)->startOfDay() : null;
         $toDate = $request->filled('to_date') ? Carbon::parse($request->to_date)->endOfDay() : null;
@@ -2560,7 +2631,6 @@ $biologyTotal = $hasSubject('Biology')
                 $row->_pta_group_key =
                     $baseCategory . '|' . $examNumber;
             }
-
         } elseif (
             str_contains(strtoupper($baseCategory), 'CUMULATIVE') &&
             $categorySubject !== null
@@ -2572,7 +2642,6 @@ $biologyTotal = $hasSubject('Biology')
 
             $row->_pta_group_key =
                 $baseCategory . '|' . $categorySubject . '|' . $dateKey;
-
         } else {
 
             $row->_pta_group_key =
@@ -2596,7 +2665,7 @@ $biologyTotal = $hasSubject('Biology')
         });
         $groups = $groups->sortBy(function ($categoryRows, $categoryName) {
             $categoryUpper = strtoupper(trim($categoryName));
-            $categorySubject = strtoupper( trim($categoryRows->first()->_category_subject ?? ''));
+            $categorySubject = strtoupper(trim($categoryRows->first()->_category_subject ?? ''));
             if (str_contains($categoryUpper, 'WEEKEND')) {
                 return 1;
             }
@@ -2685,12 +2754,12 @@ $biologyTotal = $hasSubject('Biology')
                 ->pluck('nettot')
                 ->filter(fn($value) => is_numeric($value));
 
-           $averages['total'] = $totalValues->isNotEmpty() ? round($totalValues->avg()) : null;
+            $averages['total'] = $totalValues->isNotEmpty() ? round($totalValues->avg()) : null;
 
 
-$totalMax = 0;
+            $totalMax = 0;
 
-foreach ($categoryMaxMarks as $maxData) {
+            foreach ($categoryMaxMarks as $maxData) {
                 if (is_array($maxData) && isset($maxData['mark']) && $maxData['mark'] > 0) {
                     $totalMax += (int) $maxData['mark'];
                 }
@@ -2698,78 +2767,74 @@ foreach ($categoryMaxMarks as $maxData) {
 
 
 
-$average180 = [];
+            $average180 = [];
 
-if (str_contains($categoryUpper, 'WEEKEND')) {
+            if (str_contains($categoryUpper, 'WEEKEND')) {
 
-    foreach ([
-        'PHYSICS',
-        'CHEMISTRY',
-        'BOTANY',
-        'ZOOLOGY'
-    ] as $label) {
+                foreach (
+                    [
+                        'PHYSICS',
+                        'CHEMISTRY',
+                        'BOTANY',
+                        'ZOOLOGY'
+                    ] as $label
+                ) {
 
-        $subjectAverage = $averages[$label] ?? null;
+                    $subjectAverage = $averages[$label] ?? null;
 
-        if ($subjectAverage === null) {
-            continue;
-        }
+                    if ($subjectAverage === null) {
+                        continue;
+                    }
 
-        $maxMark = 0;
+                    $maxMark = 0;
 
-        foreach ($categoryMaxMarks as $maxData) {
+                    foreach ($categoryMaxMarks as $maxData) {
 
-            if (
-                is_array($maxData) &&
-                isset($maxData['label']) &&
-                strtoupper(trim($maxData['label'])) === $label
-            ) {
-                $maxMark = (float) ($maxData['mark'] ?? 0);
-                break;
+                        if (
+                            is_array($maxData) &&
+                            isset($maxData['label']) &&
+                            strtoupper(trim($maxData['label'])) === $label
+                        ) {
+                            $maxMark = (float) ($maxData['mark'] ?? 0);
+                            break;
+                        }
+                    }
+
+                    if ($maxMark > 0) {
+
+                        $average180[$label] = round(
+                            ($subjectAverage / $maxMark) * 180,
+                            2
+                        );
+                    }
+                }
+            } elseif (str_contains($categoryUpper, 'CUMULATIVE')) {
+
+                $totalAverage = $averages['total'] ?? null;
+
+                if ($totalAverage !== null && $totalMax > 0) {
+
+                    $average180['TOTAL'] = round(
+                        ($totalAverage / $totalMax) * 180,
+                        2
+                    );
+                }
+            } elseif (str_contains($categoryUpper, 'GRAND')) {
+
+                $totalAverage = $averages['total'] ?? null;
+
+                if ($totalAverage !== null && $totalMax > 0) {
+
+                    $average180['TOTAL'] = round(
+                        ($totalAverage / $totalMax) * 180,
+                        2
+                    );
+                }
             }
-        }
-
-        if ($maxMark > 0) {
-
-            $average180[$label] = round(
-                ($subjectAverage / $maxMark) * 180,
-                2
-            );
-        }
-    }
-}
 
 
-elseif (str_contains($categoryUpper, 'CUMULATIVE')) {
+            $displayCategory = $categoryName;
 
-    $totalAverage = $averages['total'] ?? null;
-
-    if ($totalAverage !== null && $totalMax > 0) {
-
-        $average180['TOTAL'] = round(
-            ($totalAverage / $totalMax) * 180,
-            2
-        );
-    }
-}
-
-
-elseif (str_contains($categoryUpper, 'GRAND')) {
-
-    $totalAverage = $averages['total'] ?? null;
-
-    if ($totalAverage !== null && $totalMax > 0) {
-
-        $average180['TOTAL'] = round(
-            ($totalAverage / $totalMax) * 180,
-            2
-        );
-    }
-}
-
-
-$displayCategory = $categoryName;
-            
 
             if (str_contains($categoryName, '|')) {
                 [$baseCategory, $subjectGroup] = explode('|', $categoryName, 2);
@@ -2798,7 +2863,8 @@ $displayCategory = $categoryName;
         return $report->values();
     }
 
-    private function buildMergedReport($rows, $groupField = null, $includeOverallTop = false, $section = null, $isWeekend = false ) {
+    private function buildMergedReport($rows, $groupField = null, $includeOverallTop = false, $section = null, $isWeekend = false)
+    {
         $groups = $groupField
             ? $rows->groupBy($groupField)
             : $rows->map(fn($r) => collect([$r]));
@@ -2977,11 +3043,10 @@ $displayCategory = $categoryName;
                     if (property_exists($row, $key . '_tot') && $row->{$key . '_tot'} !== null && ($r > 0 || $w > 0 || $l > 0)) {
                         $examExists = true;
                     }
-
-                    } else {
+                } else {
                     $baseCategory = strtoupper(trim($row->_base_category ?? ''));
                     if (str_contains($baseCategory, 'GRAND')) {
-                        if ( $label === 'PHYSICS' || $label === 'CHEMISTRY' || $label === 'BOTANY' ) {
+                        if ($label === 'PHYSICS' || $label === 'CHEMISTRY' || $label === 'BOTANY') {
                             $examExists = true;
                         }
                         continue;
@@ -3075,26 +3140,26 @@ $displayCategory = $categoryName;
     public function allotment(Request $request)
     {
         $user = auth()->user();
-       $query = Student::with(['branch', 'hostel'])
-    ->leftJoin('hostel_rooms', function ($join) {
-        $join->on('hostel_rooms.hostel_id', '=', 'student.hostel_id')
-             ->on('hostel_rooms.room_no', '=', 'student.room_no')
-             ->on('hostel_rooms.cart_no', '=', 'student.cots_no');
-    })
-    ->select(
-        'student.*',
-        'hostel_rooms.floor as hostel_floor'
-    )
+        $query = Student::with(['branch', 'hostel'])
+            ->leftJoin('hostel_rooms', function ($join) {
+                $join->on('hostel_rooms.hostel_id', '=', 'student.hostel_id')
+                    ->on('hostel_rooms.room_no', '=', 'student.room_no')
+                    ->on('hostel_rooms.cart_no', '=', 'student.cots_no');
+            })
+            ->select(
+                'student.*',
+                'hostel_rooms.floor as hostel_floor'
+            )
             ->when($this->academic_year, fn($q) => $q->where('academic_year', $this->academic_year))
             ->when($user && strtolower(trim($user->type ?? '')) !== 'admin', function ($q) use ($user) {
-                    $branchIds = array_filter(
-                        explode(',', $user->branch_ids ?? '')
-                    );
-                    if (empty($branchIds) && $user->branch) {
-                        $branchIds = [$user->branch];
-                    }
-                    $q->whereIn('campus', $branchIds);
-                })
+                $branchIds = array_filter(
+                    explode(',', $user->branch_ids ?? '')
+                );
+                if (empty($branchIds) && $user->branch) {
+                    $branchIds = [$user->branch];
+                }
+                $q->whereIn('campus', $branchIds);
+            })
             ->when($request->filled('branch_id') || $request->filled('campus'), function ($q) use ($request) {
                 $branch = $request->branch_id ?? $request->campus;
                 $q->where('campus', $branch);
@@ -3123,27 +3188,26 @@ $displayCategory = $categoryName;
                         ->orWhere('section', 'like', "%{$search}%");
                 });
             });
-               
-    if ($request->view == 'website_login' && $request->filled('student_id')) {
-        $student = $query->where('student.id', $request->student_id)->firstOrFail();
-        $students = collect([$student]);
-        $branchname = $student->branch->name ?? '';
-        $pdf = Pdf::loadView('pdf.websitelogin',compact('students', 'branchname'));
-        return $pdf->download('Website_Login_Details_' . $student->student_id . '.pdf');
-    }
-    if ($request->view == 'hostel_verification' && $request->filled('student_id')) {
-        $student = $query->where('student.id', $request->student_id)->firstOrFail();
-        $students = collect([$student]);
-        $pdf = Pdf::loadView('pdf.hostelverification',compact('students'));
-        return $pdf->download('Hostel_Verification' . $student->student_id . '.pdf');
-    }
-    if ($request->view == 'hostel_allotment' && $request->filled('student_id')) {
-        $student = $query->where('student.id', $request->student_id)->firstOrFail();
-        $students = collect([$student]);
-        $pdf = Pdf::loadView('pdf.hostelallotment',compact('students'));
-        return $pdf->download('hostel_allotment' . $student->student_id . '.pdf');
 
-    }
+        if ($request->view == 'website_login' && $request->filled('student_id')) {
+            $student = $query->where('student.id', $request->student_id)->firstOrFail();
+            $students = collect([$student]);
+            $branchname = $student->branch->name ?? '';
+            $pdf = Pdf::loadView('pdf.websitelogin', compact('students', 'branchname'));
+            return $pdf->download('Website_Login_Details_' . $student->student_id . '.pdf');
+        }
+        if ($request->view == 'hostel_verification' && $request->filled('student_id')) {
+            $student = $query->where('student.id', $request->student_id)->firstOrFail();
+            $students = collect([$student]);
+            $pdf = Pdf::loadView('pdf.hostelverification', compact('students'));
+            return $pdf->download('Hostel_Verification' . $student->student_id . '.pdf');
+        }
+        if ($request->view == 'hostel_allotment' && $request->filled('student_id')) {
+            $student = $query->where('student.id', $request->student_id)->firstOrFail();
+            $students = collect([$student]);
+            $pdf = Pdf::loadView('pdf.hostelallotment', compact('students'));
+            return $pdf->download('hostel_allotment' . $student->student_id . '.pdf');
+        }
 
         $students = [];
         if ($request->filled('course') || $request->filled('search')) {
@@ -3152,26 +3216,26 @@ $displayCategory = $categoryName;
 
         return view('report.allotment', compact('students'));
     }
-public function visitorVerification(Request $request)
-{
-    $students = collect();
-    $selectedStudent = null;
-    $visitors = collect();
+    public function visitorVerification(Request $request)
+    {
+        $students = collect();
+        $selectedStudent = null;
+        $visitors = collect();
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $students = Student::where(function ($q) use ($search) {
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $students = Student::where(function ($q) use ($search) {
                 $q->where('student_id', 'like', "%{$search}%")
-                  ->orWhere('student_name', 'like', "%{$search}%");
+                    ->orWhere('student_name', 'like', "%{$search}%");
             })->where('academic_year', $this->academic_year)->where('coaching_type', 'OFFLINE')->get();
-    }
-    if ($request->filled('student_id')) {
-        $selectedStudent = Student::where('student_id', $request->student_id)->where('academic_year', $this->academic_year)->first();
-        if ($selectedStudent) {
-            $visitors = collect([$selectedStudent]);
         }
-    }
+        if ($request->filled('student_id')) {
+            $selectedStudent = Student::where('student_id', $request->student_id)->where('academic_year', $this->academic_year)->first();
+            if ($selectedStudent) {
+                $visitors = collect([$selectedStudent]);
+            }
+        }
 
-    return view('report.verification',compact('students', 'selectedStudent', 'visitors'));
-}
+        return view('report.verification', compact('students', 'selectedStudent', 'visitors'));
+    }
 }
