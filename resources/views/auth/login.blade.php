@@ -413,7 +413,7 @@
                 </div>
                 <!-- Slide -->
                 <div class="slide">
-                  <img src="{{asset('img/silde/slide-13a.webp')}}" alt="slide 1">
+                  <img src="{{asset('img/silde/slide-24.webp')}}" alt="slide 1">
                   <div class="slide-info">
                     <div class="slide-text">Batch 2026</div>
                     <!-- data-light contains the image to show in lightbox -->
@@ -431,7 +431,7 @@
                 </div>
                 <!-- Slide 1 -->
                 <div class="slide">
-                  <img src="{{asset('img/silde/slide-15.webp')}}" alt="slide 1">
+                  <img src="{{asset('img/silde/slide-27.webp')}}" alt="slide 1">
                   <div class="slide-info">
                     <div class="slide-text">Batch 2024</div>
                     <!-- data-light contains the image to show in lightbox -->
@@ -468,7 +468,7 @@
 
                 <!-- Slide 7 -->
                 <div class="slide">
-                  <img src="{{asset('img/silde/slide-19.webp')}}" alt="slide 3">
+                  <img src="{{asset('img/silde/slide-26.webp')}}" alt="slide 3">
                   <div class="slide-info">
                     <div class="slide-text">Batch 2020</div>
                     <!-- change this path to your real image -->
@@ -506,7 +506,7 @@
                   </div>
                 </div>
                 <div class="slide">
-                  <img src="{{asset('img/silde/slide-23.webp')}}" alt="slide 3">
+                  <img src="{{asset('img/silde/slide-25.webp')}}" alt="slide 3">
                   <div class="slide-info">
                     <div class="slide-text">YEAR WISE ACHIEVEMENT'S</div>
                     <!-- change this path to your real image -->
