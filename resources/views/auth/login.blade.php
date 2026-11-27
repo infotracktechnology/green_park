@@ -30,6 +30,86 @@
     color: #000 !important;
     text-decoration: none !important;
 }
+
+/* Header Login Queries Highlight (before Contact button) */
+.site-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.header-query-highlight {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: linear-gradient(90deg, #fef9c3, #fef08a);
+    border: 1.5px solid #eab308;
+    border-radius: 999px;
+    padding: 5px 14px;
+    box-shadow: 0 2px 8px rgba(234, 179, 8, 0.25);
+    font-family: 'Poppins', sans-serif;
+}
+
+.header-query-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #14532d;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.header-query-numbers {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.header-query-num {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #15803d;
+    color: #ffffff !important;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+.header-query-num:hover {
+    background: #0b4619;
+    color: #fef08a !important;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 992px) {
+    .header-query-highlight {
+        order: 3;
+        width: 100%;
+        margin-left: 0;
+        justify-content: center;
+        border-radius: 12px;
+        padding: 6px 10px;
+    }
+
+    .site-header .contact-btn {
+        margin-left: auto;
+    }
+
+    .header-query-title,
+    .header-query-num {
+        font-size: 11.5px;
+    }
+}
 </style>
 </head>
 
@@ -40,6 +120,25 @@
       <!-- use your logo path -->
       <img src="{{asset('img/logo.jpg')}}" alt="Green Park logo">
     </div>
+
+    <div class="header-query-highlight" role="region" aria-label="Web Login and App Login Related Queries">
+      <span class="header-query-title">
+        <i class="fa fa-headset" aria-hidden="true"></i>
+        Web Login &amp; App Login Related Queries:
+      </span>
+      <span class="header-query-numbers">
+        <a href="tel:+919360644836" class="header-query-num">
+          <i class="fa fa-phone" aria-hidden="true"></i> 93606 44836
+        </a>
+        <a href="tel:+919361048223" class="header-query-num">
+          <i class="fa fa-phone" aria-hidden="true"></i> 93610 48223
+        </a>
+        <a href="tel:+919342554546" class="header-query-num">
+          <i class="fa fa-phone" aria-hidden="true"></i> 93425 54546
+        </a>
+      </span>
+    </div>
+
     <button class="toggler pro-toggler contact-btn" id="navToggler">
       <i class="fa fa-phone"></i>
       <span>Contact</span>
@@ -54,6 +153,45 @@
       <button class="side-close" aria-label="Close">&times;</button>
     </header>
     <div class="side-panel__body">
+      <!-- WEB & APP LOGIN QUERIES -->
+      <div class="acc-item">
+        <button class="acc-btn" aria-expanded="false">
+          <span class="acc-text">
+            <strong>WEB LOGIN &amp; APP LOGIN RELATED QUERIES</strong>
+            <small>Technical &amp; login support</small>
+          </span>
+          <span class="acc-meta">
+            <svg class="call-icon" viewBox="0 0 24 24">
+              <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+            </svg>
+            <i class="chev"></i>
+          </span>
+        </button>
+        <div class="acc-content">
+          <p></p>
+          <ul class="contact-list">
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919360644836">93606 44836</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919361048223">93610 48223</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919342554546">93425 54546</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
       <!-- OFFLINE ADMISSION -->
       <div class="acc-item">
         <button class="acc-btn" aria-expanded="false">
