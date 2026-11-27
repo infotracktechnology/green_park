@@ -118,7 +118,7 @@
   <header class="site-header">
     <div class="logo">
       <!-- use your logo path -->
-      <img src="{{asset('img/logo.jpg')}}" alt="Green Park logo">
+      <img src="{{asset('img/Logo1.png')}}" alt="Green Park logo">
     </div>
 
     <div class="header-query-highlight" role="region" aria-label="Web Login and App Login Related Queries">
@@ -756,7 +756,7 @@
 
       <!-- COLUMN 1 -->
       <div class="gp-footer-col">
-        <img src="{{asset('img/logo.jpg')}}" alt="GPCC Logo" class="gp-footer-logo">
+        <img src="{{asset('img/Logo1.png')}}" alt="GPCC Logo" class="gp-footer-logo">
         <p class="gp-footer-text font-footer">
           “Bringing Dreams to Reality”, being our tagline, GPCC has set a benchmark for its
           reliability and educational guidance for those who aspire to clear medical entrance
