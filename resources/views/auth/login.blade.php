@@ -54,7 +54,7 @@
 }
 
 .header-query-title {
-    font-size: 12.5px;
+    font-size: 14px;
     font-weight: 700;
     color: #14532d;
     display: inline-flex;
@@ -76,7 +76,7 @@
     gap: 4px;
     background: #15803d;
     color: #ffffff !important;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     padding: 3px 10px;
     border-radius: 999px;
@@ -153,45 +153,7 @@
       <button class="side-close" aria-label="Close">&times;</button>
     </header>
     <div class="side-panel__body">
-      <!-- WEB & APP LOGIN QUERIES -->
-      <div class="acc-item">
-        <button class="acc-btn" aria-expanded="false">
-          <span class="acc-text">
-            <strong>WEB LOGIN &amp; APP LOGIN RELATED QUERIES</strong>
-            <small>Technical &amp; login support</small>
-          </span>
-          <span class="acc-meta">
-            <svg class="call-icon" viewBox="0 0 24 24">
-              <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
-            </svg>
-            <i class="chev"></i>
-          </span>
-        </button>
-        <div class="acc-content">
-          <p></p>
-          <ul class="contact-list">
-            <li>
-              <svg class="phone-icon" viewBox="0 0 24 24">
-                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
-              </svg>
-              <a href="tel:+919360644836">93606 44836</a>
-            </li>
-            <li>
-              <svg class="phone-icon" viewBox="0 0 24 24">
-                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
-              </svg>
-              <a href="tel:+919361048223">93610 48223</a>
-            </li>
-            <li>
-              <svg class="phone-icon" viewBox="0 0 24 24">
-                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
-              </svg>
-              <a href="tel:+919342554546">93425 54546</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
+     
       <!-- OFFLINE ADMISSION -->
       <div class="acc-item">
         <button class="acc-btn" aria-expanded="false">
@@ -365,6 +327,47 @@
           </ul>
         </div>
       </div>
+
+       <!-- WEB & APP LOGIN QUERIES -->
+      <div class="acc-item">
+        <button class="acc-btn" aria-expanded="false">
+          <span class="acc-text">
+            <strong>WEB LOGIN &amp; APP LOGIN RELATED QUERIES</strong>
+            <small>Technical &amp; login support</small>
+          </span>
+          <span class="acc-meta">
+            <svg class="call-icon" viewBox="0 0 24 24">
+              <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+            </svg>
+            <i class="chev"></i>
+          </span>
+        </button>
+        <div class="acc-content">
+          <p></p>
+          <ul class="contact-list">
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919360644836">93606 44836</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919361048223">93610 48223</a>
+            </li>
+            <li>
+              <svg class="phone-icon" viewBox="0 0 24 24">
+                <path d="M6.6 2l3.1.6c.4.1.7.3.9.7l1.4 3c.3.6.1 1.3-.4 1.7l-1.8 1.4c1 2 2.7 3.7 4.8 4.8l1.4-1.8c.4-.5 1.1-.7 1.7-.4l3 1.4c.4.2.6.5.7.9l.6 3.1c.2.8-.3 1.6-1.1 1.8-3.3.7-11-2.5-14.3-5.8S5.9 3.3 6.6 2z" />
+              </svg>
+              <a href="tel:+919342554546">93425 54546</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      
       <!-- ONLINE ADMISSION -->
       {{-- <div class="acc-item">
         <button class="acc-btn" aria-expanded="false">
