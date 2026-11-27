@@ -90,7 +90,7 @@
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
             <a href="#">
-              <img alt="image" src="{{asset('img/logo.jpg')}}" class="header-logo" style="height: 70px;" />
+              <img alt="image" src="{{asset('img/Logo1.png')}}" class="header-logo" style="height: 70px; margin: auto;" />
               {{-- <span class="logo-name">{{ env('APP_NAME') }}</span> --}}
             </a>
           </div>
